@@ -5,9 +5,14 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Essenskasse", "Essenskasse\Essenskasse.csproj", "{5A4E46F8-4246-42D3-8301-4AEA18529ACB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modells", "Modells\Modells.csproj", "{5338DBCE-7C6D-4F3D-8ED5-B99206C0C103}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modells", "Modells\Modells.csproj", "{5338DBCE-7C6D-4F3D-8ED5-B99206C0C103}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EssenskasseAPI", "EssenskasseAPI\EssenskasseAPI.csproj", "{8327A0AB-7398-49C7-96D9-AA164F2A4FED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EssenskasseAPI", "EssenskasseAPI\EssenskasseAPI.csproj", "{8327A0AB-7398-49C7-96D9-AA164F2A4FED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{21CE0EAF-2626-4A8B-954A-49788259644A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
