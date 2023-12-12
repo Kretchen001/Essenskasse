@@ -1,0 +1,54 @@
+# template copied and modified from: https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository
+name: Bug Report
+description: Report a Bug
+title: "[Bug]: <title>"
+labels: ["bug"]
+assignees:
+  - Kretchen001
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: Can I contact you per mail? (Optional)
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Please describe the bug in (english or german) and also give a small workaround to reproduce the error.
+      placeholder: text...
+      value: "text..."
+    validations:
+      required: true
+  # - type: dropdown
+  #   id: version
+  #   attributes:
+  #     label: Version
+  #     description: What software-version are you running?
+  #     options:
+  #       - 1.0.0 (Releases)
+  #       - 1.0.1 (Small Fix)
+  #     default: 0
+  #   validations:
+  #     required: true
+  - type: textarea
+    id: additional_information
+    attributes:
+      label: Additional information
+      description: Please copy and paste any relevant log output, other additional information and so on, that can maybe help to fix or reproduce the bug.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Publish?
+      description: I agree that the information I have provided is correct and that my e-mail address will be published alongside my details if I enter them.
+      options:
+        - label: I agree.
+          required: true
+
