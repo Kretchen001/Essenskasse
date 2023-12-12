@@ -1,0 +1,11 @@
+# editor
+.vs/
+.vscode/
+
+# dotnet
+bin/
+obj/
+*.user
+artifacts/
+.dotnet/
+*.binlog
