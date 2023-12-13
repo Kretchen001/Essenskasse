@@ -2,6 +2,9 @@ using Blazored.LocalStorage;
 using Essenskasse.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using Essenskasse.Client.Services;
 
 namespace Essenskasse {
     public class Program {
@@ -19,7 +22,18 @@ namespace Essenskasse {
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             // access to LocalStorage
-            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddBlazoredLocalStorage(config => {
+                config.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                config.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                config.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
+                config.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                config.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                config.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
+                config.JsonSerializerOptions.WriteIndented = false;
+            });
+
+            // add the AppData as Singelton, so by injection the data is everywhere available in the program
+            builder.Services.AddSingleton<AppDataService>();
 
             //await builder.Build().RunAsync(); // <- Old Version
             WebAssemblyHost host = builder.Build();

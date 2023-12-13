@@ -2,7 +2,7 @@
     public static class LocalizerSettings {
 
         public static CultureWithName NeutralCulture = new CultureWithName(
-            name: "German",
+            name: "Deutsch",
             culture: "de-DE"
         );
 
