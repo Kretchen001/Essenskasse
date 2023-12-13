@@ -1,0 +1,8 @@
+﻿.light-theme {
+    --background: white;
+    --font-color: black;
+    --highlight: #F7F7F7;
+    --highlight-two: #E2E3E5;
+    --link: #0366D6;
+    --border-color: #808080;
+}

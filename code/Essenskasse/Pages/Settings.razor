@@ -1,6 +1,10 @@
 ﻿@page "/settings"
 
 @inject IStringLocalizer<App> _loc
+@inject AppDataService AppData
+@inject NavigationManager Navi
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject IJSRuntime JsRuntime
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.settings)]</PageTitle>
 
@@ -17,6 +21,52 @@
     </div>
 </div>
 
-@code {
+<div class="row align-items-center" style="border: 2px solid; border-color: var(--border-color); margin-bottom: 0.5vh;">
+    <div class="col-lg-3">
+        <label>
+            @_loc[nameof(RessourceAppStrings.colortheme)]
+        </label>
+    </div>
+    <div class="col-lg-6" style="">
+        <select @bind="@currentTheme" style="width: 100%;">
+            @foreach (var entity in themeList) {
+                <option value="@entity.Key">@entity.Value</option>
+            }
+        </select>
+    </div>
+    <div class="col-lg-3 text-center">
+        <button @onclick="() => saveUserThemePersistentAsync()">
+            @_loc[nameof(RessourceAppStrings.savePermanent)]
+        </button>
+    </div>
+</div>
 
+@code {
+    /// <summary> Set the current selection to the AppData. </summary>
+    private string currentTheme {
+        get {
+            return AppData.ColorTheme;
+        }
+        set {
+            AppData.ColorTheme = value;
+            Navi.NavigateTo("/settings"); // needed, so the change is shown directly
+        }
+    }
+
+    /// <summary> Hold the entities for theme-selection. </summary>
+    private Dictionary<string, string> themeList = new Dictionary<string, string>() {
+        { "light-theme", "Hell" },    
+        { "dark-theme", "Dunkel" }   
+    };
+
+    /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>
+    private async void saveUserThemePersistentAsync() {
+        try {
+            await LocalStorage.SetItemAsStringAsync("UserTheme", currentTheme);
+            await JsRuntime.InvokeVoidAsync("alert", string.Format("Farbschema {0} erfolgreich festgelegt.", currentTheme));
+        }
+        catch {
+            await JsRuntime.InvokeVoidAsync("alert", "Fehler beim Speichern.");
+        }
+    }
 }

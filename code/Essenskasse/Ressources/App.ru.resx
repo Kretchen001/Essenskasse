@@ -117,8 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="colortheme" xml:space="preserve">
+    <value>Цветовая схема</value>
+  </data>
+  <data name="english" xml:space="preserve">
+    <value>Английский</value>
+  </data>
+  <data name="german" xml:space="preserve">
+    <value>Немецкий</value>
+  </data>
   <data name="language" xml:space="preserve">
     <value>Языки</value>
+  </data>
+  <data name="russian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+  <data name="savePermanent" xml:space="preserve">
+    <value>Сохранить навсегда</value>
   </data>
   <data name="settings" xml:space="preserve">
     <value>Настройки</value>

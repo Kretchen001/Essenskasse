@@ -2,6 +2,8 @@
 
     public enum RessourceAppStrings {
         settings,
-        language
+        language,
+        colortheme,
+        savePermanent
     }
 }
