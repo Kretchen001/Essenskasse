@@ -1,13 +1,15 @@
 ﻿@page "/settings"
 
-<PageTitle>Einstellungen</PageTitle>
+@inject IStringLocalizer<App> _loc
 
-<h3>Einstellungen</h3>
+<PageTitle>@_loc[nameof(RessourceAppStrings.settings)]</PageTitle>
+
+<h3>@_loc[nameof(RessourceAppStrings.settings)]</h3>
 
 <div class="row">
     <div class="col-lg-4">
         <label>
-            Sprache
+            @_loc[nameof(RessourceAppStrings.language)]
         </label>
     </div>
     <div class="col-lg-8" align="center">

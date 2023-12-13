@@ -4,7 +4,12 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 namespace Essenskasse {
     public class Program {
         public static async Task Main(string[] args) {
-            var builder = WebAssemblyHostBuilder.CreateDefault(args);
+            WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
+            
+            builder.Services.AddLocalization(options => {
+                options.ResourcesPath = "Ressources";
+            });
+
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
