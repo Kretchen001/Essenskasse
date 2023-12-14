@@ -1,9 +1,4 @@
-﻿main {
-    background: var(--background);
-    color: var(--font-color);
-}
-
-html, body {
+﻿html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -13,16 +8,6 @@ h1:focus {
 
 a, .btn-link {
     color: #0071c1;
-    color: var(--link);
-}
-
-.alert-secondary {
-    background-color: var(--highlight-two);
-    color: var(--font-color);
-}
-
-.table {
-    color: var(--font-color)
 }
 
 .btn-primary {
