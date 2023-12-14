@@ -5,12 +5,13 @@
 @inject NavigationManager Navi
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject IJSRuntime JsRuntime
+@inject ThemeService themeService
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.settings)]</PageTitle>
 
 <h3>@_loc[nameof(RessourceAppStrings.settings)]</h3>
 
-<div class="row">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
     <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.language)]
@@ -21,7 +22,7 @@
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: var(--border-color); margin-bottom: 0.5vh;">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
     <div class="col-lg-3">
         <label>
             @_loc[nameof(RessourceAppStrings.colortheme)]
@@ -42,21 +43,29 @@
 </div>
 
 @code {
-    /// <summary> Set the current selection to the AppData. </summary>
-    private string currentTheme {
-        get {
-            return AppData.ColorTheme;
+    ColorCode colorCode = 0;
+
+    private void ChangeTheme(string value) {
+        if (value.Equals("Dark")) {
+            colorCode = ColorCode.Dark;
         }
-        set {
-            AppData.ColorTheme = value;
-            Navi.NavigateTo("/settings"); // needed, so the change is shown directly
+        else if (value.Equals("Light")) {
+            colorCode = ColorCode.Light;
+        }
+        themeService.ThemeCode = colorCode;
+    }
+    /// <summary> Set the current selection to the ThemeService. </summary>
+    private string currentTheme {
+        set => ChangeTheme(value);
+        get {
+            return themeService.ThemeCode.ToString();
         }
     }
 
     /// <summary> Hold the entities for theme-selection. </summary>
     private Dictionary<string, string> themeList = new Dictionary<string, string>() {
-        { "light-theme", "Hell" },    
-        { "dark-theme", "Dunkel" }   
+        { "Light", "Hell" },    
+        { "Dark", "Dunkel" }   
     };
 
     /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>

@@ -14,6 +14,19 @@
         <link href="manifest.webmanifest" rel="manifest" />
         <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
         <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+    
+        <style>
+            body.Dark, .Dark button {
+                color: #EEEEEE;
+                background-color: #2D2D2D;
+                border-color: #FFFFFF;
+            }
+            body.Light, .Light button {
+                color: #000000;
+                background-color: #FFFFFF;
+                border-color: #000000;
+            }
+        </style>
     </head>
 
 
@@ -33,6 +46,23 @@
         </div>
         <script src="_framework/blazor.webassembly.js"></script>
         <script>navigator.serviceWorker.register('service-worker.js');</script>
+
+        <script>
+            window.ChangeTheme = (colorCode, oldColorCode) => {
+                switch (colorCode) {
+                    case "Light": {
+                        window.document.body.classList.remove(oldColorCode);
+                        window.document.body.classList.add("Light");
+                        break;
+                    }
+                    case "Dark": {
+                        window.document.body.classList.remove(oldColorCode);
+                        window.document.body.classList.add("Dark");
+                        break;
+                    }
+                }
+            }
+        </script>
     </body>
 
 </html>

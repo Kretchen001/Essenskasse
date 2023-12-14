@@ -35,6 +35,9 @@ namespace Essenskasse {
             // add the AppData as Singelton, so by injection the data is everywhere available in the program
             builder.Services.AddSingleton<AppDataService>();
 
+            // add the ThemeService as a Simgleton to access it by injection
+            builder.Services.AddSingleton<ThemeService>();
+
             //await builder.Build().RunAsync(); // <- Old Version
             WebAssemblyHost host = builder.Build();
             await host.SetDefaultCulture();

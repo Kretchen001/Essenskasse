@@ -2,6 +2,7 @@
 
 @inject AppDataService AppData
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject ThemeService themeService
 
 <div class="page">
     <div class="sidebar">
@@ -22,9 +23,6 @@
 </div>
 
 @code {
-    private string GetCssClass() {
-        return AppData.ColorTheme;
-    }
 
     protected override async Task OnInitializedAsync() {
         await collectUserThemeAsync();
@@ -33,12 +31,12 @@
     /// <summary> Request the LocalStorage for a saved theme. If no one is found is the light-theme selected. </summary>
     private async Task collectUserThemeAsync() {
         switch (await LocalStorage.GetItemAsStringAsync("UserTheme")) {
-            case "dark-theme": {
-                    AppData.ColorTheme = "dark-theme";
+            case "Dark": {
+                    themeService.ThemeCode = ColorCode.Dark;
                     break;
                 }
             default: { // ^= light-theme
-                    AppData.ColorTheme = "light-theme";
+                    themeService.ThemeCode = ColorCode.Light;
                     break;
                 }
         }
