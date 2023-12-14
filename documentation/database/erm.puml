@@ -1,0 +1,40 @@
+@startuml Database
+
+    entity Provider <<Anbieter>>  {
+        * Guid : Guid <<PK>>
+        --
+        * Designator : string
+    }
+
+    entity Person {
+        * Guid : Guid <<PK>>
+        --
+        * Name : string
+        * Email : string
+        * Saldo : Money
+        saldo : Money
+
+    }
+
+    entity Order <<Bestellung>> {
+        * Guid : Guid <<PK>>
+        --
+        * ReferencedPerson : Guid <<FK>>
+        * DateTime : DateTime
+        * Money : Money
+        * Provider : Anbieter
+    }
+
+    entity Payment <<Einzahlung>> {
+        * Guid : Guid <<PK>>
+        --
+        * ReferencedPerson : Guid <<FK>>
+        * DateTime : DateTime
+        * Money : Money
+    }
+
+    Order ||-right-o{ Person : n..1
+    Payment ||-left-o{ Person : 1..m
+    Order ||-down-|| Provider : n..1
+
+@enduml
