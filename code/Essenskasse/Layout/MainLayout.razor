@@ -1,16 +1,44 @@
 ﻿@inherits LayoutComponentBase
+
+@inject AppDataService AppData
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject ThemeService themeService
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
 
     <main>
+        @*
         <div class="top-row px-4">
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
+        *@
 
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code {
+
+    protected override async Task OnInitializedAsync() {
+        await collectUserThemeAsync();
+    }
+
+    /// <summary> Request the LocalStorage for a saved theme. If no one is found is the light-theme selected. </summary>
+    private async Task collectUserThemeAsync() {
+        switch (await LocalStorage.GetItemAsStringAsync("UserTheme")) {
+            case "Dark": {
+                    themeService.ThemeCode = ColorCode.Dark;
+                    break;
+                }
+            default: { // ^= light-theme
+                    themeService.ThemeCode = ColorCode.Light;
+                    break;
+                }
+        }
+    }
+}

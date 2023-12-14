@@ -1,0 +1,81 @@
+﻿@page "/settings"
+
+@inject IStringLocalizer<App> _loc
+@inject AppDataService AppData
+@inject NavigationManager Navi
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject IJSRuntime JsRuntime
+@inject ThemeService themeService
+
+<PageTitle>@_loc[nameof(RessourceAppStrings.settings)]</PageTitle>
+
+<h3>@_loc[nameof(RessourceAppStrings.settings)]</h3>
+
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-4">
+        <label>
+            @_loc[nameof(RessourceAppStrings.language)]
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        <CultureSelector />
+    </div>
+</div>
+
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-3">
+        <label>
+            @_loc[nameof(RessourceAppStrings.colortheme)]
+        </label>
+    </div>
+    <div class="col-lg-6" style="">
+        <select @bind="@currentTheme" style="width: 100%;">
+            @foreach (var entity in themeList) {
+                <option value="@entity.Key">@entity.Value</option>
+            }
+        </select>
+    </div>
+    <div class="col-lg-3 text-center">
+        <button @onclick="() => saveUserThemePersistentAsync()">
+            @_loc[nameof(RessourceAppStrings.savePermanent)]
+        </button>
+    </div>
+</div>
+
+@code {
+    ColorCode colorCode = 0;
+
+    private void ChangeTheme(string value) {
+        if (value.Equals("Dark")) {
+            colorCode = ColorCode.Dark;
+        }
+        else if (value.Equals("Light")) {
+            colorCode = ColorCode.Light;
+        }
+        themeService.ThemeCode = colorCode;
+    }
+    /// <summary> Set the current selection to the ThemeService. </summary>
+    private string currentTheme {
+        set => ChangeTheme(value);
+        get {
+            return themeService.ThemeCode.ToString();
+        }
+    }
+
+    /// <summary> Hold the entities for theme-selection. </summary>
+    private Dictionary<string, string> themeList = new Dictionary<string, string>() {
+        { "Light", "Hell" },    
+        { "Dark", "Dunkel" }   
+    };
+
+    /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>
+    private async void saveUserThemePersistentAsync() {
+        try {
+            await LocalStorage.SetItemAsStringAsync("UserTheme", currentTheme);
+            await JsRuntime.InvokeVoidAsync("alert", string.Format("Farbschema {0} erfolgreich festgelegt.", currentTheme));
+        }
+        catch {
+            await JsRuntime.InvokeVoidAsync("alert", "Fehler beim Speichern.");
+        }
+    }
+}
