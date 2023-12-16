@@ -4,6 +4,14 @@
         settings,
         language,
         colortheme,
-        savePermanent
+        savePermanent,
+        provider,
+        english,
+        german,
+        russian,
+        available,
+        add,
+        addNewProvider,
+        submit
     }
 }

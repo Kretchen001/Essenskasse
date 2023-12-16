@@ -20,6 +20,9 @@ namespace EssenskasseAPI {
                 app.UseSwaggerUI();
             }
 
+            // Allow CORS
+            app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
