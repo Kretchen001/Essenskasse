@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="addNewProvider" xml:space="preserve">
+    <value>Add new provider.</value>
+  </data>
   <data name="available" xml:space="preserve">
-    <value>Verfügbar</value>
+    <value>Available</value>
   </data>
   <data name="colortheme" xml:space="preserve">
     <value>Colortheme</value>
@@ -143,5 +149,8 @@
   </data>
   <data name="settings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="submit" xml:space="preserve">
+    <value>Submit!</value>
   </data>
 </root>

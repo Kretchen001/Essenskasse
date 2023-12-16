@@ -25,6 +25,34 @@
 <h2>@_loc[nameof(RessourceAppStrings.provider)]</h2>
 <div class="row">
     <h4 style="margin-top: 1rem;">
+        @_loc[nameof(RessourceAppStrings.add)]
+    </h4>
+    @if (!accessToAdd) {
+        <button style="width: fit-content;"
+                @onclick="() => {accessToAdd = true;}">
+            @_loc[nameof(RessourceAppStrings.addNewProvider)]
+        </button>
+    }
+    else {
+        <div class="col-lg-2">
+            <label style="vertical-align: middle;">
+                @_loc[nameof(RessourceAppStrings.add)]
+            </label>
+        </div>
+        <div class="col-lg-8">
+            <input type="text" name="nameHinzuzufuegen" id="idHinzuzufuegen"
+                   style="width: 100%;" @bind-value="newProviderDesignation">
+        </div>
+        <div class="col-lg-2">
+            <button @onclick="() => addNewAnbieter()">
+                @_loc[nameof(RessourceAppStrings.submit)]
+            </button>
+        </div>
+    }
+</div>
+<br />
+<div class="row">
+    <h4 style="margin-top: 1rem;">
         @_loc[nameof(RessourceAppStrings.available)]
     </h4>
     <div class="col-lg-12">
@@ -44,6 +72,10 @@
 </div>
 
 @code {
+    private bool accessToAdd = false;
+
+    private string newProviderDesignation = "";
+
     List<Provider> providers = new List<Provider>();
 
     protected override async Task OnInitializedAsync() {
@@ -66,6 +98,32 @@
             await JSRuntime.InvokeVoidAsync("alert", "Keine API Verbindung möglich!");
         }
     }
+
+    private async void addNewAnbieter() {
+        if (newProviderDesignation.Equals("")) {
+            return;
+        }
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(Config["API-Adress"] + "provider/new"),
+                Headers = {
+                        {"name", Uri.EscapeDataString(newProviderDesignation)}
+                    }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            string temp = await response.Content.ReadAsStringAsync();
+            providers.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
+            await JSRuntime.InvokeVoidAsync("alert", "Anbieter " + newProviderDesignation + " hinzugefügt");
+        }
+
+        newProviderDesignation = "";
+        accessToAdd = false;
+        base.StateHasChanged();
+    }
+
                 return;
     }
 }

@@ -9,6 +9,9 @@
         english,
         german,
         russian,
-        available
+        available,
+        add,
+        addNewProvider,
+        submit
     }
 }
