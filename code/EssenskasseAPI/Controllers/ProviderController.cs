@@ -15,6 +15,7 @@ namespace EssenskasseAPI.Controllers {
         [Route("requestAll")]
         public IActionResult GetAllProvider() {
             List<Provider> provider = _providerController.RequestProvider();
+            provider.ForEach(x => x.Designation = Uri.EscapeDataString(x.Designation));
 
             if (provider is not null) {
                 return Ok(JsonConvert.SerializeObject(provider));
@@ -44,6 +45,7 @@ namespace EssenskasseAPI.Controllers {
         [Route("new")]
         public IActionResult AddProvider([FromHeader] string? name) {
             if (name is not null) {
+                name = Uri.UnescapeDataString(name);
                 Provider newProvider = new Provider(name);
                 if (_providerController.SaveProvider(newProvider)) {
                     return Ok(newProvider.Guid);
