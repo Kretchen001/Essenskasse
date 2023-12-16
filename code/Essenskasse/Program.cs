@@ -10,7 +10,7 @@ namespace Essenskasse {
     public class Program {
         public static async Task Main(string[] args) {
             WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
-            
+
             // access to Localization
             builder.Services.AddLocalization(options => {
                 options.ResourcesPath = "Ressources";
