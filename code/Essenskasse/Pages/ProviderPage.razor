@@ -7,8 +7,9 @@
 
 <style>
     table, th, td {
-        border:1px solid gray;
+        border: 1px solid gray;
     }
+
     /* Width of the rows */
     th:nth-child(1), td:nth-child(1) {
         width: 33% !important; /* first row 33% of the table*/
@@ -32,7 +33,7 @@
                 <th style="padding-left: 5px;">Guid</th>
                 <th style="padding-left: 5px;">Bezeichnung</th>
             </tr>
-            @foreach(Provider x in providers) {
+            @foreach (Provider x in providers) {
                 <tr>
                     <td style="padding-left: 5px;">@x.Guid</td>
                     <td style="padding-left: 5px;">@x.Designation</td>
@@ -65,3 +66,5 @@
         }
     }
                 return;
+    }
+}
