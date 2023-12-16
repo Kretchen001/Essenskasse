@@ -70,11 +70,42 @@
         </table>
     </div>
 </div>
+<br />
+<div class="row">
+    <h4 style="margin-top: 1rem;">
+        Entfernen eines Eintrages
+    </h4>
+    @if (!accessToDelete) {
+        <button style="width: fit-content;"
+                @onclick="() => {accessToDelete = true;}">
+            Anbieter entfernen?
+        </button>
+    }
+    else {
+        <div class="col-lg-2">
+            <label style="vertical-align: middle;">
+                Guid des zu entfernenden Anbieters
+            </label>
+        </div>
+        <div class="col-lg-8">
+            <input type="text" name="nameHinzuzufuegen" id="idHinzuzufuegen"
+                   style="width: 100%; vertical-align: middle;"
+                   @bind-value="providerToDeleteGuid">
+        </div>
+        <div class="col-lg-2" style="vertical-align: middle;">
+            <button @onclick="() => deleteAnbieter()">
+                Löschen!
+            </button>
+        </div>
+    }
+</div>
 
 @code {
     private bool accessToAdd = false;
+    private bool accessToDelete = false;
 
     private string newProviderDesignation = "";
+    private string providerToDeleteGuid = "";
 
     List<Provider> providers = new List<Provider>();
 
@@ -124,6 +155,38 @@
         base.StateHasChanged();
     }
 
+    private async Task deleteAnbieter() {
+        Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
+        if (tempAnbieter is null) {
+            await JSRuntime.InvokeVoidAsync("alert", "Guid nicht vergeben!");
+            return;
+        }
+        if (await JSRuntime.InvokeAsync<bool>(
+                            "confirm",
+                            "Wollen sie den Anbieter - " +
+                            tempAnbieter.Designation +
+                            " - wirklich löschen?")) {
+            // Bestätigt, also lösche
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Delete,
+                    RequestUri = new Uri(Config["API-Adress"] + "provider/remove"),
+                    Headers = {
+                        {"guid", providerToDeleteGuid}
+                    }
+                };
+
+            var response = await HttpClient.SendAsync(httpRequestMessage);
+
+            if (response.IsSuccessStatusCode) {
+                Provider temp = JsonConvert.DeserializeObject<Provider>(await response.Content.ReadAsStringAsync())!;
+                await JSRuntime.InvokeVoidAsync("alert", "Person " + temp.Designation + " erfolgreich entfernt!");
+                providers.Remove(tempAnbieter);
+                accessToDelete = false;
+                providerToDeleteGuid = "";
+                base.StateHasChanged();
                 return;
+            }
+            await JSRuntime.InvokeVoidAsync("alert", "Hat nicht geklappt!");
+        }
     }
 }
