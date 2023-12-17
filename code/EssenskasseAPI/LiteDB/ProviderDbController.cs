@@ -2,6 +2,8 @@
 using Modells;
 
 namespace EssenskasseAPI.LiteDB {
+
+    /// <summary></summary>
     public class ProviderDbController {
 
         #region Config
@@ -84,13 +86,13 @@ namespace EssenskasseAPI.LiteDB {
         }
 
         /// <summary>Remove one provider from the database.</summary>
-        /// <param name="Provider"></param>
+        /// <param name="provider"></param>
         /// <returns>Success?</returns>
-        public bool RemoveProvider(Provider Provider) {
+        public bool RemoveProvider(Provider provider) {
             using (LiteDatabase db = new LiteDatabase(saveDir)) {
                 ILiteCollection<Provider> col = db.GetCollection<Provider>(tableName);
 
-                return col.Delete(Provider.Guid);
+                return col.Delete(provider.Guid);
             }
         }
         #endregion
