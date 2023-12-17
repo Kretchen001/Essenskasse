@@ -2,6 +2,8 @@
 using Modells;
 
 namespace EssenskasseAPI.LiteDB {
+
+    /// <summary></summary>
     public class ProviderDbController {
 
         #region Config
