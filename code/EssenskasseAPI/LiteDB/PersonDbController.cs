@@ -42,6 +42,43 @@ namespace EssenskasseAPI.LiteDB {
             }
         }
 
+        /// <summary>Update a person in the database.</summary>
+        /// <param name="person">Information to update person.</param>
+        /// <returns>Success?</returns>
+        public bool UpdatePerson(Person person) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
+
+                bool updated = col.Update(person.Guid, person);
+
+                if (updated) {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        /// <summary>Request all person, that are saved in the database.</summary>
+        /// <returns>List of all person.</returns>
+        public List<Person> RequestAllPerson() {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
+
+                return col.FindAll().ToList();
+            }
+        }
+
+        /// <summary>Search a person with the Guid.</summary>
+        /// <param name="guid">Guid of the search person</param>
+        /// <returns>Person if it is there</returns>
+        public Person? PersonPerGuid(Guid guid) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
+                Person? result = col.Query().Where(x => x.Guid.Equals(guid)).SingleOrDefault();
+                
+                return result;
+            }
+        }
         #endregion
     }
 }
