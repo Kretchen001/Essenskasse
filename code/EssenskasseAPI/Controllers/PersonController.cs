@@ -19,7 +19,7 @@ namespace EssenskasseAPI.Controllers {
             if (persons is not null) {
                 foreach (Person x in persons) {
                     x.Name = Uri.EscapeDataString(x.Name);
-                    x.Email = Uri.EscapeDataString(x.Email);
+                    x.Email = Uri.EscapeDataString(x.Email ?? "");
                 }
                 return Ok(JsonConvert.SerializeObject(persons));
             }
@@ -79,6 +79,24 @@ namespace EssenskasseAPI.Controllers {
                 }
                 else {
                     return BadRequest("Änderungen konnten nicht übernommen werden. Bitte beim Admin melden.");
+                }
+            }
+            else {
+                return NoContent();
+            }
+        }
+
+        [HttpDelete]
+        [Route("remove")]
+        public IActionResult RemovePerson([FromHeader] Guid? guid) {
+            if (guid is not null) {
+                Person? result = _personController.ExistPerson(guid ?? null, null);
+                if (result is not null) {
+                    _personController.RemovePerson(result);
+                    return Ok(JsonConvert.SerializeObject(result));
+                }
+                else {
+                    return BadRequest("Person konnte nicht gefunden werden!");
                 }
             }
             else {

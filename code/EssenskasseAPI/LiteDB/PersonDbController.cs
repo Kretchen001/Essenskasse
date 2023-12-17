@@ -79,6 +79,49 @@ namespace EssenskasseAPI.LiteDB {
                 return result;
             }
         }
+
+        /// <summary>Search a person with the name.</summary>
+        /// <param name="name">Name of the search person</param>
+        /// <returns>Person if it is there.</returns>
+        public Person? PersonPerName(string name) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
+                Person? result = col.Query().Where(x => x.Name.Equals(name)).SingleOrDefault();
+
+                return result;
+            }
+        }
+
+        /// <summary></summary>
+        /// <param name="guid"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Person? ExistPerson(Guid? guid, string? name) {
+            if (guid is null) {
+                return null;
+            }
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
+
+                Person? result = col.Find(x => x.Guid == guid).SingleOrDefault();
+                if (result is null) {
+                    name ??= ""; // if name is null then ""
+                    result = col.Find(x => x.Name.Equals(name)).SingleOrDefault();
+                }
+                return result;
+            }
+        }
+
+        /// <summary>Remove one person from the database.</summary>
+        /// <param name="person"></param>
+        /// <returns>Success?</returns>
+        public bool RemovePerson(Person person) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
+
+                return col.Delete(person.Guid);
+            }
+        }
         #endregion
     }
 }

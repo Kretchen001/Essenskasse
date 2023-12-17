@@ -27,10 +27,10 @@ namespace Modells {
         /// <param name="name"></param>
         /// <param name="email"></param>
         [JsonConstructor]
-        public Person(Guid guid, string name, string email) {
+        public Person(Guid guid, string name, string? email) {
             Guid = guid;
             Name = name;
-            Email = email;
+            Email = email ?? "";
         }
 
         /// <summary></summary>
