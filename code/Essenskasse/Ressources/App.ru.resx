@@ -123,6 +123,9 @@
   <data name="addNewProvider" xml:space="preserve">
     <value>Добавить нового провайдера.</value>
   </data>
+  <data name="addPerson" xml:space="preserve">
+    <value>NOCH HINZUFÜGEN</value>
+  </data>
   <data name="available" xml:space="preserve">
     <value>Доступно</value>
   </data>
@@ -137,6 +140,9 @@
   </data>
   <data name="language" xml:space="preserve">
     <value>Языки</value>
+  </data>
+  <data name="person" xml:space="preserve">
+    <value>NOCH EINTRAGEN</value>
   </data>
   <data name="provider" xml:space="preserve">
     <value>Поставщик</value>

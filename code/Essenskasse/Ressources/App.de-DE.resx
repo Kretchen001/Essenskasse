@@ -123,6 +123,9 @@
   <data name="addNewProvider" xml:space="preserve">
     <value>Neuen Anbieter hinzufügen.</value>
   </data>
+  <data name="addPerson" xml:space="preserve">
+    <value>Person hinzufügen</value>
+  </data>
   <data name="available" xml:space="preserve">
     <value>Verfügbar</value>
   </data>
@@ -137,6 +140,9 @@
   </data>
   <data name="language" xml:space="preserve">
     <value>Sprache</value>
+  </data>
+  <data name="person" xml:space="preserve">
+    <value>Personen</value>
   </data>
   <data name="provider" xml:space="preserve">
     <value>Anbieter</value>

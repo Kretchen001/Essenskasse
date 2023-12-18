@@ -1,0 +1,53 @@
+﻿@page "/person"
+
+@inject IStringLocalizer<App> _loc
+
+<style>
+    table, th, td {
+        border: 1px solid gray;
+    }
+
+    th:nth-child(1), td:nth-child(1) {
+        width: 30% !important; /* First row 30% width */
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+        width: 30% !important; /* Secound row 30% width (60%) */
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 40% !important; /* Third row 40% width (100%) */
+    }
+</style>
+
+<PageTitle>@_loc[nameof(RessourceAppStrings.person)]</PageTitle>
+
+<h2>@_loc[nameof(RessourceAppStrings.person)]</h2>
+<div class="row">
+    <h4 style="margin-top: 1rem;">
+        Personen registriert
+    </h4>
+    <table>
+        <tr>
+            <th style="padding-left: 5px;">Guid</th>
+            <th style="padding-left: 5px;">Name</th>
+            <th style="padding-left: 5px;">E-Mail</th>
+        </tr>
+        @foreach (var x in person) {
+            <tr>
+                <td style="padding-left: 5px;">@x.Guid</td>
+                <td style="padding-left: 5px;">@x.Name</td>
+                <td style="padding-left: 5px;">@x.Email</td>
+            </tr>
+        }
+    </table>
+</div>
+
+@code {
+    private List<Person> person = new List<Person>();
+
+    protected override async Task OnInitializedAsync () {
+        // Request all Person, that are saved in the database
+    }
+
+}

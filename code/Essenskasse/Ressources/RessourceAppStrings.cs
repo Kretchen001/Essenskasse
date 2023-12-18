@@ -12,6 +12,8 @@
         available,
         add,
         addNewProvider,
-        submit
+        submit,
+        person,
+        addPerson
     }
 }
