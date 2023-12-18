@@ -25,6 +25,39 @@
 <h2>@_loc[nameof(RessourceAppStrings.person)]</h2>
 <div class="row">
     <h4 style="margin-top: 1rem;">
+        @_loc[nameof(RessourceAppStrings.addPerson)]
+    </h4>
+    @if (!accessToAdd) {
+        <button style="width: fit-content;"
+        @onclick="() => {accessToAdd = true;}">
+            Neue Person hinzufügen.
+        </button>
+    }
+    else {
+        <div class="col-lg-2">
+            <label style="vertical-align: middle;">
+                Hinzuzufügen
+            </label>
+        </div>
+        <div class="col-lg-8">
+            <div class="row">
+                <input type="text" name="nameHinzuzufuegen" placeholder="Name" id="idHinzuzufuegen"
+                       style="width: 100%;" @bind-value="newPersonName">
+            </div>
+            <div class="row">
+                <input type="text" name="nameHinzuzufuegen" placeholder="E-Mail" id="idHinzuzufuegen"
+                       style="width: 100%;" @bind-value="newPersonEmail">
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <button @onclick="() => { addNewPerson(); }">
+                Abschicken!
+            </button>
+        </div>
+    }
+</div>
+<div class="row">
+    <h4 style="margin-top: 1rem;">
         Personen registriert
     </h4>
     <table>
@@ -44,10 +77,20 @@
 </div>
 
 @code {
+    private bool accessToAdd = false;
+
+    private string newPersonName = "";
+    private string newPersonEmail = "";
+
     private List<Person> person = new List<Person>();
 
     protected override async Task OnInitializedAsync () {
         // Request all Person, that are saved in the database
     }
 
+    private async void addNewPerson() {
+        if (newPersonName.Equals("")) {
+            return;
+        }
+    }
 }
