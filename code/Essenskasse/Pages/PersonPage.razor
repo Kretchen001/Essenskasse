@@ -82,7 +82,7 @@
     <h4 style="margin-top: 1rem;">
         Person bearbeiten
     </h4>
-    <EditPersonCard />
+    <EditPersonCard OnChangeCommit="ChangeOfPersonCommit" />
 </div>
 
 @code {
@@ -94,6 +94,10 @@
     private List<Person> person = new List<Person>();
 
     protected override async Task OnInitializedAsync () {
+        await requestAllPersonFromApiAsync();
+    }
+
+    private async Task requestAllPersonFromApiAsync() {
         // Request all Person, that are saved in the database
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -154,5 +158,10 @@
                 base.StateHasChanged();
             }
         }
+    }
+
+    private async void ChangeOfPersonCommit() {
+        await requestAllPersonFromApiAsync();
+        base.StateHasChanged();
     }
 }
