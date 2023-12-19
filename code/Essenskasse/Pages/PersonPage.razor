@@ -1,5 +1,8 @@
 ﻿@page "/person"
 
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
 
 <style>
@@ -103,6 +106,47 @@
     private async void addNewPerson() {
         if (newPersonName.Equals("")) {
             return;
+        }
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(Config["API-Adress"] + "person/new"),
+                Headers = {
+                        {"name", Uri.EscapeDataString(newPersonName)},
+                        {"email", Uri.EscapeDataString(newPersonEmail)}
+                    }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            string tempGuid = await response.Content.ReadAsStringAsync();
+            HttpRequestMessage httpRequestMessage2 = new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "person/perGuid"),
+                    Headers = {
+                        {"guid", tempGuid[1..(tempGuid.Length - 1)] }
+                    }
+                };
+
+            HttpResponseMessage response2 = await HttpClient.SendAsync(httpRequestMessage2);
+
+            if (response2.IsSuccessStatusCode) {
+                Person temp = JsonConvert.DeserializeObject<Person>(await response2.Content.ReadAsStringAsync())!;
+                temp.Name = Uri.UnescapeDataString(temp.Name);
+                temp.Email = Uri.UnescapeDataString(temp.Email);
+                person.Add(temp);
+                await JSRuntime.InvokeVoidAsync("alert", "" + newPersonName + " hinzugefügt und verfügbar");
+                accessToAdd = false;
+                newPersonName = newPersonEmail = "";
+                base.StateHasChanged();
+            }
+            else {
+                await JSRuntime.InvokeVoidAsync("alert", "" + newPersonName + " hinzugefügt\n\n ABER nicht abrufbar!!!");
+                accessToAdd = false;
+                newPersonName = "";
+                newPersonEmail = "";
+                base.StateHasChanged();
+            }
         }
     }
 }

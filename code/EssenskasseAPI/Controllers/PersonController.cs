@@ -34,7 +34,7 @@ namespace EssenskasseAPI.Controllers {
             Person? person = _personController.PersonPerGuid(guid);
             if (person is not null) {
                 person.Name = Uri.EscapeDataString(person.Name);
-                person.Email = Uri.EscapeDataString(person.Email);
+                person.Email = Uri.EscapeDataString(person.Email ?? "");
                 return Ok(JsonConvert.SerializeObject(person));
             }
             else {
@@ -46,10 +46,12 @@ namespace EssenskasseAPI.Controllers {
         [Route("new")]
         public IActionResult AddNewPerson([FromHeader] string? name,
                                             [FromHeader] string? email) {
-            if (name is not null) {
-                Person newPerson = new Person(name, email);
+            if (name is not null) { 
+                Person newPerson = new Person(
+                    Uri.UnescapeDataString(name),
+                    Uri.UnescapeDataString(email ?? ""));
                 if (_personController.SavePerson(newPerson)) {
-                    return Ok(newPerson.Guid);
+                    return Ok(JsonConvert.SerializeObject(newPerson.Guid));
                 }
                 else {
                     return BadRequest("Person konnte nicht eingefügt werden. Bitte Admin benachrichten.");
