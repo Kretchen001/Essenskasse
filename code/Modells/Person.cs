@@ -26,6 +26,18 @@ namespace Modells {
         /// <param name="guid"></param>
         /// <param name="name"></param>
         /// <param name="email"></param>
+        /// <param name="money"></param>
+        public Person(Guid guid, string name, string? email, Money money) {
+            Guid = guid;
+            Name = name;
+            Email = email ?? "";
+            Saldo = money;
+        }
+
+        /// <summary></summary>
+        /// <param name="guid"></param>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
         [JsonConstructor]
         public Person(Guid guid, string name, string? email) {
             Guid = guid;

@@ -1,0 +1,167 @@
+﻿@page "/person"
+
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Config
+@inject IStringLocalizer<App> _loc
+
+<style>
+    table, th, td {
+        border: 1px solid gray;
+    }
+
+    th:nth-child(1), td:nth-child(1) {
+        width: 30% !important; /* First row 30% width */
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+        width: 30% !important; /* Secound row 30% width (60%) */
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 40% !important; /* Third row 40% width (100%) */
+    }
+</style>
+
+<PageTitle>@_loc[nameof(RessourceAppStrings.person)]</PageTitle>
+
+<h2>@_loc[nameof(RessourceAppStrings.person)]</h2>
+<div class="row">
+    <h4 style="margin-top: 1rem;">
+        @_loc[nameof(RessourceAppStrings.addPerson)]
+    </h4>
+    @if (!accessToAdd) {
+        <button style="width: fit-content;"
+        @onclick="() => {accessToAdd = true;}">
+            Neue Person hinzufügen.
+        </button>
+    }
+    else {
+        <div class="col-lg-2">
+            <label style="vertical-align: middle;">
+                Hinzuzufügen
+            </label>
+        </div>
+        <div class="col-lg-8">
+            <div class="row">
+                <input type="text" name="nameHinzuzufuegen" placeholder="Name" id="idHinzuzufuegen"
+                       style="width: 100%;" @bind-value="newPersonName">
+            </div>
+            <div class="row">
+                <input type="text" name="nameHinzuzufuegen" placeholder="E-Mail" id="idHinzuzufuegen"
+                       style="width: 100%;" @bind-value="newPersonEmail">
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <button @onclick="() => { addNewPerson(); }">
+                Abschicken!
+            </button>
+        </div>
+    }
+</div>
+<div class="row">
+    <h4 style="margin-top: 1rem;">
+        Personen registriert
+    </h4>
+    <table>
+        <tr>
+            <th style="padding-left: 5px;">Guid</th>
+            <th style="padding-left: 5px;">Name</th>
+            <th style="padding-left: 5px;">E-Mail</th>
+        </tr>
+        @foreach (var x in person) {
+            <tr>
+                <td style="padding-left: 5px;">@x.Guid</td>
+                <td style="padding-left: 5px;">@x.Name</td>
+                <td style="padding-left: 5px;">@x.Email</td>
+            </tr>
+        }
+    </table>
+</div>
+<div class="row">
+    <h4 style="margin-top: 1rem;">
+        Person bearbeiten
+    </h4>
+    <EditPersonCard OnChangeCommit="ChangeOfPersonCommit" />
+</div>
+
+@code {
+    private bool accessToAdd = false;
+
+    private string newPersonName = "";
+    private string newPersonEmail = "";
+
+    private List<Person> person = new List<Person>();
+
+    protected override async Task OnInitializedAsync () {
+        await requestAllPersonFromApiAsync();
+    }
+
+    private async Task requestAllPersonFromApiAsync() {
+        // Request all Person, that are saved in the database
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
+            person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
+            person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+        }
+    }
+
+    private async void addNewPerson() {
+        if (newPersonName.Equals("")) {
+            return;
+        }
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(Config["API-Adress"] + "person/new"),
+                Headers = {
+                        {"name", Uri.EscapeDataString(newPersonName)},
+                        {"email", Uri.EscapeDataString(newPersonEmail)}
+                    }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            string tempGuid = await response.Content.ReadAsStringAsync();
+            HttpRequestMessage httpRequestMessage2 = new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "person/perGuid"),
+                    Headers = {
+                        {"guid", tempGuid[1..(tempGuid.Length - 1)] }
+                    }
+                };
+
+            HttpResponseMessage response2 = await HttpClient.SendAsync(httpRequestMessage2);
+
+            if (response2.IsSuccessStatusCode) {
+                Person temp = JsonConvert.DeserializeObject<Person>(await response2.Content.ReadAsStringAsync())!;
+                temp.Name = Uri.UnescapeDataString(temp.Name);
+                temp.Email = Uri.UnescapeDataString(temp.Email);
+                person.Add(temp);
+                await JSRuntime.InvokeVoidAsync("alert", "" + newPersonName + " hinzugefügt und verfügbar");
+                accessToAdd = false;
+                newPersonName = newPersonEmail = "";
+                base.StateHasChanged();
+            }
+            else {
+                await JSRuntime.InvokeVoidAsync("alert", "" + newPersonName + " hinzugefügt\n\n ABER nicht abrufbar!!!");
+                accessToAdd = false;
+                newPersonName = "";
+                newPersonEmail = "";
+                base.StateHasChanged();
+            }
+        }
+    }
+
+    private async void ChangeOfPersonCommit() {
+        await requestAllPersonFromApiAsync();
+        base.StateHasChanged();
+    }
+}
