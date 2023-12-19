@@ -1,0 +1,141 @@
+@inject HttpClient HttpClient
+@inject IConfiguration Config
+@inject IJSRuntime JSRuntime
+
+<style>
+    .Rahmen {
+        border: 3px solid;
+        border-color: darkgreen;
+        border-radius: 5px;
+        padding: 0.5rem;
+    }
+
+    .Zeile {
+        margin-top: 0.1rem;
+        margin-bottom: 0.1rem;
+    }
+</style>
+
+<div class="Rahmen">
+    <div class="row Zeile" style="border-bottom: 1px solid; border-bottom-color: lightgray;">
+        <div class="col-lg-4">
+            <label>
+                Guid (nicht änderbar!)
+            </label>
+        </div>
+        <div class="col-lg-8">
+            <input type="text" name="nameHinzuzufuegen" placeholder="Guid" id="idGuid"
+                   style="width: 100%;" @bind-value="selectedPerson">
+        </div>
+    </div>
+    <div class="row Zeile" style="border-bottom: 1px solid; border-bottom-color: lightgray">
+        <div class="col-lg-4">
+            <label>
+                Name
+            </label>
+        </div>
+        <div class="col-lg-8">
+            <input type="text" name="nameHinzuzufuegen" placeholder="Name" id="idName"
+                   style="width: 100%;" @bind-value="person.Name">
+        </div>
+    </div>
+    <div class="row Zeile">
+        <div class="col-lg-4">
+            <label>
+                Email
+            </label>
+        </div>
+        <div class="col-lg-8">
+            <input type="text" name="nameHinzuzufuegen" placeholder="E-Mail" id="idEmail"
+                   style="width: 100%;" @bind-value="person.Email">
+        </div>
+    </div>
+    <div class="row Zeile">
+        <div class="col-lg-2">
+        </div>
+        <div class="col-lg-4">
+            <button @onclick="() => requestPersonFromTheGuidInput()">
+                Daten laden
+            </button>
+        </div>
+        <div class="col-lg-4">
+            <button disabled="@dataNotLoadYet" @onclick="() => commitChangesToApi()">
+                Änderungen akzeptieren
+            </button>
+        </div>
+        <div class="col-lg-2">
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary></summary>
+    [Parameter]
+    public Person person { get; set; } = new Person();
+    private Person safePerson = new Person();
+
+    private string selectedPerson = "";
+
+    private bool dataNotLoadYet = true;
+
+    ElementReference inputTypeFileElement;
+
+    private async void requestPersonFromTheGuidInput () {
+        if (Guid.TryParse(selectedPerson, out _)) {
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/perGuid"),
+                Headers = {
+                    { "guid", Guid.Parse(selectedPerson).ToString() }
+                }
+            };
+
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+            if (response.IsSuccessStatusCode) {
+                person = JsonConvert.DeserializeObject<Person>(await response.Content.ReadAsStringAsync())!;
+                person.Name = Uri.UnescapeDataString(person.Name);
+                person.Email= Uri.UnescapeDataString(person.Email);
+                safePerson = person;
+                dataNotLoadYet = false;
+                base.StateHasChanged();
+            }
+            else {
+                person = new Person(new Guid(), "", "", new Money());
+                await JSRuntime.InvokeVoidAsync("alert", "Person nicht verfügbar!\nBitte Guid überprüfen.");
+            }
+        }
+        else {
+            await JSRuntime.InvokeVoidAsync("alert", "Keine Guid da!");
+        }
+    }
+
+    private async void commitChangesToApi() {
+        if (person.Name.Equals(safePerson.Name) && person.Email.Equals(safePerson.Email)) {
+            await JSRuntime.InvokeVoidAsync("alert", "Keine Änderung!");
+            return;
+        }
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(Config["API-Adress"] + "person/update"),
+                Headers = {
+                    { "guid", Guid.Parse(selectedPerson).ToString() },
+                    { "name", person.Name },
+                    { "email", person.Email }
+                }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            safePerson = new Person(new Guid(), "", "", new Money());
+            person = new Person(new Guid(), "", "", new Money());
+            dataNotLoadYet = true;
+            base.StateHasChanged();
+        }
+        else {
+            person = new Person(new Guid(), "", "", new Money());
+            await JSRuntime.InvokeVoidAsync("alert", "Person nicht verfügbar!\nBitte Guid überprüfen.");
+        }
+    }
+}

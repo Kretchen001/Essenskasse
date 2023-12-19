@@ -70,10 +70,10 @@ namespace EssenskasseAPI.Controllers {
             Person? personToUpdate = _personController.PersonPerGuid(personGuid);
             if (personToUpdate is not null) {
                 if (name is not null) {
-                    personToUpdate.Name = name;
+                    personToUpdate.Name = Uri.UnescapeDataString(name);
                 }
                 if (email is not null) {
-                    personToUpdate.Email = email;
+                    personToUpdate.Email = Uri.UnescapeDataString(email);
                 }
 
                 if (_personController.UpdatePerson(personToUpdate)) {
