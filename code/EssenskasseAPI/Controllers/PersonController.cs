@@ -64,10 +64,10 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpPut]
         [Route("update")]
-        public IActionResult UpdatePerson([FromHeader] Guid personGuid,
+        public IActionResult UpdatePerson([FromHeader] Guid guid,
                                             [FromHeader] string? name,
                                             [FromHeader] string? email) {
-            Person? personToUpdate = _personController.PersonPerGuid(personGuid);
+            Person? personToUpdate = _personController.PersonPerGuid(guid);
             if (personToUpdate is not null) {
                 if (name is not null) {
                     personToUpdate.Name = Uri.UnescapeDataString(name);

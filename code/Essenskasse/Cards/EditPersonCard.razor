@@ -96,7 +96,7 @@
                 person = JsonConvert.DeserializeObject<Person>(await response.Content.ReadAsStringAsync())!;
                 person.Name = Uri.UnescapeDataString(person.Name);
                 person.Email= Uri.UnescapeDataString(person.Email);
-                safePerson = person;
+                safePerson = JsonConvert.DeserializeObject<Person>(JsonConvert.SerializeObject(person));
                 dataNotLoadYet = false;
                 base.StateHasChanged();
             }
@@ -115,6 +115,7 @@
             await JSRuntime.InvokeVoidAsync("alert", "Keine Änderung!");
             return;
         }
+        Console.WriteLine(selectedPerson);
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Put,
                 RequestUri = new Uri(Config["API-Adress"] + "person/update"),
