@@ -37,7 +37,7 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpPost, Route("insertNew")]
-        public IActionResult AddNewPayment([FromHeader] Money? amount,
+        public IActionResult AddNewPayment([FromBody] Money? amount,
                                             [FromHeader] Guid? referencedPerson) {
             if ((amount is not null) && (referencedPerson is not null)) {
                 Payment newPayment = new Payment(amount, referencedPerson ?? new Guid());
@@ -49,7 +49,6 @@ namespace EssenskasseAPI.Controllers {
                 }
             }
             return BadRequest("Header unvollständig!");
-
         }
     }
 }
