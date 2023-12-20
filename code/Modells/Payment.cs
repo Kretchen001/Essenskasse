@@ -13,7 +13,7 @@ namespace Modells {
         public Money Amount { get; set; } = new Money();
         /// <summary>Which person is associated with this payment.</summary>
         [JsonInclude]
-        public Guid ReferencedPerson { get; set; }
+        public Guid ReferencedPerson { get; set; } = new Guid();
 
         /// <summary></summary>
         public Payment() { }
