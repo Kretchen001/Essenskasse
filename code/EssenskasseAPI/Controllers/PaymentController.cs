@@ -7,7 +7,7 @@ namespace EssenskasseAPI.Controllers {
 
     [Route("api/payment")]
     [ApiController]
-    public class PaymentController : Controller{
+    public class PaymentController : ControllerBase {
 
         PaymentDbController _paymentController = new PaymentDbController();
 

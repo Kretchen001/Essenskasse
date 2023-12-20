@@ -7,7 +7,7 @@ namespace EssenskasseAPI.Controllers {
 
     [Route("api/person")]
     [ApiController]
-    public class PersonController : Controller {
+    public class PersonController : ControllerBase {
 
         PersonDbController _personController = new PersonDbController();
 

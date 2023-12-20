@@ -7,7 +7,7 @@ namespace EssenskasseAPI.Controllers {
     
     [Route("api/provider")]
     [ApiController]
-    public class ProviderController : Controller{
+    public class ProviderController : ControllerBase {
 
         ProviderDbController _providerController = new ProviderDbController();
 
