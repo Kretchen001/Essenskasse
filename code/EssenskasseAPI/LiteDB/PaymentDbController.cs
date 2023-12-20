@@ -64,6 +64,28 @@ namespace EssenskasseAPI.LiteDB {
                 return (col.FindAll().OrderByDescending(x => x.DateTime).Take(amount).ToList() ?? null);
             }
         }
+
+        /// <summary></summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        public List<Payment> PaymentsFromOnePersonPerGuid(Guid guid) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
+                List<Payment> matchingPayments = new List<Payment>();
+
+                IEnumerator<Payment> enumerator = col.FindAll().GetEnumerator();
+                while (enumerator.MoveNext()) {
+                    Payment x = enumerator.Current;
+                    if (x.ReferencedPerson.Equals(guid)) {
+                        matchingPayments.Add(new Payment(x.DateTime, x.Amount, x.ReferencedPerson));
+                    }
+                }
+                enumerator.Dispose();
+
+                return matchingPayments;
+            }
+
+        }
         #endregion
     }
 }
