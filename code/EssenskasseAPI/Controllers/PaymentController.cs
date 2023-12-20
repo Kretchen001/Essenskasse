@@ -1,6 +1,7 @@
 ﻿using EssenskasseAPI.LiteDB;
 using Microsoft.AspNetCore.Mvc;
 using Modells;
+using Newtonsoft.Json;
 
 namespace EssenskasseAPI.Controllers {
 
@@ -9,6 +10,31 @@ namespace EssenskasseAPI.Controllers {
     public class PaymentController : Controller{
 
         PaymentDbController _paymentController = new PaymentDbController();
+
+        [HttpGet, Route("requestAll")]
+        public IActionResult GetAllPayments() {
+            List<Payment>? payments = _paymentController.RequestAllPayments();
+            if (payments is not null) {
+                return Ok(JsonConvert.SerializeObject(payments));
+            }
+            else {
+                return NoContent();
+            }
+        }
+
+        [HttpGet, Route("requestAmount")]
+        public IActionResult GetAmountOfPayments([FromHeader] int? amount) {
+            if (amount is null) {
+                return BadRequest();
+            }
+            List<Payment>? payments = _paymentController.RequestAmountOfPayments(amount ?? 1);
+            if (payments is not null) {
+                return Ok(JsonConvert.SerializeObject(payments));
+            }
+            else {
+                return NoContent();
+            }
+        }
 
         [HttpPost, Route("insertNew")]
         public IActionResult AddNewPayment([FromHeader] Money? amount,

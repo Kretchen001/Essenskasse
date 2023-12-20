@@ -1,5 +1,7 @@
 ﻿using LiteDB;
 using Modells;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace EssenskasseAPI.LiteDB {
 
@@ -25,6 +27,9 @@ namespace EssenskasseAPI.LiteDB {
         #endregion
 
         #region Function
+        /// <summary></summary>
+        /// <param name="newPayment"></param>
+        /// <returns></returns>
         public bool NewPayment(Payment newPayment) {
             using (LiteDatabase db = new LiteDatabase(saveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
@@ -36,6 +41,27 @@ namespace EssenskasseAPI.LiteDB {
                     return true;
                 }
                 return false;
+            }
+        }
+
+        /// <summary></summary>
+        /// <returns></returns>
+        public List<Payment>? RequestAllPayments() {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
+
+                return (col.FindAll().OrderByDescending(x => x.DateTime).ToList() ?? null);
+            }
+        }
+
+        /// <summary></summary>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public List<Payment>? RequestAmountOfPayments(int amount) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
+
+                return (col.FindAll().OrderByDescending(x => x.DateTime).Take(amount).ToList() ?? null);
             }
         }
         #endregion

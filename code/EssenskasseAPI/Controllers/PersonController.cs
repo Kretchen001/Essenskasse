@@ -24,7 +24,7 @@ namespace EssenskasseAPI.Controllers {
                 return Ok(JsonConvert.SerializeObject(persons));
             }
             else {
-                return BadRequest();
+                return NoContent();
             }
         }
 
