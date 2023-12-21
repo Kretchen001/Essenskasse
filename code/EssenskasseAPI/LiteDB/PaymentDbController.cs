@@ -114,6 +114,17 @@ namespace EssenskasseAPI.LiteDB {
                 return false;
             }
         }
+
+        /// <summary></summary>
+        /// <param name="payment"></param>
+        /// <returns></returns>
+        public bool RemovePayment(Payment payment) {
+            using (LiteDatabase database = new LiteDatabase(saveDir)) {
+                ILiteCollection<Payment> col = database.GetCollection<Payment>();
+
+                return col.Delete(payment.DateTime);
+            }
+        }
         #endregion
     }
 }

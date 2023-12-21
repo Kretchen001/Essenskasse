@@ -5,8 +5,7 @@ using Newtonsoft.Json;
 
 namespace EssenskasseAPI.Controllers {
 
-    [Route("api/payment")]
-    [ApiController]
+    [ApiController, Route("api/payment")]
     public class PaymentController : ControllerBase {
 
         PaymentDbController _paymentController = new PaymentDbController();
@@ -85,7 +84,25 @@ namespace EssenskasseAPI.Controllers {
                     return Ok();
                 }
                 else {
-                    return BadRequest();
+                    return BadRequest("Keine Einzahlung zum angegebenen Datum gefunden.");
+                }
+            }
+            else {
+                return NoContent();
+            }
+        }
+
+        [HttpDelete, Route("remove")]
+        public IActionResult DeletePayment([FromHeader] string? dateString) {
+            if (dateString is not null) {
+                DateTime date = DateTime.Parse(dateString);
+                Payment? result = _paymentController.PaymentAtDateTime(date);
+                if (result is not null) {
+                    _paymentController.RemovePayment(result);
+                    return Ok(JsonConvert.SerializeObject(result));
+                }
+                else {
+                    return BadRequest("Einzahlung konnte nicht gefunden werden!\nFehler in der Eingabe?");
                 }
             }
             else {
