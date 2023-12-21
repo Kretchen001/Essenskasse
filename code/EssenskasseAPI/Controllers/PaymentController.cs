@@ -8,7 +8,7 @@ namespace EssenskasseAPI.Controllers {
     [ApiController, Route("api/payment")]
     public class PaymentController : ControllerBase {
 
-        PaymentDbController _paymentController = new PaymentDbController();
+        readonly PaymentDbController _paymentController = new PaymentDbController();
 
         [HttpGet, Route("requestAll")]
         public IActionResult GetAllPayments() {

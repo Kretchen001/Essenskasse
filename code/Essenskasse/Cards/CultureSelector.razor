@@ -16,7 +16,7 @@
 </span>
 
 @code {
-    CultureWithName SelectedCulture = null;
+    CultureWithName? SelectedCulture = null;
 
     protected override async Task OnInitializedAsync() {
         string? culture = await LocalStorage.GetItemAsync<string>("culture");
@@ -31,7 +31,7 @@
     }
 
     private async Task NewCultureSelectedAsync(ChangeEventArgs args) {
-        string cultureString = args.Value.ToString();
+        string cultureString = args.Value.ToString() ?? "de-DE";
         await LocalStorage.SetItemAsync<string>("culture", cultureString);
         Navi.NavigateTo(Navi.Uri, true);
     }

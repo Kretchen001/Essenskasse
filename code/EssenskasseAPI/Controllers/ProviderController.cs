@@ -5,14 +5,12 @@ using Newtonsoft.Json;
 
 namespace EssenskasseAPI.Controllers {
     
-    [Route("api/provider")]
-    [ApiController]
+    [ApiController, Route("api/provider")]
     public class ProviderController : ControllerBase {
 
         ProviderDbController _providerController = new ProviderDbController();
 
-        [HttpGet]
-        [Route("requestAll")]
+        [HttpGet, Route("requestAll")]
         public IActionResult GetAllProvider() {
             List<Provider> provider = _providerController.RequestProvider();
             provider.ForEach(x => x.Designation = Uri.EscapeDataString(x.Designation));
@@ -25,8 +23,7 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpGet]
-        [Route("testExist")]
+        [HttpGet, Route("testExist")]
         public IActionResult CheckExistProvider([FromHeader] Guid? guid, [FromHeader] string? designator) {
             Provider? provider = _providerController.ExistProvider(guid, designator);
             
@@ -41,8 +38,7 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpPost]
-        [Route("new")]
+        [HttpPost, Route("new")]
         public IActionResult AddProvider([FromHeader] string? name) {
             if (name is not null) {
                 name = Uri.UnescapeDataString(name);
@@ -59,8 +55,7 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpPut]
-        [Route("change")]
+        [HttpPut, Route("change")]
         public IActionResult ChangeProvider([FromHeader] Guid? guid, [FromHeader] string designation) {
             if (guid is not null) {
                 Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
@@ -82,8 +77,7 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpDelete]
-        [Route("remove")]
+        [HttpDelete, Route("remove")]
         public IActionResult RemoveProvider([FromHeader] Guid? guid) {
             if (guid is not null) {
                 Provider? gefunden = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
