@@ -64,5 +64,33 @@ namespace EssenskasseAPI.Controllers {
             }
             return BadRequest("Header unvollständig!");
         }
+
+        [HttpPut, Route("update")]
+        public IActionResult UpdatePayment([FromHeader] string? dateString,
+                                            [FromBody] Money? money,
+                                            [FromHeader] Guid? referencedPerson) {
+            if (dateString is null) {
+                return BadRequest("Kein Datum angegeben!");
+            }
+            DateTime date = DateTime.Parse(dateString);
+            Payment? paymentToUpdate = _paymentController.PaymentAtDateTime(date);
+            if (paymentToUpdate is not null) {
+                if (money is not null) {
+                    paymentToUpdate.Amount = money;
+                }
+                if (referencedPerson is not null) {
+                    paymentToUpdate.ReferencedPerson = referencedPerson ?? new Guid();
+                }
+                if (_paymentController.UpdatePayment(paymentToUpdate)) {
+                    return Ok();
+                }
+                else {
+                    return BadRequest();
+                }
+            }
+            else {
+                return NoContent();
+            }
+        }
     }
 }

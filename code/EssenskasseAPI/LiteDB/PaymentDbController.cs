@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using Modells;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -85,6 +86,33 @@ namespace EssenskasseAPI.LiteDB {
                 return matchingPayments;
             }
 
+        }
+
+        /// <summary></summary>
+        /// <param name="date"></param>
+        /// <returns>the payment or null if not found</returns>
+        public Payment? PaymentAtDateTime(DateTime date) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
+
+                return col.FindOne(x => x.DateTime.Equals(date));
+            }
+        }
+
+        /// <summary></summary>
+        /// <param name="payment"></param>
+        /// <returns></returns>
+        public bool UpdatePayment(Payment payment) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
+
+                bool updated = col.Update(payment.DateTime, payment);
+
+                if (updated) {
+                    return true;
+                }
+                return false;
+            }
         }
         #endregion
     }
