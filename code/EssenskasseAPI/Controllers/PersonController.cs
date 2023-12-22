@@ -83,6 +83,18 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        [HttpPut, Route("updateDatabasePersonSaldo")]
+        public IActionResult UpdatePersonSaldoInDatabase() {
+            SaldoDbController _saldoDbController = new SaldoDbController();
+            try {
+                _saldoDbController.RecalculateSaldoInTheDatabase();
+                return Ok("Keine Fehler.");
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpDelete, Route("remove")]
         public IActionResult RemovePerson([FromHeader] Guid? guid) {
             if (guid is not null) {
