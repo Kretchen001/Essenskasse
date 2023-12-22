@@ -5,14 +5,12 @@ using Newtonsoft.Json;
 
 namespace EssenskasseAPI.Controllers {
 
-    [Route("api/person")]
-    [ApiController]
+    [ApiController, Route("api/person")]
     public class PersonController : ControllerBase {
 
-        PersonDbController _personController = new PersonDbController();
+        readonly PersonDbController _personController = new PersonDbController();
 
-        [HttpGet]
-        [Route("requestAll")]
+        [HttpGet, Route("requestAll")]
         public IActionResult GetAllPerson() {
             List<Person>? persons = _personController.RequestAllPerson();
 
@@ -28,8 +26,7 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpGet]
-        [Route("perGuid")]
+        [HttpGet, Route("perGuid")]
         public IActionResult GetPerGuidPerson([FromHeader] Guid guid) {
             Person? person = _personController.PersonPerGuid(guid);
             if (person is not null) {
@@ -42,8 +39,7 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpPost]
-        [Route("new")]
+        [HttpPost, Route("new")]
         public IActionResult AddNewPerson([FromHeader] string? name,
                                             [FromHeader] string? email) {
             if (name is not null) { 
@@ -62,8 +58,7 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpPut]
-        [Route("update")]
+        [HttpPut, Route("update")]
         public IActionResult UpdatePerson([FromHeader] Guid guid,
                                             [FromHeader] string? name,
                                             [FromHeader] string? email) {
@@ -88,8 +83,19 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpDelete]
-        [Route("remove")]
+        [HttpPut, Route("updateDatabasePersonSaldo")]
+        public IActionResult UpdatePersonSaldoInDatabase() {
+            SaldoDbController _saldoDbController = new SaldoDbController();
+            try {
+                _saldoDbController.RecalculateSaldoInTheDatabase();
+                return Ok("Keine Fehler.");
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete, Route("remove")]
         public IActionResult RemovePerson([FromHeader] Guid? guid) {
             if (guid is not null) {
                 Person? result = _personController.ExistPerson(guid ?? null, null);
