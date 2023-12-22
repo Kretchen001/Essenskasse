@@ -55,10 +55,10 @@ namespace EssenskasseAPI.Controllers {
             if ((amount is not null) && (referencedPerson is not null)) {
                 Payment newPayment = new Payment(amount, referencedPerson ?? new Guid());
                 if (_paymentController.NewPayment(newPayment)) {
-                    return Ok(newPayment);
+                    return Ok(JsonConvert.SerializeObject(newPayment));
                 }
                 else {
-                    return Conflict(newPayment);
+                    return Conflict(JsonConvert.SerializeObject(newPayment));
                 }
             }
             return BadRequest("Header unvollständig!");

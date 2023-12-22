@@ -36,7 +36,6 @@ namespace EssenskasseAPI.LiteDB {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
 
                 BsonValue? inserted = col.Insert(newPayment);
-                //col.EnsureIndex(x => x.Guid);
 
                 if (inserted is not null) {
                     return true;
