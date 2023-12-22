@@ -5,12 +5,12 @@ namespace Modells {
     /// <summary>Represent the Money for a database.</summary>
     public class Money {
 
-        /// <summary>ulong as a pre-decimal number</summary>
+        /// <summary>long as a pre-decimal number</summary>
         [JsonInclude]
-        public ulong Euro { get; set; } = 0;
-        /// <summary>ushort as a post-decimal number</summary>
+        public long Euro { get; set; } = 0;
+        /// <summary>short as a post-decimal number</summary>
         [JsonInclude]
-        public ushort Cent { get; set; } = 0;
+        public short Cent { get; set; } = 0;
 
         /// <summary></summary>
         public Money() { }
@@ -19,7 +19,7 @@ namespace Modells {
         /// <param name="euro"></param>
         /// <param name="cent"></param>
         [JsonConstructor]
-        public Money(ulong euro, ushort cent) {
+        public Money(long euro, short cent) {
             Euro = euro;
             Cent = cent;
         }
