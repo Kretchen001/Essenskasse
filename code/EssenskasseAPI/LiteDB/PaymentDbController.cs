@@ -84,7 +84,6 @@ namespace EssenskasseAPI.LiteDB {
 
                 return matchingPayments;
             }
-
         }
 
         /// <summary></summary>
