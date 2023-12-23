@@ -24,14 +24,28 @@ namespace Modells {
             Cent = cent;
         }
 
-        /// <summary>Override the ToString so it returns a valid String</summary>
+        /// <summary>Override the ToString so it returns a valid money String.
+        /// For further information see documentation/pap/Money_ToString.puml</summary>
         /// <returns>EURO,CENT€</returns>
         public override string ToString() {
-            if (Cent < 10) {
-                return (Euro.ToString() + ",0" + Cent.ToString() + "€");
+            if (Math.Abs(Cent) < 10) {
+                if (Cent < 0) {
+                    return ("-" + Math.Abs(Euro).ToString() + ",0" + Math.Abs(Cent).ToString() + "€");
+                }
+                else {
+                    return (Euro.ToString() + ",0" + Math.Abs(Cent).ToString() + "€");
+                }
             }
             else {
-                return (Euro.ToString() + "," + Cent.ToString() + "€");
+                if (Cent < 0) {
+                    return ("-" + Math.Abs(Euro).ToString() + "," + Math.Abs(Cent).ToString() + "€");
+                }
+                else if (Euro < 0) {
+                    return (Euro.ToString() + "," + Cent.ToString() + "€");
+                }
+                else {
+                    return (Euro.ToString() + "," + Cent.ToString() + "€");
+                }
             }
         }
     }

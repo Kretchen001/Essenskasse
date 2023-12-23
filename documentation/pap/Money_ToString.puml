@@ -1,0 +1,23 @@
+@startuml Money.ToString()
+
+    start
+    if (weniger als 10 Cent\n(Absolutwert)) then (ja)
+        if ("Cent negativ") then (ja)
+        :"-" voranstellen\nMath.Abs(Euro)\n",0" hinzufügen\nMath.Abs(Cent)\n"€";
+        stop
+        else (nein)
+        :Euro\n",0" hinzufügen\nMath.Abs(Cent)\n"€";
+        stop
+        endif
+    else (nein)
+        if ("Cent negativ") then (ja)
+        :"-" voranstellen\nMath.Abs(Euro)\n"," hinzufügen\nMath.Abs(Cent)\n"€";
+        stop
+        elseif ("Euro negativ") then (ja)
+        :Euro\n"," hinzufügen\nCent\n"€";
+        stop
+        else (nein)
+        :Euro\n"," hinzufügen\nCent\n"€";
+        stop
+
+@enduml
