@@ -98,5 +98,23 @@ namespace EssenskasseAPI.Controllers {
                 return NoContent();
             }
         }
+
+        [HttpDelete, Route("remove")]
+        public IActionResult DeletePayment([FromHeader] string? dateString) {
+            if (dateString is not null) {
+                DateTime date = DateTime.Parse(dateString);
+                Order? result = _orderDbController.OrderAtDateTime(date);
+                if (result is not null) {
+                    _orderDbController.RemoveOrder(result);
+                    return Ok(JsonConvert.SerializeObject(result));
+                }
+                else {
+                    return BadRequest("Bestelung konnte nicht gefunden werden!\nFehler in der Eingabe?");
+                }
+            }
+            else {
+                return NoContent();
+            }
+        }
     }
 }

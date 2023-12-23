@@ -101,7 +101,7 @@ namespace EssenskasseAPI.LiteDB {
 
 
         /// <summary></summary>
-        /// <param name="payment"></param>
+        /// <param name="order"></param>
         /// <returns></returns>
         public bool UpdateOrder(Order order) {
             using (LiteDatabase db = new LiteDatabase(saveDir)) {
@@ -113,6 +113,17 @@ namespace EssenskasseAPI.LiteDB {
                     return true;
                 }
                 return false;
+            }
+        }
+
+        /// <summary></summary>
+        /// <param name="order"></param>
+        /// <returns></returns>
+        public bool RemoveOrder(Order order) {
+            using (LiteDatabase database = new LiteDatabase(saveDir)) {
+                ILiteCollection<Payment> col = database.GetCollection<Payment>();
+
+                return col.Delete(order.DateTime);
             }
         }
         #endregion
