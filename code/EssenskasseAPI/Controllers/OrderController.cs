@@ -41,9 +41,9 @@ namespace EssenskasseAPI.Controllers {
             if (guid is null) {
                 return BadRequest();
             }
-            List<Payment>? payments = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid());
-            if (payments is not null) {
-                return Ok(JsonConvert.SerializeObject(payments));
+            List<Order>? orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid());
+            if (orders is not null) {
+                return Ok(JsonConvert.SerializeObject(orders));
             }
             else {
                 return NoContent();
