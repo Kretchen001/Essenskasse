@@ -44,7 +44,7 @@ namespace EssenskasseAPI.Controllers {
                 name = Uri.UnescapeDataString(name);
                 Provider newProvider = new Provider(name);
                 if (_providerController.SaveProvider(newProvider)) {
-                    return Ok(newProvider.Guid);
+                    return Ok(JsonConvert.SerializeObject(newProvider.Guid));
                 }
                 else {
                     return BadRequest("Provider konnte nicht eingefügt werden. Bitte Admin benachrichten.");
