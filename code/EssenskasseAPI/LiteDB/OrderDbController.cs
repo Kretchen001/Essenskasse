@@ -87,6 +87,34 @@ namespace EssenskasseAPI.LiteDB {
                 return matchingPayments;
             }
         }
+
+        /// <summary></summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public Order? OrderAtDateTime(DateTime date) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
+
+                return col.FindOne(x => x.DateTime.Equals(date));
+            }
+        }
+
+
+        /// <summary></summary>
+        /// <param name="payment"></param>
+        /// <returns></returns>
+        public bool UpdateOrder(Order order) {
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
+
+                bool updated = col.Update(order.DateTime, order);
+
+                if (updated) {
+                    return true;
+                }
+                return false;
+            }
+        }
         #endregion
     }
 }
