@@ -33,7 +33,12 @@ namespace EssenskasseAPI.LiteDB {
             List<Person> persons = _personDbController.RequestAllPerson();
 
             foreach (Person x in persons) {
-                x.Saldo = GetAllPaymentsFromPerson(x.Guid);
+                Money paymentSaldo = GetAllPaymentsFromPerson(x.Guid);
+                Money orderSaldo = GetAllOrdersFromPerson(x.Guid);
+                Money res = new Money();
+                res.Euro = paymentSaldo.Euro - orderSaldo.Euro;
+                res.Cent = (short)(paymentSaldo.Cent - orderSaldo.Cent);
+                x.Saldo = res;
                 _personDbController.UpdatePerson(x);
             }
         }
@@ -67,6 +72,23 @@ namespace EssenskasseAPI.LiteDB {
                 }
                 return money;
             }
+        }
+
+        /// <summary></summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        public Money GetAllOrdersFromPerson(Guid guid) {
+            List<Payment> list = new List<Payment>();
+            Money money = new Money();
+                foreach (Payment x in list) {
+                    money.Euro += x.Amount.Euro;
+                    money.Cent += x.Amount.Cent;
+                }
+                while (money.Cent > 100) {
+                    money.Cent -= 100;
+                    money.Euro += 1;
+                }
+                return money;
         }
         #endregion
     }
