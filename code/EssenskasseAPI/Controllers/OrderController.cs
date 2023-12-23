@@ -11,6 +11,20 @@ namespace EssenskasseAPI.Controllers {
         readonly ProviderDbController _providerController = new ProviderDbController();
         readonly OrderDbController _orderDbController = new OrderDbController();
 
+        [HttpGet, Route("fromPerson")]
+        public IActionResult GetPaymentsFromPersonPerGuid([FromHeader] Guid? guid) {
+            if (guid is null) {
+                return BadRequest();
+            }
+            List<Payment>? payments = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid());
+            if (payments is not null) {
+                return Ok(JsonConvert.SerializeObject(payments));
+            }
+            else {
+                return NoContent();
+            }
+        }
+
         [HttpPost, Route("insertNew")]
         public IActionResult AddNewPayment([FromBody] Order? order) {
             if (order is not null) {
