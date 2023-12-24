@@ -93,6 +93,7 @@
     private int payment = 0;
 
     private List<Payment> paymentsOfSelectedPerson = new List<Payment>();
+    private int amount = 10;
 
     protected override async Task OnInitializedAsync () {
         // Request all Person, that are saved in the database
@@ -120,7 +121,8 @@
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/fromPerson"),
                 Headers = {
-                    { "guid", selectedPerson.ToString() }
+                    { "guid", selectedPerson.ToString() },
+                    { "amount", amount.ToString() }
                 }
             };
 
