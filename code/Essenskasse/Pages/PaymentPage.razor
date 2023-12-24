@@ -1,11 +1,91 @@
 ﻿@page "/payment"
 
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.payment)]</PageTitle>
 
 <h2>@_loc[nameof(RessourceAppStrings.payment)]</h2>
 
+<div class="row">
+    <div class="col-lg-3 align-self-center">
+        <label>
+            @_loc[nameof(RessourceAppStrings.person)]
+        </label>
+    </div>
+    <div class="col-lg-9">
+        <select class="form-select" @bind="@selectedPerson">
+            @if (person is not null) {
+                @foreach (var x in person) {
+                    <option value="@x.Guid">@x.Name</option>
+                }
+            }
+        </select>
+    </div>
+</div>
+
 @code {
 
+    private List<Person>? person = new List<Person>();
+    private Guid _selectedPerson;
+    private Guid selectedPerson {
+        get {
+            return _selectedPerson;
+        }
+        set {
+            _selectedPerson = value;
+        }
+    }
+
+    private int payment = 0;
+
+    protected override async Task OnInitializedAsync () {
+        // Request all Person, that are saved in the database
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
+            person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
+            person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+
+            if (person.Count > 0) {
+                selectedPerson = person[0].Guid;
+            }
+        }
+    }
+
+    private async void insertPayment () {
+        short cent = (short) (payment % 100);
+        long euro = (long) ((payment - cent) * 0.01);
+        Money money = new Money(euro, cent);
+
+        if (!(await JSRuntime.InvokeAsync<bool>("confirm", "Folgenden Betrag eintragen?\n" + money.ToString()))) {
+            return;
+        }
+
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),
+                Headers = {
+                    {"referencedPerson", selectedPerson.ToString()}
+                },
+                Content = new StringContent(JsonConvert.SerializeObject(money), Encoding.UTF8, "application/json")
+            };
+
+        var response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            await JSRuntime.InvokeVoidAsync("alert", "Hat geklappt");
+            base.StateHasChanged();
+            return;
+        }
+        await JSRuntime.InvokeVoidAsync("alert", "Hat nicht geklappt!");
+    }
 }

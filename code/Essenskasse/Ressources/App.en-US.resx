@@ -126,6 +126,9 @@
   <data name="addPerson" xml:space="preserve">
     <value>Add person</value>
   </data>
+  <data name="amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
   <data name="available" xml:space="preserve">
     <value>Available</value>
   </data>

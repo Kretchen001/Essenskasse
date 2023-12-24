@@ -126,6 +126,9 @@
   <data name="addPerson" xml:space="preserve">
     <value>NOCH HINZUFÜGEN</value>
   </data>
+  <data name="amount" xml:space="preserve">
+    <value>Сумма</value>
+  </data>
   <data name="available" xml:space="preserve">
     <value>Доступно</value>
   </data>

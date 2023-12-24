@@ -15,6 +15,7 @@
         submit,
         person,
         addPerson,
-        payment
+        payment,
+        amount,
     }
 }
