@@ -141,6 +141,9 @@
   <data name="language" xml:space="preserve">
     <value>Sprache</value>
   </data>
+  <data name="payment" xml:space="preserve">
+    <value>Einzahlung</value>
+  </data>
   <data name="person" xml:space="preserve">
     <value>Personen</value>
   </data>

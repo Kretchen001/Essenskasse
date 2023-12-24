@@ -14,6 +14,7 @@
         addNewProvider,
         submit,
         person,
-        addPerson
+        addPerson,
+        payment
     }
 }

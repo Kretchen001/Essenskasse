@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Pr
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modells.Test", "Modells.Test\Modells.Test.csproj", "{88172E1B-5FCC-4D0F-A873-85BA7AD0DC05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modells.Test", "Modells.Test\Modells.Test.csproj", "{88172E1B-5FCC-4D0F-A873-85BA7AD0DC05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
