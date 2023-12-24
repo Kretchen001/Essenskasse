@@ -25,6 +25,56 @@
         </select>
     </div>
 </div>
+<br />
+<div class="row">
+    <div class="col-lg-3 align-self-center">
+        <label>
+            @_loc[nameof(RessourceAppStrings.amount)]
+        </label>
+    </div>
+    <div class="col-lg-9 align-self-center">
+        <input style="width: 25vw" type="number" @bind="payment" placeholder="Euro,Cent -> 1000 = 10,00€">
+    </div>
+</div>
+<br />
+<div class="row">
+    <button @onclick="() => insertPayment()">
+        Betrag gutschreiben!
+    </button>
+</div>
+<br />
+<hr />
+<br />
+<div class="row">
+    <div class="col-lg-12">
+        <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
+            <tr>
+                <th>Datum</th>
+                <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
+            </tr>
+            @for (int i = 0; i < paymentsOfSelectedPerson.Count; i += 1) {
+                @if (i % 3 == 0) {
+                    <tr>
+                        <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                        <td>@paymentsOfSelectedPerson[i].Amount</td>
+                    </tr>
+                }
+                else if (i % 3 == 1) {
+                    <tr style="background-color: lightgray">
+                        <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                        <td>@paymentsOfSelectedPerson[i].Amount</td>
+                    </tr>
+                }
+                else if (i % 3 == 2) {
+                    <tr style="background-color: grey">
+                        <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                        <td>@paymentsOfSelectedPerson[i].Amount</td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</div>
 
 @code {
 
@@ -36,10 +86,13 @@
         }
         set {
             _selectedPerson = value;
+            requestPaymentsOfPerson();
         }
     }
 
     private int payment = 0;
+
+    private List<Payment> paymentsOfSelectedPerson = new List<Payment>();
 
     protected override async Task OnInitializedAsync () {
         // Request all Person, that are saved in the database
@@ -59,6 +112,25 @@
                 selectedPerson = person[0].Guid;
             }
         }
+    }
+
+    private async void requestPaymentsOfPerson () {
+        // Request last 10 payments of a person
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "payment/fromPerson"),
+                Headers = {
+                    { "guid", selectedPerson.ToString() }
+                }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            paymentsOfSelectedPerson = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+        }
+
+        base.StateHasChanged();
     }
 
     private async void insertPayment () {
