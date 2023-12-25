@@ -96,6 +96,10 @@
     private int amount = 10;
 
     protected override async Task OnInitializedAsync () {
+        await refreshPersonList();
+    }
+
+    private async Task refreshPersonList () {
         // Request all Person, that are saved in the database
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,

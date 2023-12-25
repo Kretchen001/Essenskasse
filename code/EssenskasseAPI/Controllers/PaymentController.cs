@@ -50,6 +50,21 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        [HttpGet, Route("singlePerDate")]
+        public IActionResult GetPaymentPerDate([FromHeader] string? dateString) {
+            if (dateString is null) {
+                return BadRequest();
+            }
+            DateTime date = DateTime.Parse(dateString);
+            Payment? payment = _paymentController.PaymentAtDateTime(date);
+            if (payment is not null) {
+                return Ok(JsonConvert.SerializeObject(payment));
+            }
+            else {
+                return NoContent();
+            }
+        }
+
         [HttpPost, Route("insertNew")]
         public IActionResult AddNewPayment([FromBody] Money? amount,
                                             [FromHeader] Guid? referencedPerson) {
