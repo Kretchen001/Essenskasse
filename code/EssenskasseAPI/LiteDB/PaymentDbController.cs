@@ -68,7 +68,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <summary></summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-        public List<Payment> PaymentsFromOnePersonPerGuid(Guid guid) {
+        public List<Payment> PaymentsFromOnePersonPerGuid(Guid guid, int? amount) {
             using (LiteDatabase db = new LiteDatabase(saveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
                 List<Payment> matchingPayments = new List<Payment>();
@@ -77,12 +77,17 @@ namespace EssenskasseAPI.LiteDB {
                 while (enumerator.MoveNext()) {
                     Payment x = enumerator.Current;
                     if (x.ReferencedPerson.Equals(guid)) {
-                        matchingPayments.Add(new Payment(x.DateTime, x.Amount, x.ReferencedPerson));
+                        matchingPayments.Add(x);
                     }
                 }
                 enumerator.Dispose();
 
-                return matchingPayments;
+                if (amount is null) {
+                    return matchingPayments.OrderByDescending(x => x.DateTime).ToList();
+                }
+                else {
+                    return matchingPayments.OrderByDescending(x => x.DateTime).Take(amount ?? 1).ToList();
+                }
             }
         }
 

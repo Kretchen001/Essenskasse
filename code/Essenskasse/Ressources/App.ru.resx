@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="acceptChanges" xml:space="preserve">
+    <value>Принять изменения</value>
+  </data>
   <data name="add" xml:space="preserve">
     <value>Добавить</value>
   </data>
@@ -124,13 +127,31 @@
     <value>Добавить нового провайдера.</value>
   </data>
   <data name="addPerson" xml:space="preserve">
-    <value>NOCH HINZUFÜGEN</value>
+    <value>Добавить человека</value>
+  </data>
+  <data name="amount" xml:space="preserve">
+    <value>Сумма</value>
   </data>
   <data name="available" xml:space="preserve">
     <value>Доступно</value>
   </data>
+  <data name="cannotBeChanged" xml:space="preserve">
+    <value>(Изменить нельзя!)</value>
+  </data>
   <data name="colortheme" xml:space="preserve">
     <value>Цветовая схема</value>
+  </data>
+  <data name="creditAmount" xml:space="preserve">
+    <value>Зачислите сумму!</value>
+  </data>
+  <data name="date" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="editPerson" xml:space="preserve">
+    <value>Редактировать человека</value>
+  </data>
+  <data name="email" xml:space="preserve">
+    <value>e-mail</value>
   </data>
   <data name="english" xml:space="preserve">
     <value>Английский</value>
@@ -138,11 +159,29 @@
   <data name="german" xml:space="preserve">
     <value>Немецкий</value>
   </data>
+  <data name="guid" xml:space="preserve">
+    <value>Гуид</value>
+  </data>
   <data name="language" xml:space="preserve">
     <value>Языки</value>
   </data>
+  <data name="loadData" xml:space="preserve">
+    <value>Данные о нагрузке</value>
+  </data>
+  <data name="name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="notEntered" xml:space="preserve">
+    <value>Не зарегистрирован...</value>
+  </data>
+  <data name="payment" xml:space="preserve">
+    <value>Депозит</value>
+  </data>
   <data name="person" xml:space="preserve">
-    <value>NOCH EINTRAGEN</value>
+    <value>Человек</value>
+  </data>
+  <data name="personRegistered" xml:space="preserve">
+    <value>Зарегистрированные лица</value>
   </data>
   <data name="provider" xml:space="preserve">
     <value>Поставщик</value>

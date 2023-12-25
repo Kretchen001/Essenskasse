@@ -36,13 +36,29 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpGet, Route("fromPerson")]
-        public IActionResult GetPaymentsFromPersonPerGuid([FromHeader] Guid? guid) {
+        public IActionResult GetPaymentsFromPersonPerGuid([FromHeader] Guid? guid,
+                                                            [FromHeader] int? amount) {
             if (guid is null) {
                 return BadRequest();
             }
-            List<Payment>? payments = _paymentController.PaymentsFromOnePersonPerGuid(guid ?? new Guid());
+            List<Payment>? payments = _paymentController.PaymentsFromOnePersonPerGuid(guid ?? new Guid(), amount);
             if (payments is not null) {
                 return Ok(JsonConvert.SerializeObject(payments));
+            }
+            else {
+                return NoContent();
+            }
+        }
+
+        [HttpGet, Route("singlePerDate")]
+        public IActionResult GetPaymentPerDate([FromHeader] string? dateString) {
+            if (dateString is null) {
+                return BadRequest();
+            }
+            DateTime date = DateTime.Parse(dateString);
+            Payment? payment = _paymentController.PaymentAtDateTime(date);
+            if (payment is not null) {
+                return Ok(JsonConvert.SerializeObject(payment));
             }
             else {
                 return NoContent();

@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="acceptChanges" xml:space="preserve">
+    <value>Änderungen akzeptieren</value>
+  </data>
   <data name="add" xml:space="preserve">
     <value>Hinzufügen</value>
   </data>
@@ -126,11 +129,29 @@
   <data name="addPerson" xml:space="preserve">
     <value>Person hinzufügen</value>
   </data>
+  <data name="amount" xml:space="preserve">
+    <value>Betrag</value>
+  </data>
   <data name="available" xml:space="preserve">
     <value>Verfügbar</value>
   </data>
+  <data name="cannotBeChanged" xml:space="preserve">
+    <value>(nicht änderbar!)</value>
+  </data>
   <data name="colortheme" xml:space="preserve">
     <value>Farbschema</value>
+  </data>
+  <data name="creditAmount" xml:space="preserve">
+    <value>Betrag gutschreiben!</value>
+  </data>
+  <data name="date" xml:space="preserve">
+    <value>Datum</value>
+  </data>
+  <data name="editPerson" xml:space="preserve">
+    <value>Person bearbeiten</value>
+  </data>
+  <data name="email" xml:space="preserve">
+    <value>E-Mail</value>
   </data>
   <data name="english" xml:space="preserve">
     <value>Englisch</value>
@@ -138,11 +159,29 @@
   <data name="german" xml:space="preserve">
     <value>Deutsch</value>
   </data>
+  <data name="guid" xml:space="preserve">
+    <value>Guid</value>
+  </data>
   <data name="language" xml:space="preserve">
     <value>Sprache</value>
   </data>
+  <data name="loadData" xml:space="preserve">
+    <value>Daten laden</value>
+  </data>
+  <data name="name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="notEntered" xml:space="preserve">
+    <value>Nicht eingetragen...</value>
+  </data>
+  <data name="payment" xml:space="preserve">
+    <value>Einzahlung</value>
+  </data>
   <data name="person" xml:space="preserve">
     <value>Personen</value>
+  </data>
+  <data name="personRegistered" xml:space="preserve">
+    <value>Personen registriert</value>
   </data>
   <data name="provider" xml:space="preserve">
     <value>Anbieter</value>

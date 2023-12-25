@@ -14,6 +14,19 @@
         addNewProvider,
         submit,
         person,
-        addPerson
+        addPerson,
+        payment,
+        amount,
+        creditAmount,
+        date,
+        personRegistered,
+        editPerson,
+        name,
+        email,
+        loadData,
+        guid,
+        cannotBeChanged,
+        acceptChanges,
+        notEntered,
     }
 }
