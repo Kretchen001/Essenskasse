@@ -7,20 +7,63 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<h2>Übersicht</h2>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="boxZuBeachten">
+            <h3><u>Zu beachten</u></h3>
+            @for (int i = 0; i < person.Count; i += 1) {
+                @if (positivSaldo.Contains(i)) {
+                    <ShowPersonCard Person="person[i]" PositivSaldo="true" />
+                }
+            }
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="boxUnverdaechtig">
+            <h3><u>Unverdächtig</u></h3>
+            @for (int i = 0; i < person.Count; i += 1) {
+                @if (!positivSaldo.Contains(i)) {
+                    <ShowPersonCard Person="person[i]" PositivSaldo="false" />
+                }
+            }
+        </div>
+    </div>
+</div>
 
 <button @onclick="RecalculateSaldos">
     Saldo neu berechnen lassen
 </button>
 
 @code {
+    private List<Person> person = new List<Person>();
+    private List<int> positivSaldo = new List<int>();
+
+    protected override async Task OnInitializedAsync () {
+        await requestAllPerson();
+        base.StateHasChanged();
+    }
+
+    private async Task requestAllPerson () {
+        // Request all Person, that are saved in the database
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
+            person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
+            person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+        }
+    }
 
     private async void RecalculateSaldos() {
         // Request all providers, that are saved in the database.
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
+                Method = HttpMethod.Put,
                 RequestUri = new Uri(Config["API-Adress"] + "person/updateDatabasePersonSaldo")
             };
 
@@ -28,7 +71,8 @@ Welcome to your new app.
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                await JSRuntime.InvokeVoidAsync("alert", "Erfolg\nAber muss noch implementiert werden.");
+                await requestAllPerson();
+                base.StateHasChanged();
             }
         }
         catch {

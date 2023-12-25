@@ -1,0 +1,20 @@
+﻿@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Config
+@inject IStringLocalizer<App> _loc
+
+<h5>@Person.Name</h5>
+
+<label>
+    @Person.Saldo.ToString()
+</label>
+
+
+@code {
+    [Parameter]
+    public Person Person { get; set; } = new Person();
+
+    [Parameter]
+    public bool PositivSaldo { get; set; } = false;
+
+}
