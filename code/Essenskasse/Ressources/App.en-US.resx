@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="acceptChanges" xml:space="preserve">
+    <value>Accept changes</value>
+  </data>
   <data name="add" xml:space="preserve">
     <value>Add</value>
   </data>
@@ -132,8 +135,23 @@
   <data name="available" xml:space="preserve">
     <value>Available</value>
   </data>
+  <data name="cannotBeChanged" xml:space="preserve">
+    <value>(cannot be changed!)</value>
+  </data>
   <data name="colortheme" xml:space="preserve">
     <value>Colortheme</value>
+  </data>
+  <data name="creditAmount" xml:space="preserve">
+    <value>Credit the amount!</value>
+  </data>
+  <data name="date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="editPerson" xml:space="preserve">
+    <value>Edit Person</value>
+  </data>
+  <data name="email" xml:space="preserve">
+    <value>E-Mail</value>
   </data>
   <data name="english" xml:space="preserve">
     <value>English</value>
@@ -141,14 +159,29 @@
   <data name="german" xml:space="preserve">
     <value>German</value>
   </data>
+  <data name="guid" xml:space="preserve">
+    <value>Guid</value>
+  </data>
   <data name="language" xml:space="preserve">
     <value>Language</value>
+  </data>
+  <data name="loadData" xml:space="preserve">
+    <value>Load data</value>
+  </data>
+  <data name="name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="notEntered" xml:space="preserve">
+    <value>Not entered...</value>
   </data>
   <data name="payment" xml:space="preserve">
     <value>Payment</value>
   </data>
   <data name="person" xml:space="preserve">
     <value>Person</value>
+  </data>
+  <data name="personRegistered" xml:space="preserve">
+    <value>Persons registered</value>
   </data>
   <data name="provider" xml:space="preserve">
     <value>Provider</value>

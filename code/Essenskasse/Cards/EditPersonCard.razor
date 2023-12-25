@@ -1,6 +1,7 @@
 @inject HttpClient HttpClient
-@inject IConfiguration Config
 @inject IJSRuntime JSRuntime
+@inject IConfiguration Config
+@inject IStringLocalizer<App> _loc
 
 <style>
     .Rahmen {
@@ -20,33 +21,33 @@
     <div class="row Zeile" style="border-bottom: 1px solid; border-bottom-color: lightgray;">
         <div class="col-lg-4">
             <label>
-                Guid (nicht änderbar!)
+                @_loc[nameof(RessourceAppStrings.guid)] @_loc[nameof(RessourceAppStrings.cannotBeChanged)]
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" placeholder="Guid" id="idGuid"
+            <input type="text" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.guid)]" id="idGuid"
                    style="width: 100%;" @bind-value="selectedPerson">
         </div>
     </div>
     <div class="row Zeile" style="border-bottom: 1px solid; border-bottom-color: lightgray">
         <div class="col-lg-4">
             <label>
-                Name
+                @_loc[nameof(RessourceAppStrings.name)]
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" placeholder="Name" id="idName"
+            <input type="text" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.name)]" id="idName"
                    style="width: 100%;" @bind-value="person.Name">
         </div>
     </div>
     <div class="row Zeile">
         <div class="col-lg-4">
             <label>
-                Email
+                @_loc[nameof(RessourceAppStrings.email)]
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" placeholder="E-Mail" id="idEmail"
+            <input type="text" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.email)]" id="idEmail"
                    style="width: 100%;" @bind-value="person.Email">
         </div>
     </div>
@@ -55,12 +56,12 @@
         </div>
         <div class="col-lg-4">
             <button @onclick="() => requestPersonFromTheGuidInput()">
-                Daten laden
+                @_loc[nameof(RessourceAppStrings.loadData)]
             </button>
         </div>
         <div class="col-lg-4">
             <button disabled="@dataNotLoadYet" @onclick="() => commitChangesToApi()">
-                Änderungen akzeptieren
+                @_loc[nameof(RessourceAppStrings.acceptChanges)]
             </button>
         </div>
         <div class="col-lg-2">

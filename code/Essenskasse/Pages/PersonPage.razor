@@ -33,54 +33,63 @@
     @if (!accessToAdd) {
         <button style="width: fit-content;"
         @onclick="() => {accessToAdd = true;}">
-            Neue Person hinzufügen.
+            @_loc[nameof(RessourceAppStrings.addPerson)]
         </button>
     }
     else {
         <div class="col-lg-2">
             <label style="vertical-align: middle;">
-                Hinzuzufügen
+                @_loc[nameof(RessourceAppStrings.add)]
             </label>
         </div>
         <div class="col-lg-8">
             <div class="row">
-                <input type="text" name="nameHinzuzufuegen" placeholder="Name" id="idHinzuzufuegen"
+                <input type="text" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.name)]" id="idHinzuzufuegen"
                        style="width: 100%;" @bind-value="newPersonName">
             </div>
             <div class="row">
-                <input type="email" name="nameHinzuzufuegen" placeholder="E-Mail" id="idHinzuzufuegen"
+                <input type="email" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.email)]" id="idHinzuzufuegen"
                        style="width: 100%;" @bind-value="newPersonEmail">
             </div>
         </div>
         <div class="col-lg-2">
             <button @onclick="() => { addNewPerson(); }">
-                Abschicken!
+                @_loc[nameof(RessourceAppStrings.submit)]
             </button>
         </div>
     }
 </div>
 <div class="row">
     <h4 style="margin-top: 1rem;">
-        Personen registriert
+        @_loc[nameof(RessourceAppStrings.personRegistered)]
     </h4>
     <table>
         <tr>
-            <th style="padding-left: 5px;">Guid</th>
-            <th style="padding-left: 5px;">Name</th>
-            <th style="padding-left: 5px;">E-Mail</th>
+            <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.guid)]</th>
+            <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.name)]</th>
+            <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.email)]</th>
         </tr>
         @foreach (var x in person) {
-            <tr>
-                <td style="padding-left: 5px;">@x.Guid</td>
-                <td style="padding-left: 5px;">@x.Name</td>
-                <td style="padding-left: 5px;">@x.Email</td>
-            </tr>
+            @if (x.Email.Equals("")) {
+                <tr>
+                    <td style="padding-left: 5px;">@x.Guid</td>
+                    <td style="padding-left: 5px;">@x.Name</td>
+                    <td style="padding-left: 5px; color: gray">@_loc[nameof(RessourceAppStrings.notEntered)]</td>
+                </tr>
+            }
+            else {
+                <tr>
+                    <td style="padding-left: 5px;">@x.Guid</td>
+                    <td style="padding-left: 5px;">@x.Name</td>
+                    <td style="padding-left: 5px;">@x.Email</td>
+                </tr>
+            }
         }
     </table>
 </div>
 <div class="row">
     <h4 style="margin-top: 1rem;">
-        Person bearbeiten
+        @_loc[nameof(RessourceAppStrings.editPerson)]
     </h4>
     <EditPersonCard OnChangeCommit="ChangeOfPersonCommit" />
 </div>
