@@ -7,35 +7,76 @@
 
 <PageTitle>Home</PageTitle>
 
-<h2>Übersicht</h2>
+
 <div class="row">
-    <div class="col-lg-6">
-        <div class="boxZuBeachten">
-            <h3><u>Zu beachten</u></h3>
+    <div class="col-lg-4">
+        <h2>Übersicht</h2>
+    </div>
+    <div class="col-lg-8">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" unchecked @bind="isSingleListWish">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Einspaltig = @returnListWish</label>
+        </div>
+    </div>
+</div>
+
+@if (isSingleListWish) {
+    <div class="row">
+        <div class="col-lg-12">
             @for (int i = 0; i < person.Count; i += 1) {
-                @if (positivSaldo.Contains(i)) {
+                @if (!positivSaldo.Contains(i)) {
+                    <ShowPersonCard Person="person[i]" PositivSaldo="true" />
+                }
+                else {
                     <ShowPersonCard Person="person[i]" PositivSaldo="false" />
                 }
             }
         </div>
     </div>
-    <div class="col-lg-6">
-        <div class="boxUnverdaechtig">
-            <h3><u>Unverdächtig</u></h3>
-            @for (int i = 0; i < person.Count; i += 1) {
-                @if (!positivSaldo.Contains(i)) {
-                    <ShowPersonCard Person="person[i]" PositivSaldo="true" />
+}
+else {
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="boxZuBeachten">
+                <h3><u>Zu beachten</u></h3>
+                @for (int i = 0; i < person.Count; i += 1) {
+                    @if (positivSaldo.Contains(i)) {
+                        <ShowPersonCard Person="person[i]" PositivSaldo="false" />
+                    }
                 }
-            }
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="boxUnverdaechtig">
+                <h3><u>Unverdächtig</u></h3>
+                @for (int i = 0; i < person.Count; i += 1) {
+                    @if (!positivSaldo.Contains(i)) {
+                        <ShowPersonCard Person="person[i]" PositivSaldo="true" />
+                    }
+                }
+            </div>
         </div>
     </div>
-</div>
+}
 
 <button @onclick="RecalculateSaldos">
     Saldo neu berechnen lassen
 </button>
 
 @code {
+    private bool isSingleListWish = false;
+
+    private string returnListWish {
+        get {
+            if (isSingleListWish) {
+                return "Ja";
+            }
+            else {
+                return "Nein";
+            }
+        }
+    }
+
     private List<Person> person = new List<Person>();
     private List<int> positivSaldo = new List<int>();
 
@@ -57,6 +98,7 @@
             person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
             person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
             person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+            person = person.OrderBy(x => x.Name).ToList();
         }
     }
 
