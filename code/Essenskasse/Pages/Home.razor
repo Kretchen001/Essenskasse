@@ -14,7 +14,7 @@
             <h3><u>Zu beachten</u></h3>
             @for (int i = 0; i < person.Count; i += 1) {
                 @if (positivSaldo.Contains(i)) {
-                    <ShowPersonCard Person="person[i]" PositivSaldo="true" />
+                    <ShowPersonCard Person="person[i]" PositivSaldo="false" />
                 }
             }
         </div>
@@ -24,7 +24,7 @@
             <h3><u>Unverdächtig</u></h3>
             @for (int i = 0; i < person.Count; i += 1) {
                 @if (!positivSaldo.Contains(i)) {
-                    <ShowPersonCard Person="person[i]" PositivSaldo="false" />
+                    <ShowPersonCard Person="person[i]" PositivSaldo="true" />
                 }
             }
         </div>

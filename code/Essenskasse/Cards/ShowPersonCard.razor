@@ -3,11 +3,26 @@
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
 
-<h5>@Person.Name</h5>
+@if (PositivSaldo) {
+    <div style="border: 0.2rem; border-style: outset; border-radius: 5px; margin: 0.25rem; padding: 0.25rem;
+                background-color: aquamarine; color: black;">
+        <h5>@Person.Name</h5>
 
-<label>
-    @Person.Saldo.ToString()
-</label>
+        <label>
+            @Person.Saldo.ToString()
+        </label>
+    </div>
+}
+else {
+    <div style="border: 0.2rem; border-style: outset; border-radius: 5px; margin: 0.25rem; padding: 0.25rem;
+                background-color: mistyrose; color: black;">
+        <h5>@Person.Name</h5>
+
+        <label>
+            @Person.Saldo.ToString()
+        </label>
+    </div>
+}
 
 
 @code {
