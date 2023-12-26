@@ -17,7 +17,7 @@ namespace Modells {
         public string Email { get; set; } = "";
         /// <summary></summary>
         [JsonInclude]
-        public Money Saldo = new Money();
+        public Money Saldo { get; set; } = new Money();
 
         /// <summary></summary>
         public Person() { }
@@ -27,6 +27,7 @@ namespace Modells {
         /// <param name="name"></param>
         /// <param name="email"></param>
         /// <param name="money"></param>
+        [JsonConstructor]
         public Person(Guid guid, string name, string? email, Money money) {
             Guid = guid;
             Name = name;
@@ -38,7 +39,6 @@ namespace Modells {
         /// <param name="guid"></param>
         /// <param name="name"></param>
         /// <param name="email"></param>
-        [JsonConstructor]
         public Person(Guid guid, string name, string? email) {
             Guid = guid;
             Name = name;
