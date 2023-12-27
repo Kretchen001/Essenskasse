@@ -26,10 +26,11 @@ else {
 
 
 @code {
+    /// <summary>Person, that the Card must show.</summary>
     [Parameter]
     public Person Person { get; set; } = new Person();
 
+    /// <summary>Status of the Person's saldo.</summary>
     [Parameter]
     public bool PositivSaldo { get; set; } = false;
-
 }

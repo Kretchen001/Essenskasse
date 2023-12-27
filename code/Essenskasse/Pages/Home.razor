@@ -17,7 +17,7 @@
     <div class="col-lg-8">
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="isSingleListWish">
-            <label class="form-check-label" for="flexSwitchCheckChecked">Einspaltig = @returnListWish</label>
+            <label class="form-check-label" for="flexSwitchCheckChecked">@_loc[nameof(RessourceAppStrings.singleColumn)] = @returnListWish</label>
         </div>
     </div>
 </div>
@@ -79,10 +79,10 @@ else {
     private string returnListWish {
         get {
             if (isSingleListWish) {
-                return "Ja";
+                return _loc[nameof(RessourceAppStrings.yes)];
             }
             else {
-                return "Nein";
+                return _loc[nameof(RessourceAppStrings.no)];
             }
         }
     }

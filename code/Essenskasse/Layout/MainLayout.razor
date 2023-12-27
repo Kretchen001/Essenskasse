@@ -10,12 +10,6 @@
     </div>
 
     <main>
-        @*
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-        *@
-
         <article class="content px-4">
             @Body
         </article>
@@ -26,7 +20,7 @@
 
     protected override async Task OnInitializedAsync() {
         await collectUserThemeAsync();
-        await readLocalStorageListWish();
+        await readLocalStorage();
     }
 
     /// <summary> Request the LocalStorage for a saved theme. If no one is found is the light-theme selected. </summary>
@@ -43,7 +37,8 @@
         }
     }
 
-    private async Task readLocalStorageListWish() {
+    /// <summary>Read all Key-Value Pairs from the LocalStorage and bring it to its necessary place.</summary>
+    private async Task readLocalStorage() {
         AppData.IsSingleListWishDashboard = await LocalStorage.GetItemAsync<bool>("IsSingleWishListDashboard");
     }
 }
