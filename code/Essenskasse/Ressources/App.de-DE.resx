@@ -144,6 +144,12 @@
   <data name="creditAmount" xml:space="preserve">
     <value>Betrag gutschreiben!</value>
   </data>
+  <data name="currentlySelected" xml:space="preserve">
+    <value>aktuell ausgewählt</value>
+  </data>
+  <data name="dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
   <data name="date" xml:space="preserve">
     <value>Datum</value>
   </data>
@@ -171,6 +177,9 @@
   <data name="name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="no" xml:space="preserve">
+    <value>Nein</value>
+  </data>
   <data name="notEntered" xml:space="preserve">
     <value>Nicht eingetragen...</value>
   </data>
@@ -195,7 +204,13 @@
   <data name="settings" xml:space="preserve">
     <value>Einstellungen</value>
   </data>
+  <data name="singleColumn" xml:space="preserve">
+    <value>Einspaltig</value>
+  </data>
   <data name="submit" xml:space="preserve">
     <value>Abschicken!</value>
+  </data>
+  <data name="yes" xml:space="preserve">
+    <value>Ja</value>
   </data>
 </root>

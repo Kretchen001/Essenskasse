@@ -28,5 +28,10 @@
         cannotBeChanged,
         acceptChanges,
         notEntered,
+        yes,
+        no,
+        singleColumn,
+        dashboard,
+        currentlySelected,
     }
 }

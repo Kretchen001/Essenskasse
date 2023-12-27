@@ -4,6 +4,8 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
+@inject ILocalStorageService LocalStorage
+@inject AppDataService AppData
 
 <PageTitle>Home</PageTitle>
 
@@ -14,8 +16,8 @@
     </div>
     <div class="col-lg-8">
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" unchecked @bind="isSingleListWish">
-            <label class="form-check-label" for="flexSwitchCheckChecked">Einspaltig = @returnListWish</label>
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="isSingleListWish">
+            <label class="form-check-label" for="flexSwitchCheckChecked">@_loc[nameof(RessourceAppStrings.singleColumn)] = @returnListWish</label>
         </div>
     </div>
 </div>
@@ -64,15 +66,23 @@ else {
 </button>
 
 @code {
-    private bool isSingleListWish = false;
+    private bool isSingleListWish {
+        get {
+            return AppData.IsSingleListWishDashboard;
+        }
+        set {
+            AppData.IsSingleListWishDashboard = value;
+            WriteWishListToLocalStorage(value);
+        }
+    }
 
     private string returnListWish {
         get {
             if (isSingleListWish) {
-                return "Ja";
+                return _loc[nameof(RessourceAppStrings.yes)];
             }
             else {
-                return "Nein";
+                return _loc[nameof(RessourceAppStrings.no)];
             }
         }
     }
@@ -120,5 +130,9 @@ else {
         catch {
             await JSRuntime.InvokeVoidAsync("alert", "Keine API Verbindung möglich!");
         }
+    }
+
+    private async void WriteWishListToLocalStorage(bool value) {
+        await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
     }
 }
