@@ -23,27 +23,47 @@
 </div>
 
 <div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
-    <div class="col-lg-3">
+    <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.colortheme)]
         </label>
     </div>
-    <div class="col-lg-6" style="">
-        <select @bind="@currentTheme" style="width: 100%;">
+    <div class="col-lg-8" align="center">
+        <select @bind="@currentTheme">
             @foreach (var entity in themeList) {
                 <option value="@entity.Key">@entity.Value</option>
             }
         </select>
-    </div>
-    <div class="col-lg-3 text-center">
         <button @onclick="() => saveUserThemePersistentAsync()">
             @_loc[nameof(RessourceAppStrings.savePermanent)]
         </button>
     </div>
 </div>
 
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-4">
+        <label>
+            @_loc[nameof(RessourceAppStrings.singleColumn)] (@_loc[nameof(RessourceAppStrings.currentlySelected)])
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        @returnListWish
+    </div>
+</div>
+
 @code {
     ColorCode colorCode = 0;
+
+    private string returnListWish {
+        get {
+            if (AppData.IsSingleListWishDashboard) {
+                return _loc[nameof(RessourceAppStrings.yes)];
+            }
+            else {
+                return _loc[nameof(RessourceAppStrings.no)];
+            }
+        }
+    }
 
     private void ChangeTheme(string value) {
         if (value.Equals("Dark")) {

@@ -31,5 +31,7 @@
         yes,
         no,
         singleColumn,
+        dashboard,
+        currentlySelected,
     }
 }

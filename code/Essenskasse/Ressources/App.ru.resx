@@ -144,6 +144,12 @@
   <data name="creditAmount" xml:space="preserve">
     <value>Зачислите сумму!</value>
   </data>
+  <data name="currentlySelected" xml:space="preserve">
+    <value>выбранный в данный момент</value>
+  </data>
+  <data name="dashboard" xml:space="preserve">
+    <value>Приборная панель</value>
+  </data>
   <data name="date" xml:space="preserve">
     <value>Дата</value>
   </data>
