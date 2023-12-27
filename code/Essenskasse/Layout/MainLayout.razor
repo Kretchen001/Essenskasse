@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
 @inject AppDataService AppData
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject ILocalStorageService LocalStorage
 @inject ThemeService themeService
 
 <div class="page">
@@ -26,6 +26,7 @@
 
     protected override async Task OnInitializedAsync() {
         await collectUserThemeAsync();
+        await readLocalStorageListWish();
     }
 
     /// <summary> Request the LocalStorage for a saved theme. If no one is found is the light-theme selected. </summary>
@@ -40,5 +41,9 @@
                     break;
                 }
         }
+    }
+
+    private async Task readLocalStorageListWish() {
+        AppData.IsSingleListWishDashboard = await LocalStorage.GetItemAsync<bool>("IsSingleWishListDashboard");
     }
 }
