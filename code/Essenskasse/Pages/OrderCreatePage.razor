@@ -15,7 +15,7 @@
         </label>
     </div>
     <div class="col-lg-9 align-self-center">
-        <input type="date" @bind-value="ausgewaehltesDatum" />
+        <input type="date" @bind-value="selectedDate" />
     </div>
 </div>
 
@@ -57,7 +57,7 @@
     private List<Person> person = new List<Person>();
     private List<Money> money = new List<Money>();
 
-    private DateTime ausgewaehltesDatum;
+    private DateTime selectedDate = DateTime.Now;
 
     private Guid selectedProvider;
 
