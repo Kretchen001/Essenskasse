@@ -105,6 +105,7 @@ else {
         HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
         if (response.IsSuccessStatusCode) {
+            person.Clear();
             person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
             person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
             person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
