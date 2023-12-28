@@ -1,0 +1,46 @@
+﻿@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<App> _loc
+
+<div class="row" style="padding: 0.5rem;">
+    <div class="col-lg-4 align-self-center">
+        <label style="margin-left: 0.75vw;">
+            @PersonName
+        </label>
+    </div>
+    <div class="col-lg-8 align-self-center">
+        <input style="width: 25vw" type="number" @bind="orderAmount" placeholder="Euro,Cent -> 1000 = 10,00€" @onfocusout="orderToMoney">
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string PersonName { get; set; } = "";
+
+    [Parameter]
+    public Money Money { get; set; } = new Money();
+    private Money _money;
+
+    [Parameter]
+    public EventCallback<Money> OnValuesChanged { get; set; }
+
+    private int orderAmount = 0;
+
+    private async Task UpdateValues() {
+        // Money = _money;
+
+        // inform the parent that a change is there
+        await OnValuesChanged.InvokeAsync(Money);
+    }
+
+    private async void orderToMoney() {
+        try {
+            short cent = (short)(orderAmount % 100);
+            long euro = (long)((orderAmount - cent) * 0.01);
+            Money = new Money(euro, cent);
+            UpdateValues();
+        }
+        catch {
+            JSRuntime.InvokeVoidAsync("alert", "Betrag invalide!");
+        }
+    }
+}
