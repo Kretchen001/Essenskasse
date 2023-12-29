@@ -26,7 +26,7 @@
     <div class="row">
         <div class="col-lg-12">
             @for (int i = 0; i < person.Count; i += 1) {
-                @if (!positivSaldo.Contains(i)) {
+                @if (positivSaldo.Contains(i)) {
                     <ShowPersonCard Person="person[i]" PositivSaldo="true" />
                 }
                 else {
@@ -42,7 +42,7 @@ else {
             <div class="boxZuBeachten">
                 <h3><u>Zu beachten</u></h3>
                 @for (int i = 0; i < person.Count; i += 1) {
-                    @if (positivSaldo.Contains(i)) {
+                    @if (!positivSaldo.Contains(i)) {
                         <ShowPersonCard Person="person[i]" PositivSaldo="false" />
                     }
                 }
@@ -52,7 +52,7 @@ else {
             <div class="boxUnverdaechtig">
                 <h3><u>Unverdächtig</u></h3>
                 @for (int i = 0; i < person.Count; i += 1) {
-                    @if (!positivSaldo.Contains(i)) {
+                    @if (positivSaldo.Contains(i)) {
                         <ShowPersonCard Person="person[i]" PositivSaldo="true" />
                     }
                 }
@@ -105,10 +105,16 @@ else {
         HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
         if (response.IsSuccessStatusCode) {
+            person.Clear();
             person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
             person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
             person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
             person = person.OrderBy(x => x.Name).ToList();
+            for (int i = 0; i < person.Count; i += 1) {
+                if (person[i].Saldo.IsPositiv()) {
+                    positivSaldo.Add(i);
+                }
+            }
         }
     }
 

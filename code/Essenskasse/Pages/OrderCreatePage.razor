@@ -1,0 +1,252 @@
+﻿@page "/orderCreate"
+
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Config
+@inject IStringLocalizer<App> _loc
+
+<PageTitle>Neue Bestellung aufgeben</PageTitle>
+<h2>Neue Bestellung aufgeben</h2>
+
+<div class="row" style="margin-bottom: 1rem; margin-top: 1rem;">
+    <div class="col-lg-3 align-self-center">
+        <label>
+            Datum
+        </label>
+    </div>
+    <div class="col-lg-9 align-self-center">
+        <input type="date" @bind-value="selectedDate" />
+    </div>
+</div>
+
+<br />
+
+<div class="row" style="margin-bottom: 1rem;">
+    <div class="col-lg-3 align-self-center">
+        <label>
+            Anbieter
+        </label>
+    </div>
+    <div class="col-lg-9">
+        <select class="form-select" @bind="@selectedProvider">
+            @foreach (var x in providers) {
+                <option value="@x.Guid">@x.Designation</option>
+            }
+        </select>
+    </div>
+</div>
+
+<br />
+
+@foreach (int i in Enumerable.Range(0, person.Count)) {
+    <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-8">
+                    <PersonOrderCard PersonName="@person[i].Name" Money="@money[i]"
+                        OnValuesChanged="(ChangedValues => HandleValuesChanged(i, ChangedValues))" />
+                </div>
+                <div class="col-lg-2 align-self-center">
+                    <label>
+                        @money[i].ToString()
+                    </label>
+                </div>
+                <div class="col-lg-2 align-self-center">
+                    @if (showHistory[i]) {
+                        <button @onclick="() => loadAndShowHistory(i)">
+                            Bestellungshistorie ausblenden
+                        </button>
+                    }
+                    else {
+                        <button @onclick="() => loadAndShowHistory(i)">
+                            Bestellungshistorie
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                @if (showHistory[i]) {
+                    <div style="border: 0.5rem ridge; margin: 0.5rem;">
+                        <PersonOrderHistoryCard Orders="shownOrders[i]"/>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<br />
+
+<div class="row justify-content-between">
+    <button @onclick="postOrderForTheDay">
+        Bestellung aufgeben
+    </button>
+</div>
+
+@code {
+    private List<Provider> providers = new List<Provider>();
+    private List<Person> person = new List<Person>();
+    private List<Money> money = new List<Money>();
+    private List<List<Order>> shownOrders = new List<List<Order>>();
+
+    private DateTime selectedDate = DateTime.Now;
+
+    private Guid selectedProvider;
+
+    private List<bool> showHistory = new List<bool>();
+
+    private int amount = 25;
+
+    protected override async Task OnInitializedAsync() {
+        await requestAllProvider();
+        await requestAllPerson();
+        base.StateHasChanged();
+    }
+
+    private async Task requestAllProvider() {
+        // Request all providers, that are saved in the database.
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "provider/requestAll")
+            };
+
+        try {
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+            if (response.IsSuccessStatusCode) { // success?
+                                                // deserialize the result-JSON with Newtownsoft to the List
+                providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
+                providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
+            }
+        }
+        catch {
+            await JSRuntime.InvokeVoidAsync("alert", "Keine API Verbindung möglich!");
+        }
+    }
+
+    private async Task requestAllPerson() {
+        // Request all Person, that are saved in the database
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            person.Clear();
+            person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
+            person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
+            person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+            person = person.OrderBy(x => x.Name).ToList();
+            foreach (Person x in person) {
+                money.Add(new Money());
+                showHistory.Add(false);
+                shownOrders.Add(new List<Order>());
+            }
+        }
+    }
+
+    private void HandleValuesChanged(int index, Money changedValues) {
+        // Access to the changed Money
+        Money newMoney = changedValues;
+
+        // update List
+        money[index] = newMoney;
+    }
+
+    private async Task postOrderForTheDay() {
+        // request Date
+        HttpRequestMessage httpRequestMessageDate = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "order/requestDate"),
+                Headers = {
+                    { "dateString", selectedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffK") }
+                }
+            };
+
+        HttpResponseMessage responseDate = await HttpClient.SendAsync(httpRequestMessageDate);
+
+        if (!responseDate.IsSuccessStatusCode) {
+            await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
+        }
+        else {
+            int res = Int32.Parse(await responseDate.Content.ReadAsStringAsync());
+            if(res != 0) {
+                if(!(await JSRuntime.InvokeAsync<bool>("confirm",
+                                                        String.Format(
+                                                            "An diesem Tag wurde(n) bereits {0} Bestellung(en) vorgefunden.\n" +
+                                                            "Dennoch eintragen? (Ja)",
+                                                            res)))) {
+                    return;
+                }
+            }
+        }
+
+        // collect orders
+        List<Order> orders = new List<Order>();
+        for (int i = 0; i < person.Count; i += 1) {
+            if (money[i].Euro.Equals(0) && money[i].Cent.Equals(0)) {
+                // empty -> so do nothing
+            }
+            else {
+                Provider p = providers.Find(x => x.Guid.Equals(selectedProvider))!;
+                orders.Add(new Order(
+                    dateTime: selectedDate,
+                    money: money[i],
+                    provider: p,
+                    referencedPerson: person[i].Guid
+                ));
+            }
+        }
+
+        if (orders.Count == 0) {
+            await JSRuntime.InvokeVoidAsync("alert", "Bei niemanden etwas eingetragen!");
+        }
+
+        // send orders
+        foreach (Order x in orders) {
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "order/insertNew"),
+                    Content = new StringContent(JsonConvert.SerializeObject(x), Encoding.UTF8, "application/json")
+                };
+
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+            if (!response.IsSuccessStatusCode) {
+                await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
+            }
+        }
+    }
+
+    private async Task loadAndShowHistory(int index) {
+        // toggle preview
+        showHistory[index] = !showHistory[index];
+
+        // load data
+        Guid personGuid = person[index].Guid;
+
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "order/fromPerson"),
+                Headers = {
+                    { "guid", personGuid.ToString() },
+                    { "amount", amount.ToString() }
+                }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            shownOrders[index].Clear();
+            shownOrders[index] = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+            base.StateHasChanged();
+        }
+        else {
+            await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
+        }
+    }
+}

@@ -22,7 +22,7 @@ namespace EssenskasseAPI.LiteDB {
 
         /// <summary>Define the name of the table.</summary>
         private readonly string tableNamePayment = "Payment";
-        //private readonly string tableNameOrder = "Order"; // <- Preperation for later
+        private readonly string tableNameOrder = "Order";
         #endregion
 
         #region Function
@@ -81,17 +81,31 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="guid"></param>
         /// <returns></returns>
         public Money GetAllOrdersFromPerson(Guid guid) {
-            List<Payment> list = new List<Payment>();
-            Money money = new Money();
-                foreach (Payment x in list) {
-                    money.Euro += x.Amount.Euro;
-                    money.Cent += x.Amount.Cent;
+            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+                ILiteCollection<Order> col = db.GetCollection<Order>(tableNameOrder);
+
+                List<Order> list = new List<Order>();
+
+                IEnumerator<Order> enumerator = col.FindAll().GetEnumerator();
+                while (enumerator.MoveNext()) {
+                    Order currentOrder = enumerator.Current;
+                    if (currentOrder.ReferencedPerson.Equals(guid)) {
+                        list.Add(currentOrder);
+                    }
+                }
+                enumerator.Dispose();
+
+                Money money = new Money();
+                foreach (Order x in list) {
+                    money.Euro += x.Money.Euro;
+                    money.Cent += x.Money.Cent;
                 }
                 while (money.Cent > 100) {
                     money.Cent -= 100;
                     money.Euro += 1;
                 }
                 return money;
+            }
         }
         #endregion
     }

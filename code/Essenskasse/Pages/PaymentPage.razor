@@ -27,13 +27,18 @@
 </div>
 <br />
 <div class="row">
-    <div class="col-lg-3 align-self-center">
+    <div class="col-lg-2 align-self-center">
         <label>
             @_loc[nameof(RessourceAppStrings.amount)]
         </label>
     </div>
-    <div class="col-lg-9 align-self-center">
+    <div class="col-lg-8 align-self-center">
         <input style="width: 25vw" type="number" @bind="payment" placeholder="Euro,Cent -> 1000 = 10,00€">
+    </div>
+    <div class="col-lg-2 align-self-center">
+        <label>
+            @money.ToString()
+        </label>
     </div>
 </div>
 <br />
@@ -91,6 +96,13 @@
     }
 
     private int payment = 0;
+    private Money money {
+        get {
+            short cent = (short)(payment % 100);
+            long euro = (long)((payment - cent) * 0.01);
+            return new Money(euro, cent);
+        }
+    }
 
     private List<Payment> paymentsOfSelectedPerson = new List<Payment>();
     private int amount = 10;
@@ -140,10 +152,6 @@
     }
 
     private async void insertPayment () {
-        short cent = (short) (payment % 100);
-        long euro = (long) ((payment - cent) * 0.01);
-        Money money = new Money(euro, cent);
-
         if (!(await JSRuntime.InvokeAsync<bool>("confirm", "Folgenden Betrag eintragen?\n" + money.ToString()))) {
             return;
         }

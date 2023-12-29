@@ -37,16 +37,40 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpGet, Route("fromPerson")]
-        public IActionResult GetOrdersFromPersonPerGuid([FromHeader] Guid? guid) {
+        public IActionResult GetOrdersFromPersonPerGuid([FromHeader] Guid? guid,
+                                                            [FromHeader] int? amount) {
             if (guid is null) {
                 return BadRequest();
             }
-            List<Order>? orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid());
+            List<Order>? orders = null;
+            if (amount is null) { // request all
+                orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid());
+            }
+            else { // request amount
+                orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid(), amount);
+            }
             if (orders is not null) {
                 return Ok(JsonConvert.SerializeObject(orders));
             }
             else {
                 return NoContent();
+            }
+        }
+
+        [HttpGet, Route("requestDate")]
+        public IActionResult GetCountOfOrdersFromDay([FromHeader] string? dateString) {
+            if (dateString is not null) {
+                DateTime date = DateTime.Parse(dateString);
+                List<Order>? orders = _orderDbController.OrdersAtDay(date);
+                if (orders is not null) {
+                    return Ok(JsonConvert.SerializeObject(orders.Count));
+                }
+                else {
+                    return Ok(JsonConvert.SerializeObject(0));
+                }
+            }
+            else {
+                return BadRequest("Leeres Datum");
             }
         }
 

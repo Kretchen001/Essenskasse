@@ -65,10 +65,10 @@ namespace EssenskasseAPI.LiteDB {
         /// <summary></summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-        public List<Order> OrdersFromOnePersonPerGuid(Guid guid) {
+        public List<Order>? OrdersFromOnePersonPerGuid(Guid guid, int? amount = 0) {
             using (LiteDatabase db = new LiteDatabase(saveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
-                List<Order> matchingPayments = new List<Order>();
+                List<Order>? matchingPayments = new List<Order>();
 
                 IEnumerator<Order> enumerator = col.FindAll().GetEnumerator();
                 while (enumerator.MoveNext()) {
@@ -84,7 +84,12 @@ namespace EssenskasseAPI.LiteDB {
                 }
                 enumerator.Dispose();
 
-                return matchingPayments;
+                if (amount == 0) {
+                    return matchingPayments;
+                }
+                else {
+                    return matchingPayments.OrderByDescending(x => x.DateTime).Take(amount ?? 0).ToList();
+                }
             }
         }
 
@@ -121,9 +126,20 @@ namespace EssenskasseAPI.LiteDB {
         /// <returns></returns>
         public bool RemoveOrder(Order order) {
             using (LiteDatabase database = new LiteDatabase(saveDir)) {
-                ILiteCollection<Payment> col = database.GetCollection<Payment>();
+                ILiteCollection<Order> col = database.GetCollection<Order>();
 
                 return col.Delete(order.DateTime);
+            }
+        }
+
+        /// <summary></summary>
+        /// <param name="requestedDay"></param>
+        /// <returns></returns>
+        public List<Order> OrdersAtDay(DateTime requestedDay) {
+            using (LiteDatabase database = new LiteDatabase(saveDir)) {
+                ILiteCollection<Order> col = database.GetCollection<Order>();
+
+                return col.Query().Where(x => x.DateTime.Date.Equals(requestedDay.Date)).ToList();
             }
         }
         #endregion
