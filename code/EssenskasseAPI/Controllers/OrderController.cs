@@ -57,6 +57,22 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        [HttpGet, Route("requestDate")]
+        public IActionResult GetCountOfOrdersFromDay([FromHeader] string? dateString) {
+            if (dateString is not null) {
+                List<Order>? orders = _orderDbController.OrdersAtDay(DateTime.Parse(dateString));
+                if (orders is not null) {
+                    return Ok(JsonConvert.SerializeObject(orders.Count));
+                }
+                else {
+                    return Ok(JsonConvert.SerializeObject(0));
+                }
+            }
+            else {
+                return BadRequest("Leeres Datum");
+            }
+        }
+
         [HttpPost, Route("insertNew")]
         public IActionResult AddNewOrder([FromBody] Order? order) {
             if (order is not null) {
