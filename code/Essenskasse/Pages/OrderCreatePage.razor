@@ -40,7 +40,7 @@
 
 @foreach (int i in Enumerable.Range(0, person.Count)) {
     <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
-        <div class="col-lg-10">
+        <div class="col-lg-8">
             <PersonOrderCard PersonName="@person[i].Name" Money="@money[i]"
                 OnValuesChanged="(ChangedValues => HandleValuesChanged(i, ChangedValues))" />
         </div>
@@ -49,6 +49,14 @@
                 @money[i].ToString()
             </label>
         </div>
+        <div class="col-lg-2 align-self-center">
+            <button @onclick="() => loadAndShowHistory(i)">
+                Bestellungshistorie
+            </button>
+        </div>
+        @if (showHistory[i]) {
+            <PersonOrderHistoryCard Orders="shownOrders[i]"/>
+        }
     </div>
 }
 
@@ -64,10 +72,15 @@
     private List<Provider> providers = new List<Provider>();
     private List<Person> person = new List<Person>();
     private List<Money> money = new List<Money>();
+    private List<List<Order>> shownOrders = new List<List<Order>>();
 
     private DateTime selectedDate = DateTime.Now;
 
     private Guid selectedProvider;
+
+    private List<bool> showHistory = new List<bool>();
+
+    private int amount = 25;
 
     protected override async Task OnInitializedAsync() {
         await requestAllProvider();
@@ -113,6 +126,8 @@
             person = person.OrderBy(x => x.Name).ToList();
             foreach (Person x in person) {
                 money.Add(new Money());
+                showHistory.Add(false);
+                shownOrders.Add(new List<Order>());
             }
         }
     }
@@ -158,6 +173,34 @@
             if (!response.IsSuccessStatusCode) {
                 await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
             }
+        }
+    }
+
+    private async Task loadAndShowHistory(int index) {
+        // toggle preview
+        showHistory[index] = !showHistory[index];
+
+        // load data
+        Guid personGuid = person[index].Guid;
+
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "order/fromPerson"),
+                Headers = {
+                    { "guid", personGuid.ToString() },
+                    { "amount", amount.ToString() }
+                }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            shownOrders[index].Clear();
+            shownOrders[index] = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+            base.StateHasChanged();
+        }
+        else {
+            await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
         }
     }
 }
