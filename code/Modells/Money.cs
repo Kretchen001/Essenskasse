@@ -48,5 +48,14 @@ namespace Modells {
                 }
             }
         }
+
+        /// <summary>Is the current Money-value positiv?</summary>
+        /// <returns>Positiv or not</returns>
+        public bool IsPositiv() {
+            if (Cent < 0 || Euro < 0) {
+                return false;
+            }
+            return true;
+        }
     }
 }
