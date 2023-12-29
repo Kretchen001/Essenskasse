@@ -39,18 +39,26 @@
 <br />
 
 @foreach (int i in Enumerable.Range(0, person.Count)) {
-    <div class="row">
+    <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
         <div class="col-lg-10">
             <PersonOrderCard PersonName="@person[i].Name" Money="@money[i]"
                 OnValuesChanged="(ChangedValues => HandleValuesChanged(i, ChangedValues))" />
         </div>
-        <div class="col-lg-2">
+        <div class="col-lg-2 align-self-center">
             <label>
                 @money[i].ToString()
             </label>
         </div>
     </div>
 }
+
+<br />
+
+<div class="row justify-content-between">
+    <button @onclick="postOrderForTheDay">
+        Bestellung aufgeben
+    </button>
+</div>
 
 @code {
     private List<Provider> providers = new List<Provider>();
@@ -115,5 +123,41 @@
 
         // update List
         money[index] = newMoney;
+    }
+
+    private async Task postOrderForTheDay() {
+        List<Order> orders = new List<Order>();
+        for (int i = 0; i < person.Count; i += 1) {
+            if (money[i].Euro.Equals(0) && money[i].Cent.Equals(0)) {
+                // empty -> so do nothing
+            }
+            else {
+                Provider p = providers.Find(x => x.Guid.Equals(selectedProvider))!;
+                orders.Add(new Order(
+                    dateTime: selectedDate,
+                    money: money[i],
+                    provider: p,
+                    referencedPerson: person[i].Guid
+                ));
+            }
+        }
+
+        if (orders.Count == 0) {
+            await JSRuntime.InvokeVoidAsync("alert", "Bei niemanden etwas eingetragen!");
+        }
+
+        foreach (Order x in orders) {
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "order/insertNew"),
+                    Content = new StringContent(JsonConvert.SerializeObject(x), Encoding.UTF8, "application/json")
+                };
+
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+            if (!response.IsSuccessStatusCode) {
+                await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
+            }
+        }
     }
 }
