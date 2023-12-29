@@ -126,7 +126,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <returns></returns>
         public bool RemoveOrder(Order order) {
             using (LiteDatabase database = new LiteDatabase(saveDir)) {
-                ILiteCollection<Payment> col = database.GetCollection<Payment>();
+                ILiteCollection<Order> col = database.GetCollection<Order>();
 
                 return col.Delete(order.DateTime);
             }
