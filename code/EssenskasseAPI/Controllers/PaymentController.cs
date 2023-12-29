@@ -82,8 +82,8 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpPut, Route("update")]
         public IActionResult UpdatePayment([FromHeader] string? dateString,
-                                            [FromBody] Money? money,
-                                            [FromHeader] Guid? referencedPerson) {
+                                            [FromHeader] Guid? referencedPerson,
+                                            [FromBody] Money? money) {
             if (dateString is null) {
                 return BadRequest("Kein Datum angegeben!");
             }

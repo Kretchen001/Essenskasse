@@ -126,9 +126,20 @@ namespace EssenskasseAPI.LiteDB {
         /// <returns></returns>
         public bool RemoveOrder(Order order) {
             using (LiteDatabase database = new LiteDatabase(saveDir)) {
-                ILiteCollection<Payment> col = database.GetCollection<Payment>();
+                ILiteCollection<Order> col = database.GetCollection<Order>();
 
                 return col.Delete(order.DateTime);
+            }
+        }
+
+        /// <summary></summary>
+        /// <param name="requestedDay"></param>
+        /// <returns></returns>
+        public List<Order> OrdersAtDay(DateTime requestedDay) {
+            using (LiteDatabase database = new LiteDatabase(saveDir)) {
+                ILiteCollection<Order> col = database.GetCollection<Order>();
+
+                return col.Query().Where(x => x.DateTime.Date.Equals(requestedDay.Date)).ToList();
             }
         }
         #endregion
