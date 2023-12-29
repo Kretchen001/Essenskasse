@@ -40,23 +40,40 @@
 
 @foreach (int i in Enumerable.Range(0, person.Count)) {
     <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
-        <div class="col-lg-8">
-            <PersonOrderCard PersonName="@person[i].Name" Money="@money[i]"
-                OnValuesChanged="(ChangedValues => HandleValuesChanged(i, ChangedValues))" />
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-8">
+                    <PersonOrderCard PersonName="@person[i].Name" Money="@money[i]"
+                        OnValuesChanged="(ChangedValues => HandleValuesChanged(i, ChangedValues))" />
+                </div>
+                <div class="col-lg-2 align-self-center">
+                    <label>
+                        @money[i].ToString()
+                    </label>
+                </div>
+                <div class="col-lg-2 align-self-center">
+                    @if (showHistory[i]) {
+                        <button @onclick="() => loadAndShowHistory(i)">
+                            Bestellungshistorie ausblenden
+                        </button>
+                    }
+                    else {
+                        <button @onclick="() => loadAndShowHistory(i)">
+                            Bestellungshistorie
+                        </button>
+                    }
+                </div>
+            </div>
         </div>
-        <div class="col-lg-2 align-self-center">
-            <label>
-                @money[i].ToString()
-            </label>
+        <div class="row">
+            <div class="col-lg-12">
+                @if (showHistory[i]) {
+                    <div style="border: 0.5rem ridge; margin: 0.5rem;">
+                        <PersonOrderHistoryCard Orders="shownOrders[i]"/>
+                    </div>
+                }
+            </div>
         </div>
-        <div class="col-lg-2 align-self-center">
-            <button @onclick="() => loadAndShowHistory(i)">
-                Bestellungshistorie
-            </button>
-        </div>
-        @if (showHistory[i]) {
-            <PersonOrderHistoryCard Orders="shownOrders[i]"/>
-        }
     </div>
 }
 
