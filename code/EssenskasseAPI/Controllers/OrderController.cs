@@ -37,11 +37,18 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpGet, Route("fromPerson")]
-        public IActionResult GetOrdersFromPersonPerGuid([FromHeader] Guid? guid) {
+        public IActionResult GetOrdersFromPersonPerGuid([FromHeader] Guid? guid,
+                                                            [FromHeader] int? amount) {
             if (guid is null) {
                 return BadRequest();
             }
-            List<Order>? orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid());
+            List<Order>? orders = null;
+            if (amount is null) { // request all
+                orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid());
+            }
+            else { // request amount
+                orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid(), amount);
+            }
             if (orders is not null) {
                 return Ok(JsonConvert.SerializeObject(orders));
             }
