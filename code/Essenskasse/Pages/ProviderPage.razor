@@ -99,7 +99,12 @@
         <div class="col-lg-8">
             <input type="text" name="nameHinzuzufuegen" id="idHinzuzufuegen"
                    style="width: 100%; vertical-align: middle;"
-                   @bind-value="providerToDeleteGuid">
+                   @bind-value="providerToDeleteGuid" list="suggestions">
+            <datalist id="suggestions">
+                @foreach (Provider x in providers) {
+                    <option value="@x.Guid" />
+                }
+            </datalist>
         </div>
         <div class="col-lg-2" style="vertical-align: middle;">
             <button @onclick="() => deleteAnbieter()">
