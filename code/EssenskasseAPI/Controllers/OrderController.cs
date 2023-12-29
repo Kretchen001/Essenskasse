@@ -60,7 +60,8 @@ namespace EssenskasseAPI.Controllers {
         [HttpGet, Route("requestDate")]
         public IActionResult GetCountOfOrdersFromDay([FromHeader] string? dateString) {
             if (dateString is not null) {
-                List<Order>? orders = _orderDbController.OrdersAtDay(DateTime.Parse(dateString));
+                DateTime date = DateTime.Parse(dateString);
+                List<Order>? orders = _orderDbController.OrdersAtDay(date);
                 if (orders is not null) {
                     return Ok(JsonConvert.SerializeObject(orders.Count));
                 }

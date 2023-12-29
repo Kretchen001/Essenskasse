@@ -158,6 +158,34 @@
     }
 
     private async Task postOrderForTheDay() {
+        // request Date
+        HttpRequestMessage httpRequestMessageDate = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "order/requestDate"),
+                Headers = {
+                    { "dateString", selectedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffK") }
+                }
+            };
+
+        HttpResponseMessage responseDate = await HttpClient.SendAsync(httpRequestMessageDate);
+
+        if (!responseDate.IsSuccessStatusCode) {
+            await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
+        }
+        else {
+            int res = Int32.Parse(await responseDate.Content.ReadAsStringAsync());
+            if(res != 0) {
+                if(!(await JSRuntime.InvokeAsync<bool>("confirm",
+                                                        String.Format(
+                                                            "An diesem Tag wurde(n) bereits {0} Bestellung(en) vorgefunden.\n" +
+                                                            "Dennoch eintragen? (Ja)",
+                                                            res)))) {
+                    return;
+                }
+            }
+        }
+
+        // collect orders
         List<Order> orders = new List<Order>();
         for (int i = 0; i < person.Count; i += 1) {
             if (money[i].Euro.Equals(0) && money[i].Cent.Equals(0)) {
@@ -178,6 +206,7 @@
             await JSRuntime.InvokeVoidAsync("alert", "Bei niemanden etwas eingetragen!");
         }
 
+        // send orders
         foreach (Order x in orders) {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                     Method = HttpMethod.Post,
