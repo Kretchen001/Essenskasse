@@ -31,5 +31,17 @@ namespace Modells {
             Guid = Guid.NewGuid();
             this.Designation = designation;
         }
+
+        /// <summary></summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public bool Equals(Provider b) {
+            if (this.Guid.Equals(b.Guid)) {
+                if (this.Designation.Equals(b.Designation)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
