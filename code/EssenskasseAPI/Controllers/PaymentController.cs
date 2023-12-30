@@ -76,6 +76,7 @@ namespace EssenskasseAPI.Controllers {
                     Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
                     if (x is not null) {
                         x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, newPayment.Amount)!;
+                        _personDbController.UpdatePerson(x);
                     }
                     return Ok(JsonConvert.SerializeObject(newPayment));
                 }
