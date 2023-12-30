@@ -9,7 +9,6 @@
 
 <PageTitle>Home</PageTitle>
 
-
 <div class="row">
     <div class="col-lg-4">
         <h2>Übersicht</h2>
@@ -64,6 +63,13 @@ else {
 <button @onclick="RecalculateSaldos">
     Saldo neu berechnen lassen
 </button>
+
+@inject ToastService toastService
+
+<button class="btn btn-info" @onclick="@(() => toastService.ShowToast("A", ToastLevel.Info))">Info Toast</button>
+<button class="btn btn-success" @onclick="@(() => toastService.ShowToast("B", ToastLevel.Success))">Success Toast</button>
+<button class="btn btn-warning" @onclick="@(() => toastService.ShowToast("C", ToastLevel.Warning))">Warning Toast</button>
+<button class="btn btn-danger" @onclick="@(() => toastService.ShowToast("D", ToastLevel.Error))">Error Toast</button>
 
 @code {
     private bool isSingleListWish {
