@@ -88,5 +88,17 @@ namespace Modells {
                     }
             }
         }
+
+        /// <summary></summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public bool Equals(Money b) {
+            if (this.Euro.Equals(b.Euro)) {
+                if (this.Cent.Equals(b.Cent)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
