@@ -15,12 +15,18 @@ namespace Modells.Test {
 
         [Fact]
         public void ToStringTest_CentNegativ() {
-            Assert.Equal("-0,05€", new Money(0,-05).ToString());
+            Assert.Equal("-0,05€", new Money(0, -05).ToString());
+            Assert.Equal("-0,50€", new Money(0, -50).ToString());
+        }
+
+        [Fact]
+        public void ToStringTest_CentPositivSmallerTen() {
+            Assert.Equal("0,05€", new Money(0, 5).ToString());
         }
 
         [Fact]
         public void ToStringTest_BothNegativ() {
-            Assert.Equal("-8,30€", new Money(-8,-30).ToString());
+            Assert.Equal("-8,30€", new Money(-8, -30).ToString());
         }
     }
 }
