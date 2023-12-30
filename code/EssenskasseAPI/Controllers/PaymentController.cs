@@ -104,6 +104,13 @@ namespace EssenskasseAPI.Controllers {
                     paymentToUpdate.ReferencedPerson = referencedPerson ?? new Guid();
                 }
                 if (_paymentController.UpdatePayment(paymentToUpdate)) {
+                    // recalculate Person Saldo
+                    PersonDbController _personDbController = new PersonDbController();
+                    Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
+                    if (x is not null) {
+                        x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, paymentToUpdate.Amount)!;
+                        _personDbController.UpdatePerson(x);
+                    }
                     return Ok();
                 }
                 else {
