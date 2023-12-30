@@ -6,6 +6,7 @@
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject IJSRuntime JsRuntime
 @inject ThemeService themeService
+@inject ToastService ToastService
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.settings)]</PageTitle>
 
@@ -157,12 +158,14 @@
     /// <param name="value"></param>
     private async void saveAmountOfPaymentsPersistentAsync(int value) {
         await LocalStorage.SetItemAsync<int>("loadAmountOfPayments", value);
+        ToastService.ShowToast(value.ToString() + " erfolgreich festgelegt für die zu ladende Einzahlungen.", ToastLevel.Success);
     }
 
     /// <summary></summary>
     /// <param name="value"></param>
     private async void saveAmountOfOrderPersistentAsync (int value) {
         await LocalStorage.SetItemAsync<int>("loadAmountOfOrders", value);
+        ToastService.ShowToast(value.ToString() + " erfolgreich festgelegt für die zu ladende Bestellungen.", ToastLevel.Success);
     }
     #endregion
 }
