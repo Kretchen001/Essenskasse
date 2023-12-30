@@ -80,5 +80,11 @@ namespace Modells.Test {
                                                                 new Money(9, 95),
                                                                 new Money(10, 15))!));
         }
+
+        [Fact]
+        public void CalculateDefaultBranch() {
+            Money? a = new Money().CalculateMoney(null, new Money(40, 0), new Money(20, 0));
+            Assert.True(a is null);
+        }
     }
 }
