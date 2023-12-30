@@ -41,5 +41,6 @@
     private async Task readLocalStorage() {
         AppData.IsSingleListWishDashboard = await LocalStorage.GetItemAsync<bool>("IsSingleWishListDashboard");
         AppData.LoadAmountPayment = await LocalStorage.GetItemAsync<int>("loadAmountOfPayments");
+        AppData.LoadAmountOrder = await LocalStorage.GetItemAsync<int>("loadAmountOfOrders");
     }
 }

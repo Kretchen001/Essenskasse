@@ -125,6 +125,14 @@
             saveAmountOfPaymentsPersistentAsync(value);
         }
     }
+
+    private int loadAmountOrders {
+        get => AppData.LoadAmountOrder;
+        set {
+            AppData.LoadAmountOrder = value;
+            saveAmountOfOrderPersistentAsync(value);
+        }
+    }
     #endregion
 
     #region Functions
@@ -149,6 +157,12 @@
     /// <param name="value"></param>
     private async void saveAmountOfPaymentsPersistentAsync(int value) {
         await LocalStorage.SetItemAsync<int>("loadAmountOfPayments", value);
+    }
+
+    /// <summary></summary>
+    /// <param name="value"></param>
+    private async void saveAmountOfOrderPersistentAsync (int value) {
+        await LocalStorage.SetItemAsync<int>("loadAmountOfOrders", value);
     }
     #endregion
 }

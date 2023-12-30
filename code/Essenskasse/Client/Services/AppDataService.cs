@@ -9,5 +9,8 @@
 
         /// <summary></summary>
         public int LoadAmountPayment { get; set; } = 10;
+
+        /// <summary></summary>
+        public int LoadAmountOrder { get; set; } = 25;
     }
 }
