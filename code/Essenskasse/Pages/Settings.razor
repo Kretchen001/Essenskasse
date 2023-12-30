@@ -52,19 +52,35 @@
     </div>
 </div>
 
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-4">
+        <label>
+            Zu ladende Einzahlungen
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        <input type="number" @bind="loadAmountPayments" />
+    </div>
+</div>
+
 @code {
+
+    #region Variable
+    /// <summary></summary>
     ColorCode colorCode = 0;
 
+    /// <summary></summary>
     private bool isSingleListWish {
         get {
             return AppData.IsSingleListWishDashboard;
         }
         set {
             AppData.IsSingleListWishDashboard = value;
-            WriteWishListToLocalStorage(value);
+            writeWishListToLocalStorage(value);
         }
     }
 
+    /// <summary></summary>
     private string returnListWish {
         get {
             if (AppData.IsSingleListWishDashboard) {
@@ -76,7 +92,8 @@
         }
     }
 
-    private void ChangeTheme(string value) {
+    /// <summary></summary>
+    private void ChangeTheme (string value) {
         if (value.Equals("Dark")) {
             colorCode = ColorCode.Dark;
         }
@@ -85,6 +102,7 @@
         }
         themeService.ThemeCode = colorCode;
     }
+
     /// <summary> Set the current selection to the ThemeService. </summary>
     private string currentTheme {
         set => ChangeTheme(value);
@@ -99,6 +117,17 @@
         { "Dark", "Dunkel" }   
     };
 
+    /// <summary></summary>
+    private int loadAmountPayments {
+        get => AppData.LoadAmountPayment;
+        set {
+            AppData.LoadAmountPayment = value;
+            saveAmountOfPaymentsPersistentAsync(value);
+        }
+    }
+    #endregion
+
+    #region Functions
     /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>
     private async void saveUserThemePersistentAsync() {
         try {
@@ -112,7 +141,14 @@
 
     /// <summary>Save the Listform to localstorage persistant.</summary>
     /// <param name="value">new listwish bool</param>
-    private async void WriteWishListToLocalStorage (bool value) {
+    private async void writeWishListToLocalStorage (bool value) {
         await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
     }
+
+    /// <summary></summary>
+    /// <param name="value"></param>
+    private async void saveAmountOfPaymentsPersistentAsync(int value) {
+        await LocalStorage.SetItemAsync<int>("loadAmountOfPayments", value);
+    }
+    #endregion
 }

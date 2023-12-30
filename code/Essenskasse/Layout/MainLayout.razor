@@ -40,5 +40,6 @@
     /// <summary>Read all Key-Value Pairs from the LocalStorage and bring it to its necessary place.</summary>
     private async Task readLocalStorage() {
         AppData.IsSingleListWishDashboard = await LocalStorage.GetItemAsync<bool>("IsSingleWishListDashboard");
+        AppData.LoadAmountPayment = await LocalStorage.GetItemAsync<int>("loadAmountOfPayments");
     }
 }

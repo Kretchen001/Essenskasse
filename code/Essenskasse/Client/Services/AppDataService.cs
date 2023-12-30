@@ -6,5 +6,8 @@
         /// <summary>The value describes the user's preference as to whether the
         /// dashboard displays two lists of people or an alphabetical list.</summary>
         public bool IsSingleListWishDashboard { get; set; } = false;
+
+        /// <summary></summary>
+        public int LoadAmountPayment { get; set; } = 10;
     }
 }
