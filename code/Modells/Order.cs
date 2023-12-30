@@ -45,5 +45,21 @@ namespace Modells {
             Provider = provider;
             ReferencedPerson = referencedPerson;
         }
+
+        /// <summary></summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public bool Equals(Order b) {
+            if (this.DateTime.Equals(b.DateTime)) {
+                if (this.Money.Equals(b.Money)) {
+                    if (this.Provider.Equals(b.Provider)) {
+                        if (this.ReferencedPerson.Equals(b.ReferencedPerson)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
     }
 }
