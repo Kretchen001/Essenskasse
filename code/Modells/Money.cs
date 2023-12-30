@@ -57,5 +57,36 @@ namespace Modells {
             }
             return true;
         }
+
+        /// <summary></summary>
+        /// <param name="method">Which mathemtical operation should be used?</param>
+        /// <param name="money1">First Parameter (by Subtraction Minued)</param>
+        /// <param name="money2">Secount Parameter (by Subtraction Subtrahend)</param>
+        /// <returns></returns>
+        public Money? CalculateMoney(CalculationOperation method, Money money1, Money money2) {
+            switch (method) {
+                case CalculationOperation.Addition: {
+                        Money saldo = new Money(0, 0);
+                        long temp1 = money1.Cent + (100 * money1.Euro);
+                        long temp2 = money2.Cent + (100 * money2.Euro);
+                        long tempR = temp1 + temp2;
+                        saldo.Cent = (short)(tempR % 100);
+                        saldo.Euro = (long)((tempR - saldo.Cent) * 0.01); // multiply is faster then divide
+                        return saldo;
+                    }
+                case CalculationOperation.Substraction: {
+                        Money saldo = new Money(0, 0);
+                        long temp1 = money1.Cent + (100 * money1.Euro);
+                        long temp2 = money2.Cent + (100 * money2.Euro);
+                        long tempR = temp1 - temp2;
+                        saldo.Cent = (short)(tempR % 100);
+                        saldo.Euro = (long)((tempR - saldo.Cent) * 0.01); // multiply is faster then divide
+                        return saldo;
+                    }
+                default: {
+                        return null;
+                    }
+            }
+        }
     }
 }
