@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
+@inject AppDataService AppData
 
 <PageTitle>Neue Bestellung aufgeben</PageTitle>
 <h2>Neue Bestellung aufgeben</h2>
@@ -97,7 +98,9 @@
 
     private List<bool> showHistory = new List<bool>();
 
-    private int amount = 25;
+    private int amount {
+        get => AppData.LoadAmountOrder;
+    }
 
     protected override async Task OnInitializedAsync() {
         await requestAllProvider();
