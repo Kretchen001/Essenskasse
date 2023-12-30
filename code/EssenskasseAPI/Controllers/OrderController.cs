@@ -83,6 +83,13 @@ namespace EssenskasseAPI.Controllers {
                     return BadRequest("Provider existiert nicht!");
                 }
                 if (_orderDbController.NewOrder(order)) {
+                    // recalculate Person Saldo
+                    PersonDbController _personDbController = new PersonDbController();
+                    Person? x = _personDbController.PersonPerGuid(order.ReferencedPerson);
+                    if (x is not null) {
+                        x.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, x.Saldo, order.Money)!;
+                        _personDbController.UpdatePerson(x);
+                    }
                     return Ok(JsonConvert.SerializeObject(order));
                 }
                 else {
@@ -112,6 +119,13 @@ namespace EssenskasseAPI.Controllers {
                     orderToUpdate.ReferencedPerson = values.Item3 ?? new Guid();
                 }
                 if (_orderDbController.UpdateOrder(orderToUpdate)) {
+                    // recalculate Person Saldo
+                    PersonDbController _personDbController = new PersonDbController();
+                    Person? x = _personDbController.PersonPerGuid(orderToUpdate.ReferencedPerson);
+                    if (x is not null) {
+                        x.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, x.Saldo, orderToUpdate.Money)!;
+                        _personDbController.UpdatePerson(x);
+                    }
                     return Ok();
                 }
                 else {

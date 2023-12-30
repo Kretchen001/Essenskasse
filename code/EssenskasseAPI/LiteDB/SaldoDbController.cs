@@ -35,12 +35,7 @@ namespace EssenskasseAPI.LiteDB {
             foreach (Person x in persons) {
                 Money paymentSaldo = GetAllPaymentsFromPerson(x.Guid);
                 Money orderSaldo = GetAllOrdersFromPerson(x.Guid);
-                Money saldo = new Money(0, 0);
-                long tempP = paymentSaldo.Cent + (100 * paymentSaldo.Euro);
-                long tempO = orderSaldo.Cent + (100 * orderSaldo.Euro);
-                long tempR = tempP - tempO;
-                saldo.Cent = (short) (tempR % 100);
-                saldo.Euro = (long) ((tempR - saldo.Cent) * 0.01); // multiply is faster then divide
+                Money saldo = new Money().CalculateMoney(CalculationOperation.Substraction, paymentSaldo, orderSaldo)!;
                 x.Saldo = saldo;
                 _personDbController.UpdatePerson(x);
             }
