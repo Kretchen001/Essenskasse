@@ -49,5 +49,36 @@ namespace Modells.Test {
             Assert.True(a.Equals(new Money(1, 0)));
             Assert.False(a.Equals(new Money(2, 92)));
         }
+
+        [Fact]
+        public void CalculateAddition() {
+            Money a = new Money(20, 0);
+            Assert.True(a.Equals(new Money().CalculateMoney(CalculationOperation.Addition,
+                                                                new Money(10, 0),
+                                                                new Money(10, 0))!));
+            Assert.True(a.Equals(new Money().CalculateMoney(CalculationOperation.Addition,
+                                                                new Money(9, 95),
+                                                                new Money(10, 5))!));
+            Assert.False(a.Equals(new Money().CalculateMoney(CalculationOperation.Addition,
+                                                                new Money(9, 95),
+                                                                new Money(10, 15))!));
+        }
+
+        [Fact]
+        public void CalculateSubtraction() {
+            Money a = new Money(20, 0);
+            Assert.True(a.Equals(new Money().CalculateMoney(CalculationOperation.Substraction,
+                                                                new Money(40, 0),
+                                                                new Money(20, 0))!));
+            Assert.True(a.Equals(new Money().CalculateMoney(CalculationOperation.Substraction,
+                                                                new Money(20, 0),
+                                                                new Money(0, 0))!));
+            Assert.True(a.Equals(new Money().CalculateMoney(CalculationOperation.Substraction,
+                                                                new Money(19, 0),
+                                                                new Money(-1, 0))!));
+            Assert.False(a.Equals(new Money().CalculateMoney(CalculationOperation.Substraction,
+                                                                new Money(9, 95),
+                                                                new Money(10, 15))!));
+        }
     }
 }
