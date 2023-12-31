@@ -1,4 +1,5 @@
 ﻿using LiteDB;
+using System;
 using System.Text.Json.Serialization;
 
 namespace Modells {
@@ -59,6 +60,33 @@ namespace Modells {
             Guid = Guid.NewGuid();
             Name = name ?? ""; // if name is null then schreibe ""
             Email = email ?? "";
+        }
+
+        /// <summary></summary>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="money"></param>
+        public Person(string name, string? email, Money money) {
+            Guid = Guid.NewGuid();
+            Name = name;
+            Email = email ?? "";
+            Saldo = money;
+        }
+
+        /// <summary></summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public bool Equals(Person b) {
+            if (this.Guid.Equals(b.Guid)) {
+                if (this.Name.Equals(b.Name)) {
+                    if (this.Email.Equals(b.Email)) {
+                        if (this.Saldo.Equals(b.Saldo)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
     }
 }
