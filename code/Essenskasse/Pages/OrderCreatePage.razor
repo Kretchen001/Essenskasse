@@ -172,11 +172,12 @@
 
         HttpResponseMessage responseDate = await HttpClient.SendAsync(httpRequestMessageDate);
 
+        int res = 0;
         if (!responseDate.IsSuccessStatusCode) {
             await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
         }
         else {
-            int res = Int32.Parse(await responseDate.Content.ReadAsStringAsync());
+            res = Int32.Parse(await responseDate.Content.ReadAsStringAsync());
             if(res != 0) {
                 if(!(await JSRuntime.InvokeAsync<bool>("confirm",
                                                         String.Format(
@@ -190,14 +191,14 @@
 
         // collect orders
         List<Order> orders = new List<Order>();
+        Provider p = providers.Find(x => x.Guid.Equals(selectedProvider))!;
         for (int i = 0; i < person.Count; i += 1) {
             if (money[i].Euro.Equals(0) && money[i].Cent.Equals(0)) {
                 // empty -> so do nothing
             }
             else {
-                Provider p = providers.Find(x => x.Guid.Equals(selectedProvider))!;
                 orders.Add(new Order(
-                    dateTime: selectedDate,
+                    dateTime: selectedDate.AddMilliseconds(orders.Count + res),
                     money: money[i],
                     provider: p,
                     referencedPerson: person[i].Guid
@@ -207,21 +208,19 @@
 
         if (orders.Count == 0) {
             await JSRuntime.InvokeVoidAsync("alert", "Bei niemanden etwas eingetragen!");
+            return;
         }
 
-        // send orders
-        foreach (Order x in orders) {
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(Config["API-Adress"] + "order/insertNew"),
-                    Content = new StringContent(JsonConvert.SerializeObject(x), Encoding.UTF8, "application/json")
-                };
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(Config["API-Adress"] + "order/insertNewList"),
+                Content = new StringContent(JsonConvert.SerializeObject(orders), Encoding.UTF8, "application/json")
+            };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
-            if (!response.IsSuccessStatusCode) {
-                await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
-            }
+        if (!response.IsSuccessStatusCode) {
+            await JSRuntime.InvokeVoidAsync("alert", "Fehler in der Übertragung...");
         }
     }
 
