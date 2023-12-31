@@ -38,5 +38,19 @@ namespace Modells {
             Amount = amount;
             ReferencedPerson = referencedPerson;
         }
+
+        /// <summary></summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public bool Equals(Payment b) {
+            if (this.DateTime.Equals(b.DateTime)) {
+                if (this.Amount.Equals(b.Amount)) {
+                    if (this.ReferencedPerson.Equals(b.ReferencedPerson)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 }
