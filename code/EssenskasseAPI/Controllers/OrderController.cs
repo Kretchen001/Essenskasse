@@ -99,6 +99,30 @@ namespace EssenskasseAPI.Controllers {
             return BadRequest("Body unvollständig!");
         }
 
+        [HttpPost, Route("insertNewList")]
+        public IActionResult AddNewOrderList([FromBody] List<Order>? orders) {
+            if (orders is not null) {
+                if (_providerController.ExistProvider(
+                                            guid: orders[0].Provider.Guid,
+                                            name: orders[0].Provider.Designation) is null) {
+                    return BadRequest("Provider existiert nicht!");
+                }
+                bool success = true;
+                foreach (Order x in orders) {
+                    if (!_orderDbController.NewOrder(x)) {
+                        success = false;
+                        break;
+                    }
+                }
+                if (success) {
+                    return Ok();
+                }
+                else {
+                    return Conflict();
+                }
+            }
+            return BadRequest("Body unvollständig!");
+        }
 
         [HttpPut, Route("update")]
         public IActionResult UpdatePayment([FromHeader] string? dateString,
