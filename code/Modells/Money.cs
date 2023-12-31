@@ -63,7 +63,7 @@ namespace Modells {
         /// <param name="money1">First Parameter (by Subtraction Minued)</param>
         /// <param name="money2">Secount Parameter (by Subtraction Subtrahend)</param>
         /// <returns></returns>
-        public Money? CalculateMoney(CalculationOperation method, Money money1, Money money2) {
+        public Money? CalculateMoney(CalculationOperation? method, Money money1, Money money2) {
             switch (method) {
                 case CalculationOperation.Addition: {
                         Money saldo = new Money(0, 0);
@@ -87,6 +87,18 @@ namespace Modells {
                         return null;
                     }
             }
+        }
+
+        /// <summary></summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public bool Equals(Money b) {
+            if (this.Euro.Equals(b.Euro)) {
+                if (this.Cent.Equals(b.Cent)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

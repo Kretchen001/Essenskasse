@@ -9,3 +9,5 @@ obj/
 artifacts/
 .dotnet/
 *.binlog
+
+TestResults
