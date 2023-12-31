@@ -172,6 +172,7 @@
 
         if (response.IsSuccessStatusCode) {
             await JSRuntime.InvokeVoidAsync("alert", "Hat geklappt");
+            paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!);
             base.StateHasChanged();
             return;
         }
