@@ -239,7 +239,7 @@ var assemblies = [
       { "name": "Modells.Money", "rp": "Modells_Money.html", "cl": 54, "ucl": 0, "cal": 54, "tl": 104, "cb": 22, "tb": 22, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Modells.Order", "rp": "Modells_Order.html", "cl": 28, "ucl": 0, "cal": 28, "tl": 65, "cb": 8, "tb": 8, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Modells.Payment", "rp": "Modells_Payment.html", "cl": 0, "ucl": 14, "cal": 14, "tl": 42, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Modells.Person", "rp": "Modells_Person.html", "cl": 0, "ucl": 25, "cal": 25, "tl": 64, "cb": 0, "tb": 10, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Modells.Person", "rp": "Modells_Person.html", "cl": 42, "ucl": 0, "cal": 42, "tl": 92, "cb": 20, "tb": 20, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Modells.Provider", "rp": "Modells_Provider.html", "cl": 18, "ucl": 0, "cal": 18, "tl": 47, "cb": 4, "tb": 4, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
     ]},
 ];
