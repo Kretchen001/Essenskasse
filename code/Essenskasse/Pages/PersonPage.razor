@@ -137,6 +137,7 @@
             person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
             person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
             person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+            person = person.OrderBy(x => x.Name).ToList();
         }
     }
 
@@ -175,6 +176,7 @@
                 await JSRuntime.InvokeVoidAsync("alert", "" + newPersonName + " hinzugefügt und verfügbar");
                 accessToAdd = false;
                 newPersonName = newPersonEmail = "";
+                person = person.OrderBy(x => x.Name).ToList();
                 base.StateHasChanged();
             }
             else {

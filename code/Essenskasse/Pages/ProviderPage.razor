@@ -137,6 +137,7 @@
                                                 // deserialize the result-JSON with Newtownsoft to the List
                 providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
                 providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
+                providers = providers.OrderBy(x => x.Designation).ToList();
             }
         }
         catch {

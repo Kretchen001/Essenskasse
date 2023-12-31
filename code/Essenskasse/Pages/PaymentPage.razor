@@ -127,6 +127,7 @@
             person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
             person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
             person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+            person = person.OrderBy(x => x.Name).ToList();
 
             if (person.Count > 0) {
                 selectedPerson = person[0].Guid;
