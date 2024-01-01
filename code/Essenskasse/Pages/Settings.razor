@@ -75,6 +75,17 @@
     </div>
 </div>
 
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-4">
+        <label>
+            Filter (Anbieter) anschalten
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="filterShowProvider">
+    </div>
+</div>
+
 @code {
 
     #region Variable
@@ -145,6 +156,14 @@
             saveAmountOfOrderPersistentAsync(value);
         }
     }
+
+    private bool filterShowProvider {
+        get => AppData.FilterShowProvider;
+        set {
+            AppData.FilterShowProvider = value;
+            saveFilterShowProvider(value);
+        }
+    }
     #endregion
 
     #region Functions
@@ -177,6 +196,18 @@
     private async void saveAmountOfOrderPersistentAsync (int value) {
         await LocalStorage.SetItemAsync<int>("loadAmountOfOrders", value);
         ToastService.ShowToast(value.ToString() + " erfolgreich festgelegt für die zu ladende Bestellungen.", ToastLevel.Success);
+    }
+
+    /// <summary></summary>
+    /// <param name="value"></param>
+    private async void saveFilterShowProvider (bool value) {
+        await LocalStorage.SetItemAsync<bool>("filterShowProvider", value);
+        if (AppData.FilterShowProvider) {
+            ToastService.ShowToast("Filter für den Anbieter angeschalten!", ToastLevel.Success);        
+        }
+        else {
+            ToastService.ShowToast("Filter für den Anbieter ausgeschalten!", ToastLevel.Success);
+        }
     }
     #endregion
 }
