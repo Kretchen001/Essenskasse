@@ -12,5 +12,11 @@
 
         /// <summary></summary>
         public int LoadAmountOrder { get; set; } = 25;
+
+        /// <summary></summary>
+        public bool FilterShowProvider { get; set; } = true;
+
+        /// <summary></summary>
+        public bool FilterShowPerson { get; set; } = true;
     }
 }

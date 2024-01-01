@@ -28,15 +28,15 @@
 </div>
 <br />
 <div class="row">
-    <div class="col-lg-2 align-self-center">
+    <div class="col-lg-3 align-self-center">
         <label>
             @_loc[nameof(RessourceAppStrings.amount)]
         </label>
     </div>
-    <div class="col-lg-8 align-self-center">
+    <div class="col-lg-4 align-self-center">
         <input style="width: 25vw" type="number" @bind="payment" placeholder="Euro,Cent -> 1000 = 10,00€">
     </div>
-    <div class="col-lg-2 align-self-center">
+    <div class="col-lg-5 align-self-center">
         <label>
             @money.ToString()
         </label>
@@ -127,6 +127,7 @@
             person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
             person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
             person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+            person = person.OrderBy(x => x.Name).ToList();
 
             if (person.Count > 0) {
                 selectedPerson = person[0].Guid;
@@ -172,6 +173,7 @@
 
         if (response.IsSuccessStatusCode) {
             await JSRuntime.InvokeVoidAsync("alert", "Hat geklappt");
+            paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!);
             base.StateHasChanged();
             return;
         }

@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
+@inject AppDataService AppData
 
 <style>
     table, th, td {
@@ -23,10 +24,9 @@
 <PageTitle>@_loc[nameof(RessourceAppStrings.provider)]</PageTitle>
 
 <h2>@_loc[nameof(RessourceAppStrings.provider)]</h2>
-<div class="row">
-    <h4 style="margin-top: 1rem;">
-        @_loc[nameof(RessourceAppStrings.add)]
-    </h4>
+
+<h4>@_loc[nameof(RessourceAppStrings.add)]</h4>
+<div class="row" style="margin-top: 1rem;">
     @if (!accessToAdd) {
         <button style="width: fit-content;"
                 @onclick="() => {accessToAdd = true;}">
@@ -50,36 +50,48 @@
         </div>
     }
 </div>
+
 <br />
-<div class="row">
-    <h4 style="margin-top: 1rem;">
-        @_loc[nameof(RessourceAppStrings.available)]
-    </h4>
-    <div class="col-lg-12">
-        <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
-            <tr>
-                <th style="padding-left: 5px;">Guid</th>
-                <th style="padding-left: 5px;">Bezeichnung</th>
-            </tr>
-            @foreach (Provider x in providers) {
-                <tr>
-                    <td style="padding-left: 5px;">
-                        @x.Guid
-                        <button style="border: none;" title="Kopieren" @onclick="async () => CopyToClipboard(x.Guid.ToString())">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7" />
-                                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z" />
-                                <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z" />
-                            </svg>
-                        </button>
-                    </td>
-                    <td style="padding-left: 5px;">@x.Designation</td>
-                </tr>
-            }
-        </table>
+
+<h4>@_loc[nameof(RessourceAppStrings.available)]</h4>
+@if (AppData.FilterShowProvider) {
+    <div class="row" style="margin-top: 1rem;">
+        <div class="col-lg-2">
+            <label>
+                Filter
+            </label>
+        </div>
+        <div class="col-lg-10 align-self-center">
+            <input @bind="filter" @bind:event="oninput" @onkeyup="ChangeProviderShownList" />
+        </div>
     </div>
+}
+<div class="row" style="margin-top: 1rem;">
+    <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
+        <tr>
+            <th style="padding-left: 5px;">Guid</th>
+            <th style="padding-left: 5px;">Bezeichnung</th>
+        </tr>
+        @foreach (Provider x in shownProviderList) {
+            <tr>
+                <td style="padding-left: 5px;">
+                    @x.Guid
+                    <button style="border: none;" title="Kopieren" @onclick="async () => CopyToClipboard(x.Guid.ToString())">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7" />
+                            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z" />
+                            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z" />
+                        </svg>
+                    </button>
+                </td>
+                <td style="padding-left: 5px;">@x.Designation</td>
+            </tr>
+        }
+    </table>
 </div>
+
 <br />
+
 <div class="row">
     <h4 style="margin-top: 1rem;">
         Entfernen eines Eintrages
@@ -121,7 +133,10 @@
     private string newProviderDesignation = "";
     private string providerToDeleteGuid = "";
 
-    List<Provider> providers = new List<Provider>();
+    private string filter = "";
+
+    private List<Provider> providers = new List<Provider>();
+    private List<Provider> shownProviderList = new List<Provider>();
 
     protected override async Task OnInitializedAsync() {
         // Request all providers, that are saved in the database.
@@ -137,6 +152,8 @@
                                                 // deserialize the result-JSON with Newtownsoft to the List
                 providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
                 providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
+                providers = providers.OrderBy(x => x.Designation).ToList();
+                shownProviderList.AddRange(providers);
             }
         }
         catch {
@@ -161,6 +178,9 @@
         if (response.IsSuccessStatusCode) {
             string temp = await response.Content.ReadAsStringAsync();
             providers.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
+            providers = providers.OrderBy(x => x.Designation).ToList();
+            shownProviderList.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
+            shownProviderList = shownProviderList.OrderBy(x => x.Designation).ToList();
             await JSRuntime.InvokeVoidAsync("alert", "Anbieter " + newProviderDesignation + " hinzugefügt");
         }
 
@@ -204,7 +224,24 @@
         }
     }
 
-    public async Task CopyToClipboard(string text) {
+    private async Task CopyToClipboard(string text) {
         await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+    }
+
+    private void ChangeProviderShownList() {
+        Console.WriteLine(filter);
+        shownProviderList.Clear();
+        if (filter.Equals("")) {
+            shownProviderList.AddRange(providers);
+        }
+        else {
+            foreach (Provider x in providers)
+            {
+                if (x.Designation.Contains(filter))
+                {
+                    shownProviderList.Add(x);
+                }
+            }
+        }
     }
 }
