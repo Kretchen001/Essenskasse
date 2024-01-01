@@ -1,5 +1,6 @@
 ﻿@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<App> _loc
+@inject ToastService ToastService
 
 <div class="row" style="padding: 0.5rem;">
     <div class="col-lg-4 align-self-center">
@@ -37,7 +38,7 @@
             UpdateValues();
         }
         catch {
-            await JSRuntime.InvokeVoidAsync("alert", "Betrag invalide!");
+            ToastService.ShowToast("Betrag invalide!", ToastLevel.Error);
         }
     }
 }

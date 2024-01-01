@@ -5,6 +5,7 @@
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
 @inject AppDataService AppData
+@inject ToastService ToastService
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.payment)]</PageTitle>
 
@@ -133,6 +134,9 @@
                 selectedPerson = person[0].Guid;
             }
         }
+        else {
+            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
+        }
     }
 
     private async void requestPaymentsOfPerson () {
@@ -150,6 +154,9 @@
 
         if (response.IsSuccessStatusCode) {
             paymentsOfSelectedPerson = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+        }
+        else {
+            ToastService.ShowToast("Etwas ist schiefgelaufen!", ToastLevel.Warning);
         }
 
         base.StateHasChanged();
@@ -172,11 +179,13 @@
         var response = await HttpClient.SendAsync(httpRequestMessage);
 
         if (response.IsSuccessStatusCode) {
-            await JSRuntime.InvokeVoidAsync("alert", "Hat geklappt");
+            ToastService.ShowToast("Einfügen erfolgreich.", ToastLevel.Success);
             paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!);
             base.StateHasChanged();
             return;
         }
-        await JSRuntime.InvokeVoidAsync("alert", "Hat nicht geklappt!");
+        else {
+            ToastService.ShowToast("Einfügen nicht möglich...\nBitte Admin verständigen!", ToastLevel.Warning);
+        }
     }
 }

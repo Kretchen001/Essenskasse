@@ -6,6 +6,7 @@
 @inject IStringLocalizer<App> _loc
 @inject ILocalStorageService LocalStorage
 @inject AppDataService AppData
+@inject ToastService ToastService
 
 <PageTitle>Home</PageTitle>
 
@@ -115,6 +116,9 @@ else {
                 }
             }
         }
+        else {
+            ToastService.ShowToast("Fehler in der Übertragung...\nNichts abgerufen!", ToastLevel.Warning);
+        }
     }
 
     private async void RecalculateSaldos() {
@@ -124,16 +128,14 @@ else {
                 RequestUri = new Uri(Config["API-Adress"] + "person/updateDatabasePersonSaldo")
             };
 
-        try {
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
-            if (response.IsSuccessStatusCode) {
-                await requestAllPerson();
-                base.StateHasChanged();
-            }
+        if (response.IsSuccessStatusCode) {
+            await requestAllPerson();
+            base.StateHasChanged();
         }
-        catch {
-            await JSRuntime.InvokeVoidAsync("alert", "Keine API Verbindung möglich!");
+        else {
+            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
         }
     }
 

@@ -190,10 +190,10 @@
     private async void saveUserThemePersistentAsync() {
         try {
             await LocalStorage.SetItemAsStringAsync("UserTheme", currentTheme);
-            await JsRuntime.InvokeVoidAsync("alert", string.Format("Farbschema {0} erfolgreich festgelegt.", currentTheme));
+            ToastService.ShowToast(string.Format("Farbschema {0} erfolgreich festgelegt.", currentTheme), ToastLevel.Success);
         }
         catch {
-            await JsRuntime.InvokeVoidAsync("alert", "Fehler beim Speichern.");
+            ToastService.ShowToast("Fehler beim Speichern.", ToastLevel.Error);
         }
     }
 

@@ -5,6 +5,7 @@
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
 @inject AppDataService AppData
+@inject ToastService ToastService
 
 <style>
     table, th, td {
@@ -127,6 +128,7 @@
 </div>
 
 @code {
+
     private bool accessToAdd = false;
     private bool accessToDelete = false;
 
@@ -145,19 +147,17 @@
                 RequestUri = new Uri(Config["API-Adress"] + "provider/requestAll")
             };
 
-        try {
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
-            if (response.IsSuccessStatusCode) { // success?
-                                                // deserialize the result-JSON with Newtownsoft to the List
-                providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
-                providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
-                providers = providers.OrderBy(x => x.Designation).ToList();
-                shownProviderList.AddRange(providers);
-            }
+        if (response.IsSuccessStatusCode) { // success?
+                                            // deserialize the result-JSON with Newtownsoft to the List
+            providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
+            providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
+            providers = providers.OrderBy(x => x.Designation).ToList();
+            shownProviderList.AddRange(providers);
         }
-        catch {
-            await JSRuntime.InvokeVoidAsync("alert", "Keine API Verbindung möglich!");
+        else {
+            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
         }
     }
 
@@ -181,7 +181,7 @@
             providers = providers.OrderBy(x => x.Designation).ToList();
             shownProviderList.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
             shownProviderList = shownProviderList.OrderBy(x => x.Designation).ToList();
-            await JSRuntime.InvokeVoidAsync("alert", "Anbieter " + newProviderDesignation + " hinzugefügt");
+            ToastService.ShowToast("Anbieter " + newProviderDesignation + " hinzugefügt", ToastLevel.Success);
         }
 
         newProviderDesignation = "";
@@ -192,7 +192,7 @@
     private async Task deleteAnbieter() {
         Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
         if (tempAnbieter is null) {
-            await JSRuntime.InvokeVoidAsync("alert", "Guid nicht vergeben!");
+            ToastService.ShowToast("Guid nicht vergeben!", ToastLevel.Info);
             return;
         }
         if (await JSRuntime.InvokeAsync<bool>(
@@ -213,14 +213,18 @@
 
             if (response.IsSuccessStatusCode) {
                 Provider temp = JsonConvert.DeserializeObject<Provider>(await response.Content.ReadAsStringAsync())!;
-                await JSRuntime.InvokeVoidAsync("alert", "Person " + temp.Designation + " erfolgreich entfernt!");
+                ToastService.ShowToast("Person " + temp.Designation + " erfolgreich entfernt!", ToastLevel.Success);
                 providers.Remove(tempAnbieter);
                 accessToDelete = false;
                 providerToDeleteGuid = "";
                 base.StateHasChanged();
-                return;
             }
-            await JSRuntime.InvokeVoidAsync("alert", "Hat nicht geklappt!");
+            else if (response.StatusCode.Equals(System.Net.HttpStatusCode.NoContent)) {
+                ToastService.ShowToast("Löschen nicht möglich, da kein equivalenter Eintrag vorhanden.", ToastLevel.Info);
+            }
+            else {
+                ToastService.ShowToast("Löschen nicht möglich...\nBitte Admin verständigen!", ToastLevel.Warning);
+            }
         }
     }
 
