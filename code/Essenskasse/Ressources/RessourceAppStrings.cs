@@ -38,6 +38,7 @@
         filter,
         turnOn,
         createOrder,
-
+        noticeable,
+        inconspicuous,
     }
 }

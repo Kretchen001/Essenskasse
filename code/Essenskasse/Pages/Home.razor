@@ -8,11 +8,11 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 
-<PageTitle>Home</PageTitle>
+<PageTitle>@_loc[nameof(RessourceAppStrings.dashboard)]</PageTitle>
 
 <div class="row">
     <div class="col-lg-4">
-        <h2>Übersicht</h2>
+        <h2>@_loc[nameof(RessourceAppStrings.dashboard)]</h2>
     </div>
     <div class="col-lg-8">
         <div class="form-check form-switch">
@@ -39,24 +39,20 @@
 else {
     <div class="row">
         <div class="col-lg-6">
-            <div class="boxZuBeachten">
-                <h3><u>Zu beachten</u></h3>
-                @for (int i = 0; i < person.Count; i += 1) {
-                    @if (!positivSaldo.Contains(i)) {
-                        <ShowPersonCard Person="person[i]" PositivSaldo="false" />
-                    }
+            <h3><u>@_loc[nameof(RessourceAppStrings.noticeable)]</u></h3>
+            @for (int i = 0; i < person.Count; i += 1) {
+                @if (!positivSaldo.Contains(i)) {
+                    <ShowPersonCard Person="person[i]" PositivSaldo="false" />
                 }
-            </div>
+            }
         </div>
         <div class="col-lg-6">
-            <div class="boxUnverdaechtig">
-                <h3><u>Unverdächtig</u></h3>
-                @for (int i = 0; i < person.Count; i += 1) {
-                    @if (positivSaldo.Contains(i)) {
-                        <ShowPersonCard Person="person[i]" PositivSaldo="true" />
-                    }
+            <h3><u>@_loc[nameof(RessourceAppStrings.inconspicuous)]</u></h3>
+            @for (int i = 0; i < person.Count; i += 1) {
+                @if (positivSaldo.Contains(i)) {
+                    <ShowPersonCard Person="person[i]" PositivSaldo="true" />
                 }
-            </div>
+            }
         </div>
     </div>
 }
