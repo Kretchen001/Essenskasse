@@ -96,11 +96,11 @@
 </div>
 
 @*<button class="btn btn-primary" @onclick="() => ModalDialog.Open()">Click me!</button>*@
-<HistoryModalCard @ref="@ModalDialog" Title="ModalTitle">
+<HistoryModalCard @ref="@ModalDialog" Title="@ModalTitle">
     <div class="row">
         <div style="height: 70vh; overflow: scroll">
             @foreach (Order x in completeHistoryFromOne) {
-                <div class="row" style="margin-left: 1rem; margin-right: 1rem; border-bottom: 0.2px medium gray">
+                <div class="row" style="margin-left: 1rem; margin-right: 1rem; border-color: black; border-bottom: solid 0.2px">
                     <div class="col-lg-5">
                         @x.DateTime.ToString("dddd, dd MMMM yyyy")
                     </div>
