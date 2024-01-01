@@ -75,7 +75,7 @@
                         <PersonOrderHistoryCard Orders="shownOrders[i]" />
                         <div class="row" style="margin: 0.25rem;">
                             <div class="col-lg-12">
-                                <button class=" float-end">
+                                <button class="float-end" @onclick="() => HistoryLoadInModal(i)">
                                     Gesamte Historie einsehen
                                 </button>
                             </div>
@@ -95,16 +95,20 @@
     </button>
 </div>
 
-<button class="btn btn-primary" @onclick="() => ModalDialog.Open()">Click me!</button>
-<HistoryModalCard @ref="@ModalDialog" Title="Hello World">
+@*<button class="btn btn-primary" @onclick="() => ModalDialog.Open()">Click me!</button>*@
+<HistoryModalCard @ref="@ModalDialog" Title="ModalTitle">
     <div class="row">
         <div style="height: 70vh; overflow: scroll">
             @foreach (Order x in completeHistoryFromOne) {
-                <div class="row">
-                    <div class="col-lg-12">
-                        <label>
-                            Hallo
-                        </label>
+                <div class="row" style="margin-left: 1rem; margin-right: 1rem; border-bottom: 0.2px medium gray">
+                    <div class="col-lg-5">
+                        @x.DateTime.ToString("dddd, dd MMMM yyyy")
+                    </div>
+                    <div class="col-lg-2">
+                        @x.Money.ToString()
+                    </div>
+                    <div class="col-lg-5">
+                        @x.Provider.Designation
                     </div>
                 </div>
             }
@@ -121,123 +125,9 @@
     private List<Person> person = new List<Person>();
     private List<Money> money = new List<Money>();
     private List<List<Order>> shownOrders = new List<List<Order>>();
-    private List<Order> completeHistoryFromOne = new List<Order>() {
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-        new Order(),
-    };
+    private List<Order> completeHistoryFromOne = new List<Order>();
+
+    private string ModalTitle = "";
 
     private DateTime selectedDate = DateTime.Now;
 
@@ -394,6 +284,34 @@
         if (response.IsSuccessStatusCode) {
             shownOrders[index].Clear();
             shownOrders[index] = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+            base.StateHasChanged();
+        }
+        else {
+            ToastService.ShowToast("Fehler in der Übertragung...\nNichts abgerufen!", ToastLevel.Warning);
+        }
+    }
+
+    private async void HistoryLoadInModal(int index) {
+        completeHistoryFromOne.Clear();
+
+        // load data
+        Guid personGuid = person[index].Guid;
+        ModalTitle = "Historie von: " + person[index].Name;
+
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "order/fromPerson"),
+                Headers = {
+                    { "guid", personGuid.ToString() }
+                    // empty amount = complete
+                }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            completeHistoryFromOne = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+            ModalDialog.Open();
             base.StateHasChanged();
         }
         else {
