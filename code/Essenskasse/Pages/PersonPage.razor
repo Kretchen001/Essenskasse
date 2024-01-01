@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
+@inject AppDataService AppData
 
 <style>
     table, th, td {
@@ -59,17 +60,30 @@
         </div>
     }
 </div>
-<div class="row">
-    <h4 style="margin-top: 1rem;">
-        @_loc[nameof(RessourceAppStrings.personRegistered)]
-    </h4>
+
+<br />
+
+<h4>@_loc[nameof(RessourceAppStrings.personRegistered)]</h4>
+@if (AppData.FilterShowPerson) {
+    <div class="row" style="margin-top: 1rem;">
+        <div class="col-lg-2">
+            <label>
+                Filter
+            </label>
+        </div>
+        <div class="col-lg-10 align-self-center">
+            <input @bind="filter" @bind:event="oninput" @onkeyup="ChangeProviderShownList" />
+        </div>
+    </div>
+}
+<div class="row" style="margin-top: 1rem;">
     <table>
         <tr>
             <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.guid)]</th>
             <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.name)]</th>
             <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.email)]</th>
         </tr>
-        @foreach (var x in person) {
+        @foreach (var x in shownPersonList) {
             @if (x.Email.Equals("")) {
                 <tr>
                     <td style="padding-left: 5px;">
@@ -118,7 +132,10 @@
     private string newPersonName = "";
     private string newPersonEmail = "";
 
+    private string filter = "";
+
     private List<Person> person = new List<Person>();
+    private List<Person> shownPersonList = new List<Person>();
 
     protected override async Task OnInitializedAsync () {
         await requestAllPersonFromApiAsync();
@@ -138,6 +155,7 @@
             person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
             person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
             person = person.OrderBy(x => x.Name).ToList();
+            shownPersonList.AddRange(person);
         }
     }
 
@@ -173,10 +191,12 @@
                 temp.Name = Uri.UnescapeDataString(temp.Name);
                 temp.Email = Uri.UnescapeDataString(temp.Email);
                 person.Add(temp);
+                shownPersonList.Add(temp);
                 await JSRuntime.InvokeVoidAsync("alert", "" + newPersonName + " hinzugefügt und verfügbar");
                 accessToAdd = false;
                 newPersonName = newPersonEmail = "";
                 person = person.OrderBy(x => x.Name).ToList();
+                shownPersonList = shownPersonList.OrderBy(x => x.Name).ToList();
                 base.StateHasChanged();
             }
             else {
@@ -196,5 +216,20 @@
 
     public async Task CopyToClipboard(string text) {
         await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+    }
+
+    private void ChangeProviderShownList () {
+        Console.WriteLine(filter);
+        shownPersonList.Clear();
+        if (filter.Equals("")) {
+            shownPersonList.AddRange(person);
+        }
+        else {
+            foreach (Person x in person) {
+                if (x.Name.Contains(filter)) {
+                    shownPersonList.Add(x);
+                }
+            }
+        }
     }
 }

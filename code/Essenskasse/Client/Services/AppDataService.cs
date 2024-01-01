@@ -15,5 +15,8 @@
 
         /// <summary></summary>
         public bool FilterShowProvider { get; set; } = true;
+
+        /// <summary></summary>
+        public bool FilterShowPerson { get; set; } = true;
     }
 }

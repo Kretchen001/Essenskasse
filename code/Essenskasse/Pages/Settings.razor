@@ -86,6 +86,17 @@
     </div>
 </div>
 
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-4">
+        <label>
+            Filter (Personen) anschalten
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="filterShowPerson">
+    </div>
+</div>
+
 @code {
 
     #region Variable
@@ -164,6 +175,14 @@
             saveFilterShowProvider(value);
         }
     }
+
+    private bool filterShowPerson {
+        get => AppData.FilterShowPerson;
+        set {
+            AppData.FilterShowPerson = value;
+            saveFilterShowPerson(value);
+        }
+    }
     #endregion
 
     #region Functions
@@ -207,6 +226,18 @@
         }
         else {
             ToastService.ShowToast("Filter für den Anbieter ausgeschalten!", ToastLevel.Success);
+        }
+    }
+
+    /// <summary></summary>
+    /// <param name="value"></param>
+    private async void saveFilterShowPerson (bool value) {
+        await LocalStorage.SetItemAsync<bool>("filterShowPerson", value);
+        if (AppData.FilterShowPerson) {
+            ToastService.ShowToast("Filter für die Personen angeschalten!", ToastLevel.Success);
+        }
+        else {
+            ToastService.ShowToast("Filter für die Personen ausgeschalten!", ToastLevel.Success);
         }
     }
     #endregion
