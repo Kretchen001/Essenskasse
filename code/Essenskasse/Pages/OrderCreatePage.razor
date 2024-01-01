@@ -8,6 +8,7 @@
 @inject ToastService ToastService
 
 <PageTitle>Neue Bestellung aufgeben</PageTitle>
+
 <h2>Neue Bestellung aufgeben</h2>
 
 <div class="row" style="margin-bottom: 1rem; margin-top: 1rem;">
@@ -71,7 +72,14 @@
             <div class="col-lg-12">
                 @if (showHistory[i]) {
                     <div style="border: 0.5rem ridge; margin: 0.5rem;">
-                        <PersonOrderHistoryCard Orders="shownOrders[i]"/>
+                        <PersonOrderHistoryCard Orders="shownOrders[i]" />
+                        <div class="row" style="margin: 0.25rem;">
+                            <div class="col-lg-12">
+                                <button class=" float-end">
+                                    Gesamte Historie einsehen
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 }
             </div>
@@ -87,11 +95,149 @@
     </button>
 </div>
 
+<button class="btn btn-primary" @onclick="() => ModalDialog.Open()">Click me!</button>
+<HistoryModalCard @ref="@ModalDialog" Title="Hello World">
+    <div class="row">
+        <div style="height: 70vh; overflow: scroll">
+            @foreach (Order x in completeHistoryFromOne) {
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label>
+                            Hallo
+                        </label>
+                    </div>
+                </div>
+            }
+        </div>
+        <button class="btn btn-primary" @onclick="() => ModalDialog.Close()">Close</button>
+    </div>
+</HistoryModalCard>
+
 @code {
+
+    private HistoryModalCard ModalDialog { get; set; }
+
     private List<Provider> providers = new List<Provider>();
     private List<Person> person = new List<Person>();
     private List<Money> money = new List<Money>();
     private List<List<Order>> shownOrders = new List<List<Order>>();
+    private List<Order> completeHistoryFromOne = new List<Order>() {
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+        new Order(),
+    };
 
     private DateTime selectedDate = DateTime.Now;
 
