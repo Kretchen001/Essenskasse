@@ -141,6 +141,9 @@
   <data name="colortheme" xml:space="preserve">
     <value>Farbschema</value>
   </data>
+  <data name="createOrder" xml:space="preserve">
+    <value>Bestellung aufgeben</value>
+  </data>
   <data name="creditAmount" xml:space="preserve">
     <value>Betrag gutschreiben!</value>
   </data>
