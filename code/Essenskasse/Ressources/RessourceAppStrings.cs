@@ -33,5 +33,10 @@
         singleColumn,
         dashboard,
         currentlySelected,
+        paymentsToBeLoaded,
+        ordersToBeLoaded,
+        filter,
+        turnOn,
+
     }
 }

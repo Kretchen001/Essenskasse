@@ -162,6 +162,9 @@
   <data name="english" xml:space="preserve">
     <value>English</value>
   </data>
+  <data name="filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
   <data name="german" xml:space="preserve">
     <value>German</value>
   </data>
@@ -183,8 +186,14 @@
   <data name="notEntered" xml:space="preserve">
     <value>Not entered...</value>
   </data>
+  <data name="ordersToBeLoaded" xml:space="preserve">
+    <value>Orders to be loaded</value>
+  </data>
   <data name="payment" xml:space="preserve">
     <value>Payment</value>
+  </data>
+  <data name="paymentsToBeLoaded" xml:space="preserve">
+    <value>Payments to be loaded</value>
   </data>
   <data name="person" xml:space="preserve">
     <value>Person</value>
@@ -209,6 +218,9 @@
   </data>
   <data name="submit" xml:space="preserve">
     <value>Submit!</value>
+  </data>
+  <data name="turnOn" xml:space="preserve">
+    <value>turn on</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Yes</value>
