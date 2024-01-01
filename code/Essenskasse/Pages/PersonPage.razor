@@ -5,6 +5,7 @@
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
 @inject AppDataService AppData
+@inject ToastService ToastService
 
 <style>
     table, th, td {
@@ -127,6 +128,7 @@
 </div>
 
 @code {
+
     private bool accessToAdd = false;
 
     private string newPersonName = "";
@@ -156,6 +158,9 @@
             person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
             person = person.OrderBy(x => x.Name).ToList();
             shownPersonList.AddRange(person);
+        }
+        else {
+            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
         }
     }
 
@@ -192,7 +197,7 @@
                 temp.Email = Uri.UnescapeDataString(temp.Email);
                 person.Add(temp);
                 shownPersonList.Add(temp);
-                await JSRuntime.InvokeVoidAsync("alert", "" + newPersonName + " hinzugefügt und verfügbar");
+                ToastService.ShowToast("" + newPersonName + " hinzugefügt und verfügbar", ToastLevel.Success);
                 accessToAdd = false;
                 newPersonName = newPersonEmail = "";
                 person = person.OrderBy(x => x.Name).ToList();
@@ -200,12 +205,15 @@
                 base.StateHasChanged();
             }
             else {
-                await JSRuntime.InvokeVoidAsync("alert", "" + newPersonName + " hinzugefügt\n\n ABER nicht abrufbar!!!");
+                ToastService.ShowToast("" + newPersonName + " hinzugefügt\n\n ABER nicht abrufbar!!!", ToastLevel.Warning);
                 accessToAdd = false;
                 newPersonName = "";
                 newPersonEmail = "";
                 base.StateHasChanged();
             }
+        }
+        else {
+            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
         }
     }
 
