@@ -148,7 +148,7 @@
     /// <summary> Hold the entities for theme-selection. </summary>
     private Dictionary<string, string> themeList = new Dictionary<string, string>() {
         { "Light", "Hell" },    
-        { "Dark", "Dunkel" }   
+        { "Dark", "Dunkel" }
     };
 
     /// <summary></summary>
@@ -186,6 +186,11 @@
     #endregion
 
     #region Functions
+    protected override async Task OnInitializedAsync () {
+        themeList["Light"] = _loc[nameof(RessourceAppStrings.light)];
+        themeList["Dark"] = _loc[nameof(RessourceAppStrings.dark)];
+    }
+
     /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>
     private async void saveUserThemePersistentAsync() {
         try {

@@ -159,6 +159,9 @@
   <data name="currentlySelected" xml:space="preserve">
     <value>currently selected</value>
   </data>
+  <data name="dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
   <data name="dashboard" xml:space="preserve">
     <value>Dashboard</value>
   </data>
@@ -203,6 +206,9 @@
   </data>
   <data name="language" xml:space="preserve">
     <value>Language</value>
+  </data>
+  <data name="light" xml:space="preserve">
+    <value>Light</value>
   </data>
   <data name="loadData" xml:space="preserve">
     <value>Load data</value>

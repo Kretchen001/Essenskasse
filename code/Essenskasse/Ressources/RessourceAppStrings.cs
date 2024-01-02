@@ -86,5 +86,7 @@
         toastFilterPersonOff,
         toastAdminCall,
         toastAdd,
+        light,
+        dark,
     }
 }

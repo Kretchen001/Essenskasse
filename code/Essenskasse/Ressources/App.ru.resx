@@ -159,6 +159,9 @@
   <data name="currentlySelected" xml:space="preserve">
     <value>выбранный в данный момент</value>
   </data>
+  <data name="dark" xml:space="preserve">
+    <value>Темный</value>
+  </data>
   <data name="dashboard" xml:space="preserve">
     <value>Приборная панель</value>
   </data>
@@ -203,6 +206,9 @@
   </data>
   <data name="language" xml:space="preserve">
     <value>Языки</value>
+  </data>
+  <data name="light" xml:space="preserve">
+    <value>Свет</value>
   </data>
   <data name="loadData" xml:space="preserve">
     <value>Данные о нагрузке</value>
