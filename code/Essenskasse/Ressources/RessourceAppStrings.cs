@@ -48,5 +48,9 @@
         order,
         historyOf,
         copy,
+        information,
+        success,
+        warning,
+        error,
     }
 }

@@ -171,6 +171,9 @@
   <data name="english" xml:space="preserve">
     <value>Английский</value>
   </data>
+  <data name="error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
   <data name="filter" xml:space="preserve">
     <value>Фильтры</value>
   </data>
@@ -188,6 +191,9 @@
   </data>
   <data name="inconspicuous" xml:space="preserve">
     <value>Незаметный</value>
+  </data>
+  <data name="information" xml:space="preserve">
+    <value>Информация</value>
   </data>
   <data name="language" xml:space="preserve">
     <value>Языки</value>
@@ -249,11 +255,17 @@
   <data name="submit" xml:space="preserve">
     <value>Отправить</value>
   </data>
+  <data name="success" xml:space="preserve">
+    <value>Успех</value>
+  </data>
   <data name="turnOn" xml:space="preserve">
     <value>включить</value>
   </data>
   <data name="viewCompleteHistory" xml:space="preserve">
     <value>Посмотреть полную историю</value>
+  </data>
+  <data name="warning" xml:space="preserve">
+    <value>Внимание</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Да</value>

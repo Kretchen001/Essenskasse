@@ -1,4 +1,6 @@
-﻿@inject ToastService ToastService
+﻿@inject IStringLocalizer<App> _loc
+@inject ToastService ToastService
+
 @implements IDisposable
 
 <div class="cs-toast @(_isVisible ? "cs-toast-visible" : null) @_backgroundCssClass">
@@ -39,22 +41,22 @@
             case ToastLevel.Info:
                 _backgroundCssClass = $"bg-info";
                 _iconCssClass = "info";
-                _heading = "Info";
+                _heading = _loc[nameof(RessourceAppStrings.information)];
                 break;
             case ToastLevel.Success:
                 _backgroundCssClass = $"bg-success";
                 _iconCssClass = "check";
-                _heading = "Success";
+                _heading = _loc[nameof(RessourceAppStrings.success)];
                 break;
             case ToastLevel.Warning:
                 _backgroundCssClass = $"bg-warning";
                 _iconCssClass = "exclamation";
-                _heading = "Warning";
+                _heading = _loc[nameof(RessourceAppStrings.warning)];
                 break;
             case ToastLevel.Error:
                 _backgroundCssClass = "bg-danger";
                 _iconCssClass = "times";
-                _heading = "Error";
+                _heading = _loc[nameof(RessourceAppStrings.error)];
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(level), level, null);

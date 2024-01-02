@@ -171,6 +171,9 @@
   <data name="english" xml:space="preserve">
     <value>English</value>
   </data>
+  <data name="error" xml:space="preserve">
+    <value>Error</value>
+  </data>
   <data name="filter" xml:space="preserve">
     <value>Filter</value>
   </data>
@@ -188,6 +191,9 @@
   </data>
   <data name="inconspicuous" xml:space="preserve">
     <value>Inconspicuous</value>
+  </data>
+  <data name="information" xml:space="preserve">
+    <value>Info</value>
   </data>
   <data name="language" xml:space="preserve">
     <value>Language</value>
@@ -249,11 +255,17 @@
   <data name="submit" xml:space="preserve">
     <value>Submit</value>
   </data>
+  <data name="success" xml:space="preserve">
+    <value>Succes</value>
+  </data>
   <data name="turnOn" xml:space="preserve">
     <value>turn on</value>
   </data>
   <data name="viewCompleteHistory" xml:space="preserve">
     <value>View complete history</value>
+  </data>
+  <data name="warning" xml:space="preserve">
+    <value>Warning</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Yes</value>
