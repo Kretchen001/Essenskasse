@@ -135,7 +135,7 @@
             }
         }
         else {
-            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
         }
     }
 
@@ -156,7 +156,7 @@
             paymentsOfSelectedPerson = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
         }
         else {
-            ToastService.ShowToast("Etwas ist schiefgelaufen!", ToastLevel.Warning);
+            ToastService.ShowToast("Da ist etwas schief gegangen!", ToastLevel.Warning);
         }
 
         base.StateHasChanged();
@@ -185,7 +185,7 @@
             return;
         }
         else {
-            ToastService.ShowToast("Einfügen nicht möglich...\nBitte Admin verständigen!", ToastLevel.Warning);
+            ToastService.ShowToast("Einfügen nicht möglich..." + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
         }
     }
 }

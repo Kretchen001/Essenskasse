@@ -193,7 +193,7 @@
             ToastService.ShowToast(string.Format("Farbschema {0} erfolgreich festgelegt.", currentTheme), ToastLevel.Success);
         }
         catch {
-            ToastService.ShowToast("Fehler beim Speichern.", ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSaveError)], ToastLevel.Error);
         }
     }
 
@@ -222,10 +222,10 @@
     private async void saveFilterShowProvider (bool value) {
         await LocalStorage.SetItemAsync<bool>("filterShowProvider", value);
         if (AppData.FilterShowProvider) {
-            ToastService.ShowToast("Filter für den Anbieter angeschalten!", ToastLevel.Success);        
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterProviderOn)], ToastLevel.Success);
         }
         else {
-            ToastService.ShowToast("Filter für den Anbieter ausgeschalten!", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterProviderOff)], ToastLevel.Success);
         }
     }
 
@@ -234,10 +234,10 @@
     private async void saveFilterShowPerson (bool value) {
         await LocalStorage.SetItemAsync<bool>("filterShowPerson", value);
         if (AppData.FilterShowPerson) {
-            ToastService.ShowToast("Filter für die Personen angeschalten!", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOn)], ToastLevel.Success);
         }
         else {
-            ToastService.ShowToast("Filter für die Personen ausgeschalten!", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOff)], ToastLevel.Success);
         }
     }
     #endregion

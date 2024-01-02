@@ -31,7 +31,7 @@ namespace Essenskasse.Client.Services {
                 return;
             }
 
-            Countdown = new Timer(5000);
+            Countdown = new Timer(8000);
             Countdown.Elapsed += HideToast;
             Countdown.AutoReset = false;
         }

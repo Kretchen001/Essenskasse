@@ -131,7 +131,7 @@ else {
             base.StateHasChanged();
         }
         else {
-            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
         }
     }
 

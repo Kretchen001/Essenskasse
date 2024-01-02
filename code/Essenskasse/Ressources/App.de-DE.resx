@@ -270,6 +270,90 @@
   <data name="success" xml:space="preserve">
     <value>Erfolg</value>
   </data>
+  <data name="toastAddedAndAvailable" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastAddedButNotAvailable" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastAdminCall" xml:space="preserve">
+    <value>Bitte Admin verständigen.</value>
+  </data>
+  <data name="toastColorThemePre" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastColorthemePost" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastConnectionError" xml:space="preserve">
+    <value>Fehler in der Übertragung...</value>
+  </data>
+  <data name="toastFilterPeronOff" xml:space="preserve">
+    <value>Filter für die Personen ausgeschalten!</value>
+  </data>
+  <data name="toastFilterPersonOn" xml:space="preserve">
+    <value>Filter für die Personen angeschalten!</value>
+  </data>
+  <data name="toastFilterProviderOff" xml:space="preserve">
+    <value>Filter für den Anbieter ausgeschalten!</value>
+  </data>
+  <data name="toastFilterProviderOn" xml:space="preserve">
+    <value>Filter für den Anbieter angeschalten!</value>
+  </data>
+  <data name="toastGuidNotThere" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastMoneyFormatInvalid" xml:space="preserve">
+    <value>Betrag invalide!</value>
+  </data>
+  <data name="toastNoApiConnection" xml:space="preserve">
+    <value>Keine API Verbindung möglich!</value>
+  </data>
+  <data name="toastNoChanges" xml:space="preserve">
+    <value>Keine Änderungen</value>
+  </data>
+  <data name="toastNoGuidThere" xml:space="preserve">
+    <value>Keine Guid da!</value>
+  </data>
+  <data name="toastNoRemove" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastNobodyHasChanges" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastNotAdded" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastNothingRequested" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastOrderSended" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastPersonNotAvailableCheckGuid" xml:space="preserve">
+    <value>Person nicht verfügbar! Bitte Guid überprüfen.</value>
+  </data>
+  <data name="toastRemoveNotBecauseNoEntity" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastSaveError" xml:space="preserve">
+    <value>Fehler beim Speichern.</value>
+  </data>
+  <data name="toastSomethingWrong" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastSuccessfullyAdded" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastSuccessfullyOrderAmount" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastSuccessfullyRemoved" xml:space="preserve">
+    <value/>
+  </data>
   <data name="turnOn" xml:space="preserve">
     <value>anschalten</value>
   </data>

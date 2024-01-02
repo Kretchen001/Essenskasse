@@ -107,17 +107,17 @@
                 base.StateHasChanged();
             }
             else {
-                ToastService.ShowToast("Person nicht verfügbar!\nBitte Guid überprüfen.", ToastLevel.Warning);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastPersonNotAvailableCheckGuid)], ToastLevel.Warning);
             }
         }
         else {
-                ToastService.ShowToast("Keine Guid da!", ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoGuidThere)], ToastLevel.Error);
         }
     }
 
     private async void commitChangesToApi() {
         if (person.Name.Equals(safePerson.Name) && person.Email.Equals(safePerson.Email)) {
-            ToastService.ShowToast("Keine Änderungen", ToastLevel.Info);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
             return;
         }
         Console.WriteLine(selectedPerson);
@@ -140,7 +140,7 @@
             await OnChangeCommit.InvokeAsync();
         }
         else {
-            ToastService.ShowToast("Person nicht verfügbar!\nBitte Guid überprüfen.", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastPersonNotAvailableCheckGuid)], ToastLevel.Warning);
         }
     }
 }

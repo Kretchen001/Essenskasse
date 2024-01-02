@@ -155,7 +155,7 @@
             shownProviderList.AddRange(providers);
         }
         else {
-            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
         }
     }
 
@@ -221,7 +221,7 @@
                 ToastService.ShowToast("Löschen nicht möglich, da kein equivalenter Eintrag vorhanden.", ToastLevel.Info);
             }
             else {
-                ToastService.ShowToast("Löschen nicht möglich...\nBitte Admin verständigen!", ToastLevel.Warning);
+                ToastService.ShowToast("Löschen nicht möglich...\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
             }
         }
     }
