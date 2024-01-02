@@ -156,7 +156,7 @@
             paymentsOfSelectedPerson = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
         }
         else {
-            ToastService.ShowToast("Da ist etwas schief gegangen!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
         }
 
         base.StateHasChanged();
@@ -179,13 +179,13 @@
         var response = await HttpClient.SendAsync(httpRequestMessage);
 
         if (response.IsSuccessStatusCode) {
-            ToastService.ShowToast("Einfügen erfolgreich.", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessfullyAdded)], ToastLevel.Success);
             paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!);
             base.StateHasChanged();
             return;
         }
         else {
-            ToastService.ShowToast("Einfügen nicht möglich..." + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNotAdded)] + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
         }
     }
 }

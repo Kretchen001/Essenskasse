@@ -270,6 +270,9 @@
   <data name="success" xml:space="preserve">
     <value>Succes</value>
   </data>
+  <data name="toastAdd" xml:space="preserve">
+    <value>added.</value>
+  </data>
   <data name="toastAddedAndAvailable" xml:space="preserve">
     <value>added and available.</value>
   </data>
@@ -280,10 +283,10 @@
     <value>Please contact admin.</value>
   </data>
   <data name="toastColorThemePre" xml:space="preserve">
-    <value/>
+    <value>Colortheme</value>
   </data>
   <data name="toastColorthemePost" xml:space="preserve">
-    <value/>
+    <value>successfully established.</value>
   </data>
   <data name="toastConnectionError" xml:space="preserve">
     <value>Error in the transmission...</value>
@@ -301,7 +304,7 @@
     <value>Filter for the provider switched on!</value>
   </data>
   <data name="toastGuidNotThere" xml:space="preserve">
-    <value/>
+    <value>Guid not forgiven!</value>
   </data>
   <data name="toastMoneyFormatInvalid" xml:space="preserve">
     <value>Amount invalid!</value>
@@ -316,16 +319,16 @@
     <value>No Guid there!</value>
   </data>
   <data name="toastNoRemove" xml:space="preserve">
-    <value/>
+    <value>Deletion not possible...</value>
   </data>
   <data name="toastNobodyHasChanges" xml:space="preserve">
     <value>Nothing registered with anyone!</value>
   </data>
   <data name="toastNotAdded" xml:space="preserve">
-    <value/>
+    <value>Insert not possible...</value>
   </data>
   <data name="toastNothingRequested" xml:space="preserve">
-    <value/>
+    <value>Nothing retrieved!</value>
   </data>
   <data name="toastOrderSended" xml:space="preserve">
     <value>Orders transmitted.</value>
@@ -334,7 +337,7 @@
     <value>Person not available! Please check Guid.</value>
   </data>
   <data name="toastRemoveNotBecauseNoEntity" xml:space="preserve">
-    <value/>
+    <value>Deletion not possible because no equivalent entry exists.</value>
   </data>
   <data name="toastSaveError" xml:space="preserve">
     <value>Error when saving.</value>
@@ -343,16 +346,16 @@
     <value>Something has gone wrong!</value>
   </data>
   <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
-    <value/>
+    <value>successfully set for the deposits to be loaded.</value>
   </data>
   <data name="toastSuccessfullyAdded" xml:space="preserve">
-    <value/>
+    <value>Insertion successful!</value>
   </data>
   <data name="toastSuccessfullyOrderAmount" xml:space="preserve">
-    <value/>
+    <value>successfully set for the orders to be loaded.</value>
   </data>
   <data name="toastSuccessfullyRemoved" xml:space="preserve">
-    <value/>
+    <value>successfully removed!</value>
   </data>
   <data name="turnOn" xml:space="preserve">
     <value>turn on</value>

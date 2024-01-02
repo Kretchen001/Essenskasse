@@ -270,6 +270,9 @@
   <data name="success" xml:space="preserve">
     <value>Erfolg</value>
   </data>
+  <data name="toastAdd" xml:space="preserve">
+    <value>hinzugefügt.</value>
+  </data>
   <data name="toastAddedAndAvailable" xml:space="preserve">
     <value>hinzugefügt und verfügbar.</value>
   </data>
@@ -280,10 +283,10 @@
     <value>Bitte Admin verständigen.</value>
   </data>
   <data name="toastColorThemePre" xml:space="preserve">
-    <value/>
+    <value>Farbschema</value>
   </data>
   <data name="toastColorthemePost" xml:space="preserve">
-    <value/>
+    <value>erfolgreich festgelegt.</value>
   </data>
   <data name="toastConnectionError" xml:space="preserve">
     <value>Fehler in der Übertragung...</value>
@@ -301,7 +304,7 @@
     <value>Filter für den Anbieter angeschalten!</value>
   </data>
   <data name="toastGuidNotThere" xml:space="preserve">
-    <value/>
+    <value>Guid nicht vergeben!</value>
   </data>
   <data name="toastMoneyFormatInvalid" xml:space="preserve">
     <value>Betrag invalide!</value>
@@ -316,16 +319,16 @@
     <value>Keine Guid da!</value>
   </data>
   <data name="toastNoRemove" xml:space="preserve">
-    <value/>
+    <value>Löschen nicht möglich...</value>
   </data>
   <data name="toastNobodyHasChanges" xml:space="preserve">
     <value>Bei niemanden etwas eingetragen!</value>
   </data>
   <data name="toastNotAdded" xml:space="preserve">
-    <value/>
+    <value>Einfügen nicht möglich...</value>
   </data>
   <data name="toastNothingRequested" xml:space="preserve">
-    <value/>
+    <value>Nichts abgerufen!</value>
   </data>
   <data name="toastOrderSended" xml:space="preserve">
     <value>Bestellungen übermittelt.</value>
@@ -334,7 +337,7 @@
     <value>Person nicht verfügbar! Bitte Guid überprüfen.</value>
   </data>
   <data name="toastRemoveNotBecauseNoEntity" xml:space="preserve">
-    <value/>
+    <value>Löschen nicht möglich, da kein equivalenter Eintrag vorhanden.</value>
   </data>
   <data name="toastSaveError" xml:space="preserve">
     <value>Fehler beim Speichern.</value>
@@ -343,16 +346,16 @@
     <value>Da ist etwas schief gegangen!</value>
   </data>
   <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
-    <value/>
+    <value>erfolgreich festgelegt für die zu ladende Einzahlungen.</value>
   </data>
   <data name="toastSuccessfullyAdded" xml:space="preserve">
-    <value/>
+    <value>Einfügen erfolgreich!</value>
   </data>
   <data name="toastSuccessfullyOrderAmount" xml:space="preserve">
-    <value/>
+    <value>erfolgreich festgelegt für die zu ladende Bestellungen.</value>
   </data>
   <data name="toastSuccessfullyRemoved" xml:space="preserve">
-    <value/>
+    <value>erfolgreich entfernt!</value>
   </data>
   <data name="turnOn" xml:space="preserve">
     <value>anschalten</value>

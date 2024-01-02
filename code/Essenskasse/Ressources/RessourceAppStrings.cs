@@ -76,7 +76,7 @@
         toastNoRemove,
         toastColorTheme,
         toastColorThemePre,
-        toastColorthemePost,
+        toastColorThemePost,
         toastSaveError,
         toastSuccessfullPaymentAmount,
         toastSuccessfullyOrderAmount,
@@ -85,5 +85,6 @@
         toastFilterPersonOn,
         toastFilterPersonOff,
         toastAdminCall,
+        toastAdd,
     }
 }

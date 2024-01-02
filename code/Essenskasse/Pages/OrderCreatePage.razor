@@ -263,7 +263,7 @@
         HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
         if (!response.IsSuccessStatusCode) {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.notEntered)], ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Error);
         }
         else {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);

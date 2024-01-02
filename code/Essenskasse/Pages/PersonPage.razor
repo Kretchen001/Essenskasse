@@ -184,7 +184,7 @@
                 temp.Email = Uri.UnescapeDataString(temp.Email);
                 person.Add(temp);
                 shownPersonList.Add(temp);
-                ToastService.ShowToast(newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedAndAvailable)], ToastLevel.Success);
+                newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedAndAvailable)], ToastLevel.Success);
                 accessToAdd = false;
                 newPersonName = newPersonEmail = "";
                 person = person.OrderBy(x => x.Name).ToList();

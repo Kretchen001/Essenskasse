@@ -179,7 +179,7 @@
             providers = providers.OrderBy(x => x.Designation).ToList();
             shownProviderList.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
             shownProviderList = shownProviderList.OrderBy(x => x.Designation).ToList();
-            ToastService.ShowToast("Anbieter " + newProviderDesignation + " hinzugefügt", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.provider)] + " " + newProviderDesignation + " " + _loc[nameof(RessourceAppStrings.toastAdd)], ToastLevel.Success);
         }
 
         newProviderDesignation = "";
@@ -190,7 +190,7 @@
     private async Task deleteAnbieter() {
         Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
         if (tempAnbieter is null) {
-            ToastService.ShowToast("Guid nicht vergeben!", ToastLevel.Info);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastGuidNotThere)], ToastLevel.Info);
             return;
         }
         if (await JSRuntime.InvokeAsync<bool>(
@@ -211,17 +211,17 @@
 
             if (response.IsSuccessStatusCode) {
                 Provider temp = JsonConvert.DeserializeObject<Provider>(await response.Content.ReadAsStringAsync())!;
-                ToastService.ShowToast("Person " + temp.Designation + " erfolgreich entfernt!", ToastLevel.Success);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.person)] + " " + temp.Designation + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyRemoved)], ToastLevel.Success);
                 providers.Remove(tempAnbieter);
                 accessToDelete = false;
                 providerToDeleteGuid = "";
                 base.StateHasChanged();
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.NoContent)) {
-                ToastService.ShowToast("Löschen nicht möglich, da kein equivalenter Eintrag vorhanden.", ToastLevel.Info);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastRemoveNotBecauseNoEntity)], ToastLevel.Info);
             }
             else {
-                ToastService.ShowToast("Löschen nicht möglich...\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoRemove)] + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
             }
         }
     }

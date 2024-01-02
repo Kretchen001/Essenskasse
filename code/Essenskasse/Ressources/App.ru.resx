@@ -270,6 +270,9 @@
   <data name="success" xml:space="preserve">
     <value>Успех</value>
   </data>
+  <data name="toastAdd" xml:space="preserve">
+    <value>добавлено.</value>
+  </data>
   <data name="toastAddedAndAvailable" xml:space="preserve">
     <value>добавлены и доступны.</value>
   </data>
@@ -280,10 +283,10 @@
     <value>Пожалуйста, свяжитесь с администратором.</value>
   </data>
   <data name="toastColorThemePre" xml:space="preserve">
-    <value/>
+    <value>Цветовая схема</value>
   </data>
   <data name="toastColorthemePost" xml:space="preserve">
-    <value/>
+    <value>Успешно создана.</value>
   </data>
   <data name="toastConnectionError" xml:space="preserve">
     <value>Ошибка при передаче...</value>
@@ -301,7 +304,7 @@
     <value>Фильтр для провайдера включен!</value>
   </data>
   <data name="toastGuidNotThere" xml:space="preserve">
-    <value/>
+    <value>Guid не прощает!</value>
   </data>
   <data name="toastMoneyFormatInvalid" xml:space="preserve">
     <value>Сумма недействительна!</value>
@@ -316,16 +319,16 @@
     <value>Никакого Гида!</value>
   </data>
   <data name="toastNoRemove" xml:space="preserve">
-    <value/>
+    <value>Удаление невозможно...</value>
   </data>
   <data name="toastNobodyHasChanges" xml:space="preserve">
     <value>Ни с кем ничего не зарегистрировано!</value>
   </data>
   <data name="toastNotAdded" xml:space="preserve">
-    <value/>
+    <value>Вставить невозможно...</value>
   </data>
   <data name="toastNothingRequested" xml:space="preserve">
-    <value/>
+    <value>Ничего не найдено!</value>
   </data>
   <data name="toastOrderSended" xml:space="preserve">
     <value>Приказы переданы.</value>
@@ -334,7 +337,7 @@
     <value>Человек недоступен! Пожалуйста, проверьте гида.</value>
   </data>
   <data name="toastRemoveNotBecauseNoEntity" xml:space="preserve">
-    <value/>
+    <value>Удаление невозможно, так как не существует эквивалентной записи.</value>
   </data>
   <data name="toastSaveError" xml:space="preserve">
     <value>Ошибка при сохранении.</value>
@@ -343,16 +346,16 @@
     <value>Что-то пошло не так!</value>
   </data>
   <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
-    <value/>
+    <value>успешно установлен для загрузки депозитов.</value>
   </data>
   <data name="toastSuccessfullyAdded" xml:space="preserve">
-    <value/>
+    <value>Вставка прошла успешно!</value>
   </data>
   <data name="toastSuccessfullyOrderAmount" xml:space="preserve">
-    <value/>
+    <value>успешно установлен для загрузки заказов.</value>
   </data>
   <data name="toastSuccessfullyRemoved" xml:space="preserve">
-    <value/>
+    <value>успешно удалены!</value>
   </data>
   <data name="turnOn" xml:space="preserve">
     <value>включить</value>

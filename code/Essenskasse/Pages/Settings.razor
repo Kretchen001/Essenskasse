@@ -190,7 +190,8 @@
     private async void saveUserThemePersistentAsync() {
         try {
             await LocalStorage.SetItemAsStringAsync("UserTheme", currentTheme);
-            ToastService.ShowToast(string.Format("Farbschema {0} erfolgreich festgelegt.", currentTheme), ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastColorThemePre)] + " " + currentTheme + " " +
+                                        _loc[nameof(RessourceAppStrings.toastColorThemePost)], ToastLevel.Success);
         }
         catch {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSaveError)], ToastLevel.Error);
@@ -207,14 +208,14 @@
     /// <param name="value"></param>
     private async void saveAmountOfPaymentsPersistentAsync(int value) {
         await LocalStorage.SetItemAsync<int>("loadAmountOfPayments", value);
-        ToastService.ShowToast(value.ToString() + " erfolgreich festgelegt für die zu ladende Einzahlungen.", ToastLevel.Success);
+        ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullPaymentAmount)], ToastLevel.Success);
     }
 
     /// <summary></summary>
     /// <param name="value"></param>
     private async void saveAmountOfOrderPersistentAsync (int value) {
         await LocalStorage.SetItemAsync<int>("loadAmountOfOrders", value);
-        ToastService.ShowToast(value.ToString() + " erfolgreich festgelegt für die zu ladende Bestellungen.", ToastLevel.Success);
+        ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyOrderAmount)], ToastLevel.Success);
     }
 
     /// <summary></summary>
