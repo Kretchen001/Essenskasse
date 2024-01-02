@@ -184,7 +184,7 @@
                 temp.Email = Uri.UnescapeDataString(temp.Email);
                 person.Add(temp);
                 shownPersonList.Add(temp);
-                ToastService.ShowToast("" + newPersonName + " hinzugefügt und verfügbar", ToastLevel.Success);
+                ToastService.ShowToast(newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedAndAvailable)], ToastLevel.Success);
                 accessToAdd = false;
                 newPersonName = newPersonEmail = "";
                 person = person.OrderBy(x => x.Name).ToList();
@@ -192,7 +192,7 @@
                 base.StateHasChanged();
             }
             else {
-                ToastService.ShowToast("" + newPersonName + " hinzugefügt\nABER nicht abrufbar!", ToastLevel.Warning);
+                ToastService.ShowToast(newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedButNotAvailable)], ToastLevel.Warning);
                 accessToAdd = false;
                 newPersonName = "";
                 newPersonEmail = "";

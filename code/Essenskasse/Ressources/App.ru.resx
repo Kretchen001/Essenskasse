@@ -271,10 +271,10 @@
     <value>Успех</value>
   </data>
   <data name="toastAddedAndAvailable" xml:space="preserve">
-    <value/>
+    <value>добавлены и доступны.</value>
   </data>
   <data name="toastAddedButNotAvailable" xml:space="preserve">
-    <value/>
+    <value>добавлено; НО не доступно!</value>
   </data>
   <data name="toastAdminCall" xml:space="preserve">
     <value>Пожалуйста, свяжитесь с администратором.</value>
@@ -319,7 +319,7 @@
     <value/>
   </data>
   <data name="toastNobodyHasChanges" xml:space="preserve">
-    <value/>
+    <value>Ни с кем ничего не зарегистрировано!</value>
   </data>
   <data name="toastNotAdded" xml:space="preserve">
     <value/>
@@ -328,7 +328,7 @@
     <value/>
   </data>
   <data name="toastOrderSended" xml:space="preserve">
-    <value/>
+    <value>Приказы переданы.</value>
   </data>
   <data name="toastPersonNotAvailableCheckGuid" xml:space="preserve">
     <value>Человек недоступен! Пожалуйста, проверьте гида.</value>
@@ -340,7 +340,7 @@
     <value>Ошибка при сохранении.</value>
   </data>
   <data name="toastSomethingWrong" xml:space="preserve">
-    <value/>
+    <value>Что-то пошло не так!</value>
   </data>
   <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
     <value/>

@@ -161,7 +161,7 @@
             providers = providers.OrderBy(x => x.Designation).ToList();
         }
         else {
-            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
         }
     }
 
@@ -184,10 +184,11 @@
                 money.Add(new Money());
                 showHistory.Add(false);
                 shownOrders.Add(new List<Order>());
+                personOrderCards.Add(new PersonOrderCard());
             }
         }
         else {
-            ToastService.ShowToast("Da ist etwas schief gegangen!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
         }
     }
 
@@ -213,7 +214,7 @@
 
         int res = 0;
         if (!responseDate.IsSuccessStatusCode) {
-            ToastService.ShowToast("Fehler in der Übertragung...", ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
         }
         else {
             res = Int32.Parse(await responseDate.Content.ReadAsStringAsync());
@@ -246,7 +247,10 @@
         }
 
         if (orders.Count == 0) {
-            ToastService.ShowToast("Bei niemanden etwas eingetragen!", ToastLevel.Info);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNobodyHasChanges)], ToastLevel.Info);
+            foreach (PersonOrderCard x in personOrderCards) {
+                x.ResetMoney();
+            }
             return;
         }
 
@@ -259,7 +263,10 @@
         HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
         if (!response.IsSuccessStatusCode) {
-            ToastService.ShowToast("Fehler in der Übertragung...\nNichts eingetragen!", ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.notEntered)], ToastLevel.Error);
+        }
+        else {
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
         }
     }
 
@@ -287,7 +294,7 @@
             base.StateHasChanged();
         }
         else {
-            ToastService.ShowToast("Fehler in der Übertragung...\nNichts abgerufen!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
         }
     }
 
@@ -315,7 +322,7 @@
             base.StateHasChanged();
         }
         else {
-            ToastService.ShowToast("Fehler in der Übertragung...\nNichts abgerufen!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
         }
     }
 }

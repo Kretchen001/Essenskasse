@@ -271,10 +271,10 @@
     <value>Erfolg</value>
   </data>
   <data name="toastAddedAndAvailable" xml:space="preserve">
-    <value/>
+    <value>hinzugefügt und verfügbar.</value>
   </data>
   <data name="toastAddedButNotAvailable" xml:space="preserve">
-    <value/>
+    <value>hinzugefügt; ABER nicht abrufbar!</value>
   </data>
   <data name="toastAdminCall" xml:space="preserve">
     <value>Bitte Admin verständigen.</value>
@@ -319,7 +319,7 @@
     <value/>
   </data>
   <data name="toastNobodyHasChanges" xml:space="preserve">
-    <value/>
+    <value>Bei niemanden etwas eingetragen!</value>
   </data>
   <data name="toastNotAdded" xml:space="preserve">
     <value/>
@@ -328,7 +328,7 @@
     <value/>
   </data>
   <data name="toastOrderSended" xml:space="preserve">
-    <value/>
+    <value>Bestellungen übermittelt.</value>
   </data>
   <data name="toastPersonNotAvailableCheckGuid" xml:space="preserve">
     <value>Person nicht verfügbar! Bitte Guid überprüfen.</value>
@@ -340,7 +340,7 @@
     <value>Fehler beim Speichern.</value>
   </data>
   <data name="toastSomethingWrong" xml:space="preserve">
-    <value/>
+    <value>Da ist etwas schief gegangen!</value>
   </data>
   <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
     <value/>
