@@ -141,6 +141,9 @@
   <data name="colortheme" xml:space="preserve">
     <value>Farbschema</value>
   </data>
+  <data name="copy" xml:space="preserve">
+    <value>kopieren</value>
+  </data>
   <data name="createNewOrder" xml:space="preserve">
     <value>Neue Bestellung aufgeben</value>
   </data>

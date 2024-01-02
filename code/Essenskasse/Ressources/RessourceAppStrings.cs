@@ -47,5 +47,6 @@
         viewCompleteHistory,
         order,
         historyOf,
+        copy,
     }
 }
