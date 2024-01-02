@@ -18,7 +18,7 @@
     public string PersonName { get; set; } = "";
 
     [Parameter]
-    public Money Money { get; set; } = new Money();
+    public Money Money { get; set; } = new Money(0, 0);
 
     [Parameter]
     public EventCallback<Money> OnValuesChanged { get; set; }
@@ -40,5 +40,11 @@
         catch {
             ToastService.ShowToast("Betrag invalide!", ToastLevel.Error);
         }
+    }
+
+    public void ResetMoney () {
+        Money = new Money(0, 0);
+        orderAmount = 0;
+        UpdateValues();
     }
 }
