@@ -52,5 +52,9 @@
         success,
         warning,
         error,
+        remove,
+        designator,
+        GuidofTheProviderToBeRemoved,
+        removeAnEntry,
     }
 }

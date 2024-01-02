@@ -41,8 +41,7 @@
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" id="idHinzuzufuegen"
-                   style="width: 100%;" @bind-value="newProviderDesignation">
+            <input type="text" style="width: 100%;" @bind-value="newProviderDesignation">
         </div>
         <div class="col-lg-2">
             <button @onclick="() => addNewAnbieter()">
@@ -70,8 +69,8 @@
 <div class="row" style="margin-top: 1rem;">
     <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
         <tr>
-            <th style="padding-left: 5px;">Guid</th>
-            <th style="padding-left: 5px;">Bezeichnung</th>
+            <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.guid)]</th>
+            <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.designator)]</th>
         </tr>
         @foreach (Provider x in shownProviderList) {
             <tr>
@@ -95,23 +94,22 @@
 
 <div class="row">
     <h4 style="margin-top: 1rem;">
-        Entfernen eines Eintrages
+        @_loc[nameof(RessourceAppStrings.removeAnEntry)]
     </h4>
     @if (!accessToDelete) {
         <button style="width: fit-content;"
                 @onclick="() => {accessToDelete = true;}">
-            Anbieter entfernen?
+            @_loc[nameof(RessourceAppStrings.provider)] @_loc[nameof(RessourceAppStrings.remove)]?
         </button>
     }
     else {
         <div class="col-lg-2">
             <label style="vertical-align: middle;">
-                Guid des zu entfernenden Anbieters
+                @_loc[nameof(RessourceAppStrings.GuidofTheProviderToBeRemoved)]
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" id="idHinzuzufuegen"
-                   style="width: 100%; vertical-align: middle;"
+            <input type="text" style="width: 100%; vertical-align: middle;"
                    @bind-value="providerToDeleteGuid" list="suggestions">
             <datalist id="suggestions">
                 @foreach (Provider x in providers) {
@@ -121,7 +119,7 @@
         </div>
         <div class="col-lg-2" style="vertical-align: middle;">
             <button @onclick="() => deleteAnbieter()">
-                Löschen!
+                @_loc[nameof(RessourceAppStrings.remove)]!
             </button>
         </div>
     }
