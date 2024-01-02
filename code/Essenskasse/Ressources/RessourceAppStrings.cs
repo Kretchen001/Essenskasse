@@ -40,5 +40,12 @@
         createOrder,
         noticeable,
         inconspicuous,
+        recalculateSaldo,
+        createNewOrder,
+        orderHistory,
+        hide,
+        viewCompleteHistory,
+        order,
+        historyOf,
     }
 }

@@ -7,14 +7,14 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 
-<PageTitle>Neue Bestellung aufgeben</PageTitle>
+<PageTitle>@_loc[nameof(RessourceAppStrings.createNewOrder)]</PageTitle>
 
-<h2>Neue Bestellung aufgeben</h2>
+<h2>@_loc[nameof(RessourceAppStrings.createNewOrder)]</h2>
 
 <div class="row" style="margin-bottom: 1rem; margin-top: 1rem;">
     <div class="col-lg-3 align-self-center">
         <label>
-            Datum
+            @_loc[nameof(RessourceAppStrings.date)]
         </label>
     </div>
     <div class="col-lg-9 align-self-center">
@@ -27,7 +27,7 @@
 <div class="row" style="margin-bottom: 1rem;">
     <div class="col-lg-3 align-self-center">
         <label>
-            Anbieter
+            @_loc[nameof(RessourceAppStrings.provider)]
         </label>
     </div>
     <div class="col-lg-9">
@@ -57,12 +57,12 @@
                 <div class="col-lg-2 align-self-center">
                     @if (showHistory[i]) {
                         <button @onclick="() => loadAndShowHistory(i)">
-                            Bestellungshistorie ausblenden
+                            @_loc[nameof(RessourceAppStrings.orderHistory)] @_loc[nameof(RessourceAppStrings.hide)]
                         </button>
                     }
                     else {
                         <button @onclick="() => loadAndShowHistory(i)">
-                            Bestellungshistorie
+                            @_loc[nameof(RessourceAppStrings.orderHistory)]
                         </button>
                     }
                 </div>
@@ -76,7 +76,7 @@
                         <div class="row" style="margin: 0.25rem;">
                             <div class="col-lg-12">
                                 <button class="float-end" @onclick="() => HistoryLoadInModal(i)">
-                                    Gesamte Historie einsehen
+                                    @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
                                 </button>
                             </div>
                         </div>
@@ -91,7 +91,7 @@
 
 <div class="row justify-content-between">
     <button @onclick="postOrderForTheDay">
-        Bestellung aufgeben
+        @_loc[nameof(RessourceAppStrings.submit)] @_loc[nameof(RessourceAppStrings.order)]
     </button>
 </div>
 
@@ -296,7 +296,7 @@
 
         // load data
         Guid personGuid = person[index].Guid;
-        ModalTitle = "Historie von: " + person[index].Name;
+        ModalTitle = _loc[nameof(RessourceAppStrings.historyOf)] + ": " + person[index].Name;
 
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,

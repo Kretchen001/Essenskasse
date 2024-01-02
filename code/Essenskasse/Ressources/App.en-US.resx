@@ -141,6 +141,9 @@
   <data name="colortheme" xml:space="preserve">
     <value>Colortheme</value>
   </data>
+  <data name="createNewOrder" xml:space="preserve">
+    <value>Create new Order</value>
+  </data>
   <data name="createOrder" xml:space="preserve">
     <value>Create Order</value>
   </data>
@@ -174,6 +177,12 @@
   <data name="guid" xml:space="preserve">
     <value>Guid</value>
   </data>
+  <data name="hide" xml:space="preserve">
+    <value>hide</value>
+  </data>
+  <data name="historyOf" xml:space="preserve">
+    <value>History of</value>
+  </data>
   <data name="inconspicuous" xml:space="preserve">
     <value>Inconspicuous</value>
   </data>
@@ -195,6 +204,12 @@
   <data name="noticeable" xml:space="preserve">
     <value>Noticeable</value>
   </data>
+  <data name="order" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="orderHistory" xml:space="preserve">
+    <value>Orderhistory</value>
+  </data>
   <data name="ordersToBeLoaded" xml:space="preserve">
     <value>Orders to be loaded</value>
   </data>
@@ -213,6 +228,9 @@
   <data name="provider" xml:space="preserve">
     <value>Provider</value>
   </data>
+  <data name="recalculateSaldo" xml:space="preserve">
+    <value>Recalculate Saldo</value>
+  </data>
   <data name="russian" xml:space="preserve">
     <value>Russian</value>
   </data>
@@ -226,10 +244,13 @@
     <value>Single column</value>
   </data>
   <data name="submit" xml:space="preserve">
-    <value>Submit!</value>
+    <value>Submit</value>
   </data>
   <data name="turnOn" xml:space="preserve">
     <value>turn on</value>
+  </data>
+  <data name="viewCompleteHistory" xml:space="preserve">
+    <value>View complete history</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Yes</value>

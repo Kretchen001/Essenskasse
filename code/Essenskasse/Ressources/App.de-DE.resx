@@ -141,6 +141,9 @@
   <data name="colortheme" xml:space="preserve">
     <value>Farbschema</value>
   </data>
+  <data name="createNewOrder" xml:space="preserve">
+    <value>Neue Bestellung aufgeben</value>
+  </data>
   <data name="createOrder" xml:space="preserve">
     <value>Bestellung aufgeben</value>
   </data>
@@ -174,6 +177,12 @@
   <data name="guid" xml:space="preserve">
     <value>Guid</value>
   </data>
+  <data name="hide" xml:space="preserve">
+    <value>ausblenden</value>
+  </data>
+  <data name="historyOf" xml:space="preserve">
+    <value>Historie von</value>
+  </data>
   <data name="inconspicuous" xml:space="preserve">
     <value>Unauffällig</value>
   </data>
@@ -195,6 +204,12 @@
   <data name="noticeable" xml:space="preserve">
     <value>Auffällig</value>
   </data>
+  <data name="order" xml:space="preserve">
+    <value>Bestellung</value>
+  </data>
+  <data name="orderHistory" xml:space="preserve">
+    <value>Bestellungshistorie</value>
+  </data>
   <data name="ordersToBeLoaded" xml:space="preserve">
     <value>Zu ladende Bestellungen</value>
   </data>
@@ -213,6 +228,9 @@
   <data name="provider" xml:space="preserve">
     <value>Anbieter</value>
   </data>
+  <data name="recalculateSaldo" xml:space="preserve">
+    <value>Saldo neu berechnen</value>
+  </data>
   <data name="russian" xml:space="preserve">
     <value>Russisch</value>
   </data>
@@ -226,10 +244,13 @@
     <value>Einspaltig</value>
   </data>
   <data name="submit" xml:space="preserve">
-    <value>Abschicken!</value>
+    <value>Abschicken</value>
   </data>
   <data name="turnOn" xml:space="preserve">
     <value>anschalten</value>
+  </data>
+  <data name="viewCompleteHistory" xml:space="preserve">
+    <value>Gesamte Historie einsehen</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Ja</value>

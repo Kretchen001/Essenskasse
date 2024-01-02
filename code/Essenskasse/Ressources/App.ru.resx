@@ -141,6 +141,9 @@
   <data name="colortheme" xml:space="preserve">
     <value>Цветовая схема</value>
   </data>
+  <data name="createNewOrder" xml:space="preserve">
+    <value>Разместить новый заказ</value>
+  </data>
   <data name="createOrder" xml:space="preserve">
     <value>Разместить заказ</value>
   </data>
@@ -174,6 +177,12 @@
   <data name="guid" xml:space="preserve">
     <value>Гуид</value>
   </data>
+  <data name="hide" xml:space="preserve">
+    <value>скрыть</value>
+  </data>
+  <data name="historyOf" xml:space="preserve">
+    <value>История</value>
+  </data>
   <data name="inconspicuous" xml:space="preserve">
     <value>Незаметный</value>
   </data>
@@ -195,6 +204,12 @@
   <data name="noticeable" xml:space="preserve">
     <value>Заметный</value>
   </data>
+  <data name="order" xml:space="preserve">
+    <value>заказ</value>
+  </data>
+  <data name="orderHistory" xml:space="preserve">
+    <value>История заказов</value>
+  </data>
   <data name="ordersToBeLoaded" xml:space="preserve">
     <value>Заказы, подлежащие загрузке</value>
   </data>
@@ -213,6 +228,9 @@
   <data name="provider" xml:space="preserve">
     <value>Поставщик</value>
   </data>
+  <data name="recalculateSaldo" xml:space="preserve">
+    <value>Пересчитать сальдо</value>
+  </data>
   <data name="russian" xml:space="preserve">
     <value>Русский</value>
   </data>
@@ -226,10 +244,13 @@
     <value>Одноколоночный</value>
   </data>
   <data name="submit" xml:space="preserve">
-    <value>Отправить!</value>
+    <value>Отправить</value>
   </data>
   <data name="turnOn" xml:space="preserve">
     <value>включить</value>
+  </data>
+  <data name="viewCompleteHistory" xml:space="preserve">
+    <value>Посмотреть полную историю</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Да</value>
