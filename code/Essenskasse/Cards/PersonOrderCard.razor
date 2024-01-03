@@ -38,7 +38,7 @@
             UpdateValues();
         }
         catch {
-            ToastService.ShowToast("Betrag invalide!", ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastMoneyFormatInvalid)], ToastLevel.Error);
         }
     }
 

@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="GuidofTheProviderToBeRemoved" xml:space="preserve">
+    <value>Guid of the provider to be removed</value>
+  </data>
   <data name="acceptChanges" xml:space="preserve">
     <value>Accept changes</value>
   </data>
@@ -141,17 +144,32 @@
   <data name="colortheme" xml:space="preserve">
     <value>Colortheme</value>
   </data>
+  <data name="copy" xml:space="preserve">
+    <value>copy</value>
+  </data>
+  <data name="createNewOrder" xml:space="preserve">
+    <value>Create new Order</value>
+  </data>
+  <data name="createOrder" xml:space="preserve">
+    <value>Create Order</value>
+  </data>
   <data name="creditAmount" xml:space="preserve">
     <value>Credit the amount!</value>
   </data>
   <data name="currentlySelected" xml:space="preserve">
     <value>currently selected</value>
   </data>
+  <data name="dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
   <data name="dashboard" xml:space="preserve">
     <value>Dashboard</value>
   </data>
   <data name="date" xml:space="preserve">
     <value>Date</value>
+  </data>
+  <data name="designator" xml:space="preserve">
+    <value>Designator</value>
   </data>
   <data name="editPerson" xml:space="preserve">
     <value>Edit Person</value>
@@ -162,14 +180,35 @@
   <data name="english" xml:space="preserve">
     <value>English</value>
   </data>
+  <data name="error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
   <data name="german" xml:space="preserve">
     <value>German</value>
   </data>
   <data name="guid" xml:space="preserve">
     <value>Guid</value>
   </data>
+  <data name="hide" xml:space="preserve">
+    <value>hide</value>
+  </data>
+  <data name="historyOf" xml:space="preserve">
+    <value>History of</value>
+  </data>
+  <data name="inconspicuous" xml:space="preserve">
+    <value>Inconspicuous</value>
+  </data>
+  <data name="information" xml:space="preserve">
+    <value>Info</value>
+  </data>
   <data name="language" xml:space="preserve">
     <value>Language</value>
+  </data>
+  <data name="light" xml:space="preserve">
+    <value>Light</value>
   </data>
   <data name="loadData" xml:space="preserve">
     <value>Load data</value>
@@ -183,8 +222,23 @@
   <data name="notEntered" xml:space="preserve">
     <value>Not entered...</value>
   </data>
+  <data name="noticeable" xml:space="preserve">
+    <value>Noticeable</value>
+  </data>
+  <data name="order" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="orderHistory" xml:space="preserve">
+    <value>Orderhistory</value>
+  </data>
+  <data name="ordersToBeLoaded" xml:space="preserve">
+    <value>Orders to be loaded</value>
+  </data>
   <data name="payment" xml:space="preserve">
     <value>Payment</value>
+  </data>
+  <data name="paymentsToBeLoaded" xml:space="preserve">
+    <value>Payments to be loaded</value>
   </data>
   <data name="person" xml:space="preserve">
     <value>Person</value>
@@ -194,6 +248,15 @@
   </data>
   <data name="provider" xml:space="preserve">
     <value>Provider</value>
+  </data>
+  <data name="recalculateSaldo" xml:space="preserve">
+    <value>Recalculate Saldo</value>
+  </data>
+  <data name="remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="removeAnEntry" xml:space="preserve">
+    <value>Remove an entry</value>
   </data>
   <data name="russian" xml:space="preserve">
     <value>Russian</value>
@@ -208,7 +271,106 @@
     <value>Single column</value>
   </data>
   <data name="submit" xml:space="preserve">
-    <value>Submit!</value>
+    <value>Submit</value>
+  </data>
+  <data name="success" xml:space="preserve">
+    <value>Succes</value>
+  </data>
+  <data name="toastAdd" xml:space="preserve">
+    <value>added.</value>
+  </data>
+  <data name="toastAddedAndAvailable" xml:space="preserve">
+    <value>added and available.</value>
+  </data>
+  <data name="toastAddedButNotAvailable" xml:space="preserve">
+    <value>added; BUT not available!</value>
+  </data>
+  <data name="toastAdminCall" xml:space="preserve">
+    <value>Please contact admin.</value>
+  </data>
+  <data name="toastColorThemePre" xml:space="preserve">
+    <value>Colortheme</value>
+  </data>
+  <data name="toastColorthemePost" xml:space="preserve">
+    <value>successfully established.</value>
+  </data>
+  <data name="toastConnectionError" xml:space="preserve">
+    <value>Error in the transmission...</value>
+  </data>
+  <data name="toastFilterPeronOff" xml:space="preserve">
+    <value>Filter for people switched off!</value>
+  </data>
+  <data name="toastFilterPersonOn" xml:space="preserve">
+    <value>Filter for the people switched on!</value>
+  </data>
+  <data name="toastFilterProviderOff" xml:space="preserve">
+    <value>Filter for the provider switched off!</value>
+  </data>
+  <data name="toastFilterProviderOn" xml:space="preserve">
+    <value>Filter for the provider switched on!</value>
+  </data>
+  <data name="toastGuidNotThere" xml:space="preserve">
+    <value>Guid not forgiven!</value>
+  </data>
+  <data name="toastMoneyFormatInvalid" xml:space="preserve">
+    <value>Amount invalid!</value>
+  </data>
+  <data name="toastNoApiConnection" xml:space="preserve">
+    <value>No API connection possible!</value>
+  </data>
+  <data name="toastNoChanges" xml:space="preserve">
+    <value>No changes</value>
+  </data>
+  <data name="toastNoGuidThere" xml:space="preserve">
+    <value>No Guid there!</value>
+  </data>
+  <data name="toastNoRemove" xml:space="preserve">
+    <value>Deletion not possible...</value>
+  </data>
+  <data name="toastNobodyHasChanges" xml:space="preserve">
+    <value>Nothing registered with anyone!</value>
+  </data>
+  <data name="toastNotAdded" xml:space="preserve">
+    <value>Insert not possible...</value>
+  </data>
+  <data name="toastNothingRequested" xml:space="preserve">
+    <value>Nothing retrieved!</value>
+  </data>
+  <data name="toastOrderSended" xml:space="preserve">
+    <value>Orders transmitted.</value>
+  </data>
+  <data name="toastPersonNotAvailableCheckGuid" xml:space="preserve">
+    <value>Person not available! Please check Guid.</value>
+  </data>
+  <data name="toastRemoveNotBecauseNoEntity" xml:space="preserve">
+    <value>Deletion not possible because no equivalent entry exists.</value>
+  </data>
+  <data name="toastSaveError" xml:space="preserve">
+    <value>Error when saving.</value>
+  </data>
+  <data name="toastSomethingWrong" xml:space="preserve">
+    <value>Something has gone wrong!</value>
+  </data>
+  <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
+    <value>successfully set for the deposits to be loaded.</value>
+  </data>
+  <data name="toastSuccessfullyAdded" xml:space="preserve">
+    <value>Insertion successful!</value>
+  </data>
+  <data name="toastSuccessfullyOrderAmount" xml:space="preserve">
+    <value>successfully set for the orders to be loaded.</value>
+  </data>
+  <data name="toastSuccessfullyRemoved" xml:space="preserve">
+    <value>successfully removed!</value>
+  </data>
+  <data name="turnOn" xml:space="preserve">
+    <value>turn on</value>
+  </data>
+  <data name="viewCompleteHistory" xml:space="preserve">
+    <value>View complete history</value>
+  </data>
+  <data name="warning" xml:space="preserve">
+    <value>Warning</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Yes</value>

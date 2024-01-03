@@ -56,7 +56,7 @@
 <div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
     <div class="col-lg-4">
         <label>
-            Zu ladende Einzahlungen
+            @_loc[nameof(RessourceAppStrings.paymentsToBeLoaded)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
@@ -67,7 +67,7 @@
 <div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
     <div class="col-lg-4">
         <label>
-            Zu ladende Bestellungen
+            @_loc[nameof(RessourceAppStrings.ordersToBeLoaded)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
@@ -78,7 +78,7 @@
 <div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
     <div class="col-lg-4">
         <label>
-            Filter (Anbieter) anschalten
+            @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.provider)]) @_loc[nameof(RessourceAppStrings.turnOn)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
@@ -89,7 +89,7 @@
 <div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
     <div class="col-lg-4">
         <label>
-            Filter (Personen) anschalten
+            @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.person)]) @_loc[nameof(RessourceAppStrings.turnOn)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
@@ -148,7 +148,7 @@
     /// <summary> Hold the entities for theme-selection. </summary>
     private Dictionary<string, string> themeList = new Dictionary<string, string>() {
         { "Light", "Hell" },    
-        { "Dark", "Dunkel" }   
+        { "Dark", "Dunkel" }
     };
 
     /// <summary></summary>
@@ -186,14 +186,20 @@
     #endregion
 
     #region Functions
+    protected override async Task OnInitializedAsync () {
+        themeList["Light"] = _loc[nameof(RessourceAppStrings.light)];
+        themeList["Dark"] = _loc[nameof(RessourceAppStrings.dark)];
+    }
+
     /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>
     private async void saveUserThemePersistentAsync() {
         try {
             await LocalStorage.SetItemAsStringAsync("UserTheme", currentTheme);
-            ToastService.ShowToast(string.Format("Farbschema {0} erfolgreich festgelegt.", currentTheme), ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastColorThemePre)] + " " + currentTheme + " " +
+                                        _loc[nameof(RessourceAppStrings.toastColorThemePost)], ToastLevel.Success);
         }
         catch {
-            ToastService.ShowToast("Fehler beim Speichern.", ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSaveError)], ToastLevel.Error);
         }
     }
 
@@ -207,14 +213,14 @@
     /// <param name="value"></param>
     private async void saveAmountOfPaymentsPersistentAsync(int value) {
         await LocalStorage.SetItemAsync<int>("loadAmountOfPayments", value);
-        ToastService.ShowToast(value.ToString() + " erfolgreich festgelegt für die zu ladende Einzahlungen.", ToastLevel.Success);
+        ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullPaymentAmount)], ToastLevel.Success);
     }
 
     /// <summary></summary>
     /// <param name="value"></param>
     private async void saveAmountOfOrderPersistentAsync (int value) {
         await LocalStorage.SetItemAsync<int>("loadAmountOfOrders", value);
-        ToastService.ShowToast(value.ToString() + " erfolgreich festgelegt für die zu ladende Bestellungen.", ToastLevel.Success);
+        ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyOrderAmount)], ToastLevel.Success);
     }
 
     /// <summary></summary>
@@ -222,10 +228,10 @@
     private async void saveFilterShowProvider (bool value) {
         await LocalStorage.SetItemAsync<bool>("filterShowProvider", value);
         if (AppData.FilterShowProvider) {
-            ToastService.ShowToast("Filter für den Anbieter angeschalten!", ToastLevel.Success);        
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterProviderOn)], ToastLevel.Success);
         }
         else {
-            ToastService.ShowToast("Filter für den Anbieter ausgeschalten!", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterProviderOff)], ToastLevel.Success);
         }
     }
 
@@ -234,10 +240,10 @@
     private async void saveFilterShowPerson (bool value) {
         await LocalStorage.SetItemAsync<bool>("filterShowPerson", value);
         if (AppData.FilterShowPerson) {
-            ToastService.ShowToast("Filter für die Personen angeschalten!", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOn)], ToastLevel.Success);
         }
         else {
-            ToastService.ShowToast("Filter für die Personen ausgeschalten!", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOff)], ToastLevel.Success);
         }
     }
     #endregion

@@ -26,7 +26,7 @@
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.guid)]" id="idGuid"
+            <input type="text" placeholder="@_loc[nameof(RessourceAppStrings.guid)]" id="idGuid"
                    style="width: 100%;" @bind-value="selectedPerson">
         </div>
     </div>
@@ -37,7 +37,7 @@
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.name)]" id="idName"
+            <input type="text" placeholder="@_loc[nameof(RessourceAppStrings.name)]" id="idName"
                    style="width: 100%;" @bind-value="person.Name">
         </div>
     </div>
@@ -48,7 +48,7 @@
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.email)]" id="idEmail"
+            <input type="text" placeholder="@_loc[nameof(RessourceAppStrings.email)]" id="idEmail"
                    style="width: 100%;" @bind-value="person.Email">
         </div>
     </div>
@@ -102,22 +102,22 @@
                 person = JsonConvert.DeserializeObject<Person>(await response.Content.ReadAsStringAsync())!;
                 person.Name = Uri.UnescapeDataString(person.Name);
                 person.Email= Uri.UnescapeDataString(person.Email);
-                safePerson = JsonConvert.DeserializeObject<Person>(JsonConvert.SerializeObject(person));
+                safePerson = JsonConvert.DeserializeObject<Person>(JsonConvert.SerializeObject(person))!;
                 dataNotLoadYet = false;
                 base.StateHasChanged();
             }
             else {
-                ToastService.ShowToast("Person nicht verfügbar!\nBitte Guid überprüfen.", ToastLevel.Warning);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastPersonNotAvailableCheckGuid)], ToastLevel.Warning);
             }
         }
         else {
-                ToastService.ShowToast("Keine Guid da!", ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoGuidThere)], ToastLevel.Error);
         }
     }
 
     private async void commitChangesToApi() {
         if (person.Name.Equals(safePerson.Name) && person.Email.Equals(safePerson.Email)) {
-            ToastService.ShowToast("Keine Änderungen", ToastLevel.Info);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
             return;
         }
         Console.WriteLine(selectedPerson);
@@ -140,7 +140,7 @@
             await OnChangeCommit.InvokeAsync();
         }
         else {
-            ToastService.ShowToast("Person nicht verfügbar!\nBitte Guid überprüfen.", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastPersonNotAvailableCheckGuid)], ToastLevel.Warning);
         }
     }
 }

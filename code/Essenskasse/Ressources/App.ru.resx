@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="GuidofTheProviderToBeRemoved" xml:space="preserve">
+    <value>Код провайдера, который необходимо удалить</value>
+  </data>
   <data name="acceptChanges" xml:space="preserve">
     <value>Принять изменения</value>
   </data>
@@ -141,17 +144,32 @@
   <data name="colortheme" xml:space="preserve">
     <value>Цветовая схема</value>
   </data>
+  <data name="copy" xml:space="preserve">
+    <value>копировать</value>
+  </data>
+  <data name="createNewOrder" xml:space="preserve">
+    <value>Разместить новый заказ</value>
+  </data>
+  <data name="createOrder" xml:space="preserve">
+    <value>Разместить заказ</value>
+  </data>
   <data name="creditAmount" xml:space="preserve">
     <value>Зачислите сумму!</value>
   </data>
   <data name="currentlySelected" xml:space="preserve">
     <value>выбранный в данный момент</value>
   </data>
+  <data name="dark" xml:space="preserve">
+    <value>Темный</value>
+  </data>
   <data name="dashboard" xml:space="preserve">
     <value>Приборная панель</value>
   </data>
   <data name="date" xml:space="preserve">
     <value>Дата</value>
+  </data>
+  <data name="designator" xml:space="preserve">
+    <value>Назначение</value>
   </data>
   <data name="editPerson" xml:space="preserve">
     <value>Редактировать человека</value>
@@ -162,14 +180,35 @@
   <data name="english" xml:space="preserve">
     <value>Английский</value>
   </data>
+  <data name="error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="filter" xml:space="preserve">
+    <value>Фильтры</value>
+  </data>
   <data name="german" xml:space="preserve">
     <value>Немецкий</value>
   </data>
   <data name="guid" xml:space="preserve">
     <value>Гуид</value>
   </data>
+  <data name="hide" xml:space="preserve">
+    <value>скрыть</value>
+  </data>
+  <data name="historyOf" xml:space="preserve">
+    <value>История</value>
+  </data>
+  <data name="inconspicuous" xml:space="preserve">
+    <value>Незаметный</value>
+  </data>
+  <data name="information" xml:space="preserve">
+    <value>Информация</value>
+  </data>
   <data name="language" xml:space="preserve">
     <value>Языки</value>
+  </data>
+  <data name="light" xml:space="preserve">
+    <value>Свет</value>
   </data>
   <data name="loadData" xml:space="preserve">
     <value>Данные о нагрузке</value>
@@ -183,8 +222,23 @@
   <data name="notEntered" xml:space="preserve">
     <value>Не зарегистрирован...</value>
   </data>
+  <data name="noticeable" xml:space="preserve">
+    <value>Заметный</value>
+  </data>
+  <data name="order" xml:space="preserve">
+    <value>заказ</value>
+  </data>
+  <data name="orderHistory" xml:space="preserve">
+    <value>История заказов</value>
+  </data>
+  <data name="ordersToBeLoaded" xml:space="preserve">
+    <value>Заказы, подлежащие загрузке</value>
+  </data>
   <data name="payment" xml:space="preserve">
     <value>Депозит</value>
+  </data>
+  <data name="paymentsToBeLoaded" xml:space="preserve">
+    <value>Депозиты, подлежащие загрузке</value>
   </data>
   <data name="person" xml:space="preserve">
     <value>Человек</value>
@@ -194,6 +248,15 @@
   </data>
   <data name="provider" xml:space="preserve">
     <value>Поставщик</value>
+  </data>
+  <data name="recalculateSaldo" xml:space="preserve">
+    <value>Пересчитать сальдо</value>
+  </data>
+  <data name="remove" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="removeAnEntry" xml:space="preserve">
+    <value>Удалить запись</value>
   </data>
   <data name="russian" xml:space="preserve">
     <value>Русский</value>
@@ -208,7 +271,106 @@
     <value>Одноколоночный</value>
   </data>
   <data name="submit" xml:space="preserve">
-    <value>Отправить!</value>
+    <value>Отправить</value>
+  </data>
+  <data name="success" xml:space="preserve">
+    <value>Успех</value>
+  </data>
+  <data name="toastAdd" xml:space="preserve">
+    <value>добавлено.</value>
+  </data>
+  <data name="toastAddedAndAvailable" xml:space="preserve">
+    <value>добавлены и доступны.</value>
+  </data>
+  <data name="toastAddedButNotAvailable" xml:space="preserve">
+    <value>добавлено; НО не доступно!</value>
+  </data>
+  <data name="toastAdminCall" xml:space="preserve">
+    <value>Пожалуйста, свяжитесь с администратором.</value>
+  </data>
+  <data name="toastColorThemePre" xml:space="preserve">
+    <value>Цветовая схема</value>
+  </data>
+  <data name="toastColorthemePost" xml:space="preserve">
+    <value>Успешно создана.</value>
+  </data>
+  <data name="toastConnectionError" xml:space="preserve">
+    <value>Ошибка при передаче...</value>
+  </data>
+  <data name="toastFilterPeronOff" xml:space="preserve">
+    <value>Фильтр для отключенных людей!</value>
+  </data>
+  <data name="toastFilterPersonOn" xml:space="preserve">
+    <value>Фильтр для включенных людей!</value>
+  </data>
+  <data name="toastFilterProviderOff" xml:space="preserve">
+    <value>Фильтр для провайдера отключен!</value>
+  </data>
+  <data name="toastFilterProviderOn" xml:space="preserve">
+    <value>Фильтр для провайдера включен!</value>
+  </data>
+  <data name="toastGuidNotThere" xml:space="preserve">
+    <value>Guid не прощает!</value>
+  </data>
+  <data name="toastMoneyFormatInvalid" xml:space="preserve">
+    <value>Сумма недействительна!</value>
+  </data>
+  <data name="toastNoApiConnection" xml:space="preserve">
+    <value>Подключение к API невозможно!</value>
+  </data>
+  <data name="toastNoChanges" xml:space="preserve">
+    <value>Без изменений</value>
+  </data>
+  <data name="toastNoGuidThere" xml:space="preserve">
+    <value>Никакого Гида!</value>
+  </data>
+  <data name="toastNoRemove" xml:space="preserve">
+    <value>Удаление невозможно...</value>
+  </data>
+  <data name="toastNobodyHasChanges" xml:space="preserve">
+    <value>Ни с кем ничего не зарегистрировано!</value>
+  </data>
+  <data name="toastNotAdded" xml:space="preserve">
+    <value>Вставить невозможно...</value>
+  </data>
+  <data name="toastNothingRequested" xml:space="preserve">
+    <value>Ничего не найдено!</value>
+  </data>
+  <data name="toastOrderSended" xml:space="preserve">
+    <value>Приказы переданы.</value>
+  </data>
+  <data name="toastPersonNotAvailableCheckGuid" xml:space="preserve">
+    <value>Человек недоступен! Пожалуйста, проверьте гида.</value>
+  </data>
+  <data name="toastRemoveNotBecauseNoEntity" xml:space="preserve">
+    <value>Удаление невозможно, так как не существует эквивалентной записи.</value>
+  </data>
+  <data name="toastSaveError" xml:space="preserve">
+    <value>Ошибка при сохранении.</value>
+  </data>
+  <data name="toastSomethingWrong" xml:space="preserve">
+    <value>Что-то пошло не так!</value>
+  </data>
+  <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
+    <value>успешно установлен для загрузки депозитов.</value>
+  </data>
+  <data name="toastSuccessfullyAdded" xml:space="preserve">
+    <value>Вставка прошла успешно!</value>
+  </data>
+  <data name="toastSuccessfullyOrderAmount" xml:space="preserve">
+    <value>успешно установлен для загрузки заказов.</value>
+  </data>
+  <data name="toastSuccessfullyRemoved" xml:space="preserve">
+    <value>успешно удалены!</value>
+  </data>
+  <data name="turnOn" xml:space="preserve">
+    <value>включить</value>
+  </data>
+  <data name="viewCompleteHistory" xml:space="preserve">
+    <value>Посмотреть полную историю</value>
+  </data>
+  <data name="warning" xml:space="preserve">
+    <value>Внимание</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Да</value>

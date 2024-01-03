@@ -7,14 +7,14 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 
-<PageTitle>Neue Bestellung aufgeben</PageTitle>
+<PageTitle>@_loc[nameof(RessourceAppStrings.createNewOrder)]</PageTitle>
 
-<h2>Neue Bestellung aufgeben</h2>
+<h2>@_loc[nameof(RessourceAppStrings.createNewOrder)]</h2>
 
 <div class="row" style="margin-bottom: 1rem; margin-top: 1rem;">
     <div class="col-lg-3 align-self-center">
         <label>
-            Datum
+            @_loc[nameof(RessourceAppStrings.date)]
         </label>
     </div>
     <div class="col-lg-9 align-self-center">
@@ -27,7 +27,7 @@
 <div class="row" style="margin-bottom: 1rem;">
     <div class="col-lg-3 align-self-center">
         <label>
-            Anbieter
+            @_loc[nameof(RessourceAppStrings.provider)]
         </label>
     </div>
     <div class="col-lg-9">
@@ -58,12 +58,12 @@
                 <div class="col-lg-2 align-self-center">
                     @if (showHistory[i]) {
                         <button @onclick="() => loadAndShowHistory(i)">
-                            Bestellungshistorie ausblenden
+                            @_loc[nameof(RessourceAppStrings.orderHistory)] @_loc[nameof(RessourceAppStrings.hide)]
                         </button>
                     }
                     else {
                         <button @onclick="() => loadAndShowHistory(i)">
-                            Bestellungshistorie
+                            @_loc[nameof(RessourceAppStrings.orderHistory)]
                         </button>
                     }
                 </div>
@@ -77,7 +77,7 @@
                         <div class="row" style="margin: 0.25rem;">
                             <div class="col-lg-12">
                                 <button class="float-end" @onclick="() => HistoryLoadInModal(i)">
-                                    Gesamte Historie einsehen
+                                    @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
                                 </button>
                             </div>
                         </div>
@@ -92,7 +92,7 @@
 
 <div class="row justify-content-between">
     <button @onclick="postOrderForTheDay">
-        Bestellung aufgeben
+        @_loc[nameof(RessourceAppStrings.submit)] @_loc[nameof(RessourceAppStrings.order)]
     </button>
 </div>
 
@@ -163,7 +163,7 @@
             providers = providers.OrderBy(x => x.Designation).ToList();
         }
         else {
-            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
         }
     }
 
@@ -190,7 +190,7 @@
             }
         }
         else {
-            ToastService.ShowToast("Da ist etwas schief gegangen!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
         }
     }
 
@@ -216,7 +216,7 @@
 
         int res = 0;
         if (!responseDate.IsSuccessStatusCode) {
-            ToastService.ShowToast("Fehler in der Übertragung...", ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
         }
         else {
             res = Int32.Parse(await responseDate.Content.ReadAsStringAsync());
@@ -252,7 +252,10 @@
         }
 
         if (orders.Count == 0) {
-            ToastService.ShowToast("Bei niemanden etwas eingetragen!", ToastLevel.Info);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNobodyHasChanges)], ToastLevel.Info);
+            foreach (PersonOrderCard x in personOrderCards) {
+                x.ResetMoney();
+            }
             return;
         }
 
@@ -265,7 +268,10 @@
         HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
         if (!response.IsSuccessStatusCode) {
-            ToastService.ShowToast("Fehler in der Übertragung...\nNichts eingetragen!", ToastLevel.Error);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Error);
+        }
+        else {
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
         }
         else {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
@@ -299,7 +305,7 @@
             base.StateHasChanged();
         }
         else {
-            ToastService.ShowToast("Fehler in der Übertragung...\nNichts abgerufen!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
         }
     }
 
@@ -308,7 +314,7 @@
 
         // load data
         Guid personGuid = person[index].Guid;
-        ModalTitle = "Historie von: " + person[index].Name;
+        ModalTitle = _loc[nameof(RessourceAppStrings.historyOf)] + ": " + person[index].Name;
 
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -327,7 +333,7 @@
             base.StateHasChanged();
         }
         else {
-            ToastService.ShowToast("Fehler in der Übertragung...\nNichts abgerufen!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
         }
     }
 }

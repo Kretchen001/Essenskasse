@@ -41,12 +41,11 @@
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" id="idHinzuzufuegen"
-                   style="width: 100%;" @bind-value="newProviderDesignation">
+            <input type="text" style="width: 100%;" @bind-value="newProviderDesignation">
         </div>
         <div class="col-lg-2">
             <button @onclick="() => addNewAnbieter()">
-                @_loc[nameof(RessourceAppStrings.submit)]
+                @_loc[nameof(RessourceAppStrings.submit)]!
             </button>
         </div>
     }
@@ -59,7 +58,7 @@
     <div class="row" style="margin-top: 1rem;">
         <div class="col-lg-2">
             <label>
-                Filter
+                @_loc[nameof(RessourceAppStrings.filter)]
             </label>
         </div>
         <div class="col-lg-10 align-self-center">
@@ -70,8 +69,8 @@
 <div class="row" style="margin-top: 1rem;">
     <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
         <tr>
-            <th style="padding-left: 5px;">Guid</th>
-            <th style="padding-left: 5px;">Bezeichnung</th>
+            <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.guid)]</th>
+            <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.designator)]</th>
         </tr>
         @foreach (Provider x in shownProviderList) {
             <tr>
@@ -95,23 +94,22 @@
 
 <div class="row">
     <h4 style="margin-top: 1rem;">
-        Entfernen eines Eintrages
+        @_loc[nameof(RessourceAppStrings.removeAnEntry)]
     </h4>
     @if (!accessToDelete) {
         <button style="width: fit-content;"
                 @onclick="() => {accessToDelete = true;}">
-            Anbieter entfernen?
+            @_loc[nameof(RessourceAppStrings.provider)] @_loc[nameof(RessourceAppStrings.remove)]?
         </button>
     }
     else {
         <div class="col-lg-2">
             <label style="vertical-align: middle;">
-                Guid des zu entfernenden Anbieters
+                @_loc[nameof(RessourceAppStrings.GuidofTheProviderToBeRemoved)]
             </label>
         </div>
         <div class="col-lg-8">
-            <input type="text" name="nameHinzuzufuegen" id="idHinzuzufuegen"
-                   style="width: 100%; vertical-align: middle;"
+            <input type="text" style="width: 100%; vertical-align: middle;"
                    @bind-value="providerToDeleteGuid" list="suggestions">
             <datalist id="suggestions">
                 @foreach (Provider x in providers) {
@@ -121,7 +119,7 @@
         </div>
         <div class="col-lg-2" style="vertical-align: middle;">
             <button @onclick="() => deleteAnbieter()">
-                Löschen!
+                @_loc[nameof(RessourceAppStrings.remove)]!
             </button>
         </div>
     }
@@ -157,7 +155,7 @@
             shownProviderList.AddRange(providers);
         }
         else {
-            ToastService.ShowToast("Keine API Verbindung möglich!", ToastLevel.Warning);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
         }
     }
 
@@ -181,7 +179,7 @@
             providers = providers.OrderBy(x => x.Designation).ToList();
             shownProviderList.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
             shownProviderList = shownProviderList.OrderBy(x => x.Designation).ToList();
-            ToastService.ShowToast("Anbieter " + newProviderDesignation + " hinzugefügt", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.provider)] + " " + newProviderDesignation + " " + _loc[nameof(RessourceAppStrings.toastAdd)], ToastLevel.Success);
         }
 
         newProviderDesignation = "";
@@ -192,7 +190,7 @@
     private async Task deleteAnbieter() {
         Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
         if (tempAnbieter is null) {
-            ToastService.ShowToast("Guid nicht vergeben!", ToastLevel.Info);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastGuidNotThere)], ToastLevel.Info);
             return;
         }
         if (await JSRuntime.InvokeAsync<bool>(
@@ -213,17 +211,17 @@
 
             if (response.IsSuccessStatusCode) {
                 Provider temp = JsonConvert.DeserializeObject<Provider>(await response.Content.ReadAsStringAsync())!;
-                ToastService.ShowToast("Person " + temp.Designation + " erfolgreich entfernt!", ToastLevel.Success);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.person)] + " " + temp.Designation + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyRemoved)], ToastLevel.Success);
                 providers.Remove(tempAnbieter);
                 accessToDelete = false;
                 providerToDeleteGuid = "";
                 base.StateHasChanged();
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.NoContent)) {
-                ToastService.ShowToast("Löschen nicht möglich, da kein equivalenter Eintrag vorhanden.", ToastLevel.Info);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastRemoveNotBecauseNoEntity)], ToastLevel.Info);
             }
             else {
-                ToastService.ShowToast("Löschen nicht möglich...\nBitte Admin verständigen!", ToastLevel.Warning);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoRemove)] + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
             }
         }
     }
