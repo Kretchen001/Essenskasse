@@ -113,6 +113,19 @@ namespace EssenskasseAPI.Controllers {
                         success = false;
                         break;
                     }
+                    else {
+                        // recalculate Person Saldo
+                        PersonDbController _personDbController = new PersonDbController();
+                        Person? y = _personDbController.PersonPerGuid(x.ReferencedPerson);
+                        if (y is not null) {
+                            y.Saldo = new Money().CalculateMoney(
+                                method: CalculationOperation.Substraction,
+                                money1: y.Saldo,
+                                money2: x.Money
+                            )!;
+                            _personDbController.UpdatePerson(y);
+                        }
+                    }
                 }
                 if (success) {
                     return Ok();
