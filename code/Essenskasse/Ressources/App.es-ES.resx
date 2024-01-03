@@ -259,22 +259,22 @@
     <value/>
   </data>
   <data name="russian" xml:space="preserve">
-    <value/>
+    <value>Ruso</value>
   </data>
   <data name="savePermanent" xml:space="preserve">
-    <value/>
+    <value>Guardar permanentemente</value>
   </data>
   <data name="settings" xml:space="preserve">
-    <value/>
+    <value>Ajustes</value>
   </data>
   <data name="singleColumn" xml:space="preserve">
-    <value/>
+    <value>Una columna</value>
   </data>
   <data name="submit" xml:space="preserve">
-    <value/>
+    <value>Enviar</value>
   </data>
   <data name="success" xml:space="preserve">
-    <value/>
+    <value>Éxito</value>
   </data>
   <data name="toastAdd" xml:space="preserve">
     <value>añadido.</value>
