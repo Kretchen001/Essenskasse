@@ -118,145 +118,145 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="GuidofTheProviderToBeRemoved" xml:space="preserve">
-    <value/>
+    <value>Guid del proveedor a eliminar</value>
   </data>
   <data name="acceptChanges" xml:space="preserve">
-    <value/>
+    <value>Aceptar cambios</value>
   </data>
   <data name="add" xml:space="preserve">
-    <value/>
+    <value>Añadir</value>
   </data>
   <data name="addNewProvider" xml:space="preserve">
-    <value/>
+    <value>Añade un nuevo proveedor.</value>
   </data>
   <data name="addPerson" xml:space="preserve">
-    <value/>
+    <value>Añadir persona</value>
   </data>
   <data name="amount" xml:space="preserve">
-    <value/>
+    <value>Importe</value>
   </data>
   <data name="available" xml:space="preserve">
-    <value/>
+    <value>Disponible</value>
   </data>
   <data name="cannotBeChanged" xml:space="preserve">
-    <value/>
+    <value>(¡no se puede cambiar!)</value>
   </data>
   <data name="colortheme" xml:space="preserve">
-    <value/>
+    <value>Combinación de colores</value>
   </data>
   <data name="copy" xml:space="preserve">
-    <value/>
+    <value>copia</value>
   </data>
   <data name="createNewOrder" xml:space="preserve">
-    <value/>
+    <value>Realizar un nuevo pedido</value>
   </data>
   <data name="createOrder" xml:space="preserve">
-    <value/>
+    <value>Hacer un pedido</value>
   </data>
   <data name="creditAmount" xml:space="preserve">
-    <value/>
+    <value>Abone el importe.</value>
   </data>
   <data name="currentlySelected" xml:space="preserve">
-    <value/>
+    <value>actualmente seleccionado</value>
   </data>
   <data name="dark" xml:space="preserve">
-    <value/>
+    <value>Oscuro</value>
   </data>
   <data name="dashboard" xml:space="preserve">
-    <value/>
+    <value>Dashboard</value>
   </data>
   <data name="date" xml:space="preserve">
-    <value/>
+    <value>fecha</value>
   </data>
   <data name="designator" xml:space="preserve">
-    <value/>
+    <value>Designación</value>
   </data>
   <data name="editPerson" xml:space="preserve">
-    <value/>
+    <value>Editar persona</value>
   </data>
   <data name="email" xml:space="preserve">
-    <value/>
+    <value>E-Mail</value>
   </data>
   <data name="english" xml:space="preserve">
-    <value/>
+    <value>Inglés</value>
   </data>
   <data name="error" xml:space="preserve">
-    <value/>
+    <value>Fallos</value>
   </data>
   <data name="filter" xml:space="preserve">
-    <value/>
+    <value>Filtros</value>
   </data>
   <data name="german" xml:space="preserve">
-    <value/>
+    <value>Alemán</value>
   </data>
   <data name="guid" xml:space="preserve">
-    <value/>
+    <value>Guía</value>
   </data>
   <data name="hide" xml:space="preserve">
-    <value/>
+    <value>ocultar</value>
   </data>
   <data name="historyOf" xml:space="preserve">
-    <value/>
+    <value>Historia de</value>
   </data>
   <data name="inconspicuous" xml:space="preserve">
-    <value/>
+    <value>Inconspicuo</value>
   </data>
   <data name="information" xml:space="preserve">
-    <value/>
+    <value>Información</value>
   </data>
   <data name="language" xml:space="preserve">
-    <value/>
+    <value>Idioma</value>
   </data>
   <data name="light" xml:space="preserve">
-    <value/>
+    <value>Luz</value>
   </data>
   <data name="loadData" xml:space="preserve">
-    <value/>
+    <value>Datos de carga</value>
   </data>
   <data name="name" xml:space="preserve">
-    <value/>
+    <value>Nombre</value>
   </data>
   <data name="no" xml:space="preserve">
-    <value/>
+    <value>No</value>
   </data>
   <data name="notEntered" xml:space="preserve">
-    <value/>
+    <value>No registrado...</value>
   </data>
   <data name="noticeable" xml:space="preserve">
-    <value/>
+    <value>Conspicuo</value>
   </data>
   <data name="order" xml:space="preserve">
-    <value/>
+    <value>pedir</value>
   </data>
   <data name="orderHistory" xml:space="preserve">
-    <value/>
+    <value>Historial de pedidos</value>
   </data>
   <data name="ordersToBeLoaded" xml:space="preserve">
-    <value/>
+    <value>Órdenes pendientes de carga</value>
   </data>
   <data name="payment" xml:space="preserve">
-    <value/>
+    <value>Depósito</value>
   </data>
   <data name="paymentsToBeLoaded" xml:space="preserve">
-    <value/>
+    <value>Depósitos a cargar</value>
   </data>
   <data name="person" xml:space="preserve">
-    <value/>
+    <value>Personas</value>
   </data>
   <data name="personRegistered" xml:space="preserve">
-    <value/>
+    <value>Personas registradas</value>
   </data>
   <data name="provider" xml:space="preserve">
-    <value/>
+    <value>Proveedor</value>
   </data>
   <data name="recalculateSaldo" xml:space="preserve">
-    <value/>
+    <value>Recalcular el saldo</value>
   </data>
   <data name="remove" xml:space="preserve">
-    <value/>
+    <value>Eliminar</value>
   </data>
   <data name="removeAnEntry" xml:space="preserve">
-    <value/>
+    <value>Eliminar una entrada</value>
   </data>
   <data name="russian" xml:space="preserve">
     <value>Ruso</value>
