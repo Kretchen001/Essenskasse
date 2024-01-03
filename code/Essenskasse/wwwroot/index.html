@@ -62,7 +62,6 @@
         <script>
             blazorExtensions = {
                 SendLocalEmail: function (mailto, subject, body) {
-                    console.log("call");
                     var link = document.createElement('a');
                     var uri = "mailto:" + mailto + "?";
                     if (!isEmpty(subject)) {
@@ -79,7 +78,7 @@
 
                     uri = encodeURI(uri);
                     uri = uri.substring(0, 2000); // Avoid exceeding querystring limits.
-                    console.log('Clicking SendLocalEmail link:', uri);
+                    // console.log('Clicking SendLocalEmail link:', uri);
 
                     link.href = uri;
                     document.body.appendChild(link); // Needed for Firefox
