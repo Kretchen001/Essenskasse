@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Microsoft ResX Schema
+
+    Version 2.0
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
+    associated with the data types.
+
+    Example:
+
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+
+    There are any number of "resheader" rows that contain simple
+    name/value pairs.
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
+    mimetype set.
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
+    extensible. For a given mimetype the value must be set accordingly:
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
+    read any of the formats listed below.
+
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="GuidofTheProviderToBeRemoved" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="acceptChanges" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="add" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="addNewProvider" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="addPerson" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="amount" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="available" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="cannotBeChanged" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="colortheme" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="copy" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="createNewOrder" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="createOrder" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="creditAmount" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="currentlySelected" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="dark" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="dashboard" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="date" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="designator" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="editPerson" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="email" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="english" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="error" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="filter" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="german" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="guid" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="hide" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="historyOf" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="inconspicuous" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="information" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="language" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="light" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="loadData" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="name" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="no" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="notEntered" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="noticeable" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="order" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="orderHistory" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="ordersToBeLoaded" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="payment" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="paymentsToBeLoaded" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="person" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="personRegistered" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="provider" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="recalculateSaldo" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="remove" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="removeAnEntry" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="russian" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="savePermanent" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="settings" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="singleColumn" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="submit" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="success" xml:space="preserve">
+    <value/>
+  </data>
+  <data name="toastAdd" xml:space="preserve">
+    <value>añadido.</value>
+  </data>
+  <data name="toastAddedAndAvailable" xml:space="preserve">
+    <value>añadido y disponible.</value>
+  </data>
+  <data name="toastAddedButNotAvailable" xml:space="preserve">
+    <value>añadido; ¡PERO no disponible!</value>
+  </data>
+  <data name="toastAdminCall" xml:space="preserve">
+    <value>Póngase en contacto con la administración.</value>
+  </data>
+  <data name="toastColorThemePre" xml:space="preserve">
+    <value>Combinación de colores</value>
+  </data>
+  <data name="toastColorthemePost" xml:space="preserve">
+    <value>establecido con éxito.</value>
+  </data>
+  <data name="toastConnectionError" xml:space="preserve">
+    <value>Error en la transmisión...</value>
+  </data>
+  <data name="toastFilterPeronOff" xml:space="preserve">
+    <value>¡Filtro para las personas apagado!</value>
+  </data>
+  <data name="toastFilterPersonOn" xml:space="preserve">
+    <value>¡Filtro para las personas encendidas!</value>
+  </data>
+  <data name="toastFilterProviderOff" xml:space="preserve">
+    <value>¡Filtro para el proveedor apagado!</value>
+  </data>
+  <data name="toastFilterProviderOn" xml:space="preserve">
+    <value>¡Filtro para el proveedor encendido!</value>
+  </data>
+  <data name="toastGuidNotThere" xml:space="preserve">
+    <value>¡Guid no perdonado!</value>
+  </data>
+  <data name="toastMoneyFormatInvalid" xml:space="preserve">
+    <value>Importe no válido</value>
+  </data>
+  <data name="toastNoApiConnection" xml:space="preserve">
+    <value>No hay conexión API posible.</value>
+  </data>
+  <data name="toastNoChanges" xml:space="preserve">
+    <value>Sin cambios</value>
+  </data>
+  <data name="toastNoGuidThere" xml:space="preserve">
+    <value>¡Ahí no hay Guid!</value>
+  </data>
+  <data name="toastNoRemove" xml:space="preserve">
+    <value>No es posible borrar...</value>
+  </data>
+  <data name="toastNobodyHasChanges" xml:space="preserve">
+    <value>¡Nada registrado con nadie!</value>
+  </data>
+  <data name="toastNotAdded" xml:space="preserve">
+    <value>Insertar no es posible...</value>
+  </data>
+  <data name="toastNothingRequested" xml:space="preserve">
+    <value>¡Nada recuperado!</value>
+  </data>
+  <data name="toastOrderSended" xml:space="preserve">
+    <value>Órdenes transmitidas.</value>
+  </data>
+  <data name="toastPersonNotAvailableCheckGuid" xml:space="preserve">
+    <value>¡Persona no disponible! Por favor, compruebe Guid.</value>
+  </data>
+  <data name="toastRemoveNotBecauseNoEntity" xml:space="preserve">
+    <value>No es posible la eliminación porque no existe ninguna entrada equivalente.</value>
+  </data>
+  <data name="toastSaveError" xml:space="preserve">
+    <value>Error al guardar.</value>
+  </data>
+  <data name="toastSomethingWrong" xml:space="preserve">
+    <value>¡Algo ha salido mal!</value>
+  </data>
+  <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
+    <value>configurado correctamente para que se carguen los depósitos.</value>
+  </data>
+  <data name="toastSuccessfullyAdded" xml:space="preserve">
+    <value>¡Inserción correcta!</value>
+  </data>
+  <data name="toastSuccessfullyOrderAmount" xml:space="preserve">
+    <value>configurado correctamente para que se carguen las órdenes.</value>
+  </data>
+  <data name="toastSuccessfullyRemoved" xml:space="preserve">
+    <value>¡eliminado con éxito!</value>
+  </data>
+  <data name="turnOn" xml:space="preserve">
+    <value>Encender</value>
+  </data>
+  <data name="viewCompleteHistory" xml:space="preserve">
+    <value>Ver el historial completo</value>
+  </data>
+  <data name="warning" xml:space="preserve">
+    <value>Advertencia</value>
+  </data>
+  <data name="yes" xml:space="preserve">
+    <value>Sí</value>
+  </data>
+</root>
