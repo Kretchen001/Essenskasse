@@ -61,10 +61,6 @@ else {
     @_loc[nameof(RessourceAppStrings.recalculateSaldo)]
 </button>
 
-<button @onclick="SendLocalEmail">
-    Email test
-</button>
-
 @code {
     private bool isSingleListWish {
         get {
@@ -141,12 +137,5 @@ else {
 
     private async void WriteWishListToLocalStorage(bool value) {
         await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
-    }
-
-    private void SendLocalEmail() {
-        SendLocalEmail("a", "b", "c");
-    }
-    protected void SendLocalEmail (string toEmailAddress, string subject, string body) {
-        JSRuntime.InvokeAsync<object>("blazorExtensions.SendLocalEmail", new object[] { toEmailAddress, subject, body });
     }
 }
