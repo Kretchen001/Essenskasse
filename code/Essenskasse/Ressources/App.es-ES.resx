@@ -177,6 +177,9 @@
   <data name="email" xml:space="preserve">
     <value>E-Mail</value>
   </data>
+  <data name="emailSubject" xml:space="preserve">
+    <value>Solicitud de pago en ventanilla</value>
+  </data>
   <data name="english" xml:space="preserve">
     <value>Inglés</value>
   </data>
@@ -203,6 +206,9 @@
   </data>
   <data name="information" xml:space="preserve">
     <value>Información</value>
+  </data>
+  <data name="insertFollowingAmount" xml:space="preserve">
+    <value>Introduzca el siguiente importe?</value>
   </data>
   <data name="language" xml:space="preserve">
     <value>Idioma</value>

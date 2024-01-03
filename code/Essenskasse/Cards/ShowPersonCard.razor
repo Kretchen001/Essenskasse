@@ -1,4 +1,5 @@
 ﻿@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<App> _loc
 @inject ToastService ToastService
 
 @if (PositivSaldo) {
@@ -45,7 +46,7 @@ else {
             ToastService.ShowToast("Keine E-Mail eingetragen!", ToastLevel.Info);
         }
         else {
-            string subject = "Zahlungsaufforderung Kasse";
+            string subject = _loc[nameof(RessourceAppStrings.emailSubject)];
             string body = "Sehr geehrte(r) " + Person.Name + ",\n\nSie befinden sich mit\n" +
                             "\xA0\xA0\xA0\xA0" +
                             Person.Saldo.ToString() + "\nnicht mehr im Positiven.\n" +

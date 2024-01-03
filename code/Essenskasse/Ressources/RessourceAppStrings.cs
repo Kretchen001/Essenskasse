@@ -88,5 +88,7 @@
         toastAdd,
         light,
         dark,
+        insertFollowingAmount,
+        emailSubject,
     }
 }
