@@ -272,9 +272,6 @@
         }
         else {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
             foreach (PersonOrderCard x in personOrderCards) {
                 x.ResetMoney();
             }
