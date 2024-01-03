@@ -44,14 +44,22 @@ else {
         if (Person.Email.Equals("")) {
             ToastService.ShowToast("Keine E-Mail eingetragen!", ToastLevel.Info);
         }
-        else {   
+        else {
+            string subject = "Zahlungsaufforderung Kasse";
+            string body = "Sehr geehrte(r) " + Person.Name + ",\n\nSie befinden sich mit\n" +
+                            "\xA0\xA0\xA0\xA0" +
+                            Person.Saldo.ToString() + "\nnicht mehr im Positiven.\n" +
+                            "Bitte Abhilfe schaffen!\n\n" +
+                            "Mit freundlichen Grüßen verbleibend\n" +
+                            "Ihre Kassenverwaltung";
             await JSRuntime.InvokeAsync<object>(
                 "blazorExtensions.SendLocalEmail", 
                 new object[] {
                     Person.Email,
-                    "subject",
-                    "body"
-                });
+                    subject,
+                    body
+                }
+            );
         }
     }
 }
