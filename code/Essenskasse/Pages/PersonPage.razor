@@ -73,7 +73,7 @@
             </label>
         </div>
         <div class="col-lg-10 align-self-center">
-            <input @bind="filter" @bind:event="oninput" @onkeyup="ChangeProviderShownList" />
+            <input @bind="filter" @bind:event="oninput" @onkeyup="ChangePersonShownList" />
         </div>
     </div>
 }
@@ -205,6 +205,8 @@
     }
 
     private async void ChangeOfPersonCommit() {
+        person.Clear();
+        shownPersonList.Clear();
         await requestAllPersonFromApiAsync();
         base.StateHasChanged();
     }
@@ -213,7 +215,7 @@
         await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
     }
 
-    private void ChangeProviderShownList () {
+    private void ChangePersonShownList () {
         Console.WriteLine(filter);
         shownPersonList.Clear();
         if (filter.Equals("")) {
