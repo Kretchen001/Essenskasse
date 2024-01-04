@@ -177,6 +177,27 @@
   <data name="email" xml:space="preserve">
     <value>E-Mail</value>
   </data>
+  <data name="emailCashManagement" xml:space="preserve">
+    <value>Ihre Kassenverwaltung</value>
+  </data>
+  <data name="emailDearSirMadam" xml:space="preserve">
+    <value>Sehr geehrte(r)</value>
+  </data>
+  <data name="emailPositiv" xml:space="preserve">
+    <value>nicht mehr im Positiven.</value>
+  </data>
+  <data name="emailRemaining" xml:space="preserve">
+    <value>Mit freundlichen Grüßen verbleibend</value>
+  </data>
+  <data name="emailRemedy" xml:space="preserve">
+    <value>Bitte Abhilfe schaffen!</value>
+  </data>
+  <data name="emailSubject" xml:space="preserve">
+    <value>Zahlungsaufforderung Kasse</value>
+  </data>
+  <data name="emailYouAreCurrently" xml:space="preserve">
+    <value>Sie befinden sich mit</value>
+  </data>
   <data name="english" xml:space="preserve">
     <value>Englisch</value>
   </data>
@@ -203,6 +224,9 @@
   </data>
   <data name="information" xml:space="preserve">
     <value>Information</value>
+  </data>
+  <data name="insertFollowingAmount" xml:space="preserve">
+    <value>Folgenden Betrag eintragen?</value>
   </data>
   <data name="language" xml:space="preserve">
     <value>Sprache</value>

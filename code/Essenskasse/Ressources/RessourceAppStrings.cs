@@ -88,5 +88,13 @@
         toastAdd,
         light,
         dark,
+        insertFollowingAmount,
+        emailSubject,
+        emailDearSirMadam,
+        emailYouAreCurrently,
+        emailPositiv,
+        emailRemedy,
+        emailRemaining,
+        emailCashManagement,
     }
 }

@@ -163,7 +163,7 @@
     }
 
     private async void insertPayment () {
-        if (!(await JSRuntime.InvokeAsync<bool>("confirm", "Folgenden Betrag eintragen?\n" + money.ToString()))) {
+        if (!(await JSRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.insertFollowingAmount)] + "\n" + money.ToString()))) {
             return;
         }
 

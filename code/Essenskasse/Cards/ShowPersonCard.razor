@@ -1,4 +1,8 @@
-﻿@if (PositivSaldo) {
+﻿@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<App> _loc
+@inject ToastService ToastService
+
+@if (PositivSaldo) {
     <div style="border: 0.2rem; border-style: outset; border-radius: 5px; margin: 0.25rem; padding: 0.25rem;
                 background-color: aquamarine; color: black;">
         <h5>@Person.Name</h5>
@@ -11,7 +15,15 @@
 else {
     <div style="border: 0.2rem; border-style: outset; border-radius: 5px; margin: 0.25rem; padding: 0.25rem;
                 background-color: mistyrose; color: black;">
-        <h5>@Person.Name</h5>
+        <h5>
+            @Person.Name
+            <label @onclick="SendEmailForPayment">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-exclamation" viewBox="0 0 16 16">
+                    <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2zm3.708 6.208L1 11.105V5.383zM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2z" />
+                    <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1.5a.5.5 0 0 1-1 0V11a.5.5 0 0 1 1 0m0 3a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0" />
+                </svg>
+            </label>
+        </h5>
 
         <label>
             @Person.Saldo.ToString()
@@ -28,4 +40,28 @@ else {
     /// <summary>Status of the Person's saldo.</summary>
     [Parameter]
     public bool PositivSaldo { get; set; } = false;
+
+    private async void SendEmailForPayment() {
+        if (Person.Email.Equals("")) {
+            ToastService.ShowToast("Keine E-Mail eingetragen!", ToastLevel.Info);
+        }
+        else {
+            string subject = _loc[nameof(RessourceAppStrings.emailSubject)];
+            string body = _loc[nameof(RessourceAppStrings.emailDearSirMadam)] + " " + Person.Name + ",\n\n" +
+                            _loc[nameof(RessourceAppStrings.emailYouAreCurrently)] + "\n" +
+                            "\xA0\xA0\xA0\xA0" + Person.Saldo.ToString() + "\n" +
+                            _loc[nameof(RessourceAppStrings.emailPositiv)] + "\n" +
+                            _loc[nameof(RessourceAppStrings.emailRemedy)] + "\n\n" +
+                            _loc[nameof(RessourceAppStrings.emailRemaining)] + "\n" +
+                            _loc[nameof(RessourceAppStrings.emailCashManagement)];
+            await JSRuntime.InvokeAsync<object>(
+                "blazorExtensions.SendLocalEmail", 
+                new object[] {
+                    Person.Email,
+                    subject,
+                    body
+                }
+            );
+        }
+    }
 }

@@ -9,7 +9,8 @@
         public static readonly List<CultureWithName> SupportedCultures = new List<CultureWithName>() {
             new CultureWithName("Deutsch", "de-DE"),
             new CultureWithName("English", "en-US"),
-            new CultureWithName("Русский", "ru")
+            new CultureWithName("Русский", "ru"),
+            new CultureWithName("Español", "es-ES")
         };
     }
 }

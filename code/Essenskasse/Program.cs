@@ -38,6 +38,7 @@ namespace Essenskasse {
             // add the ThemeService as a Simgleton to access it by injection
             builder.Services.AddSingleton<ThemeService>();
             
+            // add access to the toast's
             builder.Services.AddScoped<ToastService>();
 
             //await builder.Build().RunAsync(); // <- Old Version
