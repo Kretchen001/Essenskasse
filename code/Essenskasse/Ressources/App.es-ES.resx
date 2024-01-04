@@ -177,8 +177,26 @@
   <data name="email" xml:space="preserve">
     <value>E-Mail</value>
   </data>
+  <data name="emailCashManagement" xml:space="preserve">
+    <value>Su gestión de caja</value>
+  </data>
+  <data name="emailDearSirMadam" xml:space="preserve">
+    <value>Estimado señor o señora</value>
+  </data>
+  <data name="emailPositiv" xml:space="preserve">
+    <value>ya no es positivo.</value>
+  </data>
+  <data name="emailRemaining" xml:space="preserve">
+    <value>Le saluda atentamente</value>
+  </data>
+  <data name="emailRemedy" xml:space="preserve">
+    <value>Por favor, ponga remedio a esta situación.</value>
+  </data>
   <data name="emailSubject" xml:space="preserve">
     <value>Solicitud de pago en ventanilla</value>
+  </data>
+  <data name="emailYouAreCurrently" xml:space="preserve">
+    <value>Se encuentra con</value>
   </data>
   <data name="english" xml:space="preserve">
     <value>Inglés</value>

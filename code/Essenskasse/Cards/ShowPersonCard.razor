@@ -47,12 +47,13 @@ else {
         }
         else {
             string subject = _loc[nameof(RessourceAppStrings.emailSubject)];
-            string body = "Sehr geehrte(r) " + Person.Name + ",\n\nSie befinden sich mit\n" +
-                            "\xA0\xA0\xA0\xA0" +
-                            Person.Saldo.ToString() + "\nnicht mehr im Positiven.\n" +
-                            "Bitte Abhilfe schaffen!\n\n" +
-                            "Mit freundlichen Grüßen verbleibend\n" +
-                            "Ihre Kassenverwaltung";
+            string body = _loc[nameof(RessourceAppStrings.emailDearSirMadam)] + " " + Person.Name + ",\n\n" +
+                            _loc[nameof(RessourceAppStrings.emailYouAreCurrently)] + "\n" +
+                            "\xA0\xA0\xA0\xA0" + Person.Saldo.ToString() + "\n" +
+                            _loc[nameof(RessourceAppStrings.emailPositiv)] + "\n" +
+                            _loc[nameof(RessourceAppStrings.emailRemedy)] + "\n\n" +
+                            _loc[nameof(RessourceAppStrings.emailRemaining)] + "\n" +
+                            _loc[nameof(RessourceAppStrings.emailCashManagement)];
             await JSRuntime.InvokeAsync<object>(
                 "blazorExtensions.SendLocalEmail", 
                 new object[] {
