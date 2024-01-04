@@ -12,9 +12,9 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpGet, Route("requestAll")]
         public IActionResult GetAllPerson() {
-            List<Person>? persons = _personController.RequestAllPerson();
+            List<Person> persons = _personController.RequestAllPerson();
 
-            if (persons is not null) {
+            if (persons.Count != 0) {
                 foreach (Person x in persons) {
                     x.Name = Uri.EscapeDataString(x.Name);
                     x.Email = Uri.EscapeDataString(x.Email ?? "");
