@@ -15,6 +15,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpGet, Route("requestAll")]
         public IActionResult GetAllProvider() {
             using (Operation.Time("TaskDuration")) {
+                Log.Information("GetAllProvider called");
                 List<Provider> provider = _providerController.RequestProvider();
 
                 if (provider.Count != 0) {
@@ -23,7 +24,7 @@ namespace EssenskasseAPI.Controllers {
                     return Ok(JsonConvert.SerializeObject(provider));
                 }
                 else {
-                    Log.Warning("No Data response");
+                    Log.Warning("No Data response (GetAllProvider)");
                     return NoContent();
                 }
             }
@@ -32,7 +33,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpGet, Route("testExist")]
         public IActionResult CheckExistProvider([FromHeader] Guid? guid, [FromHeader] string? designator) {
             using (Operation.Time("TaskDuration")) {
-                Log.Information("Provider existence check called");
+                Log.Information("CheckExistProvider called");
                 Provider? provider = _providerController.ExistProvider(guid, designator);
 
                 if (provider is not null) {
@@ -53,7 +54,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpPost, Route("new")]
         public IActionResult AddProvider([FromHeader] string? name) {
             using (Operation.Time("TaskDuration")) {
-                Log.Information("Provider add called");
+                Log.Information("AddProvider called");
                 if (name is not null) {
                     name = Uri.UnescapeDataString(name);
                     Provider newProvider = new Provider(name);
@@ -76,7 +77,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpPut, Route("change")]
         public IActionResult ChangeProvider([FromHeader] Guid? guid, [FromHeader] string designation) {
             using (Operation.Time("TaskDuration")) {
-                Log.Information("Provider update/change called");
+                Log.Information("ChangeProvider called");
                 if (guid is not null) {
                     Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
                     if (result is not null) {
@@ -106,7 +107,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpDelete, Route("remove")]
         public IActionResult RemoveProvider([FromHeader] Guid? guid) {
             using (Operation.Time("TaskDuration")) {
-                Log.Information("Provider remove called");
+                Log.Information("RemoveProvider called");
                 if (guid is not null) {
                     Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
                     if (result is not null) {

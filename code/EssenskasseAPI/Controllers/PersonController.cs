@@ -26,7 +26,7 @@ namespace EssenskasseAPI.Controllers {
                     return Ok(JsonConvert.SerializeObject(persons));
                 }
                 else {
-                    Log.Warning("No Data response");
+                    Log.Warning("No Data response (GetAllPerson)");
                     return NoContent();
                 }
             }
@@ -35,7 +35,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpGet, Route("perGuid")]
         public IActionResult GetPerGuidPerson([FromHeader] Guid guid) {
             using (Operation.Time("TaskDuration")) {
-                Log.Information("Person per guid called");
+                Log.Information("GetPerGuidPerson called");
                 Person? person = _personController.PersonPerGuid(guid);
                 if (person is not null) {
                     person.Name = Uri.EscapeDataString(person.Name);
@@ -54,7 +54,7 @@ namespace EssenskasseAPI.Controllers {
         public IActionResult AddNewPerson([FromHeader] string? name,
                                             [FromHeader] string? email) {
             using (Operation.Time("TaskDuration")) {
-                Log.Information("Person add called");
+                Log.Information("AddNewPerson called");
                 if (name is not null) {
                     Person newPerson = new Person(
                         Uri.UnescapeDataString(name),
@@ -80,7 +80,7 @@ namespace EssenskasseAPI.Controllers {
                                             [FromHeader] string? name,
                                             [FromHeader] string? email) {
             using (Operation.Time("TaskDuration")) {
-                Log.Information("Person update called");
+                Log.Information("UpdatePerson called");
                 Person? personToUpdate = _personController.PersonPerGuid(guid);
                 if (personToUpdate is not null) {
                     if (name is not null) {
@@ -111,7 +111,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpPut, Route("updateDatabasePersonSaldo")]
         public IActionResult UpdatePersonSaldoInDatabase() {
             using (Operation.Time("TaskDuration")) {
-                Log.Information("Saldo recalculation called");
+                Log.Information("UpdatePersonSaldoInDatabase called");
                 SaldoDbController _saldoDbController = new SaldoDbController();
                 try {
                     _saldoDbController.RecalculateSaldoInTheDatabase();
@@ -128,7 +128,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpDelete, Route("remove")]
         public IActionResult RemovePerson([FromHeader] Guid? guid) {
             using (Operation.Time("TaskDuration")) {
-                Log.Information("Person remove called");
+                Log.Information("RemovePerson called");
                 if (guid is not null) {
                     Person? result = _personController.ExistPerson(guid ?? null, null);
                     if (result is not null) {
