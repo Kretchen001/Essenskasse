@@ -27,7 +27,7 @@ namespace EssenskasseAPI {
             app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
+                .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.LiteDB(AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB/Logs.litedb")
