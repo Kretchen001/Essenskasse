@@ -60,7 +60,7 @@ namespace EssenskasseAPI.Controllers {
                         Uri.UnescapeDataString(name),
                         Uri.UnescapeDataString(email ?? ""));
                     if (_personController.SavePerson(newPerson)) {
-                        Log.Information($"New person {newPerson.Name} & {newPerson.Email}");
+                        Log.Information($"New person {newPerson.Name} & {newPerson.Email} and {newPerson.Guid}");
                         return Ok(JsonConvert.SerializeObject(newPerson.Guid));
                     }
                     else {

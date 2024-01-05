@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Modells;
 using Newtonsoft.Json;
+using Serilog;
+using SerilogTimings;
 
 namespace EssenskasseAPI.Controllers {
     
@@ -12,85 +14,115 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpGet, Route("requestAll")]
         public IActionResult GetAllProvider() {
-            List<Provider> provider = _providerController.RequestProvider();
-            provider.ForEach(x => x.Designation = Uri.EscapeDataString(x.Designation));
+            using (Operation.Time("TaskDuration")) {
+                List<Provider> provider = _providerController.RequestProvider();
 
-            if (provider is not null) {
-                return Ok(JsonConvert.SerializeObject(provider));
-            }
-            else {
-                return BadRequest();
+                if (provider.Count != 0) {
+                    provider.ForEach(x => x.Designation = Uri.EscapeDataString(x.Designation));
+                    Log.Information(provider.Count + " Person requested");
+                    return Ok(JsonConvert.SerializeObject(provider));
+                }
+                else {
+                    Log.Warning("No Data response");
+                    return NoContent();
+                }
             }
         }
 
         [HttpGet, Route("testExist")]
         public IActionResult CheckExistProvider([FromHeader] Guid? guid, [FromHeader] string? designator) {
-            Provider? provider = _providerController.ExistProvider(guid, designator);
-            
-            if (provider is not null) {
-                if (provider.Designation != designator) {
-                    return Conflict("Guid existiert, aber mit anderer Bezeichnung!");
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("Provider existence check called");
+                Provider? provider = _providerController.ExistProvider(guid, designator);
+
+                if (provider is not null) {
+                    if (provider.Designation != designator) {
+                        Log.Information($"{guid.ToString()} with other {provider.Designation} found and not {designator}");
+                        return Conflict("Guid existiert, aber mit anderer Bezeichnung!");
+                    }
+                    Log.Information("Provider exist");
+                    return Ok(JsonConvert.SerializeObject(provider));
                 }
-                return Ok(JsonConvert.SerializeObject(provider));
-            }
-            else {
-                return BadRequest();
+                else {
+                    Log.Warning(guid.ToString() + " not found.");
+                    return NoContent();
+                }
             }
         }
 
         [HttpPost, Route("new")]
         public IActionResult AddProvider([FromHeader] string? name) {
-            if (name is not null) {
-                name = Uri.UnescapeDataString(name);
-                Provider newProvider = new Provider(name);
-                if (_providerController.SaveProvider(newProvider)) {
-                    return Ok(JsonConvert.SerializeObject(newProvider.Guid));
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("Provider add called");
+                if (name is not null) {
+                    name = Uri.UnescapeDataString(name);
+                    Provider newProvider = new Provider(name);
+                    if (_providerController.SaveProvider(newProvider)) {
+                        Log.Information($"New provider {newProvider.Designation} and {newProvider.Guid}");
+                        return Ok(JsonConvert.SerializeObject(newProvider.Guid));
+                    }
+                    else {
+                        Log.Error("AddProvider failed");
+                        return BadRequest("Provider konnte nicht eingefügt werden. Bitte Admin benachrichten.");
+                    }
                 }
                 else {
-                    return BadRequest("Provider konnte nicht eingefügt werden. Bitte Admin benachrichten.");
+                    Log.Warning("Nothing to add");
+                    return NoContent();
                 }
-            }
-            else {
-                return NoContent();
             }
         }
 
         [HttpPut, Route("change")]
         public IActionResult ChangeProvider([FromHeader] Guid? guid, [FromHeader] string designation) {
-            if (guid is not null) {
-                Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
-                if (result is not null) {
-                    result.Designation = designation;
-                    if (_providerController.SaveChangesAtProvider(result)) {
-                        return Ok();
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("Provider update/change called");
+                if (guid is not null) {
+                    Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
+                    if (result is not null) {
+                        string oldDesignation = result.Designation;
+                        result.Designation = designation;
+                        if (_providerController.SaveChangesAtProvider(result)) {
+                            Log.Information($"Provider successfully updated from {oldDesignation} to {designation}");
+                            return Ok();
+                        }
+                        else {
+                        Log.Error("UpdateProvider failed");
+                            return BadRequest("Änderungen konnten nicht übernommen werden. Bitte beim Admin melden.");
+                        }
                     }
                     else {
-                        return BadRequest("Änderungen konnten nicht übernommen werden. Bitte beim Admin melden.");
+                        Log.Warning("Guid has no entry (provider)");
+                        return NotFound("Provider konnte nicht gefunden werden");
                     }
                 }
                 else {
-                    return BadRequest("Provider konnte nicht gefunden werden");
+                    Log.Warning("No Guid there");
+                    return NoContent();
                 }
-            }
-            else {
-                return NoContent();
             }
         }
 
         [HttpDelete, Route("remove")]
         public IActionResult RemoveProvider([FromHeader] Guid? guid) {
-            if (guid is not null) {
-                Provider? gefunden = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
-                if (gefunden is not null) {
-                    _providerController.RemoveProvider(gefunden);
-                    return Ok(JsonConvert.SerializeObject(gefunden));
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("Provider remove called");
+                if (guid is not null) {
+                    Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
+                    if (result is not null) {
+                        _providerController.RemoveProvider(result);
+                        Log.Information($"{result.Designation} with {result.Guid} successfully removed");
+                        return Ok(JsonConvert.SerializeObject(result));
+                    }
+                    else {
+                        Log.Warning($"{guid} not found");
+                        return NotFound("Provider konnte nicht gefunden werden!");
+                    }
                 }
                 else {
-                    return BadRequest("Provider konnte nicht gefunden werden!");
+                    Log.Warning("Nothing to remove");
+                    return NoContent();
                 }
-            }
-            else {
-                return NoContent();
             }
         }
     }
