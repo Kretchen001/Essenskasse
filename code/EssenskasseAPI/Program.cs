@@ -44,6 +44,9 @@ namespace EssenskasseAPI {
                 Log.Information("Starting the application...");
                 app.Run();
             }
+            catch (Exception ex) {
+                Log.Fatal(ex, "Application terminated unexpectedly");
+            }
             finally {
                 Log.Information("Shutting down the application.");
                 Log.CloseAndFlush();
