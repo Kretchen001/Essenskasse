@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Modells;
 using Newtonsoft.Json;
+using Serilog;
+using SerilogTimings;
 
 namespace EssenskasseAPI.Controllers {
 
@@ -12,56 +14,77 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpGet, Route("requestAll")]
         public IActionResult GetAllPayments() {
-            List<Payment>? payments = _paymentController.RequestAllPayments();
-            if (payments is not null) {
-                return Ok(JsonConvert.SerializeObject(payments));
-            }
-            else {
-                return NoContent();
+            using (Operation.Time("TaskDuration")) {
+                List<Payment>? payments = _paymentController.RequestAllPayments();
+                if (payments is not null) {
+                    Log.Information(payments.Count + " Payments requested");
+                    return Ok(JsonConvert.SerializeObject(payments));
+                }
+                else {
+                    Log.Warning("No Data response (GetAllPayments)");
+                    return NoContent();
+                }
             }
         }
 
         [HttpGet, Route("requestAmount")]
         public IActionResult GetAmountOfPayments([FromHeader] int? amount) {
-            if (amount is null) {
-                return BadRequest();
-            }
-            List<Payment>? payments = _paymentController.RequestAmountOfPayments(amount ?? 1);
-            if (payments is not null) {
-                return Ok(JsonConvert.SerializeObject(payments));
-            }
-            else {
-                return NoContent();
+            using (Operation.Time("TaskDuration")) {
+                if (amount is null) {
+                    Log.Warning("GetAmountOfPayments with no Header called");
+                    return BadRequest();
+                }
+                List<Payment> payments = _paymentController.RequestAmountOfPayments(amount ?? 1);
+                if (payments.Count != 0) {
+                    Log.Information(payments.Count + " Payments requested");
+                    return Ok(JsonConvert.SerializeObject(payments));
+                }
+                else {
+                    Log.Warning("No Data response (GetAmountOfPayments)");
+                    return NoContent();
+                }
             }
         }
 
         [HttpGet, Route("fromPerson")]
         public IActionResult GetPaymentsFromPersonPerGuid([FromHeader] Guid? guid,
                                                             [FromHeader] int? amount) {
-            if (guid is null) {
-                return BadRequest();
-            }
-            List<Payment>? payments = _paymentController.PaymentsFromOnePersonPerGuid(guid ?? new Guid(), amount);
-            if (payments is not null) {
-                return Ok(JsonConvert.SerializeObject(payments));
-            }
-            else {
-                return NoContent();
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("GetPaymentsFromPersonPerGuid called");
+                if (guid is null) {
+                    Log.Warning("Guid Header empty");
+                    return BadRequest();
+                }
+                List<Payment> payments = _paymentController.PaymentsFromOnePersonPerGuid(guid ?? new Guid(), amount);
+                if (payments.Count != 0) {
+                    Log.Information(guid.ToString() + " requested and " + payments.Count + " found.");
+                    return Ok(JsonConvert.SerializeObject(payments));
+                }
+                else {
+                    Log.Warning(guid.ToString() + " no equivalent entry found.");
+                    return NoContent();
+                }
             }
         }
 
         [HttpGet, Route("singlePerDate")]
         public IActionResult GetPaymentPerDate([FromHeader] string? dateString) {
-            if (dateString is null) {
-                return BadRequest();
-            }
-            DateTime date = DateTime.Parse(dateString);
-            Payment? payment = _paymentController.PaymentAtDateTime(date);
-            if (payment is not null) {
-                return Ok(JsonConvert.SerializeObject(payment));
-            }
-            else {
-                return NoContent();
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("GetPaymentPerDate called");
+                if (dateString is null) {
+                    Log.Warning("dateString Header empty");
+                    return BadRequest();
+                }
+                DateTime date = DateTime.Parse(dateString);
+                Payment? payment = _paymentController.PaymentAtDateTime(date);
+                if (payment is not null) {
+                    Log.Information($"Payment on {dateString} successfully requested");
+                    return Ok(JsonConvert.SerializeObject(payment));
+                }
+                else {
+                    Log.Warning(dateString.ToString() + " no equivalent entry found.");
+                    return NoContent();
+                }
             }
         }
 
