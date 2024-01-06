@@ -91,75 +91,100 @@ namespace EssenskasseAPI.Controllers {
         [HttpPost, Route("insertNew")]
         public IActionResult AddNewPayment([FromBody] Money? amount,
                                             [FromHeader] Guid? referencedPerson) {
-            if ((amount is not null) && (referencedPerson is not null)) {
-                Payment newPayment = new Payment(amount, referencedPerson ?? new Guid());
-                if (_paymentController.NewPayment(newPayment)) {
-                    // recalculate Person Saldo
-                    PersonDbController _personDbController = new PersonDbController();
-                    Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
-                    if (x is not null) {
-                        x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, newPayment.Amount)!;
-                        _personDbController.UpdatePerson(x);
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("AddNewPayment called");
+                if ((amount is not null) && (referencedPerson is not null)) {
+                    Payment newPayment = new Payment(amount, referencedPerson ?? new Guid());
+                    if (_paymentController.NewPayment(newPayment)) {
+                        // recalculate Person Saldo
+                        PersonDbController _personDbController = new PersonDbController();
+                        Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
+                        if (x is not null) {
+                            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
+                            x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, newPayment.Amount)!;
+                            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
+                            _personDbController.UpdatePerson(x);
+                        }
+                        Log.Information($"New Payment of {amount.ToString()} for Person added.");
+                        return Ok(JsonConvert.SerializeObject(newPayment));
                     }
-                    return Ok(JsonConvert.SerializeObject(newPayment));
+                    else {
+                        Log.Warning("New Payment not inserted. Conflict return");
+                        return Conflict(JsonConvert.SerializeObject(newPayment));
+                    }
                 }
-                else {
-                    return Conflict(JsonConvert.SerializeObject(newPayment));
-                }
+                Log.Error($"Nothing to add - Header not complete {amount} | {referencedPerson}");
+                return BadRequest("Header unvollständig!");
             }
-            return BadRequest("Header unvollständig!");
         }
 
         [HttpPut, Route("update")]
         public IActionResult UpdatePayment([FromHeader] string? dateString,
                                             [FromHeader] Guid? referencedPerson,
                                             [FromBody] Money? money) {
-            if (dateString is null) {
-                return BadRequest("Kein Datum angegeben!");
-            }
-            DateTime date = DateTime.Parse(dateString);
-            Payment? paymentToUpdate = _paymentController.PaymentAtDateTime(date);
-            if (paymentToUpdate is not null) {
-                if (money is not null) {
-                    paymentToUpdate.Amount = money;
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("UpdatePayment called");
+                if (dateString is null) {
+                    Log.Warning("No dateString in Header");
+                    return BadRequest("Kein Datum angegeben!");
                 }
-                if (referencedPerson is not null) {
-                    paymentToUpdate.ReferencedPerson = referencedPerson ?? new Guid();
-                }
-                if (_paymentController.UpdatePayment(paymentToUpdate)) {
-                    // recalculate Person Saldo
-                    PersonDbController _personDbController = new PersonDbController();
-                    Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
-                    if (x is not null) {
-                        x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, paymentToUpdate.Amount)!;
-                        _personDbController.UpdatePerson(x);
+                DateTime date = DateTime.Parse(dateString);
+                Payment? paymentToUpdate = _paymentController.PaymentAtDateTime(date);
+                if (paymentToUpdate is not null) {
+                    if (money is not null) {
+                        Log.Information($"Money of Payment updated from {paymentToUpdate.Amount.ToString()} to {money.ToString()}");
+                        paymentToUpdate.Amount = money;
                     }
-                    return Ok();
+                    if (referencedPerson is not null) {
+                        Log.Information($"RefrencedPerson of Payment updated from {paymentToUpdate.ReferencedPerson} to {referencedPerson}");
+                        paymentToUpdate.ReferencedPerson = referencedPerson ?? new Guid();
+                    }
+                    if (_paymentController.UpdatePayment(paymentToUpdate)) {
+                        // recalculate Person Saldo
+                        PersonDbController _personDbController = new PersonDbController();
+                        Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
+                        if (x is not null) {
+                            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
+                            x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, paymentToUpdate.Amount)!;
+                            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
+                            _personDbController.UpdatePerson(x);
+                        }
+                        Log.Information($"Payment successfully updated");
+                        return Ok();
+                    }
+                    else {
+                        Log.Warning($"At {dateString} no payment found");
+                        return NotFound("Keine Einzahlung zum angegebenen Datum gefunden.");
+                    }
                 }
                 else {
-                    return BadRequest("Keine Einzahlung zum angegebenen Datum gefunden.");
+                    Log.Warning("Empty dateString Header");
+                    return BadRequest();
                 }
-            }
-            else {
-                return NoContent();
             }
         }
 
         [HttpDelete, Route("remove")]
         public IActionResult DeletePayment([FromHeader] string? dateString) {
-            if (dateString is not null) {
-                DateTime date = DateTime.Parse(dateString);
-                Payment? result = _paymentController.PaymentAtDateTime(date);
-                if (result is not null) {
-                    _paymentController.RemovePayment(result);
-                    return Ok(JsonConvert.SerializeObject(result));
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("DeletePayment called");
+                if (dateString is not null) {
+                    DateTime date = DateTime.Parse(dateString);
+                    Payment? result = _paymentController.PaymentAtDateTime(date);
+                    if (result is not null) {
+                        _paymentController.RemovePayment(result);
+                        Log.Information($"Payment at {result.DateTime.ToString()} successfully removed");
+                        return Ok(JsonConvert.SerializeObject(result));
+                    }
+                    else {
+                        Log.Warning($"At {dateString} no payment found");
+                        return NotFound("Einzahlung konnte nicht gefunden werden!\nFehler in der Eingabe?");
+                    }
                 }
                 else {
-                    return BadRequest("Einzahlung konnte nicht gefunden werden!\nFehler in der Eingabe?");
+                    Log.Warning("Empty dateString Header");
+                    return BadRequest();
                 }
-            }
-            else {
-                return NoContent();
             }
         }
     }
