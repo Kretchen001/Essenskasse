@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Serilog;
+using SerilogTimings;
 
 namespace EssenskasseAPI.Controllers {
 
@@ -8,7 +10,10 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpGet, Route("ping")]
         public IActionResult Ping() {
-            return Ok();
+            using (Operation.Time("TaskDuration")) {
+                Log.Information("Ping called.");
+                return Ok();
+            }
         }
     }
 }

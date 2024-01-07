@@ -57,11 +57,11 @@ namespace EssenskasseAPI.LiteDB {
         /// <summary></summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public List<Payment>? RequestAmountOfPayments(int amount) {
+        public List<Payment> RequestAmountOfPayments(int amount) {
             using (LiteDatabase db = new LiteDatabase(saveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
 
-                return (col.FindAll().OrderByDescending(x => x.DateTime).Take(amount).ToList() ?? null);
+                return col.FindAll().OrderByDescending(x => x.DateTime).Take(amount).ToList();
             }
         }
 

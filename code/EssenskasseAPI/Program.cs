@@ -1,3 +1,7 @@
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.LiteDB;
+
 namespace EssenskasseAPI {
 
     public class Program {
@@ -23,6 +27,16 @@ namespace EssenskasseAPI {
             // Allow CORS
             app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
 
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
+                .WriteTo.LiteDB(
+                    databaseUrl: AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB/Logs.litedb",
+                    rollingFilePeriod: RollingPeriod.Weekly
+                    )
+                .CreateLogger();
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
@@ -30,7 +44,17 @@ namespace EssenskasseAPI {
 
             app.MapControllers();
 
-            app.Run();
+            try {
+                Log.Information("Starting the application...");
+                app.Run();
+            }
+            catch (Exception ex) {
+                Log.Fatal(ex, "Application terminated unexpectedly");
+            }
+            finally {
+                Log.Information("Shutting down the application.");
+                Log.CloseAndFlush();
+            }
         }
     }
 }
