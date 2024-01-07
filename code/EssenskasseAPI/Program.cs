@@ -1,5 +1,6 @@
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.LiteDB;
 
 namespace EssenskasseAPI {
 
@@ -30,7 +31,10 @@ namespace EssenskasseAPI {
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.LiteDB(AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB/Logs.litedb")
+                .WriteTo.LiteDB(
+                    databaseUrl: AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB/Logs.litedb",
+                    rollingFilePeriod: RollingPeriod.Weekly
+                    )
                 .CreateLogger();
 
             app.UseHttpsRedirection();
