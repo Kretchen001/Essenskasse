@@ -177,6 +177,7 @@ namespace EssenskasseAPI.Controllers {
         public IActionResult UpdatePayment([FromHeader] string? dateString,
                                             [FromBody] Tuple<Money?, Provider?, Guid?> values) {
             using (Operation.Time("TaskDuration")) {
+                Log.Information("UpdatePerson called");
                 if (dateString is null) {
                     Log.Warning("Empty dateString Header");
                     return BadRequest("Kein Datum angegeben!");
@@ -185,12 +186,15 @@ namespace EssenskasseAPI.Controllers {
                 Order? orderToUpdate = _orderDbController.OrderAtDateTime(date);
                 if (orderToUpdate is not null) {
                     if (values.Item1 is not null) {
+                        Log.Information($"Order updated from {orderToUpdate.Money} to {values.Item1}");
                         orderToUpdate.Money = values.Item1;
                     }
                     if (values.Item2 is not null) {
+                        Log.Information($"Order updated from {orderToUpdate.Provider} to {values.Item2}");
                         orderToUpdate.Provider = values.Item2;
                     }
                     if (values.Item3 is not null) {
+                        Log.Information($"Order updated from {orderToUpdate.ReferencedPerson} to {values.Item3}");
                         orderToUpdate.ReferencedPerson = values.Item3 ?? new Guid();
                     }
                     if (_orderDbController.UpdateOrder(orderToUpdate)) {
@@ -198,37 +202,46 @@ namespace EssenskasseAPI.Controllers {
                         PersonDbController _personDbController = new PersonDbController();
                         Person? x = _personDbController.PersonPerGuid(orderToUpdate.ReferencedPerson);
                         if (x is not null) {
+                            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
                             x.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, x.Saldo, orderToUpdate.Money)!;
+                            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
                             _personDbController.UpdatePerson(x);
                         }
+                        Log.Information("Order successfully updated");
                         return Ok();
                     }
                     else {
-                        return BadRequest("Keine Einzahlung zum angegebenen Datum gefunden.");
+                        Log.Warning($"At {dateString} no Order updated");
+                        return NotFound("Keine Bestellung zum angegebenen Datum geupdated...");
                     }
                 }
                 else {
-                    return NoContent();
+                    Log.Warning($"At {dateString} no Order found");
+                    return NotFound("Keine Bestellung zum angegebenen Datum gefunden.");
                 }
             }
         }
 
         [HttpDelete, Route("remove")]
-        public IActionResult DeletePayment([FromHeader] string? dateString) {
+        public IActionResult DeleteOrder([FromHeader] string? dateString) {
             using (Operation.Time("TaskDuration")) {
+                Log.Information("DeleteOrder called");
                 if (dateString is not null) {
                     DateTime date = DateTime.Parse(dateString);
                     Order? result = _orderDbController.OrderAtDateTime(date);
                     if (result is not null) {
                         _orderDbController.RemoveOrder(result);
+                        Log.Information($"Order at {result.DateTime.ToString()} successfully removed");
                         return Ok(JsonConvert.SerializeObject(result));
                     }
                     else {
-                        return BadRequest("Bestelung konnte nicht gefunden werden!\nFehler in der Eingabe?");
+                        Log.Warning($"At {dateString} no Order found");
+                        return NotFound("Bestelung konnte nicht gefunden werden!\nFehler in der Eingabe?");
                     }
                 }
                 else {
-                    return NoContent();
+                    Log.Warning("Empty dateString Header");
+                    return BadRequest();
                 }
             }
         }

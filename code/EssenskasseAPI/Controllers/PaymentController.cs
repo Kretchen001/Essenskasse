@@ -158,7 +158,7 @@ namespace EssenskasseAPI.Controllers {
                     }
                 }
                 else {
-                    Log.Warning("Empty dateString Header");
+                    Log.Warning("No payment");
                     return BadRequest();
                 }
             }
