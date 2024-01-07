@@ -54,18 +54,18 @@ namespace EssenskasseAPI.LiteDB {
         /// <summary></summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public List<Order>? RequestAmountOfOrders(int amount) {
+        public List<Order> RequestAmountOfOrders(int amount) {
             using (LiteDatabase db = new LiteDatabase(saveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
 
-                return (col.FindAll().OrderByDescending(x => x.DateTime).Take(amount).ToList() ?? null);
+                return col.FindAll().OrderByDescending(x => x.DateTime).Take(amount).ToList();
             }
         }
 
         /// <summary></summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-        public List<Order>? OrdersFromOnePersonPerGuid(Guid guid, int? amount = 0) {
+        public List<Order> OrdersFromOnePersonPerGuid(Guid guid, int? amount = 0) {
             using (LiteDatabase db = new LiteDatabase(saveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
                 List<Order>? matchingPayments = new List<Order>();
