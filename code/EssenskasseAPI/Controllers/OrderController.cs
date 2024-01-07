@@ -94,23 +94,29 @@ namespace EssenskasseAPI.Controllers {
         [HttpPost, Route("insertNew")]
         public IActionResult AddNewOrder([FromBody] Order? order) {
             using (Operation.Time("TaskDuration")) {
+                Log.Information("AddNewOrder called");
                 if (order is not null) {
                     if (_providerController.ExistProvider(
                                             guid: order.Provider.Guid,
                                             name: order.Provider.Designation) is null) {
-                        return BadRequest("Provider existiert nicht!");
+                        Log.Warning($"{order.Provider.Guid} not available...");
+                        return NotFound("Provider existiert nicht!");
                     }
                     if (_orderDbController.NewOrder(order)) {
                         // recalculate Person Saldo
                         PersonDbController _personDbController = new PersonDbController();
                         Person? x = _personDbController.PersonPerGuid(order.ReferencedPerson);
                         if (x is not null) {
+                            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
                             x.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, x.Saldo, order.Money)!;
+                            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
                             _personDbController.UpdatePerson(x);
                         }
+                        Log.Information($"New Order of {order.Money.ToString()} for Person added.");
                         return Ok(JsonConvert.SerializeObject(order));
                     }
                     else {
+                        Log.Warning("New Order not inserted. Conflict return");
                         return Conflict(JsonConvert.SerializeObject(order));
                     }
                 }
@@ -122,15 +128,18 @@ namespace EssenskasseAPI.Controllers {
         [HttpPost, Route("insertNewList")]
         public IActionResult AddNewOrderList([FromBody] List<Order>? orders) {
             using (Operation.Time("TaskDuration")) {
+                Log.Information("AddNewOrderList called");
                 if (orders is not null) {
                     if (_providerController.ExistProvider(
                                                 guid: orders[0].Provider.Guid,
                                                 name: orders[0].Provider.Designation) is null) {
+                        Log.Warning($"{orders[0].Provider.Guid} not available...");
                         return NotFound("Provider existiert nicht!");
                     }
                     bool success = true;
                     foreach (Order x in orders) {
                         if (!_orderDbController.NewOrder(x)) {
+                            Log.Warning($"Order at{x.DateTime} with {x.ReferencedPerson} from Provider {x.Provider.Guid} not inserted");
                             success = false;
                             break;
                         }
@@ -139,19 +148,23 @@ namespace EssenskasseAPI.Controllers {
                             PersonDbController _personDbController = new PersonDbController();
                             Person? y = _personDbController.PersonPerGuid(x.ReferencedPerson);
                             if (y is not null) {
+                                Log.Information($"Person {y.Guid} {y.Name} old Saldo = {x.Money}");
                                 y.Saldo = new Money().CalculateMoney(
                                     method: CalculationOperation.Substraction,
                                     money1: y.Saldo,
                                     money2: x.Money
                                 )!;
+                                Log.Information($"Person {y.Guid} {y.Name} new Saldo = {x.Money}");
                                 _personDbController.UpdatePerson(y);
                             }
                         }
                     }
                     if (success) {
+                        Log.Information("All Orders successfully added");
                         return Ok();
                     }
                     else {
+                        Log.Warning("New Order not inserted. Conflict return");
                         return Conflict();
                     }
                 }
