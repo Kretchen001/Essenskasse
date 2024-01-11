@@ -114,13 +114,13 @@
                 </div>
             }
         </div>
-        <button class="btn btn-primary" @onclick="() => ModalDialog.Close()">Close</button>
+        <button class="btn btn-primary" @onclick="() => ModalDialog!.Close()">Close</button>
     </div>
 </HistoryModalCard>
 
 @code {
 
-    private HistoryModalCard ModalDialog { get; set; }
+    private HistoryModalCard? ModalDialog { get; set; }
 
     private List<Provider> providers = new List<Provider>();
     private List<Person> person = new List<Person>();
@@ -326,7 +326,7 @@
 
         if (response.IsSuccessStatusCode) {
             completeHistoryFromOne = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
-            ModalDialog.Open();
+            ModalDialog!.Open();
             base.StateHasChanged();
         }
         else {

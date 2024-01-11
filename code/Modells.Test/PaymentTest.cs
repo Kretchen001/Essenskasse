@@ -7,10 +7,11 @@
             DateTime dateTime = DateTime.Now;
             Money amount = new Money(10, 95);
             Guid refGuid = Guid.NewGuid();
-            Payment paymentA = new Payment();
-            paymentA.DateTime = dateTime;
-            paymentA.Amount = amount;
-            paymentA.ReferencedPerson = refGuid;
+            Payment paymentA = new Payment {
+                DateTime = dateTime,
+                Amount = amount,
+                ReferencedPerson = refGuid
+            };
 
             // complete same
             Payment paymentB = new Payment(dateTime, amount, refGuid);
@@ -21,8 +22,9 @@
             Assert.False(paymentA.Equals(paymentB));
 
             // different amount
-            paymentB = new Payment(dateTime, amount, refGuid);
-            paymentB.Amount = new Money(0, 5);
+            paymentB = new Payment(dateTime, amount, refGuid) {
+                Amount = new Money(0, 5)    // initialize Money at constructor
+            };
             Assert.False(paymentA.Equals(paymentB));
 
             // different referencedPerson

@@ -35,16 +35,16 @@
             short cent = (short)(orderAmount % 100);
             long euro = (long)((orderAmount - cent) * 0.01);
             Money = new Money(euro, cent);
-            UpdateValues();
+            await UpdateValues();
         }
         catch {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastMoneyFormatInvalid)], ToastLevel.Error);
         }
     }
 
-    public void ResetMoney () {
+    public async void ResetMoney () {
         Money = new Money(0, 0);
         orderAmount = 0;
-        UpdateValues();
+        await UpdateValues();
     }
 }

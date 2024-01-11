@@ -105,7 +105,7 @@ namespace EssenskasseAPI.Controllers {
                             Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
                             _personDbController.UpdatePerson(x);
                         }
-                        Log.Information($"New Payment of {amount.ToString()} for Person added.");
+                        Log.Information($"New Payment of {amount} for Person added.");
                         return Ok(JsonConvert.SerializeObject(newPayment));
                     }
                     else {
@@ -132,7 +132,7 @@ namespace EssenskasseAPI.Controllers {
                 Payment? paymentToUpdate = _paymentController.PaymentAtDateTime(date);
                 if (paymentToUpdate is not null) {
                     if (money is not null) {
-                        Log.Information($"Money of Payment updated from {paymentToUpdate.Amount.ToString()} to {money.ToString()}");
+                        Log.Information($"Money of Payment updated from {paymentToUpdate.Amount} to {money}");
                         paymentToUpdate.Amount = money;
                     }
                     if (referencedPerson is not null) {
@@ -173,7 +173,7 @@ namespace EssenskasseAPI.Controllers {
                     Payment? result = _paymentController.PaymentAtDateTime(date);
                     if (result is not null) {
                         _paymentController.RemovePayment(result);
-                        Log.Information($"Payment at {result.DateTime.ToString()} successfully removed");
+                        Log.Information($"Payment at {result.DateTime} successfully removed");
                         return Ok(JsonConvert.SerializeObject(result));
                     }
                     else {

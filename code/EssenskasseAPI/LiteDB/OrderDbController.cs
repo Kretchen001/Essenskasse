@@ -8,7 +8,7 @@ namespace EssenskasseAPI.LiteDB {
 
         #region Config
         /// <summary>Return the location, where the database is located.</summary>
-        private string saveDir {
+        private static string SaveDir {
             get {
                 if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "/databaseLiteDB/data.liteDB")) {
                     if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB")) {
@@ -29,7 +29,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="newOrder"></param>
         /// <returns></returns>
         public bool NewOrder(Order newOrder) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
 
                 BsonValue? inserted = col.Insert(newOrder);
@@ -44,7 +44,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <summary></summary>
         /// <returns></returns>
         public List<Order>? RequestAllOrders() {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
 
                 return (col.FindAll().OrderByDescending(x => x.DateTime).ToList() ?? null);
@@ -55,7 +55,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="amount"></param>
         /// <returns></returns>
         public List<Order> RequestAmountOfOrders(int amount) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
 
                 return col.FindAll().OrderByDescending(x => x.DateTime).Take(amount).ToList();
@@ -66,7 +66,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="guid"></param>
         /// <returns></returns>
         public List<Order> OrdersFromOnePersonPerGuid(Guid guid, int? amount = 0) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
                 List<Order>? matchingPayments = new List<Order>();
 
@@ -97,7 +97,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="date"></param>
         /// <returns></returns>
         public Order? OrderAtDateTime(DateTime date) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
 
                 return col.FindOne(x => x.DateTime.Equals(date));
@@ -109,7 +109,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="order"></param>
         /// <returns></returns>
         public bool UpdateOrder(Order order) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableName);
 
                 bool updated = col.Update(order.DateTime, order);
@@ -125,7 +125,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="order"></param>
         /// <returns></returns>
         public bool RemoveOrder(Order order) {
-            using (LiteDatabase database = new LiteDatabase(saveDir)) {
+            using (LiteDatabase database = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Order> col = database.GetCollection<Order>();
 
                 return col.Delete(order.DateTime);
@@ -136,7 +136,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="requestedDay"></param>
         /// <returns></returns>
         public List<Order> OrdersAtDay(DateTime requestedDay) {
-            using (LiteDatabase database = new LiteDatabase(saveDir)) {
+            using (LiteDatabase database = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Order> col = database.GetCollection<Order>();
 
                 return col.Query().Where(x => x.DateTime.Date.Equals(requestedDay.Date)).ToList();

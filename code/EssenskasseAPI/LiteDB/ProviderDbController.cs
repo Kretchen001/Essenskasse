@@ -8,7 +8,7 @@ namespace EssenskasseAPI.LiteDB {
 
         #region Config
         /// <summary>Return the location, where the database is located.</summary>
-        private string saveDir {
+        private static string SaveDir {
             get {
                 if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "/databaseLiteDB/data.liteDB")) {
                     if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB")) {
@@ -29,7 +29,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="Provider">Provider that should be saved.</param>
         /// <returns>Success?</returns>
         public bool SaveProvider(Provider Provider) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Provider> col = db.GetCollection<Provider>(tableName);
 
                 BsonValue? inserted = col.Insert(Provider);
@@ -45,7 +45,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <summary>Request all provider as list, that can be found in the database.</summary>
         /// <returns>List of provider</returns>
         public List<Provider> RequestProvider() {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Provider> col = db.GetCollection<Provider>(tableName);
 
                 return col.FindAll().ToList();
@@ -57,7 +57,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="name">Designator of the requested provider</param>
         /// <returns>Provider if exist, else null.</returns>
         public Provider? ExistProvider(Guid? guid, string? name) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Provider> col = db.GetCollection<Provider>(tableName);
 
                 Provider? result = col.Find(x => x.Guid == guid).SingleOrDefault();
@@ -73,7 +73,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="provider">New Provider, but the Guid will be the same, so it is the identifier.</param>
         /// <returns>Success?</returns>
         public bool SaveChangesAtProvider(Provider provider) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Provider> col = db.GetCollection<Provider>(tableName);
 
                 bool updated = col.Update(provider.Guid, provider);
@@ -89,7 +89,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="provider"></param>
         /// <returns>Success?</returns>
         public bool RemoveProvider(Provider provider) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Provider> col = db.GetCollection<Provider>(tableName);
 
                 return col.Delete(provider.Guid);

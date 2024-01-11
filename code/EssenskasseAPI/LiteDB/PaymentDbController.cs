@@ -11,7 +11,7 @@ namespace EssenskasseAPI.LiteDB {
 
         #region Config
         /// <summary>Return the location, where the database is located.</summary>
-        private string saveDir {
+        private static string SaveDir {
             get {
                 if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "/databaseLiteDB/data.liteDB")) {
                     if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB")) {
@@ -32,7 +32,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="newPayment"></param>
         /// <returns></returns>
         public bool NewPayment(Payment newPayment) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
 
                 BsonValue? inserted = col.Insert(newPayment);
@@ -47,7 +47,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <summary></summary>
         /// <returns></returns>
         public List<Payment>? RequestAllPayments() {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
 
                 return (col.FindAll().OrderByDescending(x => x.DateTime).ToList() ?? null);
@@ -58,7 +58,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="amount"></param>
         /// <returns></returns>
         public List<Payment> RequestAmountOfPayments(int amount) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
 
                 return col.FindAll().OrderByDescending(x => x.DateTime).Take(amount).ToList();
@@ -69,9 +69,9 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="guid"></param>
         /// <returns></returns>
         public List<Payment> PaymentsFromOnePersonPerGuid(Guid guid, int? amount) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
-                List<Payment> matchingPayments = new List<Payment>();
+                List<Payment> matchingPayments = [];
 
                 IEnumerator<Payment> enumerator = col.FindAll().GetEnumerator();
                 while (enumerator.MoveNext()) {
@@ -95,7 +95,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="date"></param>
         /// <returns>the payment or null if not found</returns>
         public Payment? PaymentAtDateTime(DateTime date) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
 
                 return col.FindOne(x => x.DateTime.Equals(date));
@@ -106,7 +106,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="payment"></param>
         /// <returns></returns>
         public bool UpdatePayment(Payment payment) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableName);
 
                 bool updated = col.Update(payment.DateTime, payment);
@@ -122,7 +122,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="payment"></param>
         /// <returns></returns>
         public bool RemovePayment(Payment payment) {
-            using (LiteDatabase database = new LiteDatabase(saveDir)) {
+            using (LiteDatabase database = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Payment> col = database.GetCollection<Payment>();
 
                 return col.Delete(payment.DateTime);

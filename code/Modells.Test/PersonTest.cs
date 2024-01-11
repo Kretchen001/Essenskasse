@@ -23,8 +23,9 @@
             Assert.False(personA.Equals(personC));
 
             // different email
-            Person personD = new Person("name", "tset");
-            personD.Guid = guid;
+            Person personD = new Person("name", "tset") {
+                Guid = guid
+            };
             Assert.False(personA.Equals(personD));
 
             // different saldo

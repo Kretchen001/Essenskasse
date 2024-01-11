@@ -10,7 +10,7 @@ namespace EssenskasseAPI.Controllers {
     [ApiController, Route("api/provider")]
     public class ProviderController : ControllerBase {
 
-        ProviderDbController _providerController = new ProviderDbController();
+        readonly ProviderDbController _providerController = new ProviderDbController();
 
         [HttpGet, Route("requestAll")]
         public IActionResult GetAllProvider() {
@@ -38,7 +38,7 @@ namespace EssenskasseAPI.Controllers {
 
                 if (provider is not null) {
                     if (provider.Designation != designator) {
-                        Log.Information($"{guid.ToString()} with other {provider.Designation} found and not {designator}");
+                        Log.Information($"{guid} with other {provider.Designation} found and not {designator}");
                         return Conflict("Guid existiert, aber mit anderer Bezeichnung!");
                     }
                     Log.Information("Provider exist");

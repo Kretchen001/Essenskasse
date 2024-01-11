@@ -63,6 +63,7 @@ namespace Modells {
         /// <param name="money1">First Parameter (by Subtraction Minued)</param>
         /// <param name="money2">Secount Parameter (by Subtraction Subtrahend)</param>
         /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822")]
         public Money? CalculateMoney(CalculationOperation? method, Money money1, Money money2) {
             switch (method) {
                 case CalculationOperation.Addition: {

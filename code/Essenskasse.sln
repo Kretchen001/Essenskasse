@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EssenskasseAPI", "EssenskasseAPI\EssenskasseAPI.csproj", "{8327A0AB-7398-49C7-96D9-AA164F2A4FED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{21CE0EAF-2626-4A8B-954A-49788259644A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modells.Test", "Modells.Test\Modells.Test.csproj", "{88172E1B-5FCC-4D0F-A873-85BA7AD0DC05}"
 EndProject
@@ -46,7 +49,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		        SolutionGuid = {005A93BF-FAB6-4BF5-8CE7-53849725C4E4}
 		SolutionGuid = {0A28498D-70C5-48F1-A2E2-F845C449EDCA}
+		        SolutionGuid = {005A93BF-FAB6-4BF5-8CE7-53849725C4E4}
 	EndGlobalSection
 EndGlobal

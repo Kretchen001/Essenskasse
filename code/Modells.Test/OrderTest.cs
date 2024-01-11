@@ -13,11 +13,12 @@
                 provider: p,
                 referencedPerson: guid
             );
-            Order orderB = new Order();
-            orderB.DateTime = orderA.DateTime;
-            orderB.Money = orderA.Money;
-            orderB.Provider = orderA.Provider;
-            orderB.ReferencedPerson = orderA.ReferencedPerson;
+            Order orderB = new Order {
+                DateTime = orderA.DateTime,
+                Money = orderA.Money,
+                Provider = orderA.Provider,
+                ReferencedPerson = orderA.ReferencedPerson
+            };
 
             Assert.True(orderA.Equals(orderB));
             orderB.DateTime = dateTime;

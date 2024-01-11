@@ -8,7 +8,7 @@ namespace EssenskasseAPI.LiteDB {
 
         #region Config
         /// <summary>Return the location, where the database is located.</summary>
-        private string saveDir {
+        private static string SaveDir {
             get {
                 if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "/databaseLiteDB/data.liteDB")) {
                     if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB")) {
@@ -45,7 +45,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="guid"></param>
         /// <returns></returns>
         public Money GetAllPaymentsFromPerson(Guid guid) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Payment> col = db.GetCollection<Payment>(tableNamePayment);
 
                 List<Payment> list = new List<Payment>();
@@ -76,7 +76,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="guid"></param>
         /// <returns></returns>
         public Money GetAllOrdersFromPerson(Guid guid) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Order> col = db.GetCollection<Order>(tableNameOrder);
 
                 List<Order> list = new List<Order>();

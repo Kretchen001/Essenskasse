@@ -56,7 +56,7 @@ namespace EssenskasseAPI.Controllers {
                     Log.Warning("Guid Header empty");
                     return BadRequest();
                 }
-                List<Order> orders = new List<Order>();
+                List<Order> orders = [];
                 if (amount is null) { // request all
                     orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid());
                 }
@@ -112,7 +112,7 @@ namespace EssenskasseAPI.Controllers {
                             Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
                             _personDbController.UpdatePerson(x);
                         }
-                        Log.Information($"New Order of {order.Money.ToString()} for Person added.");
+                        Log.Information($"New Order of {order.Money} for Person added.");
                         return Ok(JsonConvert.SerializeObject(order));
                     }
                     else {
@@ -231,7 +231,7 @@ namespace EssenskasseAPI.Controllers {
                     Order? result = _orderDbController.OrderAtDateTime(date);
                     if (result is not null) {
                         _orderDbController.RemoveOrder(result);
-                        Log.Information($"Order at {result.DateTime.ToString()} successfully removed");
+                        Log.Information($"Order at {result.DateTime} successfully removed");
                         return Ok(JsonConvert.SerializeObject(result));
                     }
                     else {

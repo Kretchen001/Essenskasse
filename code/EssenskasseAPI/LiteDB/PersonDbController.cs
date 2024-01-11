@@ -8,7 +8,7 @@ namespace EssenskasseAPI.LiteDB {
 
         #region Config
         /// <summary>Return the location, where the database is located.</summary>
-        private string saveDir {
+        private static string SaveDir {
             get {
                 if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "/databaseLiteDB/data.liteDB")) {
                     if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB")) {
@@ -29,7 +29,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="person">The person, that should be saved.</param>
         /// <returns>Success?</returns>
         public bool SavePerson(Person person) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
 
                 BsonValue? inserted = col.Insert(person);
@@ -46,7 +46,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="person">Information to update person.</param>
         /// <returns>Success?</returns>
         public bool UpdatePerson(Person person) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
 
                 bool updated = col.Update(person.Guid, person);
@@ -61,7 +61,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <summary>Request all person, that are saved in the database.</summary>
         /// <returns>List of all person.</returns>
         public List<Person> RequestAllPerson() {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
 
                 return col.FindAll().ToList();
@@ -72,7 +72,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="guid">Guid of the search person</param>
         /// <returns>Person if it is there</returns>
         public Person? PersonPerGuid(Guid guid) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
                 Person? result = col.Query().Where(x => x.Guid.Equals(guid)).SingleOrDefault();
                 
@@ -84,7 +84,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="name">Name of the search person</param>
         /// <returns>Person if it is there.</returns>
         public Person? PersonPerName(string name) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
                 Person? result = col.Query().Where(x => x.Name.Equals(name)).SingleOrDefault();
 
@@ -100,7 +100,7 @@ namespace EssenskasseAPI.LiteDB {
             if (guid is null) {
                 return null;
             }
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
 
                 Person? result = col.Find(x => x.Guid == guid).SingleOrDefault();
@@ -116,7 +116,7 @@ namespace EssenskasseAPI.LiteDB {
         /// <param name="person"></param>
         /// <returns>Success?</returns>
         public bool RemovePerson(Person person) {
-            using (LiteDatabase db = new LiteDatabase(saveDir)) {
+            using (LiteDatabase db = new LiteDatabase(SaveDir)) {
                 ILiteCollection<Person> col = db.GetCollection<Person>(tableName);
 
                 return col.Delete(person.Guid);

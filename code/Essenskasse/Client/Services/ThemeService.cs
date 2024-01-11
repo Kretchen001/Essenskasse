@@ -11,6 +11,7 @@ namespace Essenskasse.Client.Services {
         }
 
         private ColorCode themeCode = ColorCode.Light;
+        
         public ColorCode ThemeCode {
             get { return themeCode; }
             set {
