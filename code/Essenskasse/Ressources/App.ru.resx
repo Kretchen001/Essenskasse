@@ -219,6 +219,9 @@
   <data name="historyOf" xml:space="preserve">
     <value>История</value>
   </data>
+  <data name="inCent" xml:space="preserve">
+    <value>в центе</value>
+  </data>
   <data name="inconspicuous" xml:space="preserve">
     <value>Незаметный</value>
   </data>

@@ -96,5 +96,6 @@
         emailRemedy,
         emailRemaining,
         emailCashManagement,
+        inCent,
     }
 }

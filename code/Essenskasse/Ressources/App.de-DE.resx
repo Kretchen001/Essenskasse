@@ -219,6 +219,9 @@
   <data name="historyOf" xml:space="preserve">
     <value>Historie von</value>
   </data>
+  <data name="inCent" xml:space="preserve">
+    <value>in Cent</value>
+  </data>
   <data name="inconspicuous" xml:space="preserve">
     <value>Unauffällig</value>
   </data>
