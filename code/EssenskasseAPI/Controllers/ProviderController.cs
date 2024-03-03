@@ -74,21 +74,21 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        public IActionResult ChangeProvider([FromHeader] Guid? guid, [FromHeader] string designation) {
+        [HttpPut, Route("update")]
+        public IActionResult ChangeProvider([FromHeader] Guid? guid, [FromHeader] string? designation) {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("ChangeProvider called");
                 if (guid is not null) {
-                    Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
+                    Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000-000000000000"), null);
                     if (result is not null) {
                         string oldDesignation = result.Designation;
-                        result.Designation = designation;
+                        result.Designation = designation ?? "";
                         if (_providerController.SaveChangesAtProvider(result)) {
                             Log.Information($"Provider successfully updated from {oldDesignation} to {designation}");
                             return Ok();
-        [HttpPut, Route("update")]
                         }
                         else {
-                        Log.Error("UpdateProvider failed");
+                            Log.Error("UpdateProvider failed");
                             return BadRequest("Änderungen konnten nicht übernommen werden. Bitte beim Admin melden.");
                         }
                     }

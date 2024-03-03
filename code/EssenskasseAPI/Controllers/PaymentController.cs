@@ -119,49 +119,59 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpPut, Route("update")]
-        public IActionResult UpdatePayment([FromHeader] string? dateString,
+        public IActionResult UpdatePayment([FromHeader] Guid? accessToken, 
+                                            [FromHeader] string? dateString,
                                             [FromHeader] Guid? referencedPerson,
                                             [FromBody] Money? money) {
-            using (Operation.Time("TaskDuration")) {
-                Log.Information("UpdatePayment called");
-                if (dateString is null) {
-                    Log.Warning("No dateString in Header");
-                    return BadRequest("Kein Datum angegeben!");
-                }
-                DateTime date = DateTime.Parse(dateString);
-                Payment? paymentToUpdate = _paymentController.PaymentAtDateTime(date);
-                if (paymentToUpdate is not null) {
-                    if (money is not null) {
-                        Log.Information($"Money of Payment updated from {paymentToUpdate.Amount} to {money}");
-                        paymentToUpdate.Amount = money;
-                    }
-                    if (referencedPerson is not null) {
-                        Log.Information($"RefrencedPerson of Payment updated from {paymentToUpdate.ReferencedPerson} to {referencedPerson}");
-                        paymentToUpdate.ReferencedPerson = referencedPerson ?? new Guid();
-                    }
-                    if (_paymentController.UpdatePayment(paymentToUpdate)) {
-                        // recalculate Person Saldo
-                        PersonDbController _personDbController = new PersonDbController();
-                        Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
-                        if (x is not null) {
-                            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
-                            x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, paymentToUpdate.Amount)!;
-                            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
-                            _personDbController.UpdatePerson(x);
+            if (accessToken is not null) {
+                TokenDbController tokenDbController = new TokenDbController();
+                if (tokenDbController.CheckAccessToken(accessToken ?? new Guid("00000000-0000-0000-0000-000000000000"))) {
+                    using (Operation.Time("TaskDuration")) {
+                        Log.Information("UpdatePayment called");
+                        if (dateString is null) {
+                            Log.Warning("No dateString in Header");
+                            return BadRequest("Kein Datum angegeben!");
                         }
-                        Log.Information($"Payment successfully updated");
-                        return Ok();
-                    }
-                    else {
-                        Log.Warning($"At {dateString} no payment found");
-                        return NotFound("Keine Einzahlung zum angegebenen Datum gefunden.");
+                        DateTime date = DateTime.Parse(dateString);
+                        Payment? paymentToUpdate = _paymentController.PaymentAtDateTime(date);
+                        if (paymentToUpdate is not null) {
+                            if (money is not null) {
+                                Log.Information($"Money of Payment updated from {paymentToUpdate.Amount} to {money}");
+                                paymentToUpdate.Amount = money;
+                            }
+                            if (referencedPerson is not null) {
+                                Log.Information($"RefrencedPerson of Payment updated from {paymentToUpdate.ReferencedPerson} to {referencedPerson}");
+                                paymentToUpdate.ReferencedPerson = referencedPerson ?? new Guid();
+                            }
+                            if (_paymentController.UpdatePayment(paymentToUpdate)) {
+                                // recalculate Person Saldo
+                                PersonDbController _personDbController = new PersonDbController();
+                                Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
+                                if (x is not null) {
+                                    Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
+                                    x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, paymentToUpdate.Amount)!;
+                                    Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
+                                    _personDbController.UpdatePerson(x);
+                                }
+                                Log.Information($"Payment successfully updated");
+                                return Ok();
+                            }
+                            else {
+                                Log.Warning($"At {dateString} no payment found");
+                                return NotFound("Keine Einzahlung zum angegebenen Datum gefunden.");
+                            }
+                        }
+                        else {
+                            Log.Warning("No payment");
+                            return BadRequest();
+                        }
                     }
                 }
-                else {
-                    Log.Warning("No payment");
-                    return BadRequest();
-                }
+                Log.Warning("AccessToken wrong");
+                return BadRequest("AccessToken wrong");
             }
+            Log.Warning("No AccessToken in Request");
+            return BadRequest("No AccessToken in Request");
         }
 
         [HttpDelete, Route("remove")]
