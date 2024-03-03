@@ -74,7 +74,6 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpPut, Route("change")]
         public IActionResult ChangeProvider([FromHeader] Guid? guid, [FromHeader] string designation) {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("ChangeProvider called");
@@ -86,6 +85,7 @@ namespace EssenskasseAPI.Controllers {
                         if (_providerController.SaveChangesAtProvider(result)) {
                             Log.Information($"Provider successfully updated from {oldDesignation} to {designation}");
                             return Ok();
+        [HttpPut, Route("update")]
                         }
                         else {
                         Log.Error("UpdateProvider failed");
