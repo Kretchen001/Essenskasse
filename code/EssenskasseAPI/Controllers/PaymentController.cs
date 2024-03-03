@@ -132,7 +132,7 @@ namespace EssenskasseAPI.Controllers {
                             Log.Warning("No dateString in Header");
                             return BadRequest("Kein Datum angegeben!");
                         }
-                        DateTime date = DateTime.Parse(dateString);
+                        DateTime date = new DateTime(long.Parse(dateString));
                         Payment? paymentToUpdate = _paymentController.PaymentAtDateTime(date);
                         if (paymentToUpdate is not null) {
                             if (money is not null) {

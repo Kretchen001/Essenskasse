@@ -11,7 +11,7 @@
 
 <h2>Einträge ändern</h2>
 
-<div class="row" style="margin-bottom: 1rem;">
+<div class="row" style="height: fit-content; margin-bottom: 1rem;">
     <div class="col-lg-3 align-self-center">
         <label>
             Typ
@@ -27,27 +27,41 @@
 </div>
 
 @if (selectedType == types[0]) { // Einzahlungen/Payments
-    @foreach(Payment x in payments) {
+    @foreach(int index in Enumerable.Range(0, payments.Count - 1))
+    @* @for(int index = 0; index < payments.Count; index += 1) *@ {
+        Console.WriteLine(index);
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
-                @getTheDesignationOfPerson(x.ReferencedPerson)
+                @getTheDesignationOfPerson(payments[index].ReferencedPerson)
             </div>
             <div class="col-lg-4">
-                @x.DateTime.ToString("dddd, dd MMMM yyyy")
+                @payments[index].DateTime.ToString("dddd, dd MMMM yyyy")
             </div>
             <div class="col-lg-3">
-                @x.Amount.ToString();
+                @payments[index].Amount.ToString();
             </div>
             <div class="col-lg-2">
-                <button>
-                    Ändern
+            </div>
+            <br />
+            <div class="col-lg-3">
+                @getTheDesignationOfPerson(payments[index].ReferencedPerson)
+            </div>
+            <div class="col-lg-4">
+                <input type="date" @bind="changedPayments[index].DateTime" />
+            </div>
+            <div class="col-lg-3">
+                <input style="width: 25vw" type="number" @bind="orderAmount[index]" placeholder="Euro,Cent -> 1000 = 10,00€">
+            </div>
+            <div class="col-lg-2">
+                <button @onclick="() => commitChangesP(index)">
+                    Absenden
                 </button>
             </div>
         </div>
     }
 }
 else if (selectedType == types[1]) { // Bestellungen/Orders
-    @foreach(Order x in orders) {
+    @foreach (Order x in orders) {
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
                 @getTheDesignationOfPerson(x.ReferencedPerson)
@@ -78,11 +92,14 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
     List<Payment> payments = [];
     List<Order> orders = [];
 
+    List<Payment> changedPayments = [];
+    List<int> orderAmount = [];
+
     protected override async Task OnInitializedAsync() {
-        selectedType = types[0];
         await requestPerson();
         await requestPayments();
         await requestOrders();
+        selectedType = types[0];
         base.StateHasChanged();
     }
 
@@ -118,6 +135,8 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
 
         if (response.IsSuccessStatusCode) {
             payments = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+            changedPayments = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+            payments.ForEach(x => orderAmount.Add(0));
         }
         else {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
@@ -150,5 +169,41 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
             }
         }
         return "";
+    }
+
+    private async Task commitChangesP(int index) {
+        short cent = (short) (orderAmount[index] % 100);
+        long euro = (long) ((orderAmount[index] - cent) * 0.01);
+        changedPayments[index].Amount = new Money(euro, cent);
+        if (payments[index].Amount.Equals(changedPayments[index].Amount) &&
+            payments[index].DateTime.Equals(changedPayments[index].DateTime)) {
+            ToastService.ShowToast("Keine Änderungen detektiert!", ToastLevel.Info);
+            return;
+        }
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(Config["API-Adress"] + "payment/update"),
+                Headers = {
+                    { "accessToken", AppData.AccessToken.ToString() },
+                    { "dateString", changedPayments[index].DateTime.Ticks.ToString() }
+                },
+                Content = new StringContent(JsonConvert.SerializeObject(changedPayments[index].Amount), Encoding.UTF8, "application/json")
+            };
+
+        var response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            ToastService.ShowToast("Update erfolgreich", ToastLevel.Success);
+            payments[index] = new Payment() {
+                ReferencedPerson = payments[index].ReferencedPerson,
+                DateTime = changedPayments[index].DateTime,
+                Amount = changedPayments[index].Amount
+            };
+            base.StateHasChanged();
+            return;
+        }
+        else {
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
+        }
     }
 }
