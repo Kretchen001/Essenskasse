@@ -4,7 +4,9 @@
 @inject AppDataService AppData
 @inject NavigationManager Navi
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject HttpClient HttpClient
 @inject IJSRuntime JsRuntime
+@inject IConfiguration Config
 @inject ThemeService themeService
 @inject ToastService ToastService
 
@@ -97,7 +99,34 @@
     </div>
 </div>
 
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-4">
+        <label>
+            Token für Änderungen
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        @if (existAccessToken) {
+            <label>
+                Eingetragen
+            </label>
+            <button @onclick="() => ToastService.ShowToast(currentlyNotSupported, ToastLevel.Info)">
+                Ändern?
+            </button>
+        }
+        else {
+            <label>
+                Nicht angefordert
+            </label>
+            <button @onclick="() => requestAccessTokenForChanges()">
+                Anfordern
+            </button>
+        }
+    </div>
+</div>
+
 @code {
+    string currentlyNotSupported = "Aktuell leider noch nicht verfügbar. Bitte beim Admin melden für Hilfestellungen!";
 
     #region Variable
     /// <summary></summary>
@@ -183,6 +212,17 @@
             saveFilterShowPerson(value);
         }
     }
+
+    private bool existAccessToken {
+        get {
+            if (AppData.AccessToken is not null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
     #endregion
 
     #region Functions
@@ -245,6 +285,32 @@
         else {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOff)], ToastLevel.Success);
         }
+    }
+
+    private async Task requestAccessTokenForChanges() {
+        // Request all Person, that are saved in the database
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "token/requestNewAccessToken")
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            Guid token = JsonConvert.DeserializeObject<Guid>(await response.Content.ReadAsStringAsync());
+            AppData.AccessToken = token;
+            saveAccessToken(token);
+        }
+        else {
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+        }
+    }
+
+    /// <summary></summary>
+    /// <param name="value"></param>
+    private async void saveAccessToken(Guid value) {
+        await LocalStorage.SetItemAsync<Guid>("AccessToken", value);
+        ToastService.ShowToast("AccessToken erfolgreich abgerufen und eingetragen!", ToastLevel.Success);
     }
     #endregion
 }

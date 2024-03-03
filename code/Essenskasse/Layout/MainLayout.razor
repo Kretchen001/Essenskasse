@@ -46,5 +46,6 @@
         AppData.LoadAmountOrder = await LocalStorage.GetItemAsync<int>("loadAmountOfOrders") == 0 ? 25 : await LocalStorage.GetItemAsync<int>("loadAmountOfOrders"); 
         AppData.FilterShowProvider = await LocalStorage.GetItemAsync<bool>("filterShowProvider");
         AppData.FilterShowPerson = await LocalStorage.GetItemAsync<bool>("filterShowPerson");
+        AppData.AccessToken = await LocalStorage.GetItemAsync<Guid>("AccessToken");
     }
 }

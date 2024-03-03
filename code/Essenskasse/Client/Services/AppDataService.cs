@@ -18,5 +18,8 @@
 
         /// <summary></summary>
         public bool FilterShowPerson { get; set; } = true;
+
+        /// <summary></summary>
+        public Guid? AccessToken { get; set; } = null;
     }
 }
