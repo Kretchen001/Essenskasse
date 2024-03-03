@@ -1,0 +1,154 @@
+﻿@page "/changeEntity"
+
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Config
+@inject IStringLocalizer<App> _loc
+@inject AppDataService AppData
+@inject ToastService ToastService
+
+<PageTitle>Ändere Einträge</PageTitle>
+
+<h2>Einträge ändern</h2>
+
+<div class="row" style="margin-bottom: 1rem;">
+    <div class="col-lg-3 align-self-center">
+        <label>
+            Typ
+        </label>
+    </div>
+    <div class="col-lg-9">
+        <select class="form-select" @bind="@selectedType">
+            @foreach (var x in types) {
+                <option value="@x">@x</option>
+            }
+        </select>
+    </div>
+</div>
+
+@if (selectedType == types[0]) { // Einzahlungen/Payments
+    @foreach(Payment x in payments) {
+        <div class="row" style="border: 2px dotted gray; margin: 2px">
+            <div class="col-lg-3">
+                @getTheDesignationOfPerson(x.ReferencedPerson)
+            </div>
+            <div class="col-lg-4">
+                @x.DateTime.ToString("dddd, dd MMMM yyyy")
+            </div>
+            <div class="col-lg-3">
+                @x.Amount.ToString();
+            </div>
+            <div class="col-lg-2">
+                <button>
+                    Ändern
+                </button>
+            </div>
+        </div>
+    }
+}
+else if (selectedType == types[1]) { // Bestellungen/Orders
+    @foreach(Order x in orders) {
+        <div class="row" style="border: 2px dotted gray; margin: 2px">
+            <div class="col-lg-3">
+                @getTheDesignationOfPerson(x.ReferencedPerson)
+            </div>
+            <div class="col-lg-3">
+                @x.DateTime.ToString("dddd, dd MMMM yyyy")
+            </div>
+            <div class="col-lg-2">
+                @x.Money.ToString();
+            </div>
+            <div class="col-lg-2">
+                @x.Provider.Designation.ToString();
+            </div>
+            <div class="col-lg-2">
+                <button>
+                    Ändern
+                </button>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    List<string> types = ["Einzahlungen", "Bestellungen"];
+    string selectedType = string.Empty;
+
+    List<Person> person = [];
+    List<Payment> payments = [];
+    List<Order> orders = [];
+
+    protected override async Task OnInitializedAsync() {
+        selectedType = types[0];
+        await requestPerson();
+        await requestPayments();
+        await requestOrders();
+        base.StateHasChanged();
+    }
+
+    private async Task requestPerson() {
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
+            person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
+            person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+            person = person.OrderBy(x => x.Name).ToList();
+        }
+        else {
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+        }
+    }
+
+    private async Task requestPayments() {
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "payment/requestAmount"),
+                Headers = {
+                    { "amount", AppData.LoadAmountPayment.ToString() }
+                }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            payments = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+        }
+        else {
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+        }
+    }
+
+    private async Task requestOrders() {
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "order/requestAmount"),
+                Headers = {
+                    { "amount", AppData.LoadAmountPayment.ToString() }
+                }
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) {
+            orders = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+        }
+        else {
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+        }
+    }
+
+    private string getTheDesignationOfPerson(Guid guid) {
+        foreach(Person x in person) {
+            if (x.Guid.Equals(guid)) {
+                return x.Name;
+            }
+        }
+        return "";
+    }
+}
