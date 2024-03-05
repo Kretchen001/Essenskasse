@@ -34,13 +34,24 @@
             @_loc[nameof(RessourceAppStrings.amount)] @_loc[nameof(RessourceAppStrings.inCent)]
         </label>
     </div>
-    <div class="col-lg-4 align-self-center">
-        <input style="width: 25vw" type="number" @bind="payment" placeholder="Euro,Cent -> 1000 = 10,00€">
+    <div class="col-lg-4 align-self-center" style="width: 25%">
+        <input style="width: 100%" type="number" @bind="payment" placeholder="Euro,Cent -> 1000 = 10,00€">
     </div>
     <div class="col-lg-5 align-self-center">
         <label>
             @money.ToString()
         </label>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-lg-3">
+        <label>
+            Kommentarfeld
+        </label>
+    </div>
+    <div class="col-lg-9" style="width: 75%">
+        <input type="text" style="width: 100%" @bind="comment"/>
     </div>
 </div>
 <br />
@@ -57,24 +68,28 @@
         <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
             <tr>
                 <th>@_loc[nameof(RessourceAppStrings.date)]</th>
+                <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
                 <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
             </tr>
             @for (int i = 0; i < paymentsOfSelectedPerson.Count; i += 1) {
                 @if (i % 3 == 0) {
                     <tr>
                         <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                        <td>@paymentsOfSelectedPerson[i].Comment</td>
                         <td>@paymentsOfSelectedPerson[i].Amount</td>
                     </tr>
                 }
                 else if (i % 3 == 1) {
                     <tr style="background-color: lightgray">
                         <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                        <td>@paymentsOfSelectedPerson[i].Comment</td>
                         <td>@paymentsOfSelectedPerson[i].Amount</td>
                     </tr>
                 }
                 else if (i % 3 == 2) {
                     <tr style="background-color: grey">
                         <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                        <td>@paymentsOfSelectedPerson[i].Comment</td>
                         <td>@paymentsOfSelectedPerson[i].Amount</td>
                     </tr>
                 }
@@ -105,6 +120,8 @@
             return new Money(euro, cent);
         }
     }
+
+    private string comment = "";
 
     private List<Payment> paymentsOfSelectedPerson = new List<Payment>();
     private int amount {
@@ -171,7 +188,8 @@
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),
                 Headers = {
-                    {"referencedPerson", selectedPerson.ToString()}
+                    {"referencedPerson", selectedPerson.ToString()},
+                    {"comment", comment}
                 },
                 Content = new StringContent(JsonConvert.SerializeObject(money), Encoding.UTF8, "application/json")
             };

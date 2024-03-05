@@ -90,11 +90,12 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpPost, Route("insertNew")]
         public IActionResult AddNewPayment([FromBody] Money? amount,
-                                            [FromHeader] Guid? referencedPerson) {
+                                            [FromHeader] Guid? referencedPerson,
+                                            [FromHeader] string? comment) {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("AddNewPayment called");
                 if ((amount is not null) && (referencedPerson is not null)) {
-                    Payment newPayment = new Payment(amount, referencedPerson ?? new Guid());
+                    Payment newPayment = new Payment(amount, referencedPerson ?? new Guid(), comment ?? "");
                     if (_paymentController.NewPayment(newPayment)) {
                         // recalculate Person Saldo
                         PersonDbController _personDbController = new PersonDbController();

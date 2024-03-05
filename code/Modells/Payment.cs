@@ -15,6 +15,9 @@ namespace Modells {
         /// <summary>Which person is associated with this payment.</summary>
         [JsonInclude]
         public Guid ReferencedPerson { get; set; } = new Guid();
+        /// <summary></summary>
+        [JsonInclude]
+        public string Comment { get; set; } = default!;
 
         /// <summary></summary>
         public Payment() { }
@@ -29,6 +32,17 @@ namespace Modells {
         }
 
         /// <summary></summary>
+        /// <param name="amount"></param>
+        /// <param name="referencedPerson"></param>
+        /// <param name="comment"></param>
+        public Payment(Money amount, Guid referencedPerson, string comment) {
+            DateTime = DateTime.Now;
+            Amount = amount;
+            ReferencedPerson = referencedPerson;
+            Comment = comment;
+        }
+
+        /// <summary></summary>
         /// <param name="dateTime"></param>
         /// <param name="amount"></param>
         /// <param name="referencedPerson"></param>
@@ -40,13 +54,28 @@ namespace Modells {
         }
 
         /// <summary></summary>
+        /// <param name="dateTime"></param>
+        /// <param name="amount"></param>
+        /// <param name="referencedPerson"></param>
+        /// <param name="comment"></param>
+        [JsonConstructor]
+        public Payment(DateTime dateTime, Money amount, Guid referencedPerson, string comment) {
+            DateTime = dateTime;
+            Amount = amount;
+            ReferencedPerson = referencedPerson;
+            Comment = comment;
+        }
+
+        /// <summary></summary>
         /// <param name="b"></param>
         /// <returns></returns>
         public bool Equals(Payment b) {
             if (this.DateTime.Equals(b.DateTime)) {
                 if (this.Amount.Equals(b.Amount)) {
                     if (this.ReferencedPerson.Equals(b.ReferencedPerson)) {
-                        return true;
+                        if(this.Comment.Equals(b.Comment)) {
+                            return true;
+                        }
                     }
                 }
             }
