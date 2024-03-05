@@ -19,7 +19,7 @@
     </div>
     <div class="col-lg-9">
         <select class="form-select" @bind="@selectedType">
-            @foreach (var x in types) {
+            @foreach (string x in types) {
                 <option value="@x">@x</option>
             }
         </select>
@@ -27,76 +27,100 @@
 </div>
 
 @if (selectedType == types[0]) { // Einzahlungen/Payments
-    @foreach(int index in Enumerable.Range(0, payments.Count - 1))
-    @* @for(int index = 0; index < payments.Count; index += 1) *@ {
-        Console.WriteLine(index);
+    @foreach(int indexP in Enumerable.Range(0, payments.Count - 1)) {
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
-                @getTheDesignationOfPerson(payments[index].ReferencedPerson)
+                @getTheDesignationOfPerson(payments[indexP].ReferencedPerson)
             </div>
             <div class="col-lg-4">
-                @payments[index].DateTime.ToString("dddd, dd MMMM yyyy")
+                @payments[indexP].DateTime.ToString("dddd, dd MMMM yyyy")
             </div>
             <div class="col-lg-3">
-                @payments[index].Amount.ToString();
+                @payments[indexP].Amount.ToString();
             </div>
             <div class="col-lg-2">
             </div>
             <br />
             <div class="col-lg-3">
-                @getTheDesignationOfPerson(payments[index].ReferencedPerson)
+                @getTheDesignationOfPerson(payments[indexP].ReferencedPerson)
             </div>
             <div class="col-lg-4">
-                <input type="date" @bind="changedPayments[index].DateTime" />
+                <label>
+                    Datum nicht änderbar!
+                </label>
             </div>
             <div class="col-lg-3">
-                <input style="width: 25vw" type="number" @bind="orderAmount[index]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                <input style="width: 25vw" type="number" @bind="paymentAmount[indexP]" placeholder="Euro,Cent -> 1000 = 10,00€">
             </div>
             <div class="col-lg-2">
-                <button @onclick="() => commitChangesP(index)">
+                <button @onclick="() => commitChangesP(indexP)">
                     Absenden
                 </button>
             </div>
         </div>
     }
 }
-else if (selectedType == types[1]) { // Bestellungen/Orders
-    @foreach (Order x in orders) {
+@* else if (selectedType == types[1]) { // Bestellungen/Orders
+    @foreach (int indexO in Enumerable.Range(0, orders.Count - 1)) {
+        Console.WriteLine(orders[indexO].Provider.Designation);
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
-                @getTheDesignationOfPerson(x.ReferencedPerson)
+                @getTheDesignationOfPerson(orders[indexO].ReferencedPerson)
             </div>
             <div class="col-lg-3">
-                @x.DateTime.ToString("dddd, dd MMMM yyyy")
+                @orders[indexO].DateTime.ToString("dddd, dd MMMM yyyy")
             </div>
             <div class="col-lg-2">
-                @x.Money.ToString();
+                @orders[indexO].Money.ToString()
             </div>
             <div class="col-lg-2">
-                @x.Provider.Designation.ToString();
+                @orders[indexO].Provider.Designation
+            </div>
+            <br />
+            <div class="col-lg-3">
+                <select class="form-select" @bind="@changedOrders[indexO].ReferencedPerson">
+                    @foreach (Person x in person) {
+                        <option value="@x.Guid">@x.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-lg-3">
+                <label>
+                    Datum nicht änderbar!
+                </label>
             </div>
             <div class="col-lg-2">
-                <button>
-                    Ändern
-                </button>
+                <input style="width: 25vw" type="number" @bind="orderAmount[indexO]" placeholder="Euro,Cent -> 1000 = 10,00€">
+            </div>
+            <div class="col-lg-2">
+                <select class="form-select" @bind="@changedOrders[indexO].Provider">
+                    @foreach (Provider y in provider) {
+                        <option value="@y">@y.Designation</option>
+                    }
+                </select>
             </div>
         </div>
     }
-}
+} *@
 
 @code {
     List<string> types = ["Einzahlungen", "Bestellungen"];
     string selectedType = string.Empty;
 
-    List<Person> person = [];
-    List<Payment> payments = [];
-    List<Order> orders = [];
+    List<Person> person { get; set; } = [];
+    List<Provider> provider { get; set; } = [];
+    List<Payment> payments { get; set; } = [];
+    List<Order> orders { get; set; } = [];
 
-    List<Payment> changedPayments = [];
-    List<int> orderAmount = [];
+    List<Payment> changedPayments { get; set; } = [];
+    List<int> paymentAmount { get; set; } = [];
+
+    List<Order> changedOrders { get; set; } = [];
+    List<int> orderAmount { get; set; } = [];
 
     protected override async Task OnInitializedAsync() {
         await requestPerson();
+        await requestProvider();
         await requestPayments();
         await requestOrders();
         selectedType = types[0];
@@ -122,6 +146,25 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
         }
     }
 
+    private async Task requestProvider() {
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "provider/requestAll")
+            };
+
+        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+        if (response.IsSuccessStatusCode) { // success?
+                                            // deserialize the result-JSON with Newtownsoft to the List
+            provider = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
+            provider.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
+            provider = provider.OrderBy(x => x.Designation).ToList();
+        }
+        else {
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+        }
+    }
+
     private async Task requestPayments() {
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -136,7 +179,7 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
         if (response.IsSuccessStatusCode) {
             payments = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
             changedPayments = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
-            payments.ForEach(x => orderAmount.Add(0));
+            payments.ForEach(x => paymentAmount.Add(0));
         }
         else {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
@@ -156,6 +199,7 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
 
         if (response.IsSuccessStatusCode) {
             orders = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+            changedOrders = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
         }
         else {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
@@ -172,8 +216,8 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
     }
 
     private async Task commitChangesP(int index) {
-        short cent = (short) (orderAmount[index] % 100);
-        long euro = (long) ((orderAmount[index] - cent) * 0.01);
+        short cent = (short) (paymentAmount[index] % 100);
+        long euro = (long) ((paymentAmount[index] - cent) * 0.01);
         changedPayments[index].Amount = new Money(euro, cent);
         if (payments[index].Amount.Equals(changedPayments[index].Amount) &&
             payments[index].DateTime.Equals(changedPayments[index].DateTime)) {

@@ -8,7 +8,7 @@ namespace Modells {
 
         /// <summary></summary>
         [JsonInclude, BsonId]
-        public DateTime DateTime { get; set; }
+        public DateTime DateTime { get; set; } = new DateTime();
         /// <summary></summary>
         [JsonInclude]
         public Money Money { get; set; } = new Money();
