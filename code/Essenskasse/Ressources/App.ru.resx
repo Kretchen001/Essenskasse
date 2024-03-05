@@ -144,6 +144,9 @@
   <data name="colortheme" xml:space="preserve">
     <value>Цветовая схема</value>
   </data>
+  <data name="comment" xml:space="preserve">
+    <value>Комментарий</value>
+  </data>
   <data name="copy" xml:space="preserve">
     <value>копировать</value>
   </data>
