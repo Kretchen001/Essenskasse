@@ -50,5 +50,8 @@
         AppData.FilterShowProvider = await LocalStorage.GetItemAsync<bool>("filterShowProvider");
         AppData.FilterShowPerson = await LocalStorage.GetItemAsync<bool>("filterShowPerson");
         AppData.AccessToken = await LocalStorage.GetItemAsync<Guid>("AccessToken");
+        if (AppData.AccessToken.Equals(new Guid("00000000-0000-0000-0000-000000000000"))) {
+            AppData.AccessToken = null;
+        }
     }
 }
