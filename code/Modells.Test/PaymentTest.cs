@@ -10,11 +10,12 @@
             Payment paymentA = new Payment {
                 DateTime = dateTime,
                 Amount = amount,
-                ReferencedPerson = refGuid
+                ReferencedPerson = refGuid,
+                Comment = "lorem ipsum"
             };
 
             // complete same
-            Payment paymentB = new Payment(dateTime, amount, refGuid);
+            Payment paymentB = new Payment(dateTime, amount, refGuid, "lorem ipsum");
             Assert.True(paymentA.Equals(paymentB));
 
             // different date
@@ -31,6 +32,10 @@
             paymentB.Amount = amount;
             paymentB.ReferencedPerson = new Guid();
             Assert.False(paymentA.Equals(paymentB));
+
+            // different comment
+            Payment paymentC = new Payment(amount, refGuid, "ll");
+            Assert.False(paymentC.Equals(paymentB));
         }
     }
 }

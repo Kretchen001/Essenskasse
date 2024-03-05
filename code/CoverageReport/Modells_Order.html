@@ -87,10 +87,16 @@ div.currenthistory { margin: -2px -5px 0 -5px; padding: 2px 5px 2px 5px; height:
 .coverage td { padding: 0; border: none; }
 .stripped tr:nth-child(2n+1) { background-color: #F3F3F3; }
 
-.customizebox { font-size: 0.75em; margin-bottom: 7px; }
-.customizebox>div { width: 25%; display: inline-block; }
-.customizebox div.right input { width: 150px; }
-#namespaceslider { width: 200px; display: inline-block; margin-left: 8px; }
+.customizebox { font-size: 0.75em; margin-bottom: 7px; display: grid; grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; grid-column-gap: 10px; grid-row-gap: 10px; }
+.customizebox>div { align-self: end; }
+.customizebox div.col-right input { width: 150px; }
+
+@media screen and (min-width: 1000px) {
+  .customizebox { grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr; }
+  .customizebox div.col-center { justify-self: center; }
+  .customizebox div.col-right { justify-self: end; }
+}
+.slider-label { position: relative; left: 85px; }
 
 .percentagebar {
     padding-left: 3px;
@@ -805,7 +811,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 </tr>
 <tr>
 <th>File(s):</th>
-<td class="overflow-wrap"><a href="#DVisual_Studio_CEssenskassecodeModellsOrdercs" class="navigatetohash">D:\Visual_Studio_C#\Essenskasse\code\Modells\Order.cs</a></td>
+<td class="overflow-wrap"><a href="#CUsersTimDocumentsEigenesEssenskassecodeModellsOrdercs" class="navigatetohash">C:\Users\Tim\Documents\Eigenes\Essenskasse\code\Modells\Order.cs</a></td>
 </tr>
 </table>
 </div>
@@ -878,21 +884,28 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 <h1>Metrics</h1>
 <div class="table-responsive">
 <table class="overview table-fixed">
-<thead><tr><th>Method</th><th>Branch coverage <a href="https://en.wikipedia.org/wiki/Code_coverage" target="_blank"><i class="icon-info-circled"></i></a></th><th>Cyclomatic complexity <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity" target="_blank"><i class="icon-info-circled"></i></a></th><th>Line coverage <a href="https://en.wikipedia.org/wiki/Code_coverage" target="_blank"><i class="icon-info-circled"></i></a></th></tr></thead>
+<colgroup>
+<col class="column-min-200" />
+<col class="column105" />
+<col class="column105" />
+<col class="column105" />
+<col class="column105" />
+</colgroup>
+<thead><tr><th>Method</th><th>Branch coverage <a href="https://en.wikipedia.org/wiki/Code_coverage" target="_blank"><i class="icon-info-circled"></i></a></th><th>Crap Score <a href="https://googletesting.blogspot.de/2011/02/this-code-is-crap.html" target="_blank"><i class="icon-info-circled"></i></a></th><th>Cyclomatic complexity <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity" target="_blank"><i class="icon-info-circled"></i></a></th><th>Line coverage <a href="https://en.wikipedia.org/wiki/Code_coverage" target="_blank"><i class="icon-info-circled"></i></a></th></tr></thead>
 <tbody>
-<tr><td title="get_DateTime()"><a href="#file0_line11" class="navigatetohash">get_DateTime()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title="get_Money()"><a href="#file0_line14" class="navigatetohash">get_Money()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title="get_Provider()"><a href="#file0_line17" class="navigatetohash">get_Provider()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title="get_ReferencedPerson()"><a href="#file0_line20" class="navigatetohash">get_ReferencedPerson()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title=".ctor()"><a href="#file0_line23" class="navigatetohash">.ctor()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title=".ctor(System.DateTime,Modells.Money,Modells.Provider,System.Guid)"><a href="#file0_line31" class="navigatetohash">.ctor(...)</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title=".ctor(Modells.Money,Modells.Provider,System.Guid)"><a href="#file0_line42" class="navigatetohash">.ctor(...)</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title="Equals(Modells.Order)"><a href="#file0_line52" class="navigatetohash">Equals(...)</a></td><td>100%</td><td>8</td><td>100%</td></tr>
+<tr><td title="get_DateTime()"><a href="#file0_line11" class="navigatetohash">get_DateTime()</a></td><td>100%</td><td>1</td><td>1</td><td>100%</td></tr>
+<tr><td title="get_Money()"><a href="#file0_line14" class="navigatetohash">get_Money()</a></td><td>100%</td><td>1</td><td>1</td><td>100%</td></tr>
+<tr><td title="get_Provider()"><a href="#file0_line17" class="navigatetohash">get_Provider()</a></td><td>100%</td><td>1</td><td>1</td><td>100%</td></tr>
+<tr><td title="get_ReferencedPerson()"><a href="#file0_line20" class="navigatetohash">get_ReferencedPerson()</a></td><td>100%</td><td>1</td><td>1</td><td>100%</td></tr>
+<tr><td title=".ctor()"><a href="#file0_line23" class="navigatetohash">.ctor()</a></td><td>100%</td><td>1</td><td>1</td><td>100%</td></tr>
+<tr><td title=".ctor(System.DateTime,Modells.Money,Modells.Provider,System.Guid)"><a href="#file0_line31" class="navigatetohash">.ctor(...)</a></td><td>100%</td><td>1</td><td>1</td><td>100%</td></tr>
+<tr><td title=".ctor(Modells.Money,Modells.Provider,System.Guid)"><a href="#file0_line42" class="navigatetohash">.ctor(...)</a></td><td>100%</td><td>1</td><td>1</td><td>100%</td></tr>
+<tr><td title="Equals(Modells.Order)"><a href="#file0_line52" class="navigatetohash">Equals(...)</a></td><td>100%</td><td>8</td><td>8</td><td>100%</td></tr>
 </tbody>
 </table>
 </div>
 <h1>File(s)</h1>
-<h2 id="DVisual_Studio_CEssenskassecodeModellsOrdercs">D:\Visual_Studio_C#\Essenskasse\code\Modells\Order.cs</h2>
+<h2 id="CUsersTimDocumentsEigenesEssenskassecodeModellsOrdercs">C:\Users\Tim\Documents\Eigenes\Essenskasse\code\Modells\Order.cs</h2>
 <div class="table-responsive">
 <table class="lineAnalysis">
 <thead><tr><th></th><th>#</th><th>Line</th><th></th><th>Line coverage</th></tr></thead>
@@ -965,7 +978,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 </tbody>
 </table>
 </div>
-<div class="footer">Generated by: ReportGenerator 5.2.0.0<br />31.12.2023 - 15:55:16<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="https://reportgenerator.io">reportgenerator.io</a></div></div>
+<div class="footer">Generated by: ReportGenerator 5.2.2.0<br />05.03.2024 - 20:52:08<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="https://reportgenerator.io">reportgenerator.io</a></div></div>
 <div class="containerright">
 <div class="containerrightfixed">
 <h1>Methods/Properties</h1>
