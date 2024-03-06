@@ -101,5 +101,20 @@ namespace Modells {
             }
             return false;
         }
+
+        /// <summary>Return the boolean if the first Money is greater then the secound one.</summary>
+        /// <param name="b">Secound Money-Value</param>
+        /// <returns>True if a (this) is greater then b</returns>
+        public bool IsGreater(Money b) {
+            if (this.Euro > b.Euro) {
+                return true;
+            }
+            else if (this.Euro == b.Euro && this.Cent > b.Cent) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
     }
 }
