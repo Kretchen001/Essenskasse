@@ -35,7 +35,7 @@
         </label>
     </div>
     <div class="col-lg-4 align-self-center" style="width: 25%">
-        <input style="width: 100%" type="number" @bind="payment" placeholder="Euro,Cent -> 1000 = 10,00€">
+        <input style="width: 100%" type="number" @bind="payment" placeholder="Euro,Cent -> 10,00€">
     </div>
     <div class="col-lg-5 align-self-center">
         <label>
@@ -112,12 +112,26 @@
         }
     }
 
-    private int payment = 0;
+    private decimal _payment = 0;
+    private decimal payment {
+        get {
+            return _payment;
+        }
+        set {
+            if (value != 0) {
+                Money temp = convertToMoney(value);
+                if (temp.Cent < 100) {
+                    _payment = value;
+                }
+                else {
+                    // nothing
+                }
+            }
+        }
+    }
     private Money money {
         get {
-            short cent = (short)(payment % 100);
-            long euro = (long)((payment - cent) * 0.01);
-            return new Money(euro, cent);
+            return convertToMoney(_payment);
         }
     }
 
@@ -130,6 +144,15 @@
 
     protected override async Task OnInitializedAsync () {
         await refreshPersonList();
+    }
+
+    /// <summary></summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    private Money convertToMoney(decimal value) {
+        long euro = (long)value;
+        short cent = (short)((value - euro) * 100);
+        return new Money(euro, cent);
     }
 
     private async Task refreshPersonList () {
