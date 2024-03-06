@@ -86,5 +86,20 @@ namespace Modells.Test {
             Money? a = new Money().CalculateMoney(null, new Money(40, 0), new Money(20, 0));
             Assert.True(a is null);
         }
+
+        [Fact]
+        public void IsGreaterEuro() {
+            Assert.True(new Money(10, 10).IsGreater(new Money(5, 10)));
+        }
+
+        [Fact]
+        public void IsLess() {
+            Assert.False(new Money(5, 10).IsGreater(new Money(10, 10)));
+        }
+
+        [Fact]
+        public void IsGreaterCent() {
+            Assert.True(new Money(5, 50).IsGreater(new Money(5, 10)));
+        }
     }
 }

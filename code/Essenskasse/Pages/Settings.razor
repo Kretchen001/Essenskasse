@@ -97,6 +97,17 @@
     </div>
 </div>
 
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-4">
+        <label>
+            Grenzwert für Positives Saldo
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        <input type="number" @bind="_dashboardMoneyLimitInt">
+    </div>
+</div>
+
 @code {
 
     #region Variable
@@ -183,12 +194,39 @@
             saveFilterShowPerson(value);
         }
     }
+
+    private int _dashboardMoneyLimitInt {
+        get {
+            int temp = AppData.DashboardMoneyLimit.Cent;
+            temp += (int)AppData.DashboardMoneyLimit.Euro * 100;
+            return temp;
+        }
+        set {
+            dashboardMoneyLimit = convertToMoney(value);
+        }
+    }
+    private Money dashboardMoneyLimit {
+        get => AppData.DashboardMoneyLimit;
+        set {
+            AppData.DashboardMoneyLimit = value;
+            saveDashboardMoneyLimit(value);
+        }
+    }
     #endregion
 
     #region Functions
     protected override async Task OnInitializedAsync () {
         themeList["Light"] = _loc[nameof(RessourceAppStrings.light)];
         themeList["Dark"] = _loc[nameof(RessourceAppStrings.dark)];
+    }
+
+    /// <summary></summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    private Money convertToMoney(int value) {
+        short cent = (short)(value % 100);
+        long euro = (long)((value - cent) * 0.01);
+        return new Money(euro, cent);
     }
 
     /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>
@@ -245,6 +283,13 @@
         else {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOff)], ToastLevel.Success);
         }
+    }
+
+    /// <summary></summary>
+    /// <param name="limitToSave"></param>
+    private async void saveDashboardMoneyLimit(Money limitToSave) {
+        await LocalStorage.SetItemAsync<Money>("DashboardMoneyLimit", limitToSave);
+        ToastService.ShowToast($"Grenzwert auf {limitToSave.ToString()} gesetzt.", ToastLevel.Success);
     }
     #endregion
 }

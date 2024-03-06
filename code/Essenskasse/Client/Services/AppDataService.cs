@@ -1,4 +1,6 @@
-﻿namespace Essenskasse.Client.Services {
+﻿using Modells;
+
+namespace Essenskasse.Client.Services {
 
     /// <summary>Hold data for the hole application.</summary>
     public class AppDataService {
@@ -18,5 +20,8 @@
 
         /// <summary></summary>
         public bool FilterShowPerson { get; set; } = true;
+        
+        /// <summary></summary>
+        public Money DashboardMoneyLimit { get; set; } = new Money(0, 0);
     }
 }
