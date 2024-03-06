@@ -98,13 +98,20 @@
 </div>
 
 <div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
-    <div class="col-lg-4">
+    <div class="col-lg-6">
         <label>
             Grenzwert für Positives Saldo
         </label>
     </div>
-    <div class="col-lg-8" align="center">
+    <div class="col-lg-2" align="center">
+        <label>
+            Aktuell: @dashboardMoneyLimit.ToString()
+        </label>
+    </div>
+    <div class="col-lg-2" align="center">
         <input type="number" @bind="_dashboardMoneyLimitInt">
+    </div>
+    <div class="col-lg-2">
     </div>
 </div>
 
@@ -195,14 +202,22 @@
         }
     }
 
-    private int _dashboardMoneyLimitInt {
+    private decimal _dashboardMoneyLimitInt {
         get {
-            int temp = AppData.DashboardMoneyLimit.Cent;
-            temp += (int)AppData.DashboardMoneyLimit.Euro * 100;
+            decimal temp = AppData.DashboardMoneyLimit.Euro;
+            temp += AppData.DashboardMoneyLimit.Cent * 0.01m;
             return temp;
         }
         set {
-            dashboardMoneyLimit = convertToMoney(value);
+            if (value != 0) {
+                Money temp = convertToMoney(value);
+                if (temp.Cent < 100) {
+                    dashboardMoneyLimit = temp;
+                }
+                else {
+                    dashboardMoneyLimit = AppData.DashboardMoneyLimit;
+                }
+            }
         }
     }
     private Money dashboardMoneyLimit {
@@ -223,9 +238,9 @@
     /// <summary></summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    private Money convertToMoney(int value) {
-        short cent = (short)(value % 100);
-        long euro = (long)((value - cent) * 0.01);
+    private Money convertToMoney(decimal value) {
+        long euro = (long)value;
+        short cent = (short)((value - euro) * 100);
         return new Money(euro, cent);
     }
 
