@@ -2,6 +2,7 @@
 using Essenskasse.Ressources;
 using Modells;
 using Newtonsoft.Json;
+using System.Transactions;
 
 namespace Essenskasse.Pages {
 
@@ -31,8 +32,11 @@ namespace Essenskasse.Pages {
         private List<Person> person = new List<Person>();
         private List<int> positivSaldo = new List<int>();
 
+        private Money currentCashBalance = new Money(0, 0);
+
         protected override async Task OnInitializedAsync() {
             await requestAllPerson();
+            currentCashBalanceCalculate();
             base.StateHasChanged();
         }
 
@@ -73,6 +77,7 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 await requestAllPerson();
+                currentCashBalanceCalculate();
                 base.StateHasChanged();
             }
             else {
@@ -82,6 +87,22 @@ namespace Essenskasse.Pages {
 
         private async void WriteWishListToLocalStorage(bool value) {
             await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
+        }
+
+        private void currentCashBalanceCalculate() {
+            currentCashBalance = new Money(0, 0);
+            foreach (Person x in person) {
+                if (x.Saldo.IsPositiv()) {
+                    currentCashBalance = new Money().CalculateMoney(CalculationOperation.Addition, currentCashBalance, x.Saldo) ?? new Money(0, 0);
+                }
+                else {
+                    Money temp = new Money() {
+                        Euro = Math.Abs(x.Saldo.Euro),
+                        Cent = Math.Abs(x.Saldo.Cent),
+                    };
+                    currentCashBalance = new Money().CalculateMoney(CalculationOperation.Substraction, currentCashBalance, temp) ?? new Money(0, 0);
+                }
+            }
         }
     }
 }
