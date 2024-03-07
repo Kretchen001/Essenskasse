@@ -1,5 +1,6 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
+using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
 using System.Text;
