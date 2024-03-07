@@ -1,0 +1,87 @@
+﻿using Essenskasse.Client;
+using Essenskasse.Ressources;
+using Modells;
+using Newtonsoft.Json;
+
+namespace Essenskasse.Pages {
+
+    public partial class Home {
+
+        private bool isSingleListWish {
+            get {
+                return AppData.IsSingleListWishDashboard;
+            }
+            set {
+                AppData.IsSingleListWishDashboard = value;
+                WriteWishListToLocalStorage(value);
+            }
+        }
+
+        private string returnListWish {
+            get {
+                if (isSingleListWish) {
+                    return _loc[nameof(RessourceAppStrings.yes)];
+                }
+                else {
+                    return _loc[nameof(RessourceAppStrings.no)];
+                }
+            }
+        }
+
+        private List<Person> person = new List<Person>();
+        private List<int> positivSaldo = new List<int>();
+
+        protected override async Task OnInitializedAsync() {
+            await requestAllPerson();
+            base.StateHasChanged();
+        }
+
+        private async Task requestAllPerson() {
+            // Request all Person, that are saved in the database
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
+            };
+
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+            if (response.IsSuccessStatusCode) {
+                person.Clear();
+                person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
+                person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
+                person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+                person = person.OrderBy(x => x.Name).ToList();
+                for (int i = 0; i < person.Count; i += 1) {
+                    if (person[i].Saldo.IsGreater(AppData.DashboardMoneyLimit)) {
+                        positivSaldo.Add(i);
+                    }
+                }
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
+            }
+        }
+
+        private async void RecalculateSaldos() {
+            // Request all providers, that are saved in the database.
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(Config["API-Adress"] + "person/updateDatabasePersonSaldo")
+            };
+
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+            if (response.IsSuccessStatusCode) {
+                await requestAllPerson();
+                base.StateHasChanged();
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+            }
+        }
+
+        private async void WriteWishListToLocalStorage(bool value) {
+            await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
+        }
+    }
+}
