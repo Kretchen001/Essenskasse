@@ -14,14 +14,23 @@
     <div class="col-lg-4">
         <h2>@_loc[nameof(RessourceAppStrings.dashboard)]</h2>
     </div>
-    <div class="col-lg-8">
+    <div class="col-lg-8 align-self-lg-center">
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="isSingleListWish">
             <label class="form-check-label" for="flexSwitchCheckChecked">@_loc[nameof(RessourceAppStrings.singleColumn)] = @returnListWish</label>
         </div>
     </div>
 </div>
-
+<hr />
+<div class="row">
+    <div class="col-lg-3 align-self-lg-center">
+        <h3>Kassenstand (Ist)</h3>
+    </div>
+    <div class="col-lg-9 align-self-lg-center">
+        <h3>@currentCashBalance.ToString()</h3>
+    </div>
+</div>
+<hr />
 @if (isSingleListWish) {
     <div class="row">
         <div class="col-lg-12">
