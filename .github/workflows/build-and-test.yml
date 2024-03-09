@@ -1,0 +1,45 @@
+name: build and test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    paths:
+    - '**.cs'
+    - '**.csproj'
+
+env:
+  DOTNET_VERSION: '8.0.101' # The .NET SDK version to use
+  SLN_NAME: Essenskasse.sln
+
+jobs:
+  build-and-test:
+
+    name: build-and-test-${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [debian-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: cd & Install dependencies
+      run: |
+          cd code
+          dotnet restore ${{ env.SLN_NAME }}
+      
+    - name: Build
+      run: |
+          cd code
+          dotnet build ${{ env.SLN_NAME }} --configuration Release --no-restore
+    
+    - name: Test
+      run: |
+          cd code
+          dotnet test ${{ env.SLN_NAME }} --no-restore --verbosity normal
