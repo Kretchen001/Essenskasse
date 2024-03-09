@@ -1,13 +1,9 @@
 name: build and test
 
 on:
+  pull_request:
   push:
-#     branches: [ master ]
-#   pull_request:
-#     branches: [ master ]
-#     paths:
-#     - '**.cs'
-#     - '**.csproj'
+    branches: master
 
 env:
   DOTNET_VERSION: '8.0.101' # The .NET SDK version to use
@@ -20,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [debian-latest]
+        os: [ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v3
