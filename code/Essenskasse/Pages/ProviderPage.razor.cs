@@ -68,41 +68,46 @@ namespace Essenskasse.Pages {
         }
 
         private async Task deleteAnbieter() {
-            Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
-            if (tempAnbieter is null) {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastGuidNotThere)], ToastLevel.Info);
-                return;
-            }
-            if (await JSRuntime.InvokeAsync<bool>(
-                                "confirm",
-                                "Wollen sie den Anbieter - " +
-                                tempAnbieter.Designation +
-                                " - wirklich löschen?")) {
-                // Bestätigt, also lösche
-                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Delete,
-                    RequestUri = new Uri(Config["API-Adress"] + "provider/remove"),
-                    Headers = {
+            if (Guid.TryParse(providerToDeleteGuid, out var providerDesignation)) {
+                Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
+                if (tempAnbieter is null) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastGuidNotThere)], ToastLevel.Info);
+                    return;
+                }
+                if (await JSRuntime.InvokeAsync<bool>(
+                                    "confirm",
+                                    "Wollen sie den Anbieter - " +
+                                    tempAnbieter.Designation +
+                                    " - wirklich löschen?")) {
+                    // Bestätigt, also lösche
+                    HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                        Method = HttpMethod.Delete,
+                        RequestUri = new Uri(Config["API-Adress"] + "provider/remove"),
+                        Headers = {
                         {"guid", providerToDeleteGuid}
                     }
-                };
+                    };
 
-                var response = await HttpClient.SendAsync(httpRequestMessage);
+                    HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
-                if (response.IsSuccessStatusCode) {
-                    Provider temp = JsonConvert.DeserializeObject<Provider>(await response.Content.ReadAsStringAsync())!;
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.person)] + " " + temp.Designation + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyRemoved)], ToastLevel.Success);
-                    providers.Remove(tempAnbieter);
-                    accessToDelete = false;
-                    providerToDeleteGuid = "";
-                    base.StateHasChanged();
+                    if (response.IsSuccessStatusCode) {
+                        Provider temp = JsonConvert.DeserializeObject<Provider>(await response.Content.ReadAsStringAsync())!;
+                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.person)] + " " + temp.Designation + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyRemoved)], ToastLevel.Success);
+                        providers.Remove(tempAnbieter);
+                        accessToDelete = false;
+                        providerToDeleteGuid = "";
+                        base.StateHasChanged();
+                    }
+                    else if (response.StatusCode.Equals(System.Net.HttpStatusCode.NoContent)) {
+                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastRemoveNotBecauseNoEntity)], ToastLevel.Info);
+                    }
+                    else {
+                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoRemove)] + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
+                    }
                 }
-                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.NoContent)) {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastRemoveNotBecauseNoEntity)], ToastLevel.Info);
-                }
-                else {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoRemove)] + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
-                }
+            }
+            else {
+                ToastService.ShowToast("Keine Guid angegeben!", ToastLevel.Error);
             }
         }
 
