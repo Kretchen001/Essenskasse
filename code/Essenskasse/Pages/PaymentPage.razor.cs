@@ -126,11 +126,12 @@ namespace Essenskasse.Pages {
                 Content = new StringContent(JsonConvert.SerializeObject(money), Encoding.UTF8, "application/json")
             };
 
-            var response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessfullyAdded)], ToastLevel.Success);
                 paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!);
+                paymentsOfSelectedPerson = paymentsOfSelectedPerson.OrderByDescending(x => x.DateTime).ToList();
                 base.StateHasChanged();
                 return;
             }

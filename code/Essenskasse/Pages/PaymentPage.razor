@@ -7,6 +7,20 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 
+<style>
+    th:nth-child(1), td:nth-child(1) {
+        width: 30% !important; /* First row 30% width */
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+        width: 40% !important; /* Secound row 30% width (60%) */
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 30% !important; /* Third row 40% width (100%) */
+    }
+</style>
+
 <PageTitle>@_loc[nameof(RessourceAppStrings.payment)]</PageTitle>
 
 <h2>@_loc[nameof(RessourceAppStrings.payment)]</h2>
@@ -72,22 +86,31 @@
                 <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
             </tr>
             @for (int i = 0; i < paymentsOfSelectedPerson.Count; i += 1) {
-                @if (i % 3 == 0) {
-                    <tr>
-                        <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                        <td>@paymentsOfSelectedPerson[i].Comment</td>
-                        <td>@paymentsOfSelectedPerson[i].Amount</td>
-                    </tr>
+                @if (paymentsOfSelectedPerson[i].Amount.IsPositiv()) {
+                    @if (i % 3 == 0) {
+                        <tr style ="background-color: #EEEEEE">
+                            <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                            <td>@paymentsOfSelectedPerson[i].Comment</td>
+                            <td>@paymentsOfSelectedPerson[i].Amount</td>
+                        </tr>
+                    }
+                    else if (i % 3 == 1) {
+                        <tr style="background-color: #DDDDDD">
+                            <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                            <td>@paymentsOfSelectedPerson[i].Comment</td>
+                            <td>@paymentsOfSelectedPerson[i].Amount</td>
+                        </tr>
+                    }
+                    else if (i % 3 == 2) {
+                        <tr style="background-color: #CCCCCC">
+                            <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                            <td>@paymentsOfSelectedPerson[i].Comment</td>
+                            <td>@paymentsOfSelectedPerson[i].Amount</td>
+                        </tr>
+                    }
                 }
-                else if (i % 3 == 1) {
-                    <tr style="background-color: lightgray">
-                        <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                        <td>@paymentsOfSelectedPerson[i].Comment</td>
-                        <td>@paymentsOfSelectedPerson[i].Amount</td>
-                    </tr>
-                }
-                else if (i % 3 == 2) {
-                    <tr style="background-color: grey">
+                else {
+                    <tr style="background-color: #F55D52">
                         <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
                         <td>@paymentsOfSelectedPerson[i].Comment</td>
                         <td>@paymentsOfSelectedPerson[i].Amount</td>
