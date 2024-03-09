@@ -68,7 +68,7 @@ namespace Essenskasse.Pages {
         }
 
         private async Task deleteAnbieter() {
-            if (Guid.TryParse(providerToDeleteGuid, out var providerDesignation)) {
+            if (Guid.TryParse(providerToDeleteGuid, out Guid providerDesignation)) {
                 Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
                 if (tempAnbieter is null) {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastGuidNotThere)], ToastLevel.Info);
