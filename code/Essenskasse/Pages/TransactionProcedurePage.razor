@@ -10,21 +10,33 @@
 @inject IConfiguration Config
 @inject ILocalStorageService LocalStorage
 
+<style>
+    th:nth-child(1), td:nth-child(1) {
+        width: 30% !important; /* First row 30% width */
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+        width: 40% !important; /* Secound row 30% width (60%) */
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 30% !important; /* Third row 40% width (100%) */
+    }
+</style>
+
+<PageTitle>Kaffeekasse</PageTitle>
+
 <h3>Kaffeekasse</h3>
 
+<br />
 <div class="row">
-    <div class="col-lg-4">
-        <label>
-            Kassenstand (Ist)
-        </label>
+    <div class="col-lg-3 align-self-lg-center">
+        <h4>Kassenstand (Ist)</h4>
     </div>
-    <div class="col-lg-8">
-        <label>
-            @currentCashBalance.ToString()
-        </label>
+    <div class="col-lg-9 align-self-lg-center">
+        <h4>@currentCashBalance.ToString()</h4>
     </div>
 </div>
-<br />
 <hr />
 <br />
 <div class="row">
@@ -38,18 +50,10 @@
     </div>
     <div class="col-lg-3 align-self-center">
         <label>
-            @amountMoney.ToString()
+            (@amountMoney.ToString())
         </label>
     </div>
     <div class="col-lg-3 align-self-center">
-        <button @onclick="() => insertNewTransaction()">
-            Einsenden
-        </button>
-    </div>
-</div>
-<br />
-<div class="row">
-    <div class="col-lg-12">
         <label>
             Negative Werte beinhalten Auszahlungen!
         </label>
@@ -67,6 +71,12 @@
     </div>
 </div>
 <br />
+<div class="row">
+    <button @onclick="() => insertNewTransaction()">
+        Einsenden
+    </button>
+</div>
+<br />
 <hr />
 <br />
 <div class="row">
@@ -80,8 +90,8 @@
                 @foreach(TransactionProcedure x in transactions) {
                     <tr style="border-bottom: groove lightgray">
                         <td>@x.DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                        <td>@x.Amount</td>
                         <td>@x.Comment</td>
+                        <td>@x.Amount</td>
                     </tr>
                 }
             </table>

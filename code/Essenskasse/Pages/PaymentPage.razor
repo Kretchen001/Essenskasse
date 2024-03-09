@@ -7,6 +7,20 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 
+<style>
+    th:nth-child(1), td:nth-child(1) {
+        width: 30% !important; /* First row 30% width */
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+        width: 40% !important; /* Secound row 30% width (60%) */
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 30% !important; /* Third row 40% width (100%) */
+    }
+</style>
+
 <PageTitle>@_loc[nameof(RessourceAppStrings.payment)]</PageTitle>
 
 <h2>@_loc[nameof(RessourceAppStrings.payment)]</h2>
