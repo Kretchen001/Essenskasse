@@ -1,25 +1,25 @@
 version: '3.4'
 
 services:
-  db:
-    container_name: db
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: essenskasse
-      MYSQL_USER: dbuser
-      MYSQL_PASSWORD: password
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
-    volumes:
-      - dbdata:/var/lib/mysql
-      - ./MySqlScripts/init.sql:/docker-entrypoint-initdb.d/1.sql # 1 weil damit als erstes ausgefüht, alle anderen danach (wenn welche da sind)
-    restart: always
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
-    ports:
-      - 3306:3306
+  # db:
+  #   container_name: db
+  #   image: mysql:5.7
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #     MYSQL_DATABASE: essenskasse
+  #     MYSQL_USER: dbuser
+  #     MYSQL_PASSWORD: password
+  #     MYSQL_ALLOW_EMPTY_PASSWORD: 1
+  #   volumes:
+  #     - dbdata:/var/lib/mysql
+  #     - ./MySqlScripts/init.sql:/docker-entrypoint-initdb.d/1.sql # 1 weil damit als erstes ausgefüht, alle anderen danach (wenn welche da sind)
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+  #     timeout: 20s
+  #     retries: 10
+  #   ports:
+  #     - 3306:3306
 
   pwa:
     container_name: EssenskassePWA
@@ -28,8 +28,8 @@ services:
       dockerfile: Essenskasse/Dockerfile
     ports:
       - 8009:80
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
 
   api:
     container_name: EssenskasseAPI
@@ -38,8 +38,8 @@ services:
       dockerfile: EssenskasseAPI/Dockerfile
     ports:
       - 8010:8080
-    depends_on:
-      - db
+#     depends_on:
+#       - db
 
-volumes:
-  dbdata:
+# volumes:
+#   dbdata:
