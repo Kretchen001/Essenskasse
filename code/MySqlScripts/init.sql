@@ -1,10 +1,10 @@
-CREATE TABLE essenskasse.Users (
+CREATE TABLE essenskasse.Test (
 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 UserName VARCHAR(30) NOT NULL,
 Hobbies VARCHAR(30) NOT NULL,
 Location VARCHAR(50));
 
-INSERT INTO Users (UserName, Hobbies) 
+INSERT INTO Test (UserName, Hobbies)
 VALUES
 ('Finn', 'Tafelwischen'),
 ('Albert', 'Bouling'),
