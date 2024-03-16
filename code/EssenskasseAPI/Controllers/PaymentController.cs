@@ -491,7 +491,7 @@ namespace EssenskasseAPI.Controllers {
             if (dataTablePersonToUpdate.Rows.Count == 1) {
                 Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
                 Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} old Saldo = {personToUpdate.Saldo}");
-                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, personToUpdate.Saldo, payment.Money)!;
+                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, personToUpdate.Saldo, payment.Amount)!;
                 Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} new Saldo = {personToUpdate.Saldo}");
 
                 string queryStringPersonUpdate = $"" +
