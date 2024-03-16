@@ -280,51 +280,112 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpPut, Route("update")]
-        public IActionResult UpdatePayment([FromHeader] string? dateString,
+        public IActionResult UpdatePayment([FromHeader] long? dateAsLong,
                                             [FromBody] Tuple<Money?, Provider?, Guid?> values) {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("UpdatePerson called");
-                if (dateString is null) {
+                if (dateAsLong is null) {
                     Log.Warning("Empty dateString Header");
                     return BadRequest("Kein Datum angegeben!");
                 }
-                DateTime date = DateTime.Parse(dateString);
-                Order? orderToUpdate = _orderDbController.OrderAtDateTime(date);
-                if (orderToUpdate is not null) {
-                    if (values.Item1 is not null) {
-                        Log.Information($"Order updated from {orderToUpdate.Money} to {values.Item1}");
-                        orderToUpdate.Money = values.Item1;
-                    }
-                    if (values.Item2 is not null) {
-                        Log.Information($"Order updated from {orderToUpdate.Provider} to {values.Item2}");
-                        orderToUpdate.Provider = values.Item2;
-                    }
-                    if (values.Item3 is not null) {
-                        Log.Information($"Order updated from {orderToUpdate.ReferencedPerson} to {values.Item3}");
-                        orderToUpdate.ReferencedPerson = values.Item3 ?? new Guid();
-                    }
-                    if (_orderDbController.UpdateOrder(orderToUpdate)) {
-                        // recalculate Person Saldo
-                        PersonDbController _personDbController = new PersonDbController();
-                        Person? x = _personDbController.PersonPerGuid(orderToUpdate.ReferencedPerson);
-                        if (x is not null) {
-                            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
-                            x.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, x.Saldo, orderToUpdate.Money)!;
-                            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
-                            _personDbController.UpdatePerson(x);
-                        }
-                        Log.Information("Order successfully updated");
-                        return Ok();
-                    }
-                    else {
-                        Log.Warning($"At {dateString} no Order updated");
-                        return NotFound("Keine Bestellung zum angegebenen Datum geupdated...");
-                    }
-                }
-                else {
-                    Log.Warning($"At {dateString} no Order found");
+                string queryString = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.Order " +
+                    $"WHERE DateTime={dateAsLong}";
+                DataTable dataTable = QueryExecuterAtMySql(queryString);
+                List<Order> orders = DataTableToListOfOrders(dataTable);
+
+                if (orders.Count == 0) {
+                    Log.Warning($"At {dateAsLong} no Order found");
                     return NotFound("Keine Bestellung zum angegebenen Datum gefunden.");
                 }
+                
+                bool hasChanges = false;
+                if (values.Item1 is not null) {
+                    Log.Information($"Order updated from {orders[0].Money} to {values.Item1}");
+                    orders[0].Money = values.Item1;
+                    hasChanges = true;
+                }
+                if (values.Item2 is not null) {
+                    Log.Information($"Order updated from {orders[0].Provider} to {values.Item2}");
+                    orders[0].Provider = values.Item2;
+                    hasChanges = true;
+                }
+                if (values.Item3 is not null) {
+                    Log.Information($"Order updated from {orders[0].ReferencedPerson} to {values.Item3}");
+                    orders[0].ReferencedPerson = values.Item3 ?? new Guid();
+                    hasChanges = true;
+                }
+                if (hasChanges) {
+                    // update person saldo
+                    string queryStringUpdateSaldo = $"" +
+                        $"SELECT * " +
+                        $"FROM essenskasse.Person " +
+                        $"WHERE Guid='{orders[0].ReferencedPerson}';";
+                    DataTable dataTablePersonToUpdate = QueryExecuterAtMySql(queryStringUpdateSaldo);
+
+                    if (dataTablePersonToUpdate.Rows.Count == 1) {
+                        Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
+                        Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} old Saldo = {personToUpdate.Saldo}");
+                        personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, personToUpdate.Saldo, orders[0].Money)!;
+                        Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} new Saldo = {personToUpdate.Saldo}");
+
+                        string queryStringPersonUpdate = $"" +
+                            $"UPDATE essenskasse.Person " +
+                            $"SET SaldoEuro = {personToUpdate.Saldo.Euro}, SaldoCent = {personToUpdate.Saldo.Cent} " +
+                            $"WHERE Guid='{personToUpdate.Guid}';";
+                        QueryExecuterAtMySql(queryStringPersonUpdate);
+                    }
+
+                    string queryStringUpdate = $"" +
+                        $"UPDATE essenskasse.Order " +
+                        $"SET AmountEuro={orders[0].Money.Euro}, AmountCent={orders[0].Money.Cent}, ProviderGuid={orders[0].Provider.Guid}, ProviderDesignation={orders[0].Provider.Designation}, ReferencedPerson={orders[0].ReferencedPerson} " +
+                        $"WHERE DateTime='{dateAsLong}';";
+                    QueryExecuterAtMySql(queryStringUpdate);
+                    Log.Information("Order successfully updated");
+                    return Ok();
+                }
+                Log.Warning($"At {dateAsLong} no Order updated. Nichts zum updaten angegeben.");
+                return NotFound("Keine Bestellung zum angegebenen Datum geupdated...\nNichts zum updaten angegeben.");
+                #region oldcode
+                //DateTime date = new DateTime();
+                //Order? orders = _orderDbController.OrderAtDateTime(date);
+                //if (orders is not null) {
+                //    if (values.Item1 is not null) {
+                //        Log.Information($"Order updated from {orders.Money} to {values.Item1}");
+                //        orders.Money = values.Item1;
+                //    }
+                //    if (values.Item2 is not null) {
+                //        Log.Information($"Order updated from {orders.Provider} to {values.Item2}");
+                //        orders.Provider = values.Item2;
+                //    }
+                //    if (values.Item3 is not null) {
+                //        Log.Information($"Order updated from {orders.ReferencedPerson} to {values.Item3}");
+                //        orders.ReferencedPerson = values.Item3 ?? new Guid();
+                //    }
+                //    if (_orderDbController.UpdateOrder(orders)) {
+                //        // recalculate Person Saldo
+                //        PersonDbController _personDbController = new PersonDbController();
+                //        Person? x = _personDbController.PersonPerGuid(orders.ReferencedPerson);
+                //        if (x is not null) {
+                //            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
+                //            x.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, x.Saldo, orders.Money)!;
+                //            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
+                //            _personDbController.UpdatePerson(x);
+                //        }
+                //        Log.Information("Order successfully updated");
+                //        return Ok();
+                //    }
+                //    else {
+                //        Log.Warning($"At {dateAsLong} no Order updated");
+                //        return NotFound("Keine Bestellung zum angegebenen Datum geupdated...");
+                //    }
+                //}
+                //else {
+                //    Log.Warning($"At {dateAsLong} no Order found");
+                //    return NotFound("Keine Bestellung zum angegebenen Datum gefunden.");
+                //}
+                #endregion
             }
         }
 
@@ -374,8 +435,7 @@ namespace EssenskasseAPI.Controllers {
         #region InternalFunctions
         private DataTable QueryExecuterAtMySql(string Query) {
             // MySql Connection
-            //MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
-            MySqlConnection connection = new MySqlConnection("Server=localhost;Port=3306;Uid=dbuser;Pwd=password;Database=essenskasse;SslMode=None;");
+            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
 
             MySqlCommand cmd = new MySqlCommand(Query, connection);
 
