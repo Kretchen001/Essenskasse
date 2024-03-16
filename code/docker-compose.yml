@@ -3,7 +3,7 @@ version: '3.4'
 services:
   database:
     container_name: MySql_DB
-    image: mysql:5.7
+    image: mysql:8.0.2
     environment:
       - MYSQL_ROOT_PASSWORD=sheep
       - MYSQL_DATABASE=essenskasse
@@ -13,6 +13,7 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
       - ./MySqlScripts/init.sql:/docker-entrypoint-initdb.d/1.sql:ro # 1 weil damit als erstes ausgefüht, alle anderen danach (wenn welche da sind)
+      # - ./MySqlScripts/demoData.sql:/docker-entrypoint-initdb.d/2.sql:ro
     restart: on-failure
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
