@@ -20,9 +20,6 @@ namespace EssenskasseAPI.Controllers {
         }
         #endregion
 
-        readonly ProviderDbController _providerController = new ProviderDbController();
-        readonly OrderDbController _orderDbController = new OrderDbController();
-
         #region Controller
         [HttpGet, Route("requestAll")]
         public IActionResult GetAllOrders() {
@@ -79,7 +76,7 @@ namespace EssenskasseAPI.Controllers {
                     return Ok(JsonConvert.SerializeObject(orders));
                 }
                 else {
-                    Log.Warning("No Data response (GetAllOrders)");
+                    Log.Warning("No Data response (GetAmountOfOrders)");
                     return NoContent();
                 }
             }

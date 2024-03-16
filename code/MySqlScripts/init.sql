@@ -5,14 +5,14 @@ CREATE TABLE IF NOT EXISTS essenskasse.Test (
     Location VARCHAR(50)
 );
 
-INSERT INTO Test (UserName, Hobbies)
+INSERT INTO Test (UserName, Hobbies, Location)
 VALUES
-('Finn', 'Tafelwischen'),
-('Albert', 'Bouling'),
-('Odin', 'Wachen'),
-('Rah', 'Scheinen'),
-('Poseidon', 'Schwimmen'),
-('Kain', 'sd');
+('Finn', 'Tafelwischen', 'Mond'),
+('Albert', 'Bouling', 'Erde'),
+('Odin', 'Wachen', 'Asgard'),
+('Rah', 'Scheinen', 'Sonne'),
+('Poseidon', 'Schwimmen', 'Olymp'),
+('Kain', 'sd', 'Eden');
 
 CREATE TABLE IF NOT EXISTS essenskasse.Person (
     Guid CHAR(36) PRIMARY KEY,
