@@ -16,8 +16,8 @@ VALUES
 
 CREATE TABLE IF NOT EXISTS essenskasse.Person (
     Guid CHAR(36) PRIMARY KEY,
-    Name VARCHAR(255),
-    Email VARCHAR(255),
+    Name VARCHAR(511),
+    Email VARCHAR(511),
     SaldoEuro BIGINT,
     SaldoCent SMALLINT
 );
