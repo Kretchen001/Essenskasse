@@ -105,9 +105,9 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Payment " +
-                        $"WHERE essenkasse.Payment='{guid}' " +
+                        $"WHERE essenskasse.Payment.ReferencedPerson='{guid}' " +
                         $"ORDER BY DateTime DESC;";
-                if (amount is null) { // request all
+                if (amount is not null) { // request amount
                     queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Payment " +

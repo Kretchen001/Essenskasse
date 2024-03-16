@@ -94,13 +94,13 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Order " +
-                        $"WHERE essenkasse.Order='{guid}' " +
+                        $"WHERE essenskasse.Order.ReferencedPerson='{guid}' " +
                         $"ORDER BY DateTime DESC;";
-                if (amount is null) { // request all
+                if (amount is not null) { // request amount
                     queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Order " +
-                        $"WHERE essenkasse.Order='{guid}' " +
+                        $"WHERE essenkasse.Person.Guid='{guid}' " +
                         $"ORDER BY DateTime DESC " +
                         $"LIMIT {amount};";
                 }
@@ -288,7 +288,7 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.Order " +
-                    $"WHERE DateTime={dateAsLong}";
+                    $"WHERE DateTime={dateAsLong};";
                 DataTable dataTable = QueryExecuterAtMySql(queryString);
                 List<Order> orders = DataTableToListOfOrders(dataTable);
 
