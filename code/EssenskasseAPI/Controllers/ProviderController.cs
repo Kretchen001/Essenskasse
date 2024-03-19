@@ -108,12 +108,19 @@ namespace EssenskasseAPI.Controllers {
                 if (name is not null) {
                     name = Uri.UnescapeDataString(name);
                     Provider newProvider = new Provider(name);
-                    if (_providerController.SaveProvider(newProvider)) {
+
+                    string queryString = $"" +
+                        $"INSERT INTO essenskasse.Provider (Guid, Designation)" +
+                        $"VALUES ('{newProvider.Guid}', '{newProvider.Designation}')";
+
+                    try {
+                        QueryExecuterAtMySql(queryString);
+                    
                         Log.Information($"New provider {newProvider.Designation} and {newProvider.Guid}");
                         return Ok(JsonConvert.SerializeObject(newProvider.Guid));
                     }
-                    else {
-                        Log.Error("AddProvider failed");
+                    catch (Exception ex) {
+                        Log.Error($"AddProvider failed - {ex.Message} - {ex.StackTrace}");
                         return BadRequest("Provider konnte nicht eingefügt werden. Bitte Admin benachrichten.");
                     }
                 }
@@ -129,23 +136,50 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("ChangeProvider called");
                 if (guid is not null) {
-                    Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
-                    if (result is not null) {
-                        string oldDesignation = result.Designation;
-                        result.Designation = designation;
-                        if (_providerController.SaveChangesAtProvider(result)) {
+                    string queryString = $"" +
+                        $"SELECT * " +
+                        $"FROM essenskasse.Provider " +
+                        $"WHERE Guid='{guid}'";
+
+                    DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
+                    List<Provider> provider = DataTableToListOfProvider(dataTableProvider);
+
+                    if (provider.Count == 1) {
+                        string oldDesignation = provider[0].Designation;
+
+                        try {
+                            string queryUpdateString = $"";
                             Log.Information($"Provider successfully updated from {oldDesignation} to {designation}");
                             return Ok();
                         }
-                        else {
-                        Log.Error("UpdateProvider failed");
+                        catch (Exception ex) {
+                            Log.Error($"UpdateProvider failed - {ex.Message} - {ex.StackTrace}");
                             return BadRequest("Änderungen konnten nicht übernommen werden. Bitte beim Admin melden.");
                         }
                     }
                     else {
-                        Log.Warning("Guid has no entry (provider)");
+                        Log.Warning($"Guid has no entry (provider) - {guid}");
                         return NotFound("Provider konnte nicht gefunden werden");
                     }
+                    #region oldcode
+                    //Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
+                    //if (result is not null) {
+                    //    string oldDesignation = result.Designation;
+                    //    result.Designation = designation;
+                    //    if (_providerController.SaveChangesAtProvider(result)) {
+                    //        Log.Information($"Provider successfully updated from {oldDesignation} to {designation}");
+                    //        return Ok();
+                    //    }
+                    //    else {
+                    //        Log.Error("UpdateProvider failed");
+                    //        return BadRequest("Änderungen konnten nicht übernommen werden. Bitte beim Admin melden.");
+                    //    }
+                    //}
+                    //else {
+                    //    Log.Warning("Guid has no entry (provider)");
+                    //    return NotFound("Provider konnte nicht gefunden werden");
+                    //}
+                    #endregion
                 }
                 else {
                     Log.Warning("No Guid there");
@@ -159,16 +193,36 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("RemoveProvider called");
                 if (guid is not null) {
-                    Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
-                    if (result is not null) {
-                        _providerController.RemoveProvider(result);
-                        Log.Information($"{result.Designation} with {result.Guid} successfully removed");
-                        return Ok(JsonConvert.SerializeObject(result));
+                    string queryString = $"" +
+                        $"SELECT * " +
+                        $"FROM essenskasse.Person " +
+                        $"WHERE Guid={guid}";
+                    DataTable dataTable = QueryExecuterAtMySql(queryString);
+                    List<Provider> payments = DataTableToListOfProvider(dataTable);
+
+                    if (payments.Count == 1) {
+                        string queryStringDelete = $"" +
+                            $"DELETE " +
+                            $"FROM essenskasse.Payment" +
+                            $"WHERE Guid={guid};";
+                        QueryExecuterAtMySql(queryStringDelete);
+                        Log.Information($"{payments[0].Designation} with {payments[0].Guid} successfully removed");
+                        return Ok(JsonConvert.SerializeObject(payments[0]));
                     }
-                    else {
-                        Log.Warning($"{guid} not found");
-                        return NotFound("Provider konnte nicht gefunden werden!");
-                    }
+                    Log.Warning($"{guid} not found");
+                    return NotFound("Person konnte nicht gefunden werden!");
+                    #region oldcode
+                    //Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
+                    //if (result is not null) {
+                    //    _providerController.RemoveProvider(result);
+                    //    Log.Information($"{result.Designation} with {result.Guid} successfully removed");
+                    //    return Ok(JsonConvert.SerializeObject(result));
+                    //}
+                    //else {
+                    //    Log.Warning($"{guid} not found");
+                    //    return NotFound("Provider konnte nicht gefunden werden!");
+                    //}
+                    #endregion
                 }
                 else {
                     Log.Warning("Nothing to remove");
@@ -176,7 +230,7 @@ namespace EssenskasseAPI.Controllers {
                 }
             }
         }
-#endregion
+        #endregion
 
         #region InternalFunctions
         private DataTable QueryExecuterAtMySql(string Query) {
