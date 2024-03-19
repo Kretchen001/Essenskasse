@@ -369,9 +369,9 @@ namespace EssenskasseAPI.Controllers {
                 Log.Information("DeleteOrder called");
                 if (dateAsLong is not null) {
                     string queryString = $"" +
-                    $"SELECT * " +
-                    $"FROM essenskasse.Payment " +
-                    $"WHERE DateTime={dateAsLong}";
+                        $"SELECT * " +
+                        $"FROM essenskasse.Payment " +
+                        $"WHERE DateTime={dateAsLong}";
                     DataTable dataTable = QueryExecuterAtMySql(queryString);
                     List<Payment> payments = DataTableToListOfPayments(dataTable);
                     if (payments.Count == 0) {
@@ -445,6 +445,7 @@ namespace EssenskasseAPI.Controllers {
             }
             return paymentList;
         }
+
         private Person DataTableToPerson(DataTable DataTablePersonToUpdate) {
             return new Person(
                 guid: new Guid(DataTablePersonToUpdate.Rows[0]["Guid"].ToString()!),
