@@ -1,32 +1,58 @@
-﻿using EssenskasseAPI.LiteDB;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Modells;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using Serilog;
 using SerilogTimings;
+using System.Data;
 
 namespace EssenskasseAPI.Controllers {
-    
+
     [ApiController, Route("api/provider")]
     public class ProviderController : ControllerBase {
 
-        readonly ProviderDbController _providerController = new ProviderDbController();
+        #region Config
+        private readonly IConfiguration Configuration;
 
+        public ProviderController(IConfiguration configuration) {
+            Configuration = configuration;
+        }
+        #endregion
+
+        #region Controller
         [HttpGet, Route("requestAll")]
         public IActionResult GetAllProvider() {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("GetAllProvider called");
-                List<Provider> provider = _providerController.RequestProvider();
+
+                string queryString = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.Provider;";
+
+                DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
+                List<Provider> provider = DataTableToListOfProvider(dataTableProvider);
 
                 if (provider.Count != 0) {
-                    provider.ForEach(x => x.Designation = Uri.EscapeDataString(x.Designation));
-                    Log.Information(provider.Count + " Person requested");
+                    Log.Information(provider.Count + " Provider requested");
                     return Ok(JsonConvert.SerializeObject(provider));
                 }
                 else {
                     Log.Warning("No Data response (GetAllProvider)");
                     return NoContent();
                 }
+                #region oldcode
+                //List<Provider> provider = _providerController.RequestProvider();
+
+                //if (provider.Count != 0) {
+                //    provider.ForEach(x => x.Designation = Uri.EscapeDataString(x.Designation));
+                //    Log.Information(provider.Count + " Provider requested");
+                //    return Ok(JsonConvert.SerializeObject(provider));
+                //}
+                //else {
+                //    Log.Warning("No Data response (GetAllProvider)");
+                //    return NoContent();
+                //}
+                #endregion
             }
         }
 
@@ -34,18 +60,42 @@ namespace EssenskasseAPI.Controllers {
         public IActionResult CheckExistProvider([FromHeader] Guid? guid, [FromHeader] string? designator) {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("CheckExistProvider called");
-                Provider? provider = _providerController.ExistProvider(guid, designator);
 
-                if (provider is not null) {
-                    if (provider.Designation != designator) {
-                        Log.Information($"{guid} with other {provider.Designation} found and not {designator}");
+                string queryString = "";
+                if (guid is not null) {
+                    queryString = $"" +
+                       $"SELECT * " +
+                       $"FROM essenskasse.Provider " +
+                       $"WHERE Guid='';";
+                }
+                if (designator is not null) {
+                    queryString = $"" +
+                        $"SELECT * " +
+                        $"FROM essenskasse.Provider " +
+                        $"WHERE Guid='' OR Designation='';";
+                }
+                if (guid is null && designator is null) {
+                    Log.Warning("Both Headers null!");
+                    return BadRequest("Beide Header null!");
+                }
+
+                DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
+                List<Provider> provider = DataTableToListOfProvider(dataTableProvider);
+
+                #region oldcode
+                //Provider? providers = _providerController.ExistProvider(guid, designator);
+                #endregion
+
+                if (provider.Count == 1) {
+                    if (provider[0].Designation != designator) {
+                        Log.Information($"{guid} with other {provider[0].Designation} found and not {designator}");
                         return Conflict("Guid existiert, aber mit anderer Bezeichnung!");
                     }
                     Log.Information("Provider exist");
                     return Ok(JsonConvert.SerializeObject(provider));
                 }
                 else {
-                    Log.Warning(guid.ToString() + " not found.");
+                    Log.Warning(guid.ToString() + " not found. Or designation not found");
                     return NoContent();
                 }
             }
@@ -126,6 +176,33 @@ namespace EssenskasseAPI.Controllers {
                 }
             }
         }
+#endregion
+
+        #region InternalFunctions
+        private DataTable QueryExecuterAtMySql(string Query) {
+            // MySql Connection
+            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
+
+            MySqlCommand cmd = new MySqlCommand(Query, connection);
+
+            DataTable dataTable = new DataTable();
+            // read the result
+            connection.Open();
+            MySqlDataReader reader = cmd.ExecuteReader();
+            dataTable.Load(reader);
+            connection.Close();
+
+            return dataTable;
+        }
+
+        private List<Provider> DataTableToListOfProvider(DataTable dataTable) {
+            List<Provider> providerController = [];
+            foreach (DataRow row in dataTable.Rows) {
+                providerController.Add(new Provider());
+            }
+            return providerController;
+        }
+        #endregion
     }
 }
 
