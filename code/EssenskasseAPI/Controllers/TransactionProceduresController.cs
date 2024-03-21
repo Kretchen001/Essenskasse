@@ -38,8 +38,12 @@ namespace EssenskasseAPI.Controllers {
         public IActionResult NewOne([FromBody] TransactionProcedure newOne) {
             using (Operation.Time("NewOne at Procedures")) {
                 string queryString = $"" +
-                    $"INSERT INTO essenskasseTransactionProcedure (DateTime, AmountEuro, AmountCent, Comment)" +
-                    $"VALUES ('{newOne.DateTime.Ticks}', {newOne.Amount.Euro}, {newOne.Amount.Cent}, '{newOne.Comment}'),";
+                    $"INSERT INTO essenskasse.TransactionProcedure (DateTime, AmountEuro, AmountCent, Comment) " +
+                    $"VALUES (" +
+                    $"{newOne.DateTime.Ticks}, " +
+                    $"{newOne.Amount.Euro}, " +
+                    $"{newOne.Amount.Cent}, " +
+                    $"'{newOne.Comment}');";
 
                 try {
                     QueryExecuterAtMySql(queryString);
