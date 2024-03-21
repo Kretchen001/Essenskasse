@@ -39,17 +39,6 @@ namespace EssenskasseAPI.Controllers {
                     Log.Warning("No Data response (GetAllOrders)");
                     return NoContent();
                 }
-                #region oldcode
-                //List<Order>? ordersOld = _orderDbController.RequestAllOrders();
-                //if (ordersOld is not null) {
-                //    Log.Information(ordersOld.Count + " Orders requested");
-                //    return Ok(JsonConvert.SerializeObject(ordersOld));
-                //}
-                //else {
-                //    Log.Warning("No Data response (GetAllOrders)");
-                //    return NoContent();
-                //}
-                #endregion
             }
         }
 
@@ -68,9 +57,6 @@ namespace EssenskasseAPI.Controllers {
 
                 DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
                 List<Order> orders = DataTableToListOfOrders(dataTableOrders);
-                #region oldcode
-                //List<Order> orders = _orderDbController.RequestAmountOfOrders(amount ?? 1);
-                #endregion
                 if (orders.Count != 0) {
                     Log.Information(orders.Count + " Orders requested");
                     return Ok(JsonConvert.SerializeObject(orders));
@@ -94,27 +80,18 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Order " +
-                        $"WHERE essenskasse.Order.ReferencedPerson='{guid}' " +
+                        $"WHERE ReferencedPerson='{guid}' " +
                         $"ORDER BY DateTime DESC;";
                 if (amount is not null) { // request amount
                     queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Order " +
-                        $"WHERE essenkasse.Person.Guid='{guid}' " +
+                        $"WHERE ReferencedPerson='{guid}' " +
                         $"ORDER BY DateTime DESC " +
                         $"LIMIT {amount};";
                 }
                 DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
                 List<Order> orders = DataTableToListOfOrders(dataTableOrders);
-                #region oldcode
-                //List<Order> orders = [];
-                //if (amount is null) { // request all
-                //    orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid());
-                //}
-                //else { // request amount
-                //    orders = _orderDbController.OrdersFromOnePersonPerGuid(guid ?? new Guid(), amount);
-                //}
-                #endregion
                 if (orders.Count != 0) {
                     Log.Information(guid.ToString() + " requested and " + orders.Count + " found.");
                     return Ok(JsonConvert.SerializeObject(orders));
@@ -176,31 +153,6 @@ namespace EssenskasseAPI.Controllers {
                                 return BadRequest();
                             }
                     }
-                    #region oldcode
-                    //if (_providerController.ExistProvider(
-                    //                        guid: order.Provider.Guid,
-                    //                        name: order.Provider.Designation) is null) {
-                    //    Log.Warning($"{order.Provider.Guid} not available...");
-                    //    return NotFound("Provider existiert nicht!");
-                    //}
-                    //if (_orderDbController.NewOrder(order)) {
-                    //    // recalculate Person Saldo
-                    //    PersonDbController _personDbController = new PersonDbController();
-                    //    Person? x = _personDbController.PersonPerGuid(order.ReferencedPerson);
-                    //    if (x is not null) {
-                    //        Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
-                    //        x.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, x.Saldo, order.Money)!;
-                    //        Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
-                    //        _personDbController.UpdatePerson(x);
-                    //    }
-                    //    Log.Information($"New Order of {order.Money} for Person added.");
-                    //    return Ok(JsonConvert.SerializeObject(order));
-                    //}
-                    //else {
-                    //    Log.Warning("New Order not inserted. Conflict return");
-                    //    return Conflict(JsonConvert.SerializeObject(order));
-                    //}
-                    #endregion
                 }
                 Log.Warning("Empty order Header");
                 return BadRequest("Body unvollständig!");
@@ -233,46 +185,6 @@ namespace EssenskasseAPI.Controllers {
                 }
                 Log.Warning("Empty orders Header");
                 return BadRequest("Body unvollständig!");
-                #region oldcode
-                //if (_providerController.ExistProvider(
-                //                                guid: orders[0].Provider.Guid,
-                //                                name: orders[0].Provider.Designation) is null) {
-                //        Log.Warning($"{orders[0].Provider.Guid} not available...");
-                //        return NotFound("Provider existiert nicht!");
-                //    }
-                //    bool success = true;
-                //    foreach (Order x in orders) {
-                //        if (!_orderDbController.NewOrder(x)) {
-                //            Log.Warning($"Order at{x.DateTime} with {x.ReferencedPerson} from Provider {x.Provider.Guid} not inserted");
-                //            success = false;
-                //            break;
-                //        }
-                //        else {
-                //            // recalculate Person Saldo
-                //            PersonDbController _personDbController = new PersonDbController();
-                //            Person? y = _personDbController.PersonPerGuid(x.ReferencedPerson);
-                //            if (y is not null) {
-                //                Log.Information($"Person {y.Guid} {y.Name} old Saldo = {x.Money}");
-                //                y.Saldo = new Money().CalculateMoney(
-                //                    method: CalculationOperation.Substraction,
-                //                    money1: y.Saldo,
-                //                    money2: x.Money
-                //                )!;
-                //                Log.Information($"Person {y.Guid} {y.Name} new Saldo = {x.Money}");
-                //                _personDbController.UpdatePerson(y);
-                //            }
-                //        }
-                //    }
-                //    if (success) {
-                //        Log.Information("All Orders successfully added");
-                //        return Ok();
-                //    }
-                //    else {
-                //        Log.Warning("New Order not inserted. Conflict return");
-                //        return Conflict();
-                //    }
-                //}
-                #endregion
             }
         }
 
@@ -344,45 +256,6 @@ namespace EssenskasseAPI.Controllers {
                 }
                 Log.Warning($"At {dateAsLong} no Order updated. Nichts zum updaten angegeben.");
                 return NotFound("Keine Bestellung zum angegebenen Datum geupdated...\nNichts zum updaten angegeben.");
-                #region oldcode
-                //DateTime date = new DateTime();
-                //Order? orders = _orderDbController.OrderAtDateTime(date);
-                //if (orders is not null) {
-                //    if (values.Item1 is not null) {
-                //        Log.Information($"Order updated from {orders.Money} to {values.Item1}");
-                //        orders.Money = values.Item1;
-                //    }
-                //    if (values.Item2 is not null) {
-                //        Log.Information($"Order updated from {orders.Provider} to {values.Item2}");
-                //        orders.Provider = values.Item2;
-                //    }
-                //    if (values.Item3 is not null) {
-                //        Log.Information($"Order updated from {orders.ReferencedPerson} to {values.Item3}");
-                //        orders.ReferencedPerson = values.Item3 ?? new Guid();
-                //    }
-                //    if (_orderDbController.UpdateOrder(orders)) {
-                //        // recalculate Person Saldo
-                //        PersonDbController _personDbController = new PersonDbController();
-                //        Person? x = _personDbController.PersonPerGuid(orders.ReferencedPerson);
-                //        if (x is not null) {
-                //            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
-                //            x.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, x.Saldo, orders.Money)!;
-                //            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
-                //            _personDbController.UpdatePerson(x);
-                //        }
-                //        Log.Information("Order successfully updated");
-                //        return Ok();
-                //    }
-                //    else {
-                //        Log.Warning($"At {dateAsLong} no Order updated");
-                //        return NotFound("Keine Bestellung zum angegebenen Datum geupdated...");
-                //    }
-                //}
-                //else {
-                //    Log.Warning($"At {dateAsLong} no Order found");
-                //    return NotFound("Keine Bestellung zum angegebenen Datum gefunden.");
-                //}
-                #endregion
             }
         }
 
@@ -408,18 +281,6 @@ namespace EssenskasseAPI.Controllers {
                     QueryExecuterAtMySql(queryStringDelete);
                     Log.Information($"Order at {orders[0].DateTime.Ticks} successfully removed");
                     return Ok(JsonConvert.SerializeObject(orders[0]));
-                    #region oldcode
-                    //Order? result = _orderDbController.OrderAtDateTime(date);
-                    //if (result is not null) {
-                    //    _orderDbController.RemoveOrder(result);
-                    //    Log.Information($"Order at {result.DateTime} successfully removed");
-                    //    return Ok(JsonConvert.SerializeObject(result));
-                    //}
-                    //else {
-                    //    Log.Warning($"At {dateAsLong} no Order found");
-                    //    return NotFound("Bestelung konnte nicht gefunden werden!\nFehler in der Eingabe?");
-                    //}
-                    #endregion
                 }
                 else {
                     Log.Warning("Empty dateAsLong Header");
@@ -501,6 +362,7 @@ namespace EssenskasseAPI.Controllers {
                 $"'{order.Provider.Designation}', " +
                 $"'{order.ReferencedPerson}');";
             QueryExecuterAtMySql(queryStringInsert);
+            Log.Information(queryStringInsert + " - inserted");
 
             // update person saldo
             string queryStringUpdateSaldo = $"" +
