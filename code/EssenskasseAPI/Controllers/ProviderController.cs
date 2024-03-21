@@ -40,19 +40,6 @@ namespace EssenskasseAPI.Controllers {
                     Log.Warning("No Data response (GetAllProvider)");
                     return NoContent();
                 }
-                #region oldcode
-                //List<Provider> provider = _providerController.RequestProvider();
-
-                //if (provider.Count != 0) {
-                //    provider.ForEach(x => x.Designation = Uri.EscapeDataString(x.Designation));
-                //    Log.Information(provider.Count + " Provider requested");
-                //    return Ok(JsonConvert.SerializeObject(provider));
-                //}
-                //else {
-                //    Log.Warning("No Data response (GetAllProvider)");
-                //    return NoContent();
-                //}
-                #endregion
             }
         }
 
@@ -81,10 +68,6 @@ namespace EssenskasseAPI.Controllers {
 
                 DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
                 List<Provider> provider = DataTableToListOfProvider(dataTableProvider);
-
-                #region oldcode
-                //Provider? providers = _providerController.ExistProvider(guid, designator);
-                #endregion
 
                 if (provider.Count == 1) {
                     if (provider[0].Designation != designator) {
@@ -161,25 +144,6 @@ namespace EssenskasseAPI.Controllers {
                         Log.Warning($"Guid has no entry (provider) - {guid}");
                         return NotFound("Provider konnte nicht gefunden werden");
                     }
-                    #region oldcode
-                    //Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
-                    //if (result is not null) {
-                    //    string oldDesignation = result.Designation;
-                    //    result.Designation = designation;
-                    //    if (_providerController.SaveChangesAtProvider(result)) {
-                    //        Log.Information($"Provider successfully updated from {oldDesignation} to {designation}");
-                    //        return Ok();
-                    //    }
-                    //    else {
-                    //        Log.Error("UpdateProvider failed");
-                    //        return BadRequest("Änderungen konnten nicht übernommen werden. Bitte beim Admin melden.");
-                    //    }
-                    //}
-                    //else {
-                    //    Log.Warning("Guid has no entry (provider)");
-                    //    return NotFound("Provider konnte nicht gefunden werden");
-                    //}
-                    #endregion
                 }
                 else {
                     Log.Warning("No Guid there");
@@ -211,18 +175,6 @@ namespace EssenskasseAPI.Controllers {
                     }
                     Log.Warning($"{guid} not found");
                     return NotFound("Person konnte nicht gefunden werden!");
-                    #region oldcode
-                    //Provider? result = _providerController.ExistProvider(guid ?? new Guid("00000000-0000-0000-0000"), null);
-                    //if (result is not null) {
-                    //    _providerController.RemoveProvider(result);
-                    //    Log.Information($"{result.Designation} with {result.Guid} successfully removed");
-                    //    return Ok(JsonConvert.SerializeObject(result));
-                    //}
-                    //else {
-                    //    Log.Warning($"{guid} not found");
-                    //    return NotFound("Provider konnte nicht gefunden werden!");
-                    //}
-                    #endregion
                 }
                 else {
                     Log.Warning("Nothing to remove");

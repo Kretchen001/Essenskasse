@@ -28,18 +28,6 @@ namespace EssenskasseAPI.Controllers {
         public IActionResult PingWithDb() {
             using(Operation.Time("TaskDuration")) {
                 try {
-                    //string host = "localhost";
-                    //string userid = "dbuser";
-                    //string password = "password";
-                    //string port = "3306";
-                    //string userDatabase = "essenskasse";
-                    //MySqlConnection con = new MySqlConnection(
-                    //    $"Server={host};" +
-                    //    $"Port={port};" +
-                    //    $"Uid={userid};" +
-                    //    $"Pwd={password};" +
-                    //    $"Database={userDatabase};"
-                    //);
                     MySqlConnection con = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
 
                     MySqlCommand cmd = new MySqlCommand("SELECT * FROM Test", con);
