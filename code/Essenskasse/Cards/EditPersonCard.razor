@@ -38,7 +38,7 @@
         </div>
         <div class="col-lg-8">
             <input type="text" placeholder="@_loc[nameof(RessourceAppStrings.name)]" id="idName"
-                   style="width: 100%;" @bind-value="person.Name">
+                   style="width: 100%;" @bind-value="person.Name" disabled="@dataNotLoadYet">
         </div>
     </div>
     <div class="row Zeile">
@@ -49,7 +49,7 @@
         </div>
         <div class="col-lg-8">
             <input type="text" placeholder="@_loc[nameof(RessourceAppStrings.email)]" id="idEmail"
-                   style="width: 100%;" @bind-value="person.Email">
+                   style="width: 100%;" @bind-value="person.Email" disabled="@dataNotLoadYet">
         </div>
     </div>
     <div class="row Zeile">
@@ -120,7 +120,7 @@
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
             return;
         }
-        Console.WriteLine(selectedPerson);
+
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Put,
                 RequestUri = new Uri(Config["API-Adress"] + "person/update"),
@@ -137,6 +137,7 @@
             safePerson = new Person(new Guid(), "", "", new Money());
             person = new Person(new Guid(), "", "", new Money());
             dataNotLoadYet = true;
+            ToastService.ShowToast("Erfolgreich geändert!", ToastLevel.Success);
             await OnChangeCommit.InvokeAsync();
         }
         else {

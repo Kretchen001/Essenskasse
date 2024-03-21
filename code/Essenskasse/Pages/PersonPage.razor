@@ -78,7 +78,12 @@
     </div>
 }
 <div class="row" style="margin-top: 1rem;">
-    <table>
+    <table style="width: 100%; table-layout: fixed;">
+        <colgroup>
+            <col style="width: auto;">
+            <col style="width: 50%;">
+            <col style="width: 50%;">
+        </colgroup>
         <tr>
             <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.guid)]</th>
             <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.name)]</th>
@@ -87,7 +92,9 @@
         @foreach (var x in shownPersonList) {
             <tr>
                 <td style="padding-left: 5px;">
-                    @x.Guid
+                    <label>
+                        Kopieren:
+                    </label>
                     <button style="border: none;" title="@_loc[nameof(RessourceAppStrings.copy)]" @onclick="async () => await CopyToClipboard(x.Guid.ToString())">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7" />
@@ -96,12 +103,14 @@
                         </svg>
                     </button>
                 </td>
-                <td style="padding-left: 5px;">@x.Name</td>
+                <td style="padding-left: 5px;">
+                    @x.Name
+                </td>
                 @if (x.Email.Equals("")) {
-                        <td style="padding-left: 5px; color: gray">@_loc[nameof(RessourceAppStrings.notEntered)]</td>
+                    <td style="padding-left: 5px; color: gray;">@_loc[nameof(RessourceAppStrings.notEntered)]</td>
                 }
                 else {
-                        <td style="padding-left: 5px;">@x.Email</td>
+                    <td style="padding-left: 5px;">@x.Email</td>
                 }
             </tr>
         }
@@ -113,120 +122,3 @@
     </h4>
     <EditPersonCard OnChangeCommit="ChangeOfPersonCommit" />
 </div>
-
-@code {
-
-    private bool accessToAdd = false;
-
-    private string newPersonName = "";
-    private string newPersonEmail = "";
-
-    private string filter = "";
-
-    private List<Person> person = new List<Person>();
-    private List<Person> shownPersonList = new List<Person>();
-
-    protected override async Task OnInitializedAsync () {
-        await requestAllPersonFromApiAsync();
-    }
-
-    private async Task requestAllPersonFromApiAsync() {
-        // Request all Person, that are saved in the database
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
-            };
-
-        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
-            person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
-            person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
-            person = person.OrderBy(x => x.Name).ToList();
-            shownPersonList.AddRange(person);
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
-        }
-    }
-
-    private async void addNewPerson() {
-        if (newPersonName.Equals("")) {
-            return;
-        }
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(Config["API-Adress"] + "person/new"),
-                Headers = {
-                        {"name", Uri.EscapeDataString(newPersonName)},
-                        {"email", Uri.EscapeDataString(newPersonEmail)}
-                    }
-            };
-
-        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            string tempGuid = await response.Content.ReadAsStringAsync();
-            HttpRequestMessage httpRequestMessage2 = new HttpRequestMessage() {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri(Config["API-Adress"] + "person/perGuid"),
-                    Headers = {
-                        {"guid", tempGuid[1..(tempGuid.Length - 1)] }
-                    }
-                };
-
-            HttpResponseMessage response2 = await HttpClient.SendAsync(httpRequestMessage2);
-
-            if (response2.IsSuccessStatusCode) {
-                Person temp = JsonConvert.DeserializeObject<Person>(await response2.Content.ReadAsStringAsync())!;
-                temp.Name = Uri.UnescapeDataString(temp.Name);
-                temp.Email = Uri.UnescapeDataString(temp.Email);
-                person.Add(temp);
-                shownPersonList.Add(temp);
-                ToastService.ShowToast(newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedAndAvailable)], ToastLevel.Success);
-                accessToAdd = false;
-                newPersonName = newPersonEmail = "";
-                person = person.OrderBy(x => x.Name).ToList();
-                shownPersonList = shownPersonList.OrderBy(x => x.Name).ToList();
-                base.StateHasChanged();
-            }
-            else {
-                ToastService.ShowToast(newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedButNotAvailable)], ToastLevel.Warning);
-                accessToAdd = false;
-                newPersonName = "";
-                newPersonEmail = "";
-                base.StateHasChanged();
-            }
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
-        }
-    }
-
-    private async void ChangeOfPersonCommit() {
-        person.Clear();
-        shownPersonList.Clear();
-        await requestAllPersonFromApiAsync();
-        base.StateHasChanged();
-    }
-
-    public async Task CopyToClipboard(string text) {
-        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
-    }
-
-    private void ChangePersonShownList () {
-        Console.WriteLine(filter);
-        shownPersonList.Clear();
-        if (filter.Equals("")) {
-            shownPersonList.AddRange(person);
-        }
-        else {
-            foreach (Person x in person) {
-                if (x.Name.Contains(filter)) {
-                    shownPersonList.Add(x);
-                }
-            }
-        }
-    }
-}

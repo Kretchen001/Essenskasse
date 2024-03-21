@@ -25,21 +25,21 @@
             </tr>
             @for (int i = 0; i < Orders.Count; i += 1) {
                 @if (i % 3 == 0) {
-                    <tr>
+                    <tr style ="background-color: #EEEEEE">
                         <td>@Orders[i].DateTime.ToString("dddd, dd MMMM yyyy")</td>
                         <td>@Orders[i].Money.ToString()</td>
                         <td>@Orders[i].Provider.Designation</td>
                     </tr>
                 }
                 else if (i % 3 == 1) {
-                    <tr style="background-color: lightgray">
+                    <tr style="background-color: #DDDDDD">
                         <td>@Orders[i].DateTime.ToString("dddd, dd MMMM yyyy")</td>
                         <td>@Orders[i].Money.ToString()</td>
                         <td>@Orders[i].Provider.Designation</td>
                     </tr>
                 }
                 else if (i % 3 == 2) {
-                    <tr style="background-color: grey">
+                    <tr style="background-color: #CCCCCC">
                         <td>@Orders[i].DateTime.ToString("dddd, dd MMMM yyyy")</td>
                         <td>@Orders[i].Money.ToString()</td>
                         <td>@Orders[i].Provider.Designation</td>

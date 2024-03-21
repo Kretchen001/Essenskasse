@@ -32,7 +32,7 @@
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <select @bind="@currentTheme">
+        <select @bind="@CurrentTheme">
             @foreach (var entity in themeList) {
                 <option value="@entity.Key">@entity.Value</option>
             }
@@ -50,8 +50,8 @@
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="isSingleListWish">
-        <label class="form-check-label" for="flexSwitchCheckChecked">@returnListWish</label>
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="IsSingleListWish">
+        <label class="form-check-label" for="flexSwitchCheckChecked">@ReturnListWish</label>
     </div>
 </div>
 
@@ -62,7 +62,7 @@
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <input type="number" @bind="loadAmountPayments" />
+        <input type="number" @bind="LoadAmountPayments" />
     </div>
 </div>
 
@@ -73,7 +73,7 @@
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <input type="number" @bind="loadAmountOrders" />
+        <input type="number" @bind="LoadAmountOrders" />
     </div>
 </div>
 
@@ -84,7 +84,7 @@
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="filterShowProvider">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowProvider">
     </div>
 </div>
 
@@ -95,7 +95,25 @@
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="filterShowPerson">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowPerson">
+    </div>
+</div>
+
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-6">
+        <label>
+            Grenzwert für Positives Saldo
+        </label>
+    </div>
+    <div class="col-lg-2" align="center">
+        <label>
+            Aktuell: @DashboardMoneyLimit.ToString()
+        </label>
+    </div>
+    <div class="col-lg-2" align="center">
+        <input type="number" @bind="DashboardMoneyLimitInt">
+    </div>
+    <div class="col-lg-2">
     </div>
 </div>
 
@@ -126,191 +144,5 @@
 </div>
 
 @code {
-    string currentlyNotSupported = "Aktuell leider noch nicht verfügbar. Bitte beim Admin melden für Hilfestellungen!";
-
-    #region Variable
-    /// <summary></summary>
-    ColorCode colorCode = 0;
-
-    /// <summary></summary>
-    private bool isSingleListWish {
-        get {
-            return AppData.IsSingleListWishDashboard;
-        }
-        set {
-            AppData.IsSingleListWishDashboard = value;
-            writeWishListToLocalStorage(value);
-        }
-    }
-
-    /// <summary></summary>
-    private string returnListWish {
-        get {
-            if (AppData.IsSingleListWishDashboard) {
-                return _loc[nameof(RessourceAppStrings.yes)];
-            }
-            else {
-                return _loc[nameof(RessourceAppStrings.no)];
-            }
-        }
-    }
-
-    /// <summary></summary>
-    private void ChangeTheme (string value) {
-        if (value.Equals("Dark")) {
-            colorCode = ColorCode.Dark;
-        }
-        else if (value.Equals("Light")) {
-            colorCode = ColorCode.Light;
-        }
-        themeService.ThemeCode = colorCode;
-    }
-
-    /// <summary> Set the current selection to the ThemeService. </summary>
-    private string currentTheme {
-        set => ChangeTheme(value);
-        get {
-            return themeService.ThemeCode.ToString();
-        }
-    }
-
-    /// <summary> Hold the entities for theme-selection. </summary>
-    private Dictionary<string, string> themeList = new Dictionary<string, string>() {
-        { "Light", "Hell" },    
-        { "Dark", "Dunkel" }
-    };
-
-    /// <summary></summary>
-    private int loadAmountPayments {
-        get => AppData.LoadAmountPayment;
-        set {
-            AppData.LoadAmountPayment = value;
-            saveAmountOfPaymentsPersistentAsync(value);
-        }
-    }
-
-    private int loadAmountOrders {
-        get => AppData.LoadAmountOrder;
-        set {
-            AppData.LoadAmountOrder = value;
-            saveAmountOfOrderPersistentAsync(value);
-        }
-    }
-
-    private bool filterShowProvider {
-        get => AppData.FilterShowProvider;
-        set {
-            AppData.FilterShowProvider = value;
-            saveFilterShowProvider(value);
-        }
-    }
-
-    private bool filterShowPerson {
-        get => AppData.FilterShowPerson;
-        set {
-            AppData.FilterShowPerson = value;
-            saveFilterShowPerson(value);
-        }
-    }
-
-    private bool existAccessToken {
-        get {
-            if (AppData.AccessToken is not null) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-    #endregion
-
-    #region Functions
-    protected override async Task OnInitializedAsync () {
-        themeList["Light"] = _loc[nameof(RessourceAppStrings.light)];
-        themeList["Dark"] = _loc[nameof(RessourceAppStrings.dark)];
-    }
-
-    /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>
-    private async void saveUserThemePersistentAsync() {
-        try {
-            await LocalStorage.SetItemAsStringAsync("UserTheme", currentTheme);
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastColorThemePre)] + " " + currentTheme + " " +
-                                        _loc[nameof(RessourceAppStrings.toastColorThemePost)], ToastLevel.Success);
-        }
-        catch {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSaveError)], ToastLevel.Error);
-        }
-    }
-
-    /// <summary>Save the Listform to localstorage persistant.</summary>
-    /// <param name="value">new listwish bool</param>
-    private async void writeWishListToLocalStorage (bool value) {
-        await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
-    }
-
-    /// <summary></summary>
-    /// <param name="value"></param>
-    private async void saveAmountOfPaymentsPersistentAsync(int value) {
-        await LocalStorage.SetItemAsync<int>("loadAmountOfPayments", value);
-        ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullPaymentAmount)], ToastLevel.Success);
-    }
-
-    /// <summary></summary>
-    /// <param name="value"></param>
-    private async void saveAmountOfOrderPersistentAsync (int value) {
-        await LocalStorage.SetItemAsync<int>("loadAmountOfOrders", value);
-        ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyOrderAmount)], ToastLevel.Success);
-    }
-
-    /// <summary></summary>
-    /// <param name="value"></param>
-    private async void saveFilterShowProvider (bool value) {
-        await LocalStorage.SetItemAsync<bool>("filterShowProvider", value);
-        if (AppData.FilterShowProvider) {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterProviderOn)], ToastLevel.Success);
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterProviderOff)], ToastLevel.Success);
-        }
-    }
-
-    /// <summary></summary>
-    /// <param name="value"></param>
-    private async void saveFilterShowPerson (bool value) {
-        await LocalStorage.SetItemAsync<bool>("filterShowPerson", value);
-        if (AppData.FilterShowPerson) {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOn)], ToastLevel.Success);
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOff)], ToastLevel.Success);
-        }
-    }
-
-    private async Task requestAccessTokenForChanges() {
-        // Request all Person, that are saved in the database
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "token/requestNewAccessToken")
-            };
-
-        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            Guid token = JsonConvert.DeserializeObject<Guid>(await response.Content.ReadAsStringAsync());
-            AppData.AccessToken = token;
-            saveAccessToken(token);
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
-        }
-    }
-
-    /// <summary></summary>
-    /// <param name="value"></param>
-    private async void saveAccessToken(Guid value) {
-        await LocalStorage.SetItemAsync<Guid>("AccessToken", value);
-        ToastService.ShowToast("AccessToken erfolgreich abgerufen und eingetragen!", ToastLevel.Success);
-    }
-    #endregion
+        string currentlyNotSupported = "Aktuell leider noch nicht verfügbar. Bitte beim Admin melden für Hilfestellungen!";
 }

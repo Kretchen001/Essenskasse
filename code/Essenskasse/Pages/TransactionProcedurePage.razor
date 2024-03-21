@@ -1,0 +1,99 @@
+﻿@page "/transactionProcedure"
+
+@inject HttpClient HttpClient
+@inject AppDataService AppData
+@inject NavigationManager Navi
+@inject ThemeService themeService
+@inject ToastService ToastService
+@inject IStringLocalizer<App> _loc
+@inject IJSRuntime JsRuntime
+@inject IConfiguration Config
+@inject ILocalStorageService LocalStorage
+
+<style>
+    th:nth-child(1), td:nth-child(1) {
+        width: 30% !important; /* First row 30% width */
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+        width: 40% !important; /* Secound row 30% width (60%) */
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 30% !important; /* Third row 40% width (100%) */
+    }
+</style>
+
+<PageTitle>Kaffeekasse</PageTitle>
+
+<h3>Kaffeekasse</h3>
+
+<br />
+<div class="row">
+    <div class="col-lg-3 align-self-lg-center">
+        <h4>Kassenstand (Ist)</h4>
+    </div>
+    <div class="col-lg-9 align-self-lg-center">
+        <h4>@currentCashBalance.ToString()</h4>
+    </div>
+</div>
+<hr />
+<br />
+<div class="row">
+    <div class="col-lg-3 align-self-center">
+        <label>
+            @_loc[nameof(RessourceAppStrings.amount)]
+        </label>
+    </div>
+    <div class="col-lg-3 align-self-center" style="width: 25%">
+        <input style="width: 100%" type="number" @bind="amount" placeholder="Euro,Cent -> 10,00€">
+    </div>
+    <div class="col-lg-3 align-self-center">
+        <label>
+            (@amountMoney.ToString())
+        </label>
+    </div>
+    <div class="col-lg-3 align-self-center">
+        <label>
+            Negative Werte beinhalten Auszahlungen!
+        </label>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-lg-3">
+        <label>
+            Kommentar
+        </label>
+    </div>
+    <div class="col-lg-9">
+        <input type="text" style="width: 100%" @bind="comment" />
+    </div>
+</div>
+<br />
+<div class="row">
+    <button @onclick="() => insertNewTransaction()">
+        Einsenden
+    </button>
+</div>
+<br />
+<hr />
+<br />
+<div class="row">
+        <div class="col-lg-12">
+            <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
+                <tr style="border-bottom: groove lightgray">
+                    <th>@_loc[nameof(RessourceAppStrings.date)]</th>
+                    <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
+                    <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
+                </tr>
+                @foreach(TransactionProcedure x in transactions) {
+                    <tr style="border-bottom: groove lightgray">
+                        <td>@x.DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                        <td>@x.Comment</td>
+                        <td>@x.Amount</td>
+                    </tr>
+                }
+            </table>
+        </div>
+</div>

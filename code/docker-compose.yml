@@ -1,0 +1,47 @@
+version: '3.4'
+
+services:
+  database:
+    container_name: MySql_DB
+    image: mysql:8.0.2
+    environment:
+      - MYSQL_ROOT_PASSWORD=sheep
+      - MYSQL_DATABASE=essenskasse
+      - MYSQL_USER=dbuser
+      - MYSQL_PASSWORD=password
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./MySqlScripts/init.sql:/docker-entrypoint-initdb.d/1.sql:ro # 1 weil damit als erstes ausgefüht, alle anderen danach (wenn welche da sind)
+      # - ./MySqlScripts/demoData.sql:/docker-entrypoint-initdb.d/2.sql:ro
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    ports:
+      - 3306:3306
+    command: --default-authentication-plugin=mysql_native_password
+
+  pwa:
+    container_name: EssenskassePWA
+    build:
+      context: .
+      dockerfile: Essenskasse/Dockerfile
+    ports:
+      - 8009:80
+    depends_on:
+      - database
+
+  api:
+    container_name: EssenskasseAPI
+    build: 
+      context: .
+      dockerfile: EssenskasseAPI/Dockerfile
+    ports:
+      - 8010:8080
+    depends_on:
+      - database
+
+volumes:
+  dbdata:

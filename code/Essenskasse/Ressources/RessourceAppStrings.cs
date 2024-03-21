@@ -97,5 +97,6 @@
         emailRemaining,
         emailCashManagement,
         inCent,
+        comment,
     }
 }

@@ -87,10 +87,16 @@ div.currenthistory { margin: -2px -5px 0 -5px; padding: 2px 5px 2px 5px; height:
 .coverage td { padding: 0; border: none; }
 .stripped tr:nth-child(2n+1) { background-color: #F3F3F3; }
 
-.customizebox { font-size: 0.75em; margin-bottom: 7px; }
-.customizebox>div { width: 25%; display: inline-block; }
-.customizebox div.right input { width: 150px; }
-#namespaceslider { width: 200px; display: inline-block; margin-left: 8px; }
+.customizebox { font-size: 0.75em; margin-bottom: 7px; display: grid; grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; grid-column-gap: 10px; grid-row-gap: 10px; }
+.customizebox>div { align-self: end; }
+.customizebox div.col-right input { width: 150px; }
+
+@media screen and (min-width: 1000px) {
+  .customizebox { grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr; }
+  .customizebox div.col-center { justify-self: center; }
+  .customizebox div.col-right { justify-self: end; }
+}
+.slider-label { position: relative; left: 85px; }
 
 .percentagebar {
     padding-left: 3px;
@@ -805,7 +811,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 </tr>
 <tr>
 <th>File(s):</th>
-<td class="overflow-wrap"><a href="#DVisual_Studio_CEssenskassecodeEssenskasseAPILiteDBSaldoDbControllercs" class="navigatetohash">D:\Visual_Studio_C#\Essenskasse\code\EssenskasseAPI\LiteDB\SaldoDbController.cs</a></td>
+<td class="overflow-wrap"><a href="#CUsersTimDocumentsEigenesEssenskassecodeEssenskasseAPILiteDBSaldoDbControllercs" class="navigatetohash">C:\Users\Tim\Documents\Eigenes\Essenskasse\code\EssenskasseAPI\LiteDB\SaldoDbController.cs</a></td>
 </tr>
 </table>
 </div>
@@ -878,18 +884,25 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 <h1>Metrics</h1>
 <div class="table-responsive">
 <table class="overview table-fixed">
-<thead><tr><th>Method</th><th>Branch coverage <a href="https://en.wikipedia.org/wiki/Code_coverage" target="_blank"><i class="icon-info-circled"></i></a></th><th>Cyclomatic complexity <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity" target="_blank"><i class="icon-info-circled"></i></a></th><th>Line coverage <a href="https://en.wikipedia.org/wiki/Code_coverage" target="_blank"><i class="icon-info-circled"></i></a></th></tr></thead>
+<colgroup>
+<col class="column-min-200" />
+<col class="column105" />
+<col class="column105" />
+<col class="column105" />
+<col class="column105" />
+</colgroup>
+<thead><tr><th>Method</th><th>Branch coverage <a href="https://en.wikipedia.org/wiki/Code_coverage" target="_blank"><i class="icon-info-circled"></i></a></th><th>Crap Score <a href="https://googletesting.blogspot.de/2011/02/this-code-is-crap.html" target="_blank"><i class="icon-info-circled"></i></a></th><th>Cyclomatic complexity <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity" target="_blank"><i class="icon-info-circled"></i></a></th><th>Line coverage <a href="https://en.wikipedia.org/wiki/Code_coverage" target="_blank"><i class="icon-info-circled"></i></a></th></tr></thead>
 <tbody>
-<tr><td title="get_saveDir()"><a href="#file0_line12" class="navigatetohash">get_saveDir()</a></td><td>0%</td><td>4</td><td>0%</td></tr>
-<tr><td title=".ctor()"><a href="#file0_line24" class="navigatetohash">.ctor()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
-<tr><td title="RecalculateSaldoInTheDatabase()"><a href="#file0_line31" class="navigatetohash">RecalculateSaldoInTheDatabase()</a></td><td>0%</td><td>2</td><td>0%</td></tr>
-<tr><td title="GetAllPaymentsFromPerson(System.Guid)"><a href="#file0_line47" class="navigatetohash">GetAllPaymentsFromPerson(...)</a></td><td>0%</td><td>8</td><td>0%</td></tr>
-<tr><td title="GetAllOrdersFromPerson(System.Guid)"><a href="#file0_line78" class="navigatetohash">GetAllOrdersFromPerson(...)</a></td><td>0%</td><td>8</td><td>0%</td></tr>
+<tr><td title="get_SaveDir()"><a href="#file0_line12" class="navigatetohash">get_SaveDir()</a></td><td>0%</td><td>20</td><td>4</td><td>0%</td></tr>
+<tr><td title=".ctor()"><a href="#file0_line24" class="navigatetohash">.ctor()</a></td><td>100%</td><td>2</td><td>1</td><td>0%</td></tr>
+<tr><td title="RecalculateSaldoInTheDatabase()"><a href="#file0_line31" class="navigatetohash">RecalculateSaldoInTheDatabase()</a></td><td>0%</td><td>6</td><td>2</td><td>0%</td></tr>
+<tr><td title="GetAllPaymentsFromPerson(System.Guid)"><a href="#file0_line47" class="navigatetohash">GetAllPaymentsFromPerson(...)</a></td><td>0%</td><td>72</td><td>8</td><td>0%</td></tr>
+<tr><td title="GetAllOrdersFromPerson(System.Guid)"><a href="#file0_line78" class="navigatetohash">GetAllOrdersFromPerson(...)</a></td><td>0%</td><td>72</td><td>8</td><td>0%</td></tr>
 </tbody>
 </table>
 </div>
 <h1>File(s)</h1>
-<h2 id="DVisual_Studio_CEssenskassecodeEssenskasseAPILiteDBSaldoDbControllercs">D:\Visual_Studio_C#\Essenskasse\code\EssenskasseAPI\LiteDB\SaldoDbController.cs</h2>
+<h2 id="CUsersTimDocumentsEigenesEssenskassecodeEssenskasseAPILiteDBSaldoDbControllercs">C:\Users\Tim\Documents\Eigenes\Essenskasse\code\EssenskasseAPI\LiteDB\SaldoDbController.cs</h2>
 <div class="table-responsive">
 <table class="lineAnalysis">
 <thead><tr><th></th><th>#</th><th>Line</th><th></th><th>Line coverage</th></tr></thead>
@@ -904,7 +917,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line8"></a><code>8</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line9"></a><code>9</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#region&nbsp;Config</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line10"></a><code>10</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;summary&gt;Return&nbsp;the&nbsp;location,&nbsp;where&nbsp;the&nbsp;database&nbsp;is&nbsp;located.&lt;/summary&gt;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line11"></a><code>11</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;string&nbsp;saveDir&nbsp;{</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line11"></a><code>11</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;static&nbsp;string&nbsp;SaveDir&nbsp;{</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line12"></a><code>12</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get&nbsp;{</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits, 0 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line13"></a><code>13</code></td><td class="percentagebar percentagebar0"><i class="icon-fork"></i></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(!File.Exists(AppDomain.CurrentDomain.BaseDirectory&nbsp;+&nbsp;&quot;/databaseLiteDB/data.liteDB&quot;))&nbsp;{</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits, 0 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line14"></a><code>14</code></td><td class="percentagebar percentagebar0"><i class="icon-fork"></i></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory&nbsp;+&nbsp;&quot;databaseLiteDB&quot;))&nbsp;{</code></td></tr>
@@ -941,7 +954,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line45"></a><code>45</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;param&nbsp;name=&quot;guid&quot;&gt;&lt;/param&gt;</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line46"></a><code>46</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;returns&gt;&lt;/returns&gt;</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line47"></a><code>47</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;Money&nbsp;GetAllPaymentsFromPerson(Guid&nbsp;guid)&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line48"></a><code>48</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;using&nbsp;(LiteDatabase&nbsp;db&nbsp;=&nbsp;new&nbsp;LiteDatabase(saveDir))&nbsp;{</code></td></tr>
+<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line48"></a><code>48</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;using&nbsp;(LiteDatabase&nbsp;db&nbsp;=&nbsp;new&nbsp;LiteDatabase(SaveDir))&nbsp;{</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line49"></a><code>49</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ILiteCollection&lt;Payment&gt;&nbsp;col&nbsp;=&nbsp;db.GetCollection&lt;Payment&gt;(tableNamePayment);</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line50"></a><code>50</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line51"></a><code>51</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List&lt;Payment&gt;&nbsp;list&nbsp;=&nbsp;new&nbsp;List&lt;Payment&gt;();</code></td></tr>
@@ -972,7 +985,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line76"></a><code>76</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;param&nbsp;name=&quot;guid&quot;&gt;&lt;/param&gt;</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line77"></a><code>77</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;returns&gt;&lt;/returns&gt;</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line78"></a><code>78</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;Money&nbsp;GetAllOrdersFromPerson(Guid&nbsp;guid)&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line79"></a><code>79</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;using&nbsp;(LiteDatabase&nbsp;db&nbsp;=&nbsp;new&nbsp;LiteDatabase(saveDir))&nbsp;{</code></td></tr>
+<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line79"></a><code>79</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;using&nbsp;(LiteDatabase&nbsp;db&nbsp;=&nbsp;new&nbsp;LiteDatabase(SaveDir))&nbsp;{</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line80"></a><code>80</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ILiteCollection&lt;Order&gt;&nbsp;col&nbsp;=&nbsp;db.GetCollection&lt;Order&gt;(tableNameOrder);</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line81"></a><code>81</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line82"></a><code>82</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List&lt;Order&gt;&nbsp;list&nbsp;=&nbsp;new&nbsp;List&lt;Order&gt;();</code></td></tr>
@@ -1004,11 +1017,11 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 </tbody>
 </table>
 </div>
-<div class="footer">Generated by: ReportGenerator 5.2.0.0<br />31.12.2023 - 15:55:16<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="https://reportgenerator.io">reportgenerator.io</a></div></div>
+<div class="footer">Generated by: ReportGenerator 5.2.2.0<br />06.03.2024 - 18:22:53<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="https://reportgenerator.io">reportgenerator.io</a></div></div>
 <div class="containerright">
 <div class="containerrightfixed">
 <h1>Methods/Properties</h1>
-<a href="#file0_line12" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_saveDir()"><i class="icon-wrench"></i>get_saveDir()</a><br />
+<a href="#file0_line12" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_SaveDir()"><i class="icon-wrench"></i>get_SaveDir()</a><br />
 <a href="#file0_line24" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - .ctor()"><i class="icon-cube"></i>.ctor()</a><br />
 <a href="#file0_line31" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - RecalculateSaldoInTheDatabase()"><i class="icon-cube"></i>RecalculateSaldoInTheDatabase()</a><br />
 <a href="#file0_line47" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - GetAllPaymentsFromPerson(System.Guid)"><i class="icon-cube"></i>GetAllPaymentsFromPerson(System.Guid)</a><br />

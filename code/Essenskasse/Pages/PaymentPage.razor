@@ -7,6 +7,20 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 
+<style>
+    th:nth-child(1), td:nth-child(1) {
+        width: 30% !important; /* First row 30% width */
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+        width: 40% !important; /* Secound row 30% width (60%) */
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 30% !important; /* Third row 40% width (100%) */
+    }
+</style>
+
 <PageTitle>@_loc[nameof(RessourceAppStrings.payment)]</PageTitle>
 
 <h2>@_loc[nameof(RessourceAppStrings.payment)]</h2>
@@ -31,16 +45,27 @@
 <div class="row">
     <div class="col-lg-3 align-self-center">
         <label>
-            @_loc[nameof(RessourceAppStrings.amount)] @_loc[nameof(RessourceAppStrings.inCent)]
+            @_loc[nameof(RessourceAppStrings.amount)]
         </label>
     </div>
-    <div class="col-lg-4 align-self-center">
-        <input style="width: 25vw" type="number" @bind="payment" placeholder="Euro,Cent -> 1000 = 10,00€">
+    <div class="col-lg-4 align-self-center" style="width: 25%">
+        <input style="width: 100%" type="number" @bind="payment" placeholder="Euro,Cent -> 10,00€">
     </div>
     <div class="col-lg-5 align-self-center">
         <label>
             @money.ToString()
         </label>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-lg-3">
+        <label>
+            Kommentarfeld
+        </label>
+    </div>
+    <div class="col-lg-9" style="width: 75%">
+        <input type="text" style="width: 100%" @bind="comment"/>
     </div>
 </div>
 <br />
@@ -57,24 +82,37 @@
         <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
             <tr>
                 <th>@_loc[nameof(RessourceAppStrings.date)]</th>
+                <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
                 <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
             </tr>
             @for (int i = 0; i < paymentsOfSelectedPerson.Count; i += 1) {
-                @if (i % 3 == 0) {
-                    <tr>
-                        <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                        <td>@paymentsOfSelectedPerson[i].Amount</td>
-                    </tr>
+                @if (paymentsOfSelectedPerson[i].Amount.IsPositiv()) {
+                    @if (i % 3 == 0) {
+                        <tr style ="background-color: #EEEEEE">
+                            <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                            <td>@paymentsOfSelectedPerson[i].Comment</td>
+                            <td>@paymentsOfSelectedPerson[i].Amount</td>
+                        </tr>
+                    }
+                    else if (i % 3 == 1) {
+                        <tr style="background-color: #DDDDDD">
+                            <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                            <td>@paymentsOfSelectedPerson[i].Comment</td>
+                            <td>@paymentsOfSelectedPerson[i].Amount</td>
+                        </tr>
+                    }
+                    else if (i % 3 == 2) {
+                        <tr style="background-color: #CCCCCC">
+                            <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                            <td>@paymentsOfSelectedPerson[i].Comment</td>
+                            <td>@paymentsOfSelectedPerson[i].Amount</td>
+                        </tr>
+                    }
                 }
-                else if (i % 3 == 1) {
-                    <tr style="background-color: lightgray">
+                else {
+                    <tr style="background-color: #F55D52">
                         <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                        <td>@paymentsOfSelectedPerson[i].Amount</td>
-                    </tr>
-                }
-                else if (i % 3 == 2) {
-                    <tr style="background-color: grey">
-                        <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                        <td>@paymentsOfSelectedPerson[i].Comment</td>
                         <td>@paymentsOfSelectedPerson[i].Amount</td>
                     </tr>
                 }
@@ -82,110 +120,3 @@
         </table>
     </div>
 </div>
-
-@code {
-
-    private List<Person>? person = new List<Person>();
-    private Guid _selectedPerson;
-    private Guid selectedPerson {
-        get {
-            return _selectedPerson;
-        }
-        set {
-            _selectedPerson = value;
-            requestPaymentsOfPerson();
-        }
-    }
-
-    private int payment = 0;
-    private Money money {
-        get {
-            short cent = (short)(payment % 100);
-            long euro = (long)((payment - cent) * 0.01);
-            return new Money(euro, cent);
-        }
-    }
-
-    private List<Payment> paymentsOfSelectedPerson = new List<Payment>();
-    private int amount {
-        get => AppData.LoadAmountPayment;
-    }
-
-    protected override async Task OnInitializedAsync () {
-        await refreshPersonList();
-    }
-
-    private async Task refreshPersonList () {
-        // Request all Person, that are saved in the database
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
-            };
-
-        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
-            person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
-            person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
-            person = person.OrderBy(x => x.Name).ToList();
-
-            if (person.Count > 0) {
-                selectedPerson = person[0].Guid;
-            }
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
-        }
-    }
-
-    private async void requestPaymentsOfPerson () {
-        // Request last 10 payments of a person
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "payment/fromPerson"),
-                Headers = {
-                    { "guid", selectedPerson.ToString() },
-                    { "amount", amount.ToString() }
-                }
-            };
-
-        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            paymentsOfSelectedPerson = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
-        }
-
-        base.StateHasChanged();
-    }
-
-    private async void insertPayment () {
-        if (!(await JSRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.insertFollowingAmount)] + "\n" + money.ToString()))) {
-            return;
-        }
-
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),
-                Headers = {
-                    {"referencedPerson", selectedPerson.ToString()}
-                },
-                Content = new StringContent(JsonConvert.SerializeObject(money), Encoding.UTF8, "application/json")
-            };
-
-        var response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessfullyAdded)], ToastLevel.Success);
-            paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!);
-            base.StateHasChanged();
-            return;
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNotAdded)] + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
-        }
-    }
-}

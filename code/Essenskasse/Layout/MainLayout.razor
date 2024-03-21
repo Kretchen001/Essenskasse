@@ -50,6 +50,7 @@
         AppData.FilterShowProvider = await LocalStorage.GetItemAsync<bool>("filterShowProvider");
         AppData.FilterShowPerson = await LocalStorage.GetItemAsync<bool>("filterShowPerson");
         AppData.AccessToken = await LocalStorage.GetItemAsync<Guid>("AccessToken");
+        AppData.DashboardMoneyLimit = await LocalStorage.GetItemAsync<Money>("DashboardMoneyLimit") ?? new Money(0,0);
         if (AppData.AccessToken.Equals(new Guid("00000000-0000-0000-0000-000000000000"))) {
             AppData.AccessToken = null;
         }

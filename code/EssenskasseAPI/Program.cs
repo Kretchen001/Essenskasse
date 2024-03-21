@@ -1,6 +1,6 @@
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.LiteDB;
 
 namespace EssenskasseAPI {
 
@@ -14,15 +14,21 @@ namespace EssenskasseAPI {
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(x => {
+                x.SwaggerDoc("v1", new OpenApiInfo { Title = "EssenskasseAPI", Version = "v1" });
+            });
 
             WebApplication app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment()) {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseSwagger();
+            app.UseSwaggerUI(x => {
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "EssenskasseAPI");
+            });
+            //// Configure the HTTP request pipeline.
+            //if (app.Environment.IsDevelopment()) {
+            //    app.UseSwagger();
+            //    app.UseSwaggerUI();
+            //}
 
             // Allow CORS
             app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
@@ -31,9 +37,9 @@ namespace EssenskasseAPI {
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.LiteDB(
-                    databaseUrl: AppDomain.CurrentDomain.BaseDirectory + "databaseLiteDB/Logs.litedb",
-                    rollingFilePeriod: RollingPeriod.Weekly
+                .WriteTo.File(
+                    path: "Log/Logs.txt",
+                    rollingInterval: RollingInterval.Day
                     )
                 .CreateLogger();
 
