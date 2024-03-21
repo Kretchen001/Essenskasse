@@ -23,11 +23,11 @@ namespace Essenskasse.Pages {
 
         private DateTime selectedDate = DateTime.Now;
 
-        private Guid selectedProvider;
+        private Guid selectedProvider = new Guid();
 
         private List<bool> showHistory = new List<bool>();
 
-        private int amount {
+        private int Amount {
             get => AppData.LoadAmountOrder;
         }
 
@@ -51,6 +51,7 @@ namespace Essenskasse.Pages {
                 providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
                 providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
                 providers = providers.OrderBy(x => x.Designation).ToList();
+                selectedProvider = providers[0].Guid;
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
@@ -180,7 +181,7 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "order/fromPerson"),
                 Headers = {
                     { "guid", personGuid.ToString() },
-                    { "amount", amount.ToString() }
+                    { "amount", Amount.ToString() }
                 }
             };
 

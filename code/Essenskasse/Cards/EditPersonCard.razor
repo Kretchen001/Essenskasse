@@ -120,7 +120,7 @@
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
             return;
         }
-        Console.WriteLine(selectedPerson);
+
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Put,
                 RequestUri = new Uri(Config["API-Adress"] + "person/update"),
@@ -137,6 +137,7 @@
             safePerson = new Person(new Guid(), "", "", new Money());
             person = new Person(new Guid(), "", "", new Money());
             dataNotLoadYet = true;
+            ToastService.ShowToast("Erfolgreich geändert!", ToastLevel.Success);
             await OnChangeCommit.InvokeAsync();
         }
         else {

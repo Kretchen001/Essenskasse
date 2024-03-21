@@ -12,7 +12,7 @@ namespace Modells {
         [JsonInclude]
         public short Cent { get; set; } = 0;
 
-        /// <summary></summary>
+        /// <summary>Empty ctor.</summary>
         public Money() { }
 
         /// <summary></summary>
