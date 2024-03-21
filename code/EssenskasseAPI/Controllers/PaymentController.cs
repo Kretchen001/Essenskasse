@@ -37,17 +37,6 @@ namespace EssenskasseAPI.Controllers {
                     Log.Warning("No Data response (GetAllPayments)");
                     return NoContent();
                 }
-                #region oldcode
-                //List<Payment>? payments = _paymentController.RequestAllPayments();
-                //if (payments is not null) {
-                //    Log.Information(payments.Count + " Payments requested");
-                //    return Ok(JsonConvert.SerializeObject(payments));
-                //}
-                //else {
-                //    Log.Warning("No Data response (GetAllPayments)");
-                //    return NoContent();
-                //}
-                #endregion
             }
         }
 
@@ -75,21 +64,6 @@ namespace EssenskasseAPI.Controllers {
                     Log.Warning("No Data response (GetAmountOfPayments)");
                     return NoContent();
                 }
-                #region oldcode
-                //if (amount is null) {
-                //    Log.Warning("GetAmountOfPayments with no Header called");
-                //    return BadRequest();
-                //}
-                //List<Payment> payments = _paymentController.RequestAmountOfPayments(amount ?? 1);
-                //if (payments.Count != 0) {
-                //    Log.Information(payments.Count + " Payments requested");
-                //    return Ok(JsonConvert.SerializeObject(payments));
-                //}
-                //else {
-                //    Log.Warning("No Data response (GetAmountOfPayments)");
-                //    return NoContent();
-                //}
-                #endregion
             }
         }
 
@@ -105,13 +79,13 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Payment " +
-                        $"WHERE essenskasse.Payment.ReferencedPerson='{guid}' " +
+                        $"WHERE ReferencedPerson='{guid}' " +
                         $"ORDER BY DateTime DESC;";
                 if (amount is not null) { // request amount
                     queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Payment " +
-                        $"WHERE essenkasse.Payment='{guid}' " +
+                        $"WHERE ReferencedPerson='{guid}' " +
                         $"ORDER BY DateTime DESC " +
                         $"LIMIT {amount};";
                 }
@@ -125,22 +99,6 @@ namespace EssenskasseAPI.Controllers {
                     Log.Warning(guid.ToString() + " no equivalent entry found.");
                     return NoContent();
                 }
-                #region oldcode
-                //Log.Information("GetPaymentsFromPersonPerGuid called");
-                //if (guid is null) {
-                //    Log.Warning("Guid Header empty");
-                //    return BadRequest();
-                //}
-                //List<Payment> payments = _paymentController.PaymentsFromOnePersonPerGuid(guid ?? new Guid(), amount);
-                //if (payments.Count != 0) {
-                //    Log.Information(guid.ToString() + " requested and " + payments.Count + " found.");
-                //    return Ok(JsonConvert.SerializeObject(payments));
-                //}
-                //else {
-                //    Log.Warning(guid.ToString() + " no equivalent entry found.");
-                //    return NoContent();
-                //}
-                #endregion
             }
         }
 
@@ -176,23 +134,6 @@ namespace EssenskasseAPI.Controllers {
                     Log.Warning("Empty dateString Header");
                     return BadRequest("Leeres Datum");
                 }
-                #region oldcode
-                //Log.Information("GetPaymentPerDate called");
-                //if (dateString is null) {
-                //    Log.Warning("dateString Header empty");
-                //    return BadRequest();
-                //}
-                //DateTime date = DateTime.Parse(dateString);
-                //Payment? payment = _paymentController.PaymentAtDateTime(date);
-                //if (payment is not null) {
-                //    Log.Information($"Payment on {dateString} successfully requested");
-                //    return Ok(JsonConvert.SerializeObject(payment));
-                //}
-                //else {
-                //    Log.Warning(dateString.ToString() + " no equivalent entry found.");
-                //    return NoContent();
-                //}
-                #endregion
             }
         }
 
@@ -221,31 +162,6 @@ namespace EssenskasseAPI.Controllers {
                 }
                 Log.Error($"Nothing to add - Header not complete {amount} | {referencedPerson}");
                 return BadRequest("Header unvollständig!");
-                #region oldcode
-                //Log.Information("AddNewPayment called");
-                //if ((amount is not null) && (referencedPerson is not null)) {
-                //    Payment newPayment = new Payment(amount, referencedPerson ?? new Guid(), comment ?? "");
-                //    if (_paymentController.NewPayment(newPayment)) {
-                //        // recalculate Person Saldo
-                //        PersonDbController _personDbController = new PersonDbController();
-                //        Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
-                //        if (x is not null) {
-                //            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
-                //            x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, newPayment.Amount)!;
-                //            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
-                //            _personDbController.UpdatePerson(x);
-                //        }
-                //        Log.Information($"New Payment of {amount} for Person added.");
-                //        return Ok(JsonConvert.SerializeObject(newPayment));
-                //    }
-                //    else {
-                //        Log.Warning("New Payment not inserted. Conflict return");
-                //        return Conflict(JsonConvert.SerializeObject(newPayment));
-                //    }
-                //}
-                //Log.Error($"Nothing to add - Header not complete {amount} | {referencedPerson}");
-                //return BadRequest("Header unvollständig!");
-                #endregion
             }
         }
 
@@ -320,46 +236,6 @@ namespace EssenskasseAPI.Controllers {
                 }
                 Log.Warning($"At {dateAsLong} nothing to change at payment.");
                 return NotFound("Keine Änderung an der Einzahlung zum angegebenen Datum.");
-                #region oldcode
-                //Log.Information("UpdatePayment called");
-                //if (dateString is null) {
-                //    Log.Warning("No dateString in Header");
-                //    return BadRequest("Kein Datum angegeben!");
-                //}
-                //DateTime date = DateTime.Parse(dateString);
-                //Payment? paymentToUpdate = _paymentController.PaymentAtDateTime(date);
-                //if (paymentToUpdate is not null) {
-                //    if (money is not null) {
-                //        Log.Information($"Money of Payment updated from {paymentToUpdate.Amount} to {money}");
-                //        paymentToUpdate.Amount = money;
-                //    }
-                //    if (referencedPerson is not null) {
-                //        Log.Information($"RefrencedPerson of Payment updated from {paymentToUpdate.ReferencedPerson} to {referencedPerson}");
-                //        paymentToUpdate.ReferencedPerson = referencedPerson ?? new Guid();
-                //    }
-                //    if (_paymentController.UpdatePayment(paymentToUpdate)) {
-                //        // recalculate Person Saldo
-                //        PersonDbController _personDbController = new PersonDbController();
-                //        Person? x = _personDbController.PersonPerGuid(referencedPerson ?? new Guid());
-                //        if (x is not null) {
-                //            Log.Information($"Person {x.Guid} {x.Name} old Saldo = {x.Saldo}");
-                //            x.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, x.Saldo, paymentToUpdate.Amount)!;
-                //            Log.Information($"Person {x.Guid} {x.Name} new Saldo = {x.Saldo}");
-                //            _personDbController.UpdatePerson(x);
-                //        }
-                //        Log.Information($"Payment successfully updated");
-                //        return Ok();
-                //    }
-                //    else {
-                //        Log.Warning($"At {dateString} no payment found");
-                //        return NotFound("Keine Einzahlung zum angegebenen Datum gefunden.");
-                //    }
-                //}
-                //else {
-                //    Log.Warning("No payment");
-                //    return BadRequest();
-                //}
-                #endregion
             }
         }
 
@@ -390,26 +266,6 @@ namespace EssenskasseAPI.Controllers {
                     Log.Warning("Empty dateAsLong Header");
                     return BadRequest();
                 }
-                #region oldcode
-                //Log.Information("DeletePayment called");
-                //if (dateString is not null) {
-                //    DateTime date = DateTime.Parse(dateString);
-                //    Payment? result = _paymentController.PaymentAtDateTime(date);
-                //    if (result is not null) {
-                //        _paymentController.RemovePayment(result);
-                //        Log.Information($"Payment at {result.DateTime} successfully removed");
-                //        return Ok(JsonConvert.SerializeObject(result));
-                //    }
-                //    else {
-                //        Log.Warning($"At {dateString} no payment found");
-                //        return NotFound("Einzahlung konnte nicht gefunden werden!\nFehler in der Eingabe?");
-                //    }
-                //}
-                //else {
-                //    Log.Warning("Empty dateString Header");
-                //    return BadRequest();
-                //}
-                #endregion
             }
         }
 
@@ -463,7 +319,7 @@ namespace EssenskasseAPI.Controllers {
             string queryString = $"" +
                 $"SELECT * " +
                 $"FROM essenskasse.Person " +
-                $"WHERE Guid='{payment.ReferencedPerson};";
+                $"WHERE Guid='{payment.ReferencedPerson}';";
 
             DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
             if (dataTableProvider.Rows.Count != 1) {
@@ -492,7 +348,7 @@ namespace EssenskasseAPI.Controllers {
             if (dataTablePersonToUpdate.Rows.Count == 1) {
                 Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
                 Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} old Saldo = {personToUpdate.Saldo}");
-                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, personToUpdate.Saldo, payment.Amount)!;
+                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, personToUpdate.Saldo, payment.Amount)!;
                 Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} new Saldo = {personToUpdate.Saldo}");
 
                 string queryStringPersonUpdate = $"" +
