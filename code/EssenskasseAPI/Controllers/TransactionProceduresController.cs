@@ -28,7 +28,7 @@ namespace EssenskasseAPI.Controllers {
                     $"FROM essenskasse.TransactionProcedure;";
 
                 DataTable dataTableTransaction = QueryExecuterAtMySql(queryString);
-                List<Provider> transactions = DataTableToListOfProvider(dataTableTransaction);
+                List<TransactionProcedure> transactions = DataTableToListOfProvider(dataTableTransaction);
 
                 return Ok(JsonConvert.SerializeObject(transactions));
             }
@@ -72,10 +72,17 @@ namespace EssenskasseAPI.Controllers {
             return dataTable;
         }
 
-        private List<Provider> DataTableToListOfProvider(DataTable dataTable) {
-            List<Provider> providerController = [];
+        private List<TransactionProcedure> DataTableToListOfProvider(DataTable dataTable) {
+            List<TransactionProcedure> providerController = [];
             foreach (DataRow row in dataTable.Rows) {
-                providerController.Add(new Provider());
+                providerController.Add(new TransactionProcedure() {
+                    DateTime = new DateTime(long.Parse(row["DateTime"].ToString()!)),
+                    Amount = new Money() {
+                        Euro = long.Parse(row["AmountEuro"].ToString()!),
+                        Cent = short.Parse(row["AmountCent"].ToString()!)
+                    },
+                    Comment = row["Comment"].ToString()!
+                });
             }
             return providerController;
         }

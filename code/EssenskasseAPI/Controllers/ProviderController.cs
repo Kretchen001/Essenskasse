@@ -252,7 +252,10 @@ namespace EssenskasseAPI.Controllers {
         private List<Provider> DataTableToListOfProvider(DataTable dataTable) {
             List<Provider> providerController = [];
             foreach (DataRow row in dataTable.Rows) {
-                providerController.Add(new Provider());
+                providerController.Add(new Provider() {
+                    Guid = new Guid(row["Guid"].ToString()!),
+                    Designation = row["Designation"].ToString()!
+                });
             }
             return providerController;
         }
