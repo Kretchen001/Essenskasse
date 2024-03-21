@@ -1,6 +1,7 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
 using Modells;
+using Newtonsoft.Json;
 
 namespace Essenskasse.Pages {
 
@@ -116,6 +117,17 @@ namespace Essenskasse.Pages {
                 saveDashboardMoneyLimit(value);
             }
         }
+
+        private bool existAccessToken {
+            get {
+                if (AppData.AccessToken is not null) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
         #endregion
 
         #region Functions
@@ -194,6 +206,32 @@ namespace Essenskasse.Pages {
         private async void saveDashboardMoneyLimit(Money limitToSave) {
             await LocalStorage.SetItemAsync<Money>("DashboardMoneyLimit", limitToSave);
             ToastService.ShowToast($"Grenzwert auf {limitToSave.ToString()} gesetzt.", ToastLevel.Success);
+        }
+
+        private async Task requestAccessTokenForChanges() {
+            // Request all Person, that are saved in the database
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "token/requestNewAccessToken")
+                };
+
+            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+
+            if (response.IsSuccessStatusCode) {
+                Guid token = JsonConvert.DeserializeObject<Guid>(await response.Content.ReadAsStringAsync());
+                AppData.AccessToken = token;
+                saveAccessToken(token);
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+            }
+        }
+
+        /// <summary></summary>
+        /// <param name="value"></param>
+        private async void saveAccessToken(Guid value) {
+            await LocalStorage.SetItemAsync<Guid>("AccessToken", value);
+            ToastService.ShowToast("AccessToken erfolgreich abgerufen und eingetragen!", ToastLevel.Success);
         }
         #endregion
     }
