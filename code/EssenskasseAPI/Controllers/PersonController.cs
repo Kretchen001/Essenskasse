@@ -164,7 +164,7 @@ namespace EssenskasseAPI.Controllers {
                     // get all Orders of Person
                     string queryStringOrders = $"" +
                         $"SELECT * " +
-                        $"FROM essenskasse.Payment " +
+                        $"FROM essenskasse.Order " +
                         $"WHERE ReferencedPerson='{person.Guid}';";
 
                     DataTable dataTableOrders= QueryExecuterAtMySql(queryStringOrders);

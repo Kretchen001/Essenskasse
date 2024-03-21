@@ -18,7 +18,7 @@ VALUES
     ('12c70c0d-87c2-4a2d-8e56-598ed8bb13bc', 'Provider B');
 
 -- Füge Dummy-Daten für Order ein
-INSERT INTO `Order` (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson)
+INSERT INTO Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson)
 VALUES
     (1637020800000, 20, 25, '0a8f5378-9e5d-4ae8-b127-4d0be89b4c56', 'Provider A', 'e6a78252-9a4c-4c9e-aa60-2bfc9ee54b01'),
     (1637107200000, 150, 50, '12c70c0d-87c2-4a2d-8e56-598ed8bb13bc', 'Provider B', '8d13c2e2-9c3f-4b7d-aa3a-36a6c2e25c8a'),
