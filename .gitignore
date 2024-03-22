@@ -11,3 +11,5 @@ artifacts/
 *.binlog
 
 TestResults
+
+.env
