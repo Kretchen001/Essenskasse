@@ -12,5 +12,12 @@
 ## Description English
 
 ## Installation and Run
+Example for the `.env` file:
+```env
+DB_ROOT_PASSWORD=root
+DB_DATABASE=essenskasse
+DB_USERNAME=u
+DB_PASSWORD=p
+```
 
 ## Usage hints

@@ -5,11 +5,11 @@ services:
     container_name: MySql_DB
     image: mysql:8.0.2
     environment:
-      - MYSQL_ROOT_PASSWORD=sheep
-      - MYSQL_DATABASE=essenskasse
-      - MYSQL_USER=dbuser
-      - MYSQL_PASSWORD=password
-      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+        MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+        MYSQL_DATABASE: "${DB_DATABASE}"
+        MYSQL_USER: "${DB_USERNAME}"
+        MYSQL_PASSWORD: "${DB_PASSWORD}"
+        MYSQL_ALLOW_EMPTY_PASSWORD: 1
     volumes:
       - dbdata:/var/lib/mysql
       - ./MySqlScripts/init.sql:/docker-entrypoint-initdb.d/1.sql:ro # 1 weil damit als erstes ausgefüht, alle anderen danach (wenn welche da sind)
@@ -20,7 +20,7 @@ services:
       timeout: 20s
       retries: 10
     ports:
-      - 3306:3306
+      - 8008:3306
     command: --default-authentication-plugin=mysql_native_password
 
   pwa:
