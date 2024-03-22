@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS essenskasse.Person (
     Name VARCHAR(511),
     Email VARCHAR(511),
     SaldoEuro BIGINT,
-    SaldoCent SMALLINT
+    SaldoCent SMALLINT,
+    Sichtbar BOOLEAN DEFAULT true
 );
 
 -- Erstelle die Tabelle für Payment
@@ -34,7 +35,8 @@ CREATE TABLE IF NOT EXISTS essenskasse.Payment (
 -- Erstelle die Tabelle für Provider
 CREATE TABLE IF NOT EXISTS essenskasse.Provider (
     Guid CHAR(36) PRIMARY KEY,
-    Designation VARCHAR(255)
+    Designation VARCHAR(255),
+    Sichtbar BOOLEAN DEFAULT true
 );
 
 -- Erstelle die Tabelle für Order

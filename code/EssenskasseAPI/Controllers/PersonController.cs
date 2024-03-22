@@ -25,7 +25,8 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("Request all Persons")) {
                 string queryString = $"" +
                     $"SELECT * " +
-                    $"FROM essenskasse.Person;";
+                    $"FROM essenskasse.Person " +
+                    $"WHERE Sichtbar=true;";
 
                 DataTable dataTablePerson = QueryExecuterAtMySql(queryString);
                 List<Person> persons = DataTableToListOfPerson(dataTablePerson);
@@ -191,7 +192,7 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpDelete, Route("remove")]
-        public IActionResult RemovePerson([FromHeader] Guid? guid) {
+        public IActionResult RemovePerson([FromHeader] Guid? guid, bool per = false) {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("RemovePerson called");
                 if (guid is not null) {
@@ -203,13 +204,24 @@ namespace EssenskasseAPI.Controllers {
                     List<Person> persons = DataTableToListOfPerson(dataTable);
 
                     if (persons.Count == 1) {
-                        string queryStringDelete = $"" +
-                            $"DELETE " +
-                            $"FROM essenskasse.Person" +
-                            $"WHERE Guid={guid};";
-                        QueryExecuterAtMySql(queryStringDelete);
-                        Log.Information($"{persons[0].Name} with {persons[0].Guid} successfully removed");
-                        return Ok(JsonConvert.SerializeObject(persons[0]));
+                        if (per == false) {
+                            string queryStringInvisible = $"" +
+                                $"UPDATE essenskasse.Person " +
+                                $"SET Sichtbarkeit=false " +
+                                $"WHERE Guid='{guid}';";
+                            QueryExecuterAtMySql(queryStringInvisible);
+                            Log.Information($"{persons[0].Name} with {persons[0].Guid} successfully invisible set");
+                            return Ok(JsonConvert.SerializeObject(persons[0]));
+                        }
+                        else {
+                            string queryStringDelete = $"" +
+                                $"DELETE " +
+                                $"FROM essenskasse.Person" +
+                                $"WHERE Guid={guid};";
+                            QueryExecuterAtMySql(queryStringDelete);
+                            Log.Information($"{persons[0].Name} with {persons[0].Guid} successfully removed");
+                            return Ok(JsonConvert.SerializeObject(persons[0]));
+                        }
                     }
                     Log.Warning($"{guid} not found");
                     return NotFound("Person konnte nicht gefunden werden!");
