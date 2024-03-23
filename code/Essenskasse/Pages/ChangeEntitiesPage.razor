@@ -27,7 +27,7 @@
 </div>
 
 @if (selectedType == types[0]) { // Einzahlungen/Payments
-    @foreach(int indexP in Enumerable.Range(0, payments.Count - 1)) {
+    @foreach(int indexP in Enumerable.Range(0, payments.Count)) {
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
                 @getTheDesignationOfPerson(payments[indexP].ReferencedPerson)
@@ -36,7 +36,7 @@
                 @payments[indexP].DateTime.ToString("dddd, dd MMMM yyyy")
             </div>
             <div class="col-lg-3">
-                @payments[indexP].Amount.ToString();
+                @payments[indexP].Amount.ToString()
             </div>
             <div class="col-lg-2">
             </div>
@@ -60,9 +60,8 @@
         </div>
     }
 }
-@* else if (selectedType == types[1]) { // Bestellungen/Orders
-    @foreach (int indexO in Enumerable.Range(0, orders.Count - 1)) {
-        Console.WriteLine(orders[indexO].Provider.Designation);
+else if (selectedType == types[1]) { // Bestellungen/Orders
+    @foreach (int indexO in Enumerable.Range(0, orders.Count)) {
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
                 @getTheDesignationOfPerson(orders[indexO].ReferencedPerson)
@@ -80,6 +79,7 @@
             <div class="col-lg-3">
                 <select class="form-select" @bind="@changedOrders[indexO].ReferencedPerson">
                     @foreach (Person x in person) {
+                        Console.WriteLine(x.Name);
                         <option value="@x.Guid">@x.Name</option>
                     }
                 </select>
@@ -95,13 +95,14 @@
             <div class="col-lg-2">
                 <select class="form-select" @bind="@changedOrders[indexO].Provider">
                     @foreach (Provider y in provider) {
+                        Console.WriteLine(y.Designation);
                         <option value="@y">@y.Designation</option>
                     }
                 </select>
             </div>
         </div>
     }
-} *@
+}
 
 @code {
     List<string> types = ["Einzahlungen", "Bestellungen"];

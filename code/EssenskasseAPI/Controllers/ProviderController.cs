@@ -27,7 +27,7 @@ namespace EssenskasseAPI.Controllers {
 
                 string queryString = $"" +
                     $"SELECT * " +
-                    $"FROM essenskasse.Provider;" +
+                    $"FROM essenskasse.Provider " +
                     $"WHERE Sichtbar=true;";
 
                 DataTable dataTableProvider = QueryExecuterAtMySql(queryString);

@@ -1,7 +1,11 @@
-﻿using EssenskasseAPI.LiteDB;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Modells;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using Serilog;
+using SerilogTimings;
+using System;
+using System.Data;
 
 namespace EssenskasseAPI.Controllers {
 
@@ -9,26 +13,86 @@ namespace EssenskasseAPI.Controllers {
     [ApiController]
     public class TokenController : ControllerBase {
 
-        readonly TokenDbController tokenDbController = new TokenDbController();
+        #region Config
+        private readonly IConfiguration Configuration;
 
+        public TokenController(IConfiguration configuration) {
+            Configuration = configuration;
+        }
+        #endregion
+
+        #region Controller
         [HttpGet, Route("requestNewAccessToken")]
         public IActionResult RequestNewAccessToken() {
             Log.Information("RequestNewAccessToken called");
-            return Ok(JsonConvert.SerializeObject(tokenDbController.CreateNewAccessToken()));
+            long a = DateTime.Now.Ticks;
+            Guid guid = Guid.NewGuid();
+
+            string queryStringInsert = $"" +
+                $"INSERT INTO essenskasse.TokenForChange (DateTime, Guid) " +
+                $"VALUES (" +
+                $"{a}," +
+                $"{guid});";
+            QueryExecuterAtMySql(queryStringInsert);
+
+            return Ok(JsonConvert.SerializeObject(guid));
         }
 
         [HttpGet, Route("checkAccessToken")]
         public IActionResult CheckAccessToken([FromHeader] Guid? accessToken, [FromQuery] bool s) {
-            if (s) {
-                Log.Information("CheckAccessToken called");
-                if (accessToken is null) {
-                    return NoContent();
+            using (Operation.Time("CheckAccessToken")) {
+                if (s) {
+                    Log.Information("CheckAccessToken called");
+                    if (accessToken is null) {
+                        Log.Information("CheckAccessToken called, but no token in Header");
+                        return NoContent();
+                    }
+                    string queryStringInsert = $"" +
+                        $"SELECT * " +
+                        $"FROM essenskasse.TokenForChange " +
+                        $"WHERE Guid='{accessToken}';";
+                    DataTable datatableInsert = QueryExecuterAtMySql(queryStringInsert);
+                    List<Tuple<DateTime, Guid>> res = DataTableToListOfPerson(datatableInsert);
+                    if (res.Count == 1) {
+                        Log.Information("CheckAccessToken called successfull");
+                        return Ok();
+                    }
+                    Log.Warning("CheckAccessToken called NOT authorized!");
+                    return BadRequest();
                 }
-                if (tokenDbController.CheckAccessToken(accessToken ?? new Guid("00000000-0000-0000-0000-000000000000"))) {
-                    return Ok();
-                }
+                Log.Information("Query-Address miss bool");
+                return BadRequest();
             }
-            return BadRequest();
         }
+        #endregion
+
+        #region InternalFunctions
+        private DataTable QueryExecuterAtMySql(string Query) {
+            // MySql Connection
+            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
+
+            MySqlCommand cmd = new MySqlCommand(Query, connection);
+
+            DataTable dataTable = new DataTable();
+            // read the result
+            connection.Open();
+            MySqlDataReader reader = cmd.ExecuteReader();
+            dataTable.Load(reader);
+            connection.Close();
+
+            return dataTable;
+        }
+
+        private List<Tuple<DateTime, Guid>> DataTableToListOfPerson(DataTable dataTable) {
+            List<Tuple<DateTime, Guid>> tokenList = [];
+            foreach (DataRow row in dataTable.Rows) {
+                tokenList.Add(new Tuple<DateTime, Guid>(
+                    item1: new DateTime(long.Parse(row["DateTime"].ToString()!)),
+                    item2: new Guid(row["Guid"].ToString()!)
+                    ));
+            }
+            return tokenList;
+        }
+        #endregion
     }
 }
