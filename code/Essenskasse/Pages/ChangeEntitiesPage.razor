@@ -61,26 +61,27 @@
     }
 }
 else if (selectedType == types[1]) { // Bestellungen/Orders
-    @foreach (int indexO in Enumerable.Range(0, orders.Count)) {
+    @foreach (Tuple<Order, int> x in orderS) {
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
-                @getTheDesignationOfPerson(orders[indexO].ReferencedPerson)
+                <strong>
+                    @getTheDesignationOfPerson(x.Item1.ReferencedPerson)
+                </strong>
             </div>
             <div class="col-lg-3">
-                @orders[indexO].DateTime.ToString("dddd, dd MMMM yyyy")
+                @x.Item1.DateTime.ToString("dddd, dd MMMM yyyy")
             </div>
             <div class="col-lg-2">
-                @orders[indexO].Money.ToString()
+                @x.Item1.Money.ToString()
             </div>
             <div class="col-lg-2">
-                @orders[indexO].Provider.Designation
+                @x.Item1.Provider.Designation
             </div>
             <br />
             <div class="col-lg-3">
-                <select class="form-select" @bind="@changedOrders[indexO].ReferencedPerson">
-                    @foreach (Person x in person) {
-                        Console.WriteLine(x.Name);
-                        <option value="@x.Guid">@x.Name</option>
+                <select class="form-select" style="margin: 0.2rem;" @bind="@changedOrders[x.Item2].ReferencedPerson">
+                    @foreach (Person y in person) {
+                        <option value="@y.Guid">@y.Name</option>
                     }
                 </select>
             </div>
@@ -90,15 +91,19 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
                 </label>
             </div>
             <div class="col-lg-2">
-                <input style="width: 25vw" type="number" @bind="orderAmount[indexO]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                <input style="width: 25vw" type="number" @bind="orderAmount[x.Item2]" placeholder="Euro,Cent -> 1000 = 10,00€">
             </div>
             <div class="col-lg-2">
-                <select class="form-select" @bind="@changedOrders[indexO].Provider">
-                    @foreach (Provider y in provider) {
-                        Console.WriteLine(y.Designation);
-                        <option value="@y">@y.Designation</option>
-                    }
+                <select class="form-select" style="margin: 0.2rem;" @onchange="(e) => {changedOrders[x.Item2].Provider = provider.First(x => x.Guid.Equals(new Guid(e.Value!.ToString()!)));}">
+                    @foreach (Provider z in provider) {
+                        <option value="@z.Guid">@z.Designation</option>
+                    } 
                 </select>
+            </div>
+            <div class="col-lg-2">
+                <button>
+                    Absenden
+                </button>
             </div>
         </div>
     }
@@ -111,13 +116,14 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
     List<Person> person { get; set; } = [];
     List<Provider> provider { get; set; } = [];
     List<Payment> payments { get; set; } = [];
-    List<Order> orders { get; set; } = [];
 
     List<Payment> changedPayments { get; set; } = [];
     List<int> paymentAmount { get; set; } = [];
 
     List<Order> changedOrders { get; set; } = [];
     List<int> orderAmount { get; set; } = [];
+
+    List<Tuple<Order, int>> orderS { get; set; } = [];
 
     protected override async Task OnInitializedAsync() {
         await requestPerson();
@@ -199,8 +205,12 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
         HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
         if (response.IsSuccessStatusCode) {
-            orders = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+            List<Order> orders = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
             changedOrders = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+            for (int i = 0; i < orders.Count; i += 1) {
+                orderAmount.Add(0);
+                orderS.Add(new Tuple<Order, int>(orders[i], i));
+            }
         }
         else {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
