@@ -47,7 +47,15 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch { //(Exception ex) {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                //await Console.Out.WriteLineAsync($"{ex.StackTrace}");
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 person.Clear();
