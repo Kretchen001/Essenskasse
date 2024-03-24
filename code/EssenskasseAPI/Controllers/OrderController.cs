@@ -1,5 +1,4 @@
-﻿using EssenskasseAPI.LiteDB;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -195,9 +194,12 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("Update Order")) {
                 Log.Information("UpdateOrder called");
                 if (accessToken is not null) {
-                    // TokenDbController tokenDbController = new TokenDbController();
-                    // if (tokenDbController.CheckAccessToken(accessToken ?? new Guid("00000000-0000-0000-0000-000000000000"))) {
-                    if (true) {
+                    string queryStringToken = $"" +
+                            $"SELECT COUNT(*) " +
+                            $"FROM essenskasse.TokenForChange " +
+                            $"WHERE Guid='{accessToken}';";
+                    DataTable dataTableTokenCount = QueryExecuterAtMySql(queryStringToken);
+                    if (dataTableTokenCount.Rows.Count == 1) {
                         if (dateAsLong is null) {
                             Log.Warning("Empty dateAsLong Header");
                             return BadRequest("Kein Datum angegeben!");

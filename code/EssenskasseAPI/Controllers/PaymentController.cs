@@ -174,9 +174,12 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("UpdatePayment")) {
                 Log.Information("UpdatePayment called");
                 if (accessToken is not null) {
-                    // TokenDbController tokenDbController = new TokenDbController();
-                    // if (tokenDbController.CheckAccessToken(accessToken ?? new Guid("00000000-0000-0000-0000-000000000000"))) {
-                    if (true) {
+                    string queryStringToken = $"" +
+                            $"SELECT COUNT(*) " +
+                            $"FROM essenskasse.TokenForChange " +
+                            $"WHERE Guid='{accessToken}';";
+                    DataTable dataTableTokenCount = QueryExecuterAtMySql(queryStringToken);
+                    if (dataTableTokenCount.Rows.Count == 1) {
                         if (dateAsLong is null) {
                             Log.Warning("No dateString in Header");
                             return BadRequest("Kein Datum angegeben!");
@@ -184,7 +187,7 @@ namespace EssenskasseAPI.Controllers {
                         string queryString = $"" +
                             $"SELECT * " +
                             $"FROM essenskasse.Payment " +
-                            $"WHERE DateTime={dateAsLong}";
+                            $"WHERE DateTime={dateAsLong};";
                         DataTable dataTable = QueryExecuterAtMySql(queryString);
                         List<Payment> payments = DataTableToListOfPayments(dataTable);
 

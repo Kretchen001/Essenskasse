@@ -31,8 +31,7 @@ namespace EssenskasseAPI.Controllers {
             string queryStringInsert = $"" +
                 $"INSERT INTO essenskasse.TokenForChange (DateTime, Guid) " +
                 $"VALUES (" +
-                $"{a}," +
-                $"{guid});";
+                $"{a}, '{guid}');";
             QueryExecuterAtMySql(queryStringInsert);
 
             return Ok(JsonConvert.SerializeObject(guid));

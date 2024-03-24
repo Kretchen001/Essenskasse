@@ -221,6 +221,7 @@ namespace Essenskasse.Pages {
                 Guid token = JsonConvert.DeserializeObject<Guid>(await response.Content.ReadAsStringAsync());
                 AppData.AccessToken = token;
                 saveAccessToken(token);
+                base.StateHasChanged();
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
