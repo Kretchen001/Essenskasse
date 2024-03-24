@@ -144,7 +144,7 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "payment/update"),
                 Headers = {
                     { "accessToken", AppData.AccessToken.ToString() },
-                    { "dateString", ChangedPayments[index].DateTime.Ticks.ToString() }
+                    { "dateAsLong", ChangedPayments[index].DateTime.Ticks.ToString() }
                 },
                 Content = new StringContent(JsonConvert.SerializeObject(ChangedPayments[index].Amount), Encoding.UTF8, "application/json")
             };

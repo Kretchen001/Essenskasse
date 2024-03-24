@@ -215,6 +215,7 @@ namespace EssenskasseAPI.Controllers {
                         }
                         
                         bool hasChanges = false;
+                        Money temp = orders[0].Money;
                         if (values.Item1 is not null) {
                             Log.Information($"Order updated from {orders[0].Money} to {values.Item1}");
                             orders[0].Money = values.Item1;
@@ -241,6 +242,7 @@ namespace EssenskasseAPI.Controllers {
                             if (dataTablePersonToUpdate.Rows.Count == 1) {
                                 Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
                                 Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} old Saldo = {personToUpdate.Saldo}");
+                                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, personToUpdate.Saldo, temp)!;
                                 personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, personToUpdate.Saldo, orders[0].Money)!;
                                 Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} new Saldo = {personToUpdate.Saldo}");
 

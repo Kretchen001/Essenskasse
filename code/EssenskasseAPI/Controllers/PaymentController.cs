@@ -199,6 +199,7 @@ namespace EssenskasseAPI.Controllers {
                             payments[0].ReferencedPerson = referencedPerson ?? new Guid();
                             hasChanges = true;
                         }
+                        Money temp = payments[0].Amount;
                         if (money is not null) {
                             Log.Information($"Payment updated from {payments[0].Amount} to {money}");
                             payments[0].Amount = money;
@@ -221,19 +222,20 @@ namespace EssenskasseAPI.Controllers {
                             if (dataTablePersonToUpdate.Rows.Count == 1) {
                                 Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
                                 Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} old Saldo = {personToUpdate.Saldo}");
+                                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, personToUpdate.Saldo, temp)!;
                                 personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, personToUpdate.Saldo, payments[0].Amount)!;
                                 Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} new Saldo = {personToUpdate.Saldo}");
 
                                 string queryStringPersonUpdate = $"" +
                                     $"UPDATE essenskasse.Person " +
-                                    $"SET SaldoEuro = {personToUpdate.Saldo.Euro}, SaldoCent = {personToUpdate.Saldo.Cent} " +
+                                    $"SET SaldoEuro={personToUpdate.Saldo.Euro}, SaldoCent={personToUpdate.Saldo.Cent} " +
                                     $"WHERE Guid='{personToUpdate.Guid}';";
                                 QueryExecuterAtMySql(queryStringPersonUpdate);
                             }
 
                             string queryStringUpdate = $"" +
                                 $"UPDATE essenskasse.Payment " +
-                                $"SET AmountEuro={payments[0].Amount.Euro}, AmountCent={payments[0].Amount.Cent}, ReferencedPerson={payments[0].ReferencedPerson}, Comment='{comment}' " +
+                                $"SET AmountEuro={payments[0].Amount.Euro}, AmountCent={payments[0].Amount.Cent}, ReferencedPerson='{payments[0].ReferencedPerson}', Comment='{comment}' " +
                                 $"WHERE DateTime='{dateAsLong}';";
                             QueryExecuterAtMySql(queryStringUpdate);
                             Log.Information("Payment successfully updated");
