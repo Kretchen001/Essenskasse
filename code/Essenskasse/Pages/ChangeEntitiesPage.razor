@@ -50,7 +50,10 @@
                 </label>
             </div>
             <div class="col-lg-3">
-                <input style="width: 100%" type="number" @bind="PaymentAmount[indexP]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                <input style="width: 59%" type="number" @bind="PaymentAmount[indexP]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                <label style="width: 39%">
+                    @ShowMoney(indexP)
+                </label>
             </div>
             <div class="col-lg-2">
                 <button @onclick="() => commitChangesP(indexP)">
@@ -91,7 +94,10 @@ else if (SelectedType == types[1]) { // Bestellungen/Orders
                 </label>
             </div>
             <div class="col-lg-2">
-                <input style="width: 100%" type="number" @bind="OrderAmount[x.Item2]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                <input style="width: 59%" type="number" @bind="OrderAmount[x.Item2]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                <label style="width: 39%">
+                    @ShowMoney(x.Item2)
+                </label>
             </div>
             <div class="col-lg-2">
                 <select class="form-select" style="margin: 0.2rem;" value="@ChangedOrders[x.Item2].Provider.Guid" @onchange="(e) => {ChangedOrders[x.Item2].Provider = Providers.First(x => x.Guid.Equals(new Guid(e.Value!.ToString()!)));}">

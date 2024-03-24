@@ -85,9 +85,8 @@ namespace Essenskasse.Pages {
                 ChangedPayments = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
 
                 Payments.ForEach(x => {
-                    long longTemp = x.Amount.Euro;
-                    longTemp += (long)(x.Amount.Cent * 0.01);
-                    PaymentAmount.Add(longTemp);
+                    decimal temp = x.Amount.Euro + (decimal)(x.Amount.Cent * 0.01);
+                    PaymentAmount.Add(temp);
                 });
             }
             else {
@@ -110,9 +109,8 @@ namespace Essenskasse.Pages {
                 List<Order> orderS = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
                 ChangedOrders = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
                 for (int i = 0; i < orderS.Count; i += 1) {
-                    long longTemp = ChangedOrders[i].Money.Euro;
-                    longTemp += (long)(ChangedOrders[i].Money.Cent * 0.01);
-                    OrderAmount.Add(longTemp);
+                    decimal temp = ChangedOrders[i].Money.Euro + (decimal)(ChangedOrders[i].Money.Cent * 0.01);
+                    OrderAmount.Add(temp);
                     Orders.Add(new Tuple<Order, int>(orderS[i], i));
                 }
             }
@@ -213,6 +211,19 @@ namespace Essenskasse.Pages {
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
             }
+        }
+
+        private string ShowMoney(int index) {
+            long euro = 0; short cent = 0;
+            if (SelectedType == types[0]) {
+                euro = (long)PaymentAmount[index];
+                cent = (short)((PaymentAmount[index] - euro) * 100);
+            }
+            else if (SelectedType == types[1]) {
+                euro = (long)OrderAmount[index];
+                cent = (short)((OrderAmount[index] - euro) * 100);
+            }
+            return new Money(euro, cent).ToString();
         }
     }
 }
