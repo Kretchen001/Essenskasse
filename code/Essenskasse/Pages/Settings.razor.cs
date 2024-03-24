@@ -1,5 +1,6 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
+using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
 
@@ -128,6 +129,14 @@ namespace Essenskasse.Pages {
                 }
             }
         }
+
+        private string AdminEmail {
+            get => AppData.AdminEmail;
+            set {
+                AppData.AdminEmail = value;
+                saveAdminEmail(value);
+            }
+        }
         #endregion
 
         #region Functions
@@ -233,6 +242,33 @@ namespace Essenskasse.Pages {
         private async void saveAccessToken(Guid value) {
             await LocalStorage.SetItemAsync<Guid>("AccessToken", value);
             ToastService.ShowToast("AccessToken erfolgreich abgerufen und eingetragen!", ToastLevel.Success);
+        }
+
+        /// <summary></summary>
+        /// <param name="value"></param>
+        private async void saveAdminEmail(string value) {
+            await LocalStorage.SetItemAsync<string>("AdminEmail", value);
+            ToastService.ShowToast("Admin-E-Mail erfolgreich eingetragen!\nBei Fehlern bitte das Vorgehen zum Nachstellen merken!", ToastLevel.Success);
+        }
+
+        private async Task SendMessageToAdmin() {
+            if (AdminEmail.Equals("")) {
+                ToastService.ShowToast("Keine E-Mail eingetragen!", ToastLevel.Info);
+            }
+            else {
+                string subject = "Fehler in der \"Essenkasse\"";
+                string body = "Bitte Namen, Zeit (Tag, Monat, Stunde, Minute) und Art des Fehlers schildern. " +
+                    "Dies meint eine Beschreibung, wie es bei der Bedienung zu dem Fehler kam, um ihn schneller isolieren und beheben zu können." +
+                    "\nDanke!";
+                await JsRuntime.InvokeAsync<object>(
+                    "blazorExtensions.SendLocalEmail",
+                    new object[] {
+                        AdminEmail,
+                        subject,
+                        body
+                    }
+                );
+            }
         }
         #endregion
     }

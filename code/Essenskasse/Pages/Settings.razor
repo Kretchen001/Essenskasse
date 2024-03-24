@@ -142,7 +142,22 @@
         }
     </div>
 </div>
-
-@code {
+@code { // only for the div row above
         string currentlyNotSupported = "Aktuell leider noch nicht verfügbar. Bitte beim Admin melden für Hilfestellungen!";
 }
+
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+    <div class="col-lg-4">
+        <label>
+            E-Mail für Admin-Kontakt
+        </label>
+    </div>
+    <div class="col-lg-4" align="right">
+        <input type="text" style="width: 50%;" @bind-value="AdminEmail">
+    </div>
+    <div class="col-lg-4" align="left">
+        <button @onclick="SendMessageToAdmin">
+            Benachrichtigen
+        </button>
+    </div>
+</div>
