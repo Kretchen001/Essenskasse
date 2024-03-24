@@ -16,8 +16,8 @@
     </div>
     <div class="col-lg-8 align-self-lg-center">
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="isSingleListWish">
-            <label class="form-check-label" for="flexSwitchCheckChecked">@_loc[nameof(RessourceAppStrings.singleColumn)] = @returnListWish</label>
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="IsSingleListWish">
+            <label class="form-check-label" for="flexSwitchCheckChecked">@_loc[nameof(RessourceAppStrings.singleColumn)] = @ReturnListWish</label>
         </div>
     </div>
 </div>
@@ -31,7 +31,7 @@
     </div>
 </div>
 <hr />
-@if (isSingleListWish) {
+@if (IsSingleListWish) {
     <div class="row">
         <div class="col-lg-12">
             @for (int i = 0; i < person.Count; i += 1) {

@@ -39,7 +39,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async void addNewAnbieter() {
+        private async void AddNewAnbieter() {
             if (newProviderDesignation.Equals("")) {
                 return;
             }
@@ -67,7 +67,7 @@ namespace Essenskasse.Pages {
             base.StateHasChanged();
         }
 
-        private async Task deleteAnbieter() {
+        private async Task DeleteAnbieter() {
             if (Guid.TryParse(providerToDeleteGuid, out Guid providerDesignation)) {
                 Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
                 if (tempAnbieter is null) {

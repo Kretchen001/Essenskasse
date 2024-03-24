@@ -57,12 +57,12 @@
                 </div>
                 <div class="col-lg-2 align-self-center">
                     @if (showHistory[i]) {
-                        <button @onclick="() => loadAndShowHistory(i)">
+                        <button @onclick="() => LoadAndShowHistory(i)">
                             @_loc[nameof(RessourceAppStrings.orderHistory)] @_loc[nameof(RessourceAppStrings.hide)]
                         </button>
                     }
                     else {
-                        <button @onclick="() => loadAndShowHistory(i)">
+                        <button @onclick="() => LoadAndShowHistory(i)">
                             @_loc[nameof(RessourceAppStrings.orderHistory)]
                         </button>
                     }
@@ -91,7 +91,7 @@
 <br />
 
 <div class="row justify-content-between">
-    <button @onclick="postOrderForTheDay">
+    <button @onclick="PostOrderForTheDay">
         @_loc[nameof(RessourceAppStrings.submit)] @_loc[nameof(RessourceAppStrings.order)]
     </button>
 </div>

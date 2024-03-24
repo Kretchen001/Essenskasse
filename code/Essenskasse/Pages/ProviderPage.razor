@@ -44,7 +44,7 @@
             <input type="text" style="width: 100%;" @bind-value="newProviderDesignation">
         </div>
         <div class="col-lg-2">
-            <button @onclick="() => addNewAnbieter()">
+            <button @onclick="() => AddNewAnbieter()">
                 @_loc[nameof(RessourceAppStrings.submit)]!
             </button>
         </div>
@@ -116,7 +116,7 @@
             </datalist>
         </div>
         <div class="col-lg-2" style="vertical-align: middle;">
-            <button @onclick="() => deleteAnbieter()">
+            <button @onclick="() => DeleteAnbieter()">
                 @_loc[nameof(RessourceAppStrings.remove)]!
             </button>
         </div>

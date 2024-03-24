@@ -19,7 +19,7 @@ namespace Essenskasse.Pages {
             }
             set {
                 AppData.IsSingleListWishDashboard = value;
-                writeWishListToLocalStorage(value);
+                WriteWishListToLocalStorage(value);
             }
         }
 
@@ -55,7 +55,7 @@ namespace Essenskasse.Pages {
         }
 
         /// <summary> Hold the entities for theme-selection. </summary>
-        private Dictionary<string, string> themeList = new Dictionary<string, string>() {
+        private readonly Dictionary<string, string> themeList = new Dictionary<string, string>() {
             { "Light", "Hell" },
             { "Dark", "Dunkel" }
         };
@@ -65,7 +65,7 @@ namespace Essenskasse.Pages {
             get => AppData.LoadAmountPayment;
             set {
                 AppData.LoadAmountPayment = value;
-                saveAmountOfPaymentsPersistentAsync(value);
+                SaveAmountOfPaymentsPersistentAsync(value);
             }
         }
 
@@ -73,7 +73,7 @@ namespace Essenskasse.Pages {
             get => AppData.LoadAmountOrder;
             set {
                 AppData.LoadAmountOrder = value;
-                saveAmountOfOrderPersistentAsync(value);
+                SaveAmountOfOrderPersistentAsync(value);
             }
         }
 
@@ -81,7 +81,7 @@ namespace Essenskasse.Pages {
             get => AppData.FilterShowProvider;
             set {
                 AppData.FilterShowProvider = value;
-                saveFilterShowProvider(value);
+                SaveFilterShowProvider(value);
             }
         }
 
@@ -89,7 +89,7 @@ namespace Essenskasse.Pages {
             get => AppData.FilterShowPerson;
             set {
                 AppData.FilterShowPerson = value;
-                saveFilterShowPerson(value);
+                SaveFilterShowPerson(value);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Essenskasse.Pages {
             }
             set {
                 if (value != 0) {
-                    Money temp = convertToMoney(value);
+                    Money temp = ConvertToMoney(value);
                     if (temp.Cent < 100) {
                         DashboardMoneyLimit = temp;
                     }
@@ -115,11 +115,11 @@ namespace Essenskasse.Pages {
             get => AppData.DashboardMoneyLimit;
             set {
                 AppData.DashboardMoneyLimit = value;
-                saveDashboardMoneyLimit(value);
+                SaveDashboardMoneyLimit(value);
             }
         }
 
-        private bool existAccessToken {
+        private bool ExistAccessToken {
             get {
                 if (AppData.AccessToken is not null) {
                     return true;
@@ -134,7 +134,7 @@ namespace Essenskasse.Pages {
             get => AppData.AdminEmail;
             set {
                 AppData.AdminEmail = value;
-                saveAdminEmail(value);
+                SaveAdminEmail(value);
             }
         }
         #endregion
@@ -148,14 +148,14 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        private Money convertToMoney(decimal value) {
+        private static Money ConvertToMoney(decimal value) {
             long euro = (long)value;
             short cent = (short)((value - euro) * 100);
             return new Money(euro, cent);
         }
 
         /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>
-        private async void saveUserThemePersistentAsync() {
+        private async void SaveUserThemePersistentAsync() {
             try {
                 await LocalStorage.SetItemAsStringAsync("UserTheme", CurrentTheme);
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastColorThemePre)] + " " + CurrentTheme + " " +
@@ -168,27 +168,27 @@ namespace Essenskasse.Pages {
 
         /// <summary>Save the Listform to localstorage persistant.</summary>
         /// <param name="value">new listwish bool</param>
-        private async void writeWishListToLocalStorage(bool value) {
+        private async void WriteWishListToLocalStorage(bool value) {
             await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
-        private async void saveAmountOfPaymentsPersistentAsync(int value) {
+        private async void SaveAmountOfPaymentsPersistentAsync(int value) {
             await LocalStorage.SetItemAsync<int>("loadAmountOfPayments", value);
             ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullPaymentAmount)], ToastLevel.Success);
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
-        private async void saveAmountOfOrderPersistentAsync(int value) {
+        private async void SaveAmountOfOrderPersistentAsync(int value) {
             await LocalStorage.SetItemAsync<int>("loadAmountOfOrders", value);
             ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyOrderAmount)], ToastLevel.Success);
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
-        private async void saveFilterShowProvider(bool value) {
+        private async void SaveFilterShowProvider(bool value) {
             await LocalStorage.SetItemAsync<bool>("filterShowProvider", value);
             if (AppData.FilterShowProvider) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterProviderOn)], ToastLevel.Success);
@@ -200,7 +200,7 @@ namespace Essenskasse.Pages {
 
         /// <summary></summary>
         /// <param name="value"></param>
-        private async void saveFilterShowPerson(bool value) {
+        private async void SaveFilterShowPerson(bool value) {
             await LocalStorage.SetItemAsync<bool>("filterShowPerson", value);
             if (AppData.FilterShowPerson) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOn)], ToastLevel.Success);
@@ -212,12 +212,12 @@ namespace Essenskasse.Pages {
 
         /// <summary></summary>
         /// <param name="limitToSave"></param>
-        private async void saveDashboardMoneyLimit(Money limitToSave) {
+        private async void SaveDashboardMoneyLimit(Money limitToSave) {
             await LocalStorage.SetItemAsync<Money>("DashboardMoneyLimit", limitToSave);
-            ToastService.ShowToast($"Grenzwert auf {limitToSave.ToString()} gesetzt.", ToastLevel.Success);
+            ToastService.ShowToast($"Grenzwert auf {limitToSave} gesetzt.", ToastLevel.Success);
         }
 
-        private async Task requestAccessTokenForChanges() {
+        private async Task RequestAccessTokenForChanges() {
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                     Method = HttpMethod.Get,
@@ -229,7 +229,7 @@ namespace Essenskasse.Pages {
             if (response.IsSuccessStatusCode) {
                 Guid token = JsonConvert.DeserializeObject<Guid>(await response.Content.ReadAsStringAsync());
                 AppData.AccessToken = token;
-                saveAccessToken(token);
+                SaveAccessToken(token);
                 base.StateHasChanged();
             }
             else {
@@ -239,14 +239,14 @@ namespace Essenskasse.Pages {
 
         /// <summary></summary>
         /// <param name="value"></param>
-        private async void saveAccessToken(Guid value) {
+        private async void SaveAccessToken(Guid value) {
             await LocalStorage.SetItemAsync<Guid>("AccessToken", value);
             ToastService.ShowToast("AccessToken erfolgreich abgerufen und eingetragen!", ToastLevel.Success);
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
-        private async void saveAdminEmail(string value) {
+        private async void SaveAdminEmail(string value) {
             await LocalStorage.SetItemAsync<string>("AdminEmail", value);
             ToastService.ShowToast("Admin-E-Mail erfolgreich eingetragen!\nBei Fehlern bitte das Vorgehen zum Nachstellen merken!", ToastLevel.Success);
         }

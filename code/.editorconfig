@@ -113,7 +113,7 @@ csharp_prefer_braces = true:silent
 csharp_prefer_simple_using_statement = false:suggestion
 csharp_style_namespace_declarations = block_scoped:warning
 csharp_style_prefer_method_group_conversion = true:silent
-csharp_style_prefer_primary_constructors = true:suggestion
+csharp_style_prefer_primary_constructors = false:suggestion
 csharp_style_prefer_top_level_statements = true:silent
 
 # Einstellungen für Ausdrucksebene
@@ -242,7 +242,7 @@ dotnet_style_null_propagation = true:suggestion
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
 dotnet_style_prefer_auto_properties = true:silent
 dotnet_style_object_initializer = true:suggestion
-dotnet_style_prefer_collection_expression = false:suggestion
+dotnet_style_prefer_collection_expression = never:suggestion
 dotnet_style_collection_initializer = true:suggestion
 dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = true:silent

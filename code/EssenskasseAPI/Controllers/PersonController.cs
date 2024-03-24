@@ -251,7 +251,7 @@ namespace EssenskasseAPI.Controllers {
             return dataTable;
         }
 
-        private List<Person> DataTableToListOfPerson(DataTable dataTable) {
+        private static List<Person> DataTableToListOfPerson(DataTable dataTable) {
             List<Person> personList = [];
             foreach (DataRow row in dataTable.Rows) {
                 personList.Add(new Person(
@@ -267,7 +267,7 @@ namespace EssenskasseAPI.Controllers {
             return personList;
         }
 
-        private List<Payment> DataTableToListOfPayments(DataTable dataTable) {
+        private static List<Payment> DataTableToListOfPayments(DataTable dataTable) {
             List<Payment> paymentList = [];
             foreach (DataRow row in dataTable.Rows) {
                 paymentList.Add(new Payment(
@@ -283,7 +283,7 @@ namespace EssenskasseAPI.Controllers {
             return paymentList;
         }
 
-        private List<Order> DataTableToListOfOrders(DataTable dataTableOrders) {
+        private static List<Order> DataTableToListOfOrders(DataTable dataTableOrders) {
             List<Order> ordersList = [];
             foreach (DataRow row in dataTableOrders.Rows) {
                 ordersList.Add(new Order(

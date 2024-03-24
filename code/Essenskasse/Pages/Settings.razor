@@ -37,7 +37,7 @@
                 <option value="@entity.Key">@entity.Value</option>
             }
         </select>
-        <button @onclick="() => saveUserThemePersistentAsync()">
+        <button @onclick="() => SaveUserThemePersistentAsync()">
             @_loc[nameof(RessourceAppStrings.savePermanent)]
         </button>
     </div>
@@ -124,7 +124,7 @@
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        @if (existAccessToken) {
+        @if (ExistAccessToken) {
             <label>
                 Eingetragen
             </label>
@@ -136,7 +136,7 @@
             <label>
                 Nicht angefordert
             </label>
-            <button @onclick="() => requestAccessTokenForChanges()">
+            <button @onclick="() => RequestAccessTokenForChanges()">
                 Anfordern
             </button>
         }

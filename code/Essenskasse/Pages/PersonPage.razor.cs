@@ -19,10 +19,10 @@ namespace Essenskasse.Pages {
         private List<Person> shownPersonList = new List<Person>();
 
         protected override async Task OnInitializedAsync() {
-            await requestAllPersonFromApiAsync();
+            await RequestAllPersonFromApiAsync();
         }
 
-        private async Task requestAllPersonFromApiAsync() {
+        private async Task RequestAllPersonFromApiAsync() {
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -43,7 +43,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async void addNewPerson() {
+        private async void AddNewPerson() {
             if (newPersonName.Equals("")) {
                 return;
             }
@@ -99,7 +99,7 @@ namespace Essenskasse.Pages {
         private async void ChangeOfPersonCommit() {
             person.Clear();
             shownPersonList.Clear();
-            await requestAllPersonFromApiAsync();
+            await RequestAllPersonFromApiAsync();
             base.StateHasChanged();
         }
 

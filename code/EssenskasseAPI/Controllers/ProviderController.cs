@@ -213,7 +213,7 @@ namespace EssenskasseAPI.Controllers {
             return dataTable;
         }
 
-        private List<Provider> DataTableToListOfProvider(DataTable dataTable) {
+        private static List<Provider> DataTableToListOfProvider(DataTable dataTable) {
             List<Provider> providerController = [];
             foreach (DataRow row in dataTable.Rows) {
                 providerController.Add(new Provider() {

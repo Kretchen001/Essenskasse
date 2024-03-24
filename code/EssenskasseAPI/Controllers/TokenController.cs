@@ -82,7 +82,7 @@ namespace EssenskasseAPI.Controllers {
             return dataTable;
         }
 
-        private List<Tuple<DateTime, Guid>> DataTableToListOfPerson(DataTable dataTable) {
+        private static List<Tuple<DateTime, Guid>> DataTableToListOfPerson(DataTable dataTable) {
             List<Tuple<DateTime, Guid>> tokenList = [];
             foreach (DataRow row in dataTable.Rows) {
                 tokenList.Add(new Tuple<DateTime, Guid>(

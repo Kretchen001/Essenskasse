@@ -32,7 +32,7 @@
         </label>
     </div>
     <div class="col-lg-9">
-        <select class="form-select" @bind="@selectedPerson">
+        <select class="form-select" @bind="@SelectedPerson">
             @if (person is not null) {
                 @foreach (var x in person) {
                     <option value="@x.Guid">@x.Name</option>
@@ -49,11 +49,11 @@
         </label>
     </div>
     <div class="col-lg-4 align-self-center" style="width: 25%">
-        <input style="width: 100%" type="number" @bind="payment" placeholder="Euro,Cent -> 10,00€">
+        <input style="width: 100%" type="number" @bind="Payment" placeholder="Euro,Cent -> 10,00€">
     </div>
     <div class="col-lg-5 align-self-center">
         <label>
-            @money.ToString()
+            @Money.ToString()
         </label>
     </div>
 </div>
@@ -70,7 +70,7 @@
 </div>
 <br />
 <div class="row">
-    <button @onclick="() => insertPayment()">
+    <button @onclick="() => InsertPayment()">
         @_loc[nameof(RessourceAppStrings.creditAmount)]
     </button>
 </div>

@@ -30,7 +30,7 @@
     @foreach(int indexP in Enumerable.Range(0, Payments.Count)) {
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
-                @getTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
+                @GetTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
             </div>
             <div class="col-lg-4">
                 @Payments[indexP].DateTime.ToString("dddd, dd. MMMM yyyy")
@@ -42,7 +42,7 @@
             </div>
             <br />
             <div class="col-lg-3">
-                @getTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
+                @GetTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
             </div>
             <div class="col-lg-4">
                 <label>
@@ -56,7 +56,7 @@
                 </label>
             </div>
             <div class="col-lg-2">
-                <button @onclick="() => commitChangesP(indexP)">
+                <button @onclick="() => CommitChangesP(indexP)">
                     Absenden
                 </button>
             </div>
@@ -68,7 +68,7 @@ else if (SelectedType == types[1]) { // Bestellungen/Orders
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
                 <strong>
-                    @getTheDesignationOfPerson(x.Item1.ReferencedPerson)
+                    @GetTheDesignationOfPerson(x.Item1.ReferencedPerson)
                 </strong>
             </div>
             <div class="col-lg-3">
@@ -107,7 +107,7 @@ else if (SelectedType == types[1]) { // Bestellungen/Orders
                 </select>
             </div>
             <div class="col-lg-2">
-                <button @onclick="() => commitChangesO(x.Item2)">
+                <button @onclick="() => CommitChangesO(x.Item2)">
                     Absenden
                 </button>
             </div>

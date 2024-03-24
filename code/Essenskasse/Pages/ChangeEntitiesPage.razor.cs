@@ -23,15 +23,15 @@ namespace Essenskasse.Pages {
         List<decimal> OrderAmount { get; set; } = [];
 
         protected override async Task OnInitializedAsync() {
-            await requestPerson();
-            await requestProvider();
-            await requestPayments();
-            await requestOrders();
+            await RequestPerson();
+            await RequestProvider();
+            await RequestPayments();
+            await RequestOrders();
             SelectedType = types[0];
             base.StateHasChanged();
         }
 
-        private async Task requestPerson() {
+        private async Task RequestPerson() {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
@@ -50,7 +50,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task requestProvider() {
+        private async Task RequestProvider() {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "provider/requestAll")
@@ -69,7 +69,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task requestPayments() {
+        private async Task RequestPayments() {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/requestAmount"),
@@ -94,7 +94,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task requestOrders() {
+        private async Task RequestOrders() {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "order/requestAmount"),
@@ -119,7 +119,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private string getTheDesignationOfPerson(Guid guid) {
+        private string GetTheDesignationOfPerson(Guid guid) {
             foreach (Person x in PersonList) {
                 if (x.Guid.Equals(guid)) {
                     return x.Name;
@@ -128,7 +128,7 @@ namespace Essenskasse.Pages {
             return "";
         }
 
-        private async Task commitChangesP(int index) {
+        private async Task CommitChangesP(int index) {
             long euro = (long)PaymentAmount[index];
             short cent = (short)((PaymentAmount[index] - euro) * 100);
             ChangedPayments[index].Amount = new Money(euro, cent);
@@ -164,7 +164,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task commitChangesO(int index) {
+        private async Task CommitChangesO(int index) {
             long euro = (long)OrderAmount[index];
             short cent = (short)((OrderAmount[index] - euro) * 100);
             ChangedOrders[index].Money = new Money(euro, cent);

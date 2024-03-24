@@ -322,7 +322,7 @@ namespace EssenskasseAPI.Controllers {
             return dataTable;
         }
 
-        private List<Order> DataTableToListOfOrders(DataTable dataTableOrders) {
+        private static List<Order> DataTableToListOfOrders(DataTable dataTableOrders) {
             List<Order> ordersList = [];
             foreach (DataRow row in dataTableOrders.Rows) {
                 ordersList.Add(new Order(
@@ -341,7 +341,7 @@ namespace EssenskasseAPI.Controllers {
             return ordersList;
         }
 
-        private Person DataTableToPerson(DataTable DataTablePersonToUpdate) {
+        private static Person DataTableToPerson(DataTable DataTablePersonToUpdate) {
             return new Person(
                 guid: new Guid(DataTablePersonToUpdate.Rows[0]["Guid"].ToString()!),
                 name: DataTablePersonToUpdate.Rows[0]["Name"].ToString()!,
