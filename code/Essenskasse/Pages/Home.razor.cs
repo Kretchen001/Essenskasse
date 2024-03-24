@@ -35,12 +35,12 @@ namespace Essenskasse.Pages {
         private Money currentCashBalance = new Money(0, 0);
 
         protected override async Task OnInitializedAsync() {
-            await requestAllPerson();
-            currentCashBalanceCalculate();
+            await RequestAllPerson();
+            CurrentCashBalanceCalculate();
             base.StateHasChanged();
         }
 
-        private async Task requestAllPerson() {
+        private async Task RequestAllPerson() {
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -76,8 +76,8 @@ namespace Essenskasse.Pages {
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                await requestAllPerson();
-                currentCashBalanceCalculate();
+                await RequestAllPerson();
+                CurrentCashBalanceCalculate();
                 base.StateHasChanged();
             }
             else {
@@ -89,7 +89,7 @@ namespace Essenskasse.Pages {
             await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
         }
 
-        private void currentCashBalanceCalculate() {
+        private void CurrentCashBalanceCalculate() {
             currentCashBalance = new Money(0, 0);
             foreach (Person x in person) {
                 if (x.Saldo.IsPositiv()) {
