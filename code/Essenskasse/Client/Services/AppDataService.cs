@@ -26,5 +26,8 @@ namespace Essenskasse.Client.Services {
 
         /// <summary></summary>
         public Guid? AccessToken { get; set; } = null;
+
+        /// <summary></summary>
+        public string AdminEmail { get; set; } = "";
     }
 }
