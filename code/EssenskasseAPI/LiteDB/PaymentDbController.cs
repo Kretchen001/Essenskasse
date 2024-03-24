@@ -1,8 +1,5 @@
 ﻿using LiteDB;
 using Modells;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace EssenskasseAPI.LiteDB {
 

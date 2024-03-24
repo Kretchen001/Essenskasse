@@ -137,7 +137,7 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpPut, Route("updateDatabasePersonSaldo")]
         public IActionResult UpdatePersonSaldoInDatabase() {
-            using (Operation.Time("TaskDuration")) {
+            using (Operation.Time("UpdatePersonSaldoInDatabase")) {
                 Log.Information("UpdatePersonSaldoInDatabase called");
                 // get all Persons
                 string queryString = $"" +

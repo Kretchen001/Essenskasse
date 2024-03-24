@@ -9,7 +9,7 @@ namespace Modells {
 
         /// <summary></summary>
         [JsonInclude, BsonId]
-        public Guid Guid { get; set; }
+        public Guid Guid { get; set; } = new Guid();
         /// <summary></summary>
         [JsonInclude]
         public string Name { get; set; } = "";

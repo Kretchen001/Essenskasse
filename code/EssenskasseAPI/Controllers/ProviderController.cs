@@ -27,7 +27,7 @@ namespace EssenskasseAPI.Controllers {
 
                 string queryString = $"" +
                     $"SELECT * " +
-                    $"FROM essenskasse.Provider;" +
+                    $"FROM essenskasse.Provider " +
                     $"WHERE Sichtbar=true;";
 
                 DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
@@ -115,8 +115,8 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpPut, Route("change")]
-        public IActionResult ChangeProvider([FromHeader] Guid? guid, [FromHeader] string designation) {
+        [HttpPut, Route("update")]
+        public IActionResult ChangeProvider([FromHeader] Guid? guid, [FromHeader] string? designation) {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("ChangeProvider called");
                 if (guid is not null) {

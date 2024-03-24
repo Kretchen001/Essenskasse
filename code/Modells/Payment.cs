@@ -8,7 +8,7 @@ namespace Modells {
 
         /// <summary>When the payment took place.</summary>
         [JsonInclude, BsonId]
-        public DateTime DateTime { get; set; }
+        public DateTime DateTime { get; set; } = new DateTime();
         /// <summary>How much money is added to the chest.</summary>
         [JsonInclude]
         public Money Amount { get; set; } = new Money();

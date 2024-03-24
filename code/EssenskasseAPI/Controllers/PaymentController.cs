@@ -166,76 +166,90 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpPut, Route("update")]
-        public IActionResult UpdatePayment([FromHeader] long? dateAsLong,
+        public IActionResult UpdatePayment([FromHeader] Guid? accessToken,
+                                            [FromHeader] long? dateAsLong,
                                             [FromHeader] Guid? referencedPerson,
                                             [FromHeader] string? comment,
                                             [FromBody] Money? money) {
-            using (Operation.Time("TaskDuration")) {
+            using (Operation.Time("UpdatePayment")) {
                 Log.Information("UpdatePayment called");
-                if (dateAsLong is null) {
-                    Log.Warning("No dateString in Header");
-                    return BadRequest("Kein Datum angegeben!");
-                }
-                string queryString = $"" +
-                    $"SELECT * " +
-                    $"FROM essenskasse.Payment " +
-                    $"WHERE DateTime={dateAsLong}";
-                DataTable dataTable = QueryExecuterAtMySql(queryString);
-                List<Payment> payments = DataTableToListOfPayments(dataTable);
+                if (accessToken is not null) {
+                    string queryStringToken = $"" +
+                            $"SELECT COUNT(*) " +
+                            $"FROM essenskasse.TokenForChange " +
+                            $"WHERE Guid='{accessToken}';";
+                    DataTable dataTableTokenCount = QueryExecuterAtMySql(queryStringToken);
+                    if (dataTableTokenCount.Rows.Count == 1) {
+                        if (dateAsLong is null) {
+                            Log.Warning("No dateString in Header");
+                            return BadRequest("Kein Datum angegeben!");
+                        }
+                        string queryString = $"" +
+                            $"SELECT * " +
+                            $"FROM essenskasse.Payment " +
+                            $"WHERE DateTime={dateAsLong};";
+                        DataTable dataTable = QueryExecuterAtMySql(queryString);
+                        List<Payment> payments = DataTableToListOfPayments(dataTable);
 
-                if (payments.Count == 0) {
-                    Log.Warning($"At {dateAsLong} no Payment found");
-                    return NotFound("Keine Einzahlung zum angegebenen Datum gefunden.");
-                }
+                        if (payments.Count == 0) {
+                            Log.Warning($"At {dateAsLong} no Payment found");
+                            return NotFound("Keine Einzahlung zum angegebenen Datum gefunden.");
+                        }
 
-                bool hasChanges = false;
-                if (referencedPerson is not null) {
-                    Log.Information($"Payment updated from {payments[0].ReferencedPerson} to {referencedPerson}");
-                    payments[0].ReferencedPerson = referencedPerson ?? new Guid();
-                    hasChanges = true;
-                }
-                if (money is not null) {
-                    Log.Information($"Payment updated from {payments[0].Amount} to {money}");
-                    payments[0].Amount = money;
-                    hasChanges = true;
-                }
-                if (comment is not null) {
-                    Log.Information($"Payment updated from {payments[0].Comment} to {comment}");
-                    payments[0].Comment = comment ?? "";
-                    hasChanges = true;
-                }
+                        bool hasChanges = false;
+                        if (referencedPerson is not null) {
+                            Log.Information($"Payment updated from {payments[0].ReferencedPerson} to {referencedPerson}");
+                            payments[0].ReferencedPerson = referencedPerson ?? new Guid();
+                            hasChanges = true;
+                        }
+                        Money temp = payments[0].Amount;
+                        if (money is not null) {
+                            Log.Information($"Payment updated from {payments[0].Amount} to {money}");
+                            payments[0].Amount = money;
+                            hasChanges = true;
+                        }
+                        if (comment is not null) {
+                            Log.Information($"Payment updated from {payments[0].Comment} to {comment}");
+                            payments[0].Comment = comment ?? "";
+                            hasChanges = true;
+                        }
 
-                if (hasChanges) {
-                    // update person saldo
-                    string queryStringUpdateSaldo = $"" +
-                        $"SELECT * " +
-                        $"FROM essenskasse.Person " +
-                        $"WHERE Guid='{payments[0].ReferencedPerson}';";
-                    DataTable dataTablePersonToUpdate = QueryExecuterAtMySql(queryStringUpdateSaldo);
+                        if (hasChanges) {
+                            // update person saldo
+                            string queryStringUpdateSaldo = $"" +
+                                $"SELECT * " +
+                                $"FROM essenskasse.Person " +
+                                $"WHERE Guid='{payments[0].ReferencedPerson}';";
+                            DataTable dataTablePersonToUpdate = QueryExecuterAtMySql(queryStringUpdateSaldo);
 
-                    if (dataTablePersonToUpdate.Rows.Count == 1) {
-                        Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
-                        Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} old Saldo = {personToUpdate.Saldo}");
-                        personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, personToUpdate.Saldo, payments[0].Amount)!;
-                        Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} new Saldo = {personToUpdate.Saldo}");
+                            if (dataTablePersonToUpdate.Rows.Count == 1) {
+                                Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
+                                Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} old Saldo = {personToUpdate.Saldo}");
+                                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, personToUpdate.Saldo, temp)!;
+                                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, personToUpdate.Saldo, payments[0].Amount)!;
+                                Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} new Saldo = {personToUpdate.Saldo}");
 
-                        string queryStringPersonUpdate = $"" +
-                            $"UPDATE essenskasse.Person " +
-                            $"SET SaldoEuro = {personToUpdate.Saldo.Euro}, SaldoCent = {personToUpdate.Saldo.Cent} " +
-                            $"WHERE Guid='{personToUpdate.Guid}';";
-                        QueryExecuterAtMySql(queryStringPersonUpdate);
+                                string queryStringPersonUpdate = $"" +
+                                    $"UPDATE essenskasse.Person " +
+                                    $"SET SaldoEuro={personToUpdate.Saldo.Euro}, SaldoCent={personToUpdate.Saldo.Cent} " +
+                                    $"WHERE Guid='{personToUpdate.Guid}';";
+                                QueryExecuterAtMySql(queryStringPersonUpdate);
+                            }
+
+                            string queryStringUpdate = $"" +
+                                $"UPDATE essenskasse.Payment " +
+                                $"SET AmountEuro={payments[0].Amount.Euro}, AmountCent={payments[0].Amount.Cent}, ReferencedPerson='{payments[0].ReferencedPerson}', Comment='{comment}' " +
+                                $"WHERE DateTime='{dateAsLong}';";
+                            QueryExecuterAtMySql(queryStringUpdate);
+                            Log.Information("Payment successfully updated");
+                            return Ok();
+                        }
+                        Log.Warning($"At {dateAsLong} nothing to change at payment.");
+                        return NotFound("Keine Änderung an der Einzahlung zum angegebenen Datum.");
                     }
-
-                    string queryStringUpdate = $"" +
-                        $"UPDATE essenskasse.Payment " +
-                        $"SET AmountEuro={payments[0].Amount.Euro}, AmountCent={payments[0].Amount.Cent}, ReferencedPerson={payments[0].ReferencedPerson}, Comment='{comment}' " +
-                        $"WHERE DateTime='{dateAsLong}';";
-                    QueryExecuterAtMySql(queryStringUpdate);
-                    Log.Information("Payment successfully updated");
-                    return Ok();
                 }
-                Log.Warning($"At {dateAsLong} nothing to change at payment.");
-                return NotFound("Keine Änderung an der Einzahlung zum angegebenen Datum.");
+                Log.Warning("No AccessToken in Request");
+                return BadRequest("No AccessToken in Request");
             }
         }
 

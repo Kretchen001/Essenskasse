@@ -8,7 +8,7 @@ namespace Modells {
 
         /// <summary>Id of the provider</summary>
         [JsonInclude, BsonId]
-        public Guid Guid { get; set; }
+        public Guid Guid { get; set; } = new Guid();
         /// <summary>Name of the provider</summary>
         [JsonInclude]
         public string Designation { get; set; } = default!;

@@ -56,3 +56,9 @@ CREATE TABLE IF NOT EXISTS essenskasse.TransactionProcedure (
     AmountCent SMALLINT,
     Comment TEXT
 );
+
+-- Erstelle die Tabelle für TransactionProcedure
+CREATE TABLE IF NOT EXISTS essenskasse.TokenForChange (
+    DateTime BIGINT PRIMARY KEY,
+    Guid CHAR(36)
+);

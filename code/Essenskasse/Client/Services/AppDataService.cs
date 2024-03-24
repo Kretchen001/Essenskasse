@@ -19,9 +19,12 @@ namespace Essenskasse.Client.Services {
         public bool FilterShowProvider { get; set; } = true;
 
         /// <summary></summary>
-        public bool FilterShowPerson { get; set; } = true;
-        
-        /// <summary></summary>
         public Money DashboardMoneyLimit { get; set; } = new Money(0, 0);
+
+        /// <summary></summary>
+        public bool FilterShowPerson { get; set; } = true;
+
+        /// <summary></summary>
+        public Guid? AccessToken { get; set; } = null;
     }
 }

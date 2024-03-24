@@ -3,12 +3,13 @@
 @inject AppDataService AppData
 @inject ILocalStorageService LocalStorage
 @inject ThemeService themeService
+@inject NavigationManager Navi
 
 <ToastCard />
 
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        <NavMenu @ref="navMenu" />
     </div>
 
     <main>
@@ -19,10 +20,12 @@
 </div>
 
 @code {
+    private NavMenu navMenu;
 
     protected override async Task OnInitializedAsync() {
         await collectUserThemeAsync();
         await readLocalStorage();
+        await navMenu.ReloadNavMenu();
     }
 
     /// <summary> Request the LocalStorage for a saved theme. If no one is found is the light-theme selected. </summary>
@@ -46,6 +49,10 @@
         AppData.LoadAmountOrder = await LocalStorage.GetItemAsync<int>("loadAmountOfOrders") == 0 ? 25 : await LocalStorage.GetItemAsync<int>("loadAmountOfOrders"); 
         AppData.FilterShowProvider = await LocalStorage.GetItemAsync<bool>("filterShowProvider");
         AppData.FilterShowPerson = await LocalStorage.GetItemAsync<bool>("filterShowPerson");
+        AppData.AccessToken = await LocalStorage.GetItemAsync<Guid>("AccessToken");
         AppData.DashboardMoneyLimit = await LocalStorage.GetItemAsync<Money>("DashboardMoneyLimit") ?? new Money(0,0);
+        if (AppData.AccessToken.Equals(new Guid("00000000-0000-0000-0000-000000000000"))) {
+            AppData.AccessToken = null;
+        }
     }
 }
