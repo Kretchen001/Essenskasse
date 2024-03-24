@@ -18,7 +18,7 @@
         </label>
     </div>
     <div class="col-lg-9">
-        <select class="form-select" @bind="@selectedType">
+        <select class="form-select" @bind="@SelectedType">
             @foreach (string x in types) {
                 <option value="@x">@x</option>
             }
@@ -26,23 +26,23 @@
     </div>
 </div>
 
-@if (selectedType == types[0]) { // Einzahlungen/Payments
-    @foreach(int indexP in Enumerable.Range(0, payments.Count)) {
+@if (SelectedType == types[0]) { // Einzahlungen/Payments
+    @foreach(int indexP in Enumerable.Range(0, Payments.Count)) {
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
-                @getTheDesignationOfPerson(payments[indexP].ReferencedPerson)
+                @getTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
             </div>
             <div class="col-lg-4">
-                @payments[indexP].DateTime.ToString("dddd, dd MMMM yyyy")
+                @Payments[indexP].DateTime.ToString("dddd, dd. MMMM yyyy")
             </div>
             <div class="col-lg-3">
-                @payments[indexP].Amount.ToString()
+                @Payments[indexP].Amount.ToString()
             </div>
             <div class="col-lg-2">
             </div>
             <br />
             <div class="col-lg-3">
-                @getTheDesignationOfPerson(payments[indexP].ReferencedPerson)
+                @getTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
             </div>
             <div class="col-lg-4">
                 <label>
@@ -50,7 +50,7 @@
                 </label>
             </div>
             <div class="col-lg-3">
-                <input style="width: 100%" type="number" @bind="paymentAmount[indexP]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                <input style="width: 100%" type="number" @bind="PaymentAmount[indexP]" placeholder="Euro,Cent -> 1000 = 10,00€">
             </div>
             <div class="col-lg-2">
                 <button @onclick="() => commitChangesP(indexP)">
@@ -60,8 +60,8 @@
         </div>
     }
 }
-else if (selectedType == types[1]) { // Bestellungen/Orders
-    @foreach (Tuple<Order, int> x in orders) {
+else if (SelectedType == types[1]) { // Bestellungen/Orders
+    @foreach (Tuple<Order, int> x in Orders) {
         <div class="row" style="border: 2px dotted gray; margin: 2px">
             <div class="col-lg-3">
                 <strong>
@@ -69,7 +69,7 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
                 </strong>
             </div>
             <div class="col-lg-3">
-                @x.Item1.DateTime.ToString("dddd, dd MMMM yyyy")
+                @x.Item1.DateTime.ToString("dddd, dd. MMMM yyyy")
             </div>
             <div class="col-lg-2">
                 @x.Item1.Money.ToString()
@@ -79,8 +79,8 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
             </div>
             <br />
             <div class="col-lg-3">
-                <select class="form-select" style="margin: 0.2rem;" @bind="@changedOrders[x.Item2].ReferencedPerson">
-                    @foreach (Person y in person) {
+                <select class="form-select" style="margin: 0.2rem;" @bind="@ChangedOrders[x.Item2].ReferencedPerson">
+                    @foreach (Person y in PersonList) {
                         <option value="@y.Guid">@y.Name</option>
                     }
                 </select>
@@ -91,11 +91,11 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
                 </label>
             </div>
             <div class="col-lg-2">
-                <input style="width: 100%" type="number" @bind="orderAmount[x.Item2]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                <input style="width: 100%" type="number" @bind="OrderAmount[x.Item2]" placeholder="Euro,Cent -> 1000 = 10,00€">
             </div>
             <div class="col-lg-2">
-                <select class="form-select" style="margin: 0.2rem;" value="@changedOrders[x.Item2].Provider.Guid" @onchange="(e) => {changedOrders[x.Item2].Provider = provider.First(x => x.Guid.Equals(new Guid(e.Value!.ToString()!)));}">
-                    @foreach (Provider z in provider) {
+                <select class="form-select" style="margin: 0.2rem;" value="@ChangedOrders[x.Item2].Provider.Guid" @onchange="(e) => {ChangedOrders[x.Item2].Provider = Providers.First(x => x.Guid.Equals(new Guid(e.Value!.ToString()!)));}">
+                    @foreach (Provider z in Providers) {
                         <option value="@z.Guid">@z.Designation</option>
                     } 
                 </select>
@@ -106,176 +106,5 @@ else if (selectedType == types[1]) { // Bestellungen/Orders
                 </button>
             </div>
         </div>
-    }
-}
-
-@code {
-    List<string> types = ["Einzahlungen", "Bestellungen"];
-    string selectedType = string.Empty;
-
-    List<Person> person { get; set; } = [];
-    List<Provider> provider { get; set; } = [];
-    List<Payment> payments { get; set; } = [];
-
-    List<Payment> changedPayments { get; set; } = [];
-    List<decimal> paymentAmount { get; set; } = [];
-
-    List<Order> changedOrders { get; set; } = [];
-    List<decimal> orderAmount { get; set; } = [];
-
-    List<Tuple<Order, int>> orders { get; set; } = [];
-
-    protected override async Task OnInitializedAsync() {
-        await requestPerson();
-        await requestProvider();
-        await requestPayments();
-        await requestOrders();
-        selectedType = types[0];
-        base.StateHasChanged();
-    }
-
-    private async Task requestPerson() {
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
-            };
-
-        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
-            person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
-            person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
-            person = person.OrderBy(x => x.Name).ToList();
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
-        }
-    }
-
-    private async Task requestProvider() {
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "provider/requestAll")
-            };
-
-        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) { // success?
-                                            // deserialize the result-JSON with Newtownsoft to the List
-            provider = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
-            provider.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
-            provider = provider.OrderBy(x => x.Designation).ToList();
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
-        }
-    }
-
-    private async Task requestPayments() {
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "payment/requestAmount"),
-                Headers = {
-                    { "amount", AppData.LoadAmountPayment.ToString() }
-                }
-            };
-
-        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            payments = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
-            changedPayments = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
-
-            payments.ForEach(x => {
-                long longTemp = x.Amount.Euro;
-                longTemp += (long) (x.Amount.Cent * 0.01);
-                paymentAmount.Add(longTemp);
-            });
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
-        }
-    }
-
-    private async Task requestOrders() {
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "order/requestAmount"),
-                Headers = {
-                    { "amount", AppData.LoadAmountPayment.ToString() }
-                }
-            };
-
-        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            List<Order> orderS = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
-            changedOrders = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
-            for (int i = 0; i < orderS.Count; i += 1) {
-                long longTemp = changedOrders[i].Money.Euro;
-                longTemp += (long)(changedOrders[i].Money.Cent * 0.01);
-                orderAmount.Add(longTemp);
-                orders.Add(new Tuple<Order, int>(orderS[i], i));
-            }
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
-        }
-    }
-
-    private string getTheDesignationOfPerson(Guid guid) {
-        foreach(Person x in person) {
-            if (x.Guid.Equals(guid)) {
-                return x.Name;
-            }
-        }
-        return "";
-    }
-
-    private async Task commitChangesP(int index) {
-        long euro = (long) paymentAmount[index];
-        short cent = (short) ((paymentAmount[index] - euro) * 100);
-        changedPayments[index].Amount = new Money(euro, cent);
-        if (payments[index].Amount.Equals(changedPayments[index].Amount) &&
-            payments[index].DateTime.Equals(changedPayments[index].DateTime)) {
-            ToastService.ShowToast("Keine Änderungen detektiert!", ToastLevel.Info);
-            return;
-        }
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Put,
-                RequestUri = new Uri(Config["API-Adress"] + "payment/update"),
-                Headers = {
-                    { "accessToken", AppData.AccessToken.ToString() },
-                    { "dateString", changedPayments[index].DateTime.Ticks.ToString() }
-                },
-                Content = new StringContent(JsonConvert.SerializeObject(changedPayments[index].Amount), Encoding.UTF8, "application/json")
-            };
-
-        var response = await HttpClient.SendAsync(httpRequestMessage);
-
-        if (response.IsSuccessStatusCode) {
-            ToastService.ShowToast("Update erfolgreich", ToastLevel.Success);
-            payments[index] = new Payment() {
-                ReferencedPerson = payments[index].ReferencedPerson,
-                DateTime = changedPayments[index].DateTime,
-                Amount = changedPayments[index].Amount
-            };
-            base.StateHasChanged();
-            return;
-        }
-        else {
-            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
-        }
-    }
-
-    private async Task commitChangesO(int index) {
-        long euro = (long)orderAmount[index];
-        short cent = (short)((orderAmount[index] - euro) * 100);
-        changedOrders[index].Money = new Money(euro, cent);
-        if (orders[index].Item1.Equals(changedOrders[index])) {
-            ToastService.ShowToast("Keine Änderungen detektiert!", ToastLevel.Info);
-            return;
-        }
     }
 }

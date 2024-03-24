@@ -189,16 +189,17 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpPut, Route("update")]
-        public IActionResult UpdatePayment([FromHeader] Guid? accessToken, [FromHeader] long? dateAsLong,
+        public IActionResult UpdateOrder([FromHeader] Guid? accessToken,
+                                            [FromHeader] long? dateAsLong,
                                             [FromBody] Tuple<Money?, Provider?, Guid?> values) {
             using (Operation.Time("Update Order")) {
-                Log.Information("UpdatePerson called");
+                Log.Information("UpdateOrder called");
                 if (accessToken is not null) {
                     // TokenDbController tokenDbController = new TokenDbController();
                     // if (tokenDbController.CheckAccessToken(accessToken ?? new Guid("00000000-0000-0000-0000-000000000000"))) {
                     if (true) {
                         if (dateAsLong is null) {
-                            Log.Warning("Empty dateString Header");
+                            Log.Warning("Empty dateAsLong Header");
                             return BadRequest("Kein Datum angegeben!");
                         }
                         string queryString = $"" +
@@ -245,14 +246,14 @@ namespace EssenskasseAPI.Controllers {
 
                                 string queryStringPersonUpdate = $"" +
                                     $"UPDATE essenskasse.Person " +
-                                    $"SET SaldoEuro = {personToUpdate.Saldo.Euro}, SaldoCent = {personToUpdate.Saldo.Cent} " +
+                                    $"SET SaldoEuro={personToUpdate.Saldo.Euro}, SaldoCent={personToUpdate.Saldo.Cent} " +
                                     $"WHERE Guid='{personToUpdate.Guid}';";
                                 QueryExecuterAtMySql(queryStringPersonUpdate);
                             }
 
                             string queryStringUpdate = $"" +
                                 $"UPDATE essenskasse.Order " +
-                                $"SET AmountEuro={orders[0].Money.Euro}, AmountCent={orders[0].Money.Cent}, ProviderGuid={orders[0].Provider.Guid}, ProviderDesignation={orders[0].Provider.Designation}, ReferencedPerson={orders[0].ReferencedPerson} " +
+                                $"SET AmountEuro={orders[0].Money.Euro}, AmountCent={orders[0].Money.Cent}, ProviderGuid='{orders[0].Provider.Guid}', ProviderDesignation='{orders[0].Provider.Designation}', ReferencedPerson='{orders[0].ReferencedPerson}' " +
                                 $"WHERE DateTime='{dateAsLong}';";
                             QueryExecuterAtMySql(queryStringUpdate);
                             Log.Information("Order successfully updated");
