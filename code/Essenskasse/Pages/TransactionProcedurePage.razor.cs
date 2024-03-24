@@ -80,7 +80,7 @@ namespace Essenskasse.Pages {
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                ToastService.ShowToast("Erfolgreich übermittelt.", ToastLevel.Success);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.successfullyTransmitted)], ToastLevel.Success);
                 transactions.Add(temp);
                 CurrentCashBalanceCalculate();
                 base.StateHasChanged();

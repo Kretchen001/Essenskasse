@@ -141,6 +141,12 @@
   <data name="cannotBeChanged" xml:space="preserve">
     <value>(cannot be changed!)</value>
   </data>
+  <data name="cashBalanceCurrent" xml:space="preserve">
+    <value>Cash balance (actual)</value>
+  </data>
+  <data name="close" xml:space="preserve">
+    <value>Close</value>
+  </data>
   <data name="colortheme" xml:space="preserve">
     <value>Colortheme</value>
   </data>
@@ -243,6 +249,9 @@
   <data name="loadData" xml:space="preserve">
     <value>Load data</value>
   </data>
+  <data name="modifyEntity" xml:space="preserve">
+    <value>Change entries</value>
+  </data>
   <data name="name" xml:space="preserve">
     <value>Name</value>
   </data>
@@ -306,6 +315,9 @@
   <data name="success" xml:space="preserve">
     <value>Succes</value>
   </data>
+  <data name="successfullyTransmitted" xml:space="preserve">
+    <value>Successfully transmitted!</value>
+  </data>
   <data name="toastAdd" xml:space="preserve">
     <value>added.</value>
   </data>
@@ -318,6 +330,9 @@
   <data name="toastAdminCall" xml:space="preserve">
     <value>Please contact admin.</value>
   </data>
+  <data name="toastAdminEmailEntered" xml:space="preserve">
+    <value>Admin email successfully entered!</value>
+  </data>
   <data name="toastColorThemePre" xml:space="preserve">
     <value>Colortheme</value>
   </data>
@@ -326,6 +341,9 @@
   </data>
   <data name="toastConnectionError" xml:space="preserve">
     <value>Error in the transmission...</value>
+  </data>
+  <data name="toastEventErrorRememberProcedurePlease" xml:space="preserve">
+    <value>In the event of errors, please remember the procedure for readjustment!</value>
   </data>
   <data name="toastFilterPeronOff" xml:space="preserve">
     <value>Filter for people switched off!</value>
@@ -342,6 +360,9 @@
   <data name="toastGuidNotThere" xml:space="preserve">
     <value>Guid not forgiven!</value>
   </data>
+  <data name="toastLimitToValueSet" xml:space="preserve">
+    <value>Limit value set to:</value>
+  </data>
   <data name="toastMoneyFormatInvalid" xml:space="preserve">
     <value>Amount invalid!</value>
   </data>
@@ -350,6 +371,9 @@
   </data>
   <data name="toastNoChanges" xml:space="preserve">
     <value>No changes</value>
+  </data>
+  <data name="toastNoEmailEntered" xml:space="preserve">
+    <value>No e-mail entered!</value>
   </data>
   <data name="toastNoGuidThere" xml:space="preserve">
     <value>No Guid there!</value>
@@ -381,6 +405,9 @@
   <data name="toastSomethingWrong" xml:space="preserve">
     <value>Something has gone wrong!</value>
   </data>
+  <data name="toastSuccessRequestedAndSaved" xml:space="preserve">
+    <value>AccessToken successfully retrieved and entered!</value>
+  </data>
   <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
     <value>successfully set for the deposits to be loaded.</value>
   </data>
@@ -393,8 +420,14 @@
   <data name="toastSuccessfullyRemoved" xml:space="preserve">
     <value>successfully removed!</value>
   </data>
+  <data name="toastUpdateSuccessful" xml:space="preserve">
+    <value>Update successful!</value>
+  </data>
   <data name="turnOn" xml:space="preserve">
     <value>turn on</value>
+  </data>
+  <data name="typ" xml:space="preserve">
+    <value>Typ</value>
   </data>
   <data name="viewCompleteHistory" xml:space="preserve">
     <value>View complete history</value>

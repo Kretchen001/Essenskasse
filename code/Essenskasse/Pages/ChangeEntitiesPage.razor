@@ -7,14 +7,14 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 
-<PageTitle>Ändere Einträge</PageTitle>
+<PageTitle>@_loc[nameof(RessourceAppStrings.modifyEntity)]</PageTitle>
 
-<h2>Einträge ändern</h2>
+<h2>@_loc[nameof(RessourceAppStrings.modifyEntity)]</h2>
 
 <div class="row" style="height: fit-content; margin-bottom: 1rem;">
     <div class="col-lg-3 align-self-center">
         <label>
-            Typ
+            @_loc[nameof(RessourceAppStrings.typ)]
         </label>
     </div>
     <div class="col-lg-9">
@@ -46,7 +46,7 @@
             </div>
             <div class="col-lg-4">
                 <label>
-                    Datum nicht änderbar!
+                    @_loc[nameof(RessourceAppStrings.date)] @_loc[nameof(RessourceAppStrings.cannotBeChanged)]
                 </label>
             </div>
             <div class="col-lg-3">
@@ -57,7 +57,7 @@
             </div>
             <div class="col-lg-2">
                 <button @onclick="() => CommitChangesP(indexP)">
-                    Absenden
+                    @_loc[nameof(RessourceAppStrings.submit)]
                 </button>
             </div>
         </div>
@@ -90,7 +90,7 @@ else if (SelectedType == types[1]) { // Bestellungen/Orders
             </div>
             <div class="col-lg-3">
                 <label>
-                    Datum nicht änderbar!
+                    @_loc[nameof(RessourceAppStrings.date)] @_loc[nameof(RessourceAppStrings.cannotBeChanged)]
                 </label>
             </div>
             <div class="col-lg-2">
@@ -108,7 +108,7 @@ else if (SelectedType == types[1]) { // Bestellungen/Orders
             </div>
             <div class="col-lg-2">
                 <button @onclick="() => CommitChangesO(x.Item2)">
-                    Absenden
+                    @_loc[nameof(RessourceAppStrings.submit)]
                 </button>
             </div>
         </div>

@@ -214,7 +214,7 @@ namespace Essenskasse.Pages {
         /// <param name="limitToSave"></param>
         private async void SaveDashboardMoneyLimit(Money limitToSave) {
             await LocalStorage.SetItemAsync<Money>("DashboardMoneyLimit", limitToSave);
-            ToastService.ShowToast($"Grenzwert auf {limitToSave} gesetzt.", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastLimitToValueSet)] + $" {limitToSave}", ToastLevel.Success);
         }
 
         private async Task RequestAccessTokenForChanges() {
@@ -241,19 +241,19 @@ namespace Essenskasse.Pages {
         /// <param name="value"></param>
         private async void SaveAccessToken(Guid value) {
             await LocalStorage.SetItemAsync<Guid>("AccessToken", value);
-            ToastService.ShowToast("AccessToken erfolgreich abgerufen und eingetragen!", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessRequestedAndSaved)], ToastLevel.Success);
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
         private async void SaveAdminEmail(string value) {
             await LocalStorage.SetItemAsync<string>("AdminEmail", value);
-            ToastService.ShowToast("Admin-E-Mail erfolgreich eingetragen!\nBei Fehlern bitte das Vorgehen zum Nachstellen merken!", ToastLevel.Success);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminEmailEntered)] + "\n" + _loc[nameof(RessourceAppStrings.toastEventErrorRememberProcedurePlease)], ToastLevel.Success);
         }
 
         private async Task SendMessageToAdmin() {
             if (AdminEmail.Equals("")) {
-                ToastService.ShowToast("Keine E-Mail eingetragen!", ToastLevel.Info);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoEmailEntered)], ToastLevel.Info);
             }
             else {
                 string subject = "Fehler in der \"Essenkasse\"";

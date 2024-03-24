@@ -98,5 +98,17 @@
         emailCashManagement,
         inCent,
         comment,
+        toastUpdateSuccessful,
+        toastLimitToValueSet,
+        toastSuccessRequestedAndSaved,
+        toastAdminEmailEntered,
+        toastEventErrorRememberProcedurePlease,
+        toastNoEmailEntered,
+        cashBalanceCurrent,
+        typ,
+        modifyEntity,
+        close,
+        commentField,
+        successfullyTransmitted,
     }
 }

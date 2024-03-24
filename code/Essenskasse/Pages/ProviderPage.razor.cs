@@ -107,7 +107,7 @@ namespace Essenskasse.Pages {
                 }
             }
             else {
-                ToastService.ShowToast("Keine Guid angegeben!", ToastLevel.Error);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoGuidThere)], ToastLevel.Error);
             }
         }
 

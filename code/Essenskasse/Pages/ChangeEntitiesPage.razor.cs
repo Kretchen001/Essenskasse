@@ -8,7 +8,7 @@ namespace Essenskasse.Pages {
     
     public partial class ChangeEntitiesPage {
 
-        readonly List<string> types = ["Einzahlungen", "Bestellungen"];
+        List<string> types = [];
         string SelectedType { get; set; } = string.Empty;
 
         List<Person> PersonList { get; set; } = [];
@@ -23,6 +23,8 @@ namespace Essenskasse.Pages {
         List<decimal> OrderAmount { get; set; } = [];
 
         protected override async Task OnInitializedAsync() {
+            types.Add(_loc[nameof(RessourceAppStrings.payment)]);
+            types.Add(_loc[nameof(RessourceAppStrings.order)]);
             await RequestPerson();
             await RequestProvider();
             await RequestPayments();
@@ -134,7 +136,7 @@ namespace Essenskasse.Pages {
             ChangedPayments[index].Amount = new Money(euro, cent);
             if (Payments[index].Amount.Equals(ChangedPayments[index].Amount) &&
                 Payments[index].DateTime.Equals(ChangedPayments[index].DateTime)) {
-                ToastService.ShowToast("Keine Änderungen detektiert!", ToastLevel.Info);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
                 return;
             }
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -150,7 +152,7 @@ namespace Essenskasse.Pages {
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                ToastService.ShowToast("Update erfolgreich", ToastLevel.Success);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
                 Payments[index] = new Payment() {
                     ReferencedPerson = Payments[index].ReferencedPerson,
                     DateTime = ChangedPayments[index].DateTime,
@@ -169,7 +171,7 @@ namespace Essenskasse.Pages {
             short cent = (short)((OrderAmount[index] - euro) * 100);
             ChangedOrders[index].Money = new Money(euro, cent);
             if (Orders[index].Item1.Equals(ChangedOrders[index])) {
-                ToastService.ShowToast("Keine Änderungen detektiert!", ToastLevel.Info);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
                 return;
             }
             Money? a = ChangedOrders[index].Money;
@@ -197,7 +199,7 @@ namespace Essenskasse.Pages {
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                ToastService.ShowToast("Update erfolgreich", ToastLevel.Success);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
                 Orders[index] = new Tuple<Order, int>(new Order() {
                     DateTime = ChangedOrders[index].DateTime,
                     Provider = ChangedOrders[index].Provider,

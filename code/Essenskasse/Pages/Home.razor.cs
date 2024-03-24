@@ -50,9 +50,8 @@ namespace Essenskasse.Pages {
             try {
                 response = await HttpClient.SendAsync(httpRequestMessage);
             }
-            catch { //(Exception ex) {
+            catch {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                //await Console.Out.WriteLineAsync($"{ex.StackTrace}");
                 return;
             }
 
