@@ -19,5 +19,13 @@ DB_DATABASE=essenskasse
 DB_USERNAME=u
 DB_PASSWORD=p
 ```
+API-`appsettings.json`
+```json
+    "ConnectionStrings": {
+        "essenskasse": "Server=database;Port=3306;Uid=u;Pwd=p;Database=essenskasse;SslMode=None;"
+    }
+```
+Server should be the service name of the MySql-Docker-Container.
+The Uid is the User and Pwd is the password, that is set in the `.env`-file.
 
 ## Usage hints

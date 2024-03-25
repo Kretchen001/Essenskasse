@@ -33,8 +33,7 @@
         @_loc[nameof(RessourceAppStrings.addPerson)]
     </h4>
     @if (!accessToAdd) {
-        <button style="width: fit-content;"
-        @onclick="() => {accessToAdd = true;}">
+        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToAdd = true;}">
             @_loc[nameof(RessourceAppStrings.addPerson)]
         </button>
     }
@@ -55,7 +54,7 @@
             </div>
         </div>
         <div class="col-lg-2">
-            <button @onclick="() => { addNewPerson(); }">
+            <button @onclick="() => { AddNewPerson(); }">
                 @_loc[nameof(RessourceAppStrings.submit)]!
             </button>
         </div>
@@ -69,7 +68,7 @@
     <div class="row" style="margin-top: 1rem;">
         <div class="col-lg-2">
             <label>
-                Filter
+                @_loc[nameof(RessourceAppStrings.filter)]
             </label>
         </div>
         <div class="col-lg-10 align-self-center">
@@ -93,7 +92,7 @@
             <tr>
                 <td style="padding-left: 5px;">
                     <label>
-                        Kopieren:
+                        @_loc[nameof(RessourceAppStrings.copy)]:
                     </label>
                     <button style="border: none;" title="@_loc[nameof(RessourceAppStrings.copy)]" @onclick="async () => await CopyToClipboard(x.Guid.ToString())">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">

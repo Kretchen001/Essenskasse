@@ -1,4 +1,3 @@
-using LiteDB;
 using System.Text.Json.Serialization;
 
 namespace Modells {
@@ -7,7 +6,7 @@ namespace Modells {
     public class Payment {
 
         /// <summary>When the payment took place.</summary>
-        [JsonInclude, BsonId]
+        [JsonInclude]
         public DateTime DateTime { get; set; } = new DateTime();
         /// <summary>How much money is added to the chest.</summary>
         [JsonInclude]

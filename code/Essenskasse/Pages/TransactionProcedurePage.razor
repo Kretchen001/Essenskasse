@@ -24,14 +24,14 @@
     }
 </style>
 
-<PageTitle>Kaffeekasse</PageTitle>
+<PageTitle>@_loc[nameof(RessourceAppStrings.coffeeFund)]</PageTitle>
 
-<h3>Kaffeekasse</h3>
+<h3>@_loc[nameof(RessourceAppStrings.coffeeFund)]</h3>
 
 <br />
 <div class="row">
     <div class="col-lg-3 align-self-lg-center">
-        <h4>Kassenstand (Ist)</h4>
+        <h4>@_loc[nameof(RessourceAppStrings.cashBalanceCurrent)]</h4>
     </div>
     <div class="col-lg-9 align-self-lg-center">
         <h4>@currentCashBalance.ToString()</h4>
@@ -46,7 +46,7 @@
         </label>
     </div>
     <div class="col-lg-3 align-self-center" style="width: 25%">
-        <input style="width: 100%" type="number" @bind="amount" placeholder="Euro,Cent -> 10,00€">
+        <input style="width: 100%" type="number" @bind="Amount" placeholder="Euro,Cent -> 10,00€">
     </div>
     <div class="col-lg-3 align-self-center">
         <label>
@@ -55,7 +55,7 @@
     </div>
     <div class="col-lg-3 align-self-center">
         <label>
-            Negative Werte beinhalten Auszahlungen!
+            @_loc[nameof(RessourceAppStrings.negativeValuePayout)]
         </label>
     </div>
 </div>
@@ -63,7 +63,7 @@
 <div class="row">
     <div class="col-lg-3">
         <label>
-            Kommentar
+            @_loc[nameof(RessourceAppStrings.comment)]
         </label>
     </div>
     <div class="col-lg-9">
@@ -72,8 +72,8 @@
 </div>
 <br />
 <div class="row">
-    <button @onclick="() => insertNewTransaction()">
-        Einsenden
+    <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="() => InsertNewTransaction()">
+        @_loc[nameof(RessourceAppStrings.submit)]
     </button>
 </div>
 <br />

@@ -29,7 +29,7 @@
             Assert.False(orderA.Equals(orderB));
 
             orderB = new Order(orderA.Money, orderA.Provider, orderA.ReferencedPerson);
-            Assert.True(!orderA.Equals(orderB));
+            Assert.False(orderA.Equals(orderB));
             Assert.NotEqual(orderA.DateTime, orderB.DateTime);
         }
     }

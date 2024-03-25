@@ -1,6 +1,4 @@
-﻿using LiteDB;
-using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Modells {
 
@@ -8,7 +6,7 @@ namespace Modells {
     public class Person {
 
         /// <summary></summary>
-        [JsonInclude, BsonId]
+        [JsonInclude]
         public Guid Guid { get; set; } = new Guid();
         /// <summary></summary>
         [JsonInclude]

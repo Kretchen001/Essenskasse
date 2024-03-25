@@ -11,17 +11,17 @@ namespace Essenskasse.Pages {
         private List<TransactionProcedure> transactions = [];
 
         /// <summary>internalValue</summary>
-        private decimal _amount = 0;
-        private decimal amount {
+        private decimal _Amount = 0;
+        private decimal Amount {
             get {
-                return _amount;
+                return _Amount;
             }
             set {
                 if (value != 0) {
                     long euro = (long)value;
                     short cent = (short)((value - euro) * 100);
                     if (cent < 100) {
-                        _amount = value;
+                        _Amount = value;
                         amountMoney = new Money(euro, cent);
                     }
                     else {
@@ -41,12 +41,12 @@ namespace Essenskasse.Pages {
         private Money currentCashBalance = new Money(0, 0);
 
         protected override async Task OnInitializedAsync() {
-            await requestAllTransactions();
-            currentCashBalanceCalculate();
+            await RequestAllTransactions();
+            CurrentCashBalanceCalculate();
             base.StateHasChanged();
         }
 
-        private async Task requestAllTransactions() {
+        private async Task RequestAllTransactions() {
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -64,7 +64,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task insertNewTransaction() {
+        private async Task InsertNewTransaction() {
             // Request all Person, that are saved in the database
             TransactionProcedure temp = new TransactionProcedure() {
                 DateTime = DateTime.Now,
@@ -80,9 +80,9 @@ namespace Essenskasse.Pages {
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                ToastService.ShowToast("Erfolgreich übermittelt.", ToastLevel.Success);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.successfullyTransmitted)], ToastLevel.Success);
                 transactions.Add(temp);
-                currentCashBalanceCalculate();
+                CurrentCashBalanceCalculate();
                 base.StateHasChanged();
             }
             else {
@@ -90,7 +90,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private void currentCashBalanceCalculate() {
+        private void CurrentCashBalanceCalculate() {
             currentCashBalance = new Money(0, 0);
             foreach (TransactionProcedure x in transactions) {
                 if (x.Amount.IsPositiv()) {

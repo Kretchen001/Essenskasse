@@ -11,26 +11,26 @@ namespace Essenskasse.Pages {
 
         private List<Person>? person = new List<Person>();
         private Guid _selectedPerson;
-        private Guid selectedPerson {
+        private Guid SelectedPerson {
             get {
                 return _selectedPerson;
             }
             set {
                 _selectedPerson = value;
-                requestPaymentsOfPerson();
+                RequestPaymentsOfPerson();
             }
         }
 
-        private decimal _payment = 0;
-        private decimal payment {
+        private decimal _Payment = 0;
+        private decimal Payment {
             get {
-                return _payment;
+                return _Payment;
             }
             set {
                 if (value != 0) {
-                    Money temp = convertToMoney(value);
+                    Money temp = ConvertToMoney(value);
                     if (temp.Cent < 100) {
-                        _payment = value;
+                        _Payment = value;
                     }
                     else {
                         // nothing
@@ -38,33 +38,33 @@ namespace Essenskasse.Pages {
                 }
             }
         }
-        private Money money {
+        private Money Money {
             get {
-                return convertToMoney(_payment);
+                return ConvertToMoney(_Payment);
             }
         }
 
         private string comment = "";
 
         private List<Payment> paymentsOfSelectedPerson = new List<Payment>();
-        private int amount {
+        private int Amount {
             get => AppData.LoadAmountPayment;
         }
 
         protected override async Task OnInitializedAsync() {
-            await refreshPersonList();
+            await RefreshPersonList();
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        private Money convertToMoney(decimal value) {
+        private static Money ConvertToMoney(decimal value) {
             long euro = (long)value;
             short cent = (short)((value - euro) * 100);
             return new Money(euro, cent);
         }
 
-        private async Task refreshPersonList() {
+        private async Task RefreshPersonList() {
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -80,7 +80,7 @@ namespace Essenskasse.Pages {
                 person = person.OrderBy(x => x.Name).ToList();
 
                 if (person.Count > 0) {
-                    selectedPerson = person[0].Guid;
+                    SelectedPerson = person[0].Guid;
                 }
             }
             else {
@@ -88,14 +88,14 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async void requestPaymentsOfPerson() {
+        private async void RequestPaymentsOfPerson() {
             // Request last 10 payments of a person
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/fromPerson"),
                 Headers = {
-                    { "guid", selectedPerson.ToString() },
-                    { "amount", amount.ToString() }
+                    { "guid", SelectedPerson.ToString() },
+                    { "amount", Amount.ToString() }
                 }
             };
 
@@ -103,6 +103,7 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 paymentsOfSelectedPerson = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+                paymentsOfSelectedPerson.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
@@ -111,8 +112,8 @@ namespace Essenskasse.Pages {
             base.StateHasChanged();
         }
 
-        private async void insertPayment() {
-            if (!(await JSRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.insertFollowingAmount)] + "\n" + money.ToString()))) {
+        private async void InsertPayment() {
+            if (!(await JSRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.insertFollowingAmount)] + "\n" + Money.ToString()))) {
                 return;
             }
 
@@ -120,10 +121,10 @@ namespace Essenskasse.Pages {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),
                 Headers = {
-                    {"referencedPerson", selectedPerson.ToString()},
-                    {"comment", comment}
+                    {"referencedPerson", SelectedPerson.ToString()},
+                    {"comment", Uri.EscapeDataString(comment)}
                 },
-                Content = new StringContent(JsonConvert.SerializeObject(money), Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonConvert.SerializeObject(Money), Encoding.UTF8, "application/json")
             };
 
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);

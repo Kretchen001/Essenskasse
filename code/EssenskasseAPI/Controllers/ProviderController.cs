@@ -154,14 +154,15 @@ namespace EssenskasseAPI.Controllers {
         }
 
         [HttpDelete, Route("remove")]
-        public IActionResult RemoveProvider([FromHeader] Guid? guid, bool per = false) {
-            using (Operation.Time("TaskDuration")) {
-                Log.Information("RemoveProvider called");
+        public IActionResult RemoveProvider([FromHeader] Guid? guid,
+                                                [FromHeader] bool per = false) {
+            using (Operation.Time("RemoveProvider")) {
+                Log.Information($"RemoveProvider called with per={per}");
                 if (guid is not null) {
                     string queryString = $"" +
                         $"SELECT * " +
-                        $"FROM essenskasse.Person " +
-                        $"WHERE Guid={guid}";
+                        $"FROM essenskasse.Provider " +
+                        $"WHERE Guid='{guid}'";
                     DataTable dataTable = QueryExecuterAtMySql(queryString);
                     List<Provider> provider = DataTableToListOfProvider(dataTable);
 
@@ -169,7 +170,7 @@ namespace EssenskasseAPI.Controllers {
                         if (per == false) {
                             string queryStringInvisible = $"" +
                                 $"UPDATE essenskasse.Provider " +
-                                $"SET Sichtbarkeit=false " +
+                                $"SET Sichtbar=false " +
                                 $"WHERE Guid='{guid}';";
                             QueryExecuterAtMySql(queryStringInvisible);
                             Log.Information($"{provider[0].Designation} with {provider[0].Guid} successfully invisible set");
@@ -179,7 +180,7 @@ namespace EssenskasseAPI.Controllers {
                             string queryStringDelete = $"" +
                                 $"DELETE " +
                                 $"FROM essenskasse.Provider" +
-                                $"WHERE Guid={guid};";
+                                $"WHERE Guid='{guid}';";
                             QueryExecuterAtMySql(queryStringDelete);
                             Log.Information($"{provider[0].Designation} with {provider[0].Guid} successfully removed");
                             return Ok(JsonConvert.SerializeObject(provider[0]));
@@ -213,7 +214,7 @@ namespace EssenskasseAPI.Controllers {
             return dataTable;
         }
 
-        private List<Provider> DataTableToListOfProvider(DataTable dataTable) {
+        private static List<Provider> DataTableToListOfProvider(DataTable dataTable) {
             List<Provider> providerController = [];
             foreach (DataRow row in dataTable.Rows) {
                 providerController.Add(new Provider() {

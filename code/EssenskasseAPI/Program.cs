@@ -24,11 +24,6 @@ namespace EssenskasseAPI {
             app.UseSwaggerUI(x => {
                 x.SwaggerEndpoint("/swagger/v1/swagger.json", "EssenskasseAPI");
             });
-            //// Configure the HTTP request pipeline.
-            //if (app.Environment.IsDevelopment()) {
-            //    app.UseSwagger();
-            //    app.UseSwaggerUI();
-            //}
 
             // Allow CORS
             app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());

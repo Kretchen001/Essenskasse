@@ -37,7 +37,7 @@
                 <option value="@entity.Key">@entity.Value</option>
             }
         </select>
-        <button @onclick="() => saveUserThemePersistentAsync()">
+        <button @onclick="() => SaveUserThemePersistentAsync()">
             @_loc[nameof(RessourceAppStrings.savePermanent)]
         </button>
     </div>
@@ -102,12 +102,12 @@
 <div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
     <div class="col-lg-6">
         <label>
-            Grenzwert für Positives Saldo
+            @_loc[nameof(RessourceAppStrings.limitValuePositivBalance)]
         </label>
     </div>
     <div class="col-lg-2" align="center">
         <label>
-            Aktuell: @DashboardMoneyLimit.ToString()
+            @_loc[nameof(RessourceAppStrings.current)]: @DashboardMoneyLimit.ToString()
         </label>
     </div>
     <div class="col-lg-2" align="center">
@@ -120,24 +120,24 @@
 <div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
     <div class="col-lg-4">
         <label>
-            Token für Änderungen
+            @_loc[nameof(RessourceAppStrings.tokenForChange)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        @if (existAccessToken) {
+        @if (ExistAccessToken) {
             <label>
-                Eingetragen
+                @_loc[nameof(RessourceAppStrings.entered)]
             </label>
             <button @onclick="() => ToastService.ShowToast(currentlyNotSupported, ToastLevel.Info)">
-                Ändern?
+                @_loc[nameof(RessourceAppStrings.change)]?
             </button>
         }
         else {
             <label>
-                Nicht angefordert
+                @_loc[nameof(RessourceAppStrings.notRequested)]
             </label>
-            <button @onclick="() => requestAccessTokenForChanges()">
-                Anfordern
+            <button @onclick="() => RequestAccessTokenForChanges()">
+                @_loc[nameof(RessourceAppStrings.request)]
             </button>
         }
     </div>
@@ -149,7 +149,7 @@
 <div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
     <div class="col-lg-4">
         <label>
-            E-Mail für Admin-Kontakt
+            @_loc[nameof(RessourceAppStrings.emailAdminContact)]
         </label>
     </div>
     <div class="col-lg-4" align="right">
@@ -157,7 +157,7 @@
     </div>
     <div class="col-lg-4" align="left">
         <button @onclick="SendMessageToAdmin">
-            Benachrichtigen
+            @_loc[nameof(RessourceAppStrings.notify)]
         </button>
     </div>
 </div>

@@ -1,4 +1,3 @@
-using LiteDB;
 using System.Text.Json.Serialization;
 
 namespace Modells {
@@ -7,7 +6,7 @@ namespace Modells {
     public class Order {
 
         /// <summary></summary>
-        [JsonInclude, BsonId]
+        [JsonInclude]
         public DateTime DateTime { get; set; } = new DateTime();
         /// <summary></summary>
         [JsonInclude]

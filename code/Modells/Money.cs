@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Modells {
 
@@ -6,10 +7,10 @@ namespace Modells {
     public class Money {
 
         /// <summary>long as a pre-decimal number</summary>
-        [JsonInclude]
+        [JsonInclude, JsonPropertyName("Euro"), JsonProperty(nameof(Euro))]
         public long Euro { get; set; } = 0;
         /// <summary>short as a post-decimal number</summary>
-        [JsonInclude]
+        [JsonInclude, JsonPropertyName("Cent"), JsonProperty(nameof(Cent))]
         public short Cent { get; set; } = 0;
 
         /// <summary>Empty ctor.</summary>
@@ -18,7 +19,7 @@ namespace Modells {
         /// <summary></summary>
         /// <param name="euro"></param>
         /// <param name="cent"></param>
-        [JsonConstructor]
+        [System.Text.Json.Serialization.JsonConstructor]
         public Money(long euro, short cent) {
             Euro = euro;
             Cent = cent;

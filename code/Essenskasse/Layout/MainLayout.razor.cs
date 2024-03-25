@@ -7,13 +7,13 @@ namespace Essenskasse.Layout {
         private NavMenu navMenu;
 
         protected override async Task OnInitializedAsync() {
-            await collectUserThemeAsync();
-            await readLocalStorage();
+            await CollectUserThemeAsync();
+            await ReadLocalStorage();
             await navMenu.ReloadNavMenu();
         }
 
         /// <summary> Request the LocalStorage for a saved theme. If no one is found is the light-theme selected. </summary>
-        private async Task collectUserThemeAsync() {
+        private async Task CollectUserThemeAsync() {
             switch (await LocalStorage.GetItemAsStringAsync("UserTheme")) {
                 case "Dark": {
                         themeService.ThemeCode = ColorCode.Dark;
@@ -27,7 +27,7 @@ namespace Essenskasse.Layout {
         }
 
         /// <summary>Read all Key-Value Pairs from the LocalStorage and bring it to its necessary place.</summary>
-        private async Task readLocalStorage() {
+        private async Task ReadLocalStorage() {
             AppData.IsSingleListWishDashboard = await LocalStorage.GetItemAsync<bool>("IsSingleWishListDashboard");
             AppData.LoadAmountPayment = await LocalStorage.GetItemAsync<int>("loadAmountOfPayments") == 0 ? 10 : await LocalStorage.GetItemAsync<int>("loadAmountOfPayments");
             AppData.LoadAmountOrder = await LocalStorage.GetItemAsync<int>("loadAmountOfOrders") == 0 ? 25 : await LocalStorage.GetItemAsync<int>("loadAmountOfOrders");

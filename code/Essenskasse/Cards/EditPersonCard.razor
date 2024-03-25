@@ -84,8 +84,6 @@
 
     private bool dataNotLoadYet = true;
 
-    ElementReference inputTypeFileElement;
-
     private async void requestPersonFromTheGuidInput () {
         if (Guid.TryParse(selectedPerson, out _)) {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {

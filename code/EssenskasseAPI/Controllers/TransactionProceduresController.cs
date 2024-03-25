@@ -76,7 +76,7 @@ namespace EssenskasseAPI.Controllers {
             return dataTable;
         }
 
-        private List<TransactionProcedure> DataTableToListOfProvider(DataTable dataTable) {
+        private static List<TransactionProcedure> DataTableToListOfProvider(DataTable dataTable) {
             List<TransactionProcedure> providerController = [];
             foreach (DataRow row in dataTable.Rows) {
                 providerController.Add(new TransactionProcedure() {

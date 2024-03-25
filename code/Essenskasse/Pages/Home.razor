@@ -16,22 +16,22 @@
     </div>
     <div class="col-lg-8 align-self-lg-center">
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="isSingleListWish">
-            <label class="form-check-label" for="flexSwitchCheckChecked">@_loc[nameof(RessourceAppStrings.singleColumn)] = @returnListWish</label>
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="IsSingleListWish">
+            <label class="form-check-label" for="flexSwitchCheckChecked">@_loc[nameof(RessourceAppStrings.singleColumn)] = @ReturnListWish</label>
         </div>
     </div>
 </div>
 <hr />
 <div class="row">
     <div class="col-lg-3 align-self-lg-center">
-        <h3>Kassenstand (Ist)</h3>
+        <h3>@_loc[nameof(RessourceAppStrings.cashBalanceCurrent)]</h3>
     </div>
     <div class="col-lg-9 align-self-lg-center">
         <h3>@currentCashBalance.ToString()</h3>
     </div>
 </div>
 <hr />
-@if (isSingleListWish) {
+@if (IsSingleListWish) {
     <div class="row">
         <div class="col-lg-12">
             @for (int i = 0; i < person.Count; i += 1) {
@@ -65,7 +65,9 @@ else {
         </div>
     </div>
 }
-
-<button @onclick="RecalculateSaldos">
+<br />
+<hr />
+<br />
+<button type="button" class="btn-secondary" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="RecalculateSaldos">
     @_loc[nameof(RessourceAppStrings.recalculateSaldo)]
 </button>

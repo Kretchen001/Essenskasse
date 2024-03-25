@@ -39,7 +39,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async void addNewAnbieter() {
+        private async void AddNewAnbieter() {
             if (newProviderDesignation.Equals("")) {
                 return;
             }
@@ -67,7 +67,7 @@ namespace Essenskasse.Pages {
             base.StateHasChanged();
         }
 
-        private async Task deleteAnbieter() {
+        private async Task DeleteAnbieter() {
             if (Guid.TryParse(providerToDeleteGuid, out Guid providerDesignation)) {
                 Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
                 if (tempAnbieter is null) {
@@ -84,8 +84,8 @@ namespace Essenskasse.Pages {
                         Method = HttpMethod.Delete,
                         RequestUri = new Uri(Config["API-Adress"] + "provider/remove"),
                         Headers = {
-                        {"guid", providerToDeleteGuid}
-                    }
+                            {"guid", providerToDeleteGuid}
+                        }
                     };
 
                     HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
@@ -107,7 +107,7 @@ namespace Essenskasse.Pages {
                 }
             }
             else {
-                ToastService.ShowToast("Keine Guid angegeben!", ToastLevel.Error);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoGuidThere)], ToastLevel.Error);
             }
         }
 

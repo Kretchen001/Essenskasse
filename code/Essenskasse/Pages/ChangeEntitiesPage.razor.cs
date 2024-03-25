@@ -5,10 +5,10 @@ using Newtonsoft.Json;
 using System.Text;
 
 namespace Essenskasse.Pages {
-    
+
     public partial class ChangeEntitiesPage {
 
-        readonly List<string> types = ["Einzahlungen", "Bestellungen"];
+        List<string> types = [];
         string SelectedType { get; set; } = string.Empty;
 
         List<Person> PersonList { get; set; } = [];
@@ -23,15 +23,17 @@ namespace Essenskasse.Pages {
         List<decimal> OrderAmount { get; set; } = [];
 
         protected override async Task OnInitializedAsync() {
-            await requestPerson();
-            await requestProvider();
-            await requestPayments();
-            await requestOrders();
+            types.Add(_loc[nameof(RessourceAppStrings.payment)]);
+            types.Add(_loc[nameof(RessourceAppStrings.order)]);
+            await RequestPerson();
+            await RequestProvider();
+            await RequestPayments();
+            await RequestOrders();
             SelectedType = types[0];
             base.StateHasChanged();
         }
 
-        private async Task requestPerson() {
+        private async Task RequestPerson() {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
@@ -50,7 +52,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task requestProvider() {
+        private async Task RequestProvider() {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "provider/requestAll")
@@ -69,7 +71,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task requestPayments() {
+        private async Task RequestPayments() {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/requestAmount"),
@@ -94,7 +96,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task requestOrders() {
+        private async Task RequestOrders() {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "order/requestAmount"),
@@ -119,7 +121,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private string getTheDesignationOfPerson(Guid guid) {
+        private string GetTheDesignationOfPerson(Guid guid) {
             foreach (Person x in PersonList) {
                 if (x.Guid.Equals(guid)) {
                     return x.Name;
@@ -128,13 +130,13 @@ namespace Essenskasse.Pages {
             return "";
         }
 
-        private async Task commitChangesP(int index) {
+        private async Task CommitChangesP(int index) {
             long euro = (long)PaymentAmount[index];
             short cent = (short)((PaymentAmount[index] - euro) * 100);
             ChangedPayments[index].Amount = new Money(euro, cent);
             if (Payments[index].Amount.Equals(ChangedPayments[index].Amount) &&
                 Payments[index].DateTime.Equals(ChangedPayments[index].DateTime)) {
-                ToastService.ShowToast("Keine Änderungen detektiert!", ToastLevel.Info);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
                 return;
             }
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -150,7 +152,7 @@ namespace Essenskasse.Pages {
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                ToastService.ShowToast("Update erfolgreich", ToastLevel.Success);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
                 Payments[index] = new Payment() {
                     ReferencedPerson = Payments[index].ReferencedPerson,
                     DateTime = ChangedPayments[index].DateTime,
@@ -164,12 +166,12 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task commitChangesO(int index) {
+        private async Task CommitChangesO(int index) {
             long euro = (long)OrderAmount[index];
             short cent = (short)((OrderAmount[index] - euro) * 100);
             ChangedOrders[index].Money = new Money(euro, cent);
             if (Orders[index].Item1.Equals(ChangedOrders[index])) {
-                ToastService.ShowToast("Keine Änderungen detektiert!", ToastLevel.Info);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
                 return;
             }
             Money? a = ChangedOrders[index].Money;
@@ -178,26 +180,32 @@ namespace Essenskasse.Pages {
             if (Orders[index].Item1.Money.Equals(ChangedOrders[index].Money)) {
                 a = null;
             }
-            if (Orders[index].Item1.Provider.Equals(ChangedOrders[index].Provider)) {
+            if (Orders[index].Item1.Provider.Equals(ChangedOrders[index].Provider) || Providers.Exists(x => x.Guid.Equals(ChangedOrders[index].Provider.Guid))) {
                 b = null;
             }
             if (Orders[index].Item1.ReferencedPerson.Equals(ChangedOrders[index].ReferencedPerson)) {
                 c = null;
             }
+            MoneyProviderGuidData data = new MoneyProviderGuidData() { 
+                Money = a,
+                Provider = b,
+                ReferencedPerson = c
+            };
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Put,
                 RequestUri = new Uri(Config["API-Adress"] + "order/update"),
                 Headers = {
                     { "accessToken", AppData.AccessToken.ToString() },
-                    { "dateAsLong", ChangedOrders[index].DateTime.Ticks.ToString() }
+                    { "dateAsLong", ChangedOrders[index].DateTime.Ticks.ToString() },
+                    { "referencedPerson", c.ToString() }
                 },
-                Content = new StringContent(JsonConvert.SerializeObject(new Tuple<Money?, Provider?, Guid?>(a, b, c)), Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json")
             };
 
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                ToastService.ShowToast("Update erfolgreich", ToastLevel.Success);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
                 Orders[index] = new Tuple<Order, int>(new Order() {
                     DateTime = ChangedOrders[index].DateTime,
                     Provider = ChangedOrders[index].Provider,

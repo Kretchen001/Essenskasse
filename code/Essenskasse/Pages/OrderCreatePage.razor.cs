@@ -32,12 +32,12 @@ namespace Essenskasse.Pages {
         }
 
         protected override async Task OnInitializedAsync() {
-            await requestAllProvider();
-            await requestAllPerson();
+            await RequestAllProvider();
+            await RequestAllPerson();
             base.StateHasChanged();
         }
 
-        private async Task requestAllProvider() {
+        private async Task RequestAllProvider() {
             // Request all providers, that are saved in the database.
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -58,7 +58,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task requestAllPerson() {
+        private async Task RequestAllPerson() {
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -93,7 +93,7 @@ namespace Essenskasse.Pages {
             money[index] = newMoney;
         }
 
-        private async Task postOrderForTheDay() {
+        private async Task PostOrderForTheDay() {
             // request Date
             HttpRequestMessage httpRequestMessageDate = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -169,7 +169,7 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task loadAndShowHistory(int index) {
+        private async Task LoadAndShowHistory(int index) {
             // toggle preview
             showHistory[index] = !showHistory[index];
 

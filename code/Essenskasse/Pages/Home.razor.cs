@@ -2,13 +2,12 @@
 using Essenskasse.Ressources;
 using Modells;
 using Newtonsoft.Json;
-using System.Transactions;
 
 namespace Essenskasse.Pages {
 
     public partial class Home {
 
-        private bool isSingleListWish {
+        private bool IsSingleListWish {
             get {
                 return AppData.IsSingleListWishDashboard;
             }
@@ -18,9 +17,9 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private string returnListWish {
+        private string ReturnListWish {
             get {
-                if (isSingleListWish) {
+                if (IsSingleListWish) {
                     return _loc[nameof(RessourceAppStrings.yes)];
                 }
                 else {
@@ -51,9 +50,8 @@ namespace Essenskasse.Pages {
             try {
                 response = await HttpClient.SendAsync(httpRequestMessage);
             }
-            catch { //(Exception ex) {
+            catch {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                //await Console.Out.WriteLineAsync($"{ex.StackTrace}");
                 return;
             }
 

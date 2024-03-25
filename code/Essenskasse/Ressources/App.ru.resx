@@ -141,6 +141,21 @@
   <data name="cannotBeChanged" xml:space="preserve">
     <value>(Изменить нельзя!)</value>
   </data>
+  <data name="cashBalanceCurrent" xml:space="preserve">
+    <value>Остаток денежных средств (фактический)</value>
+  </data>
+  <data name="change" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="changes" xml:space="preserve">
+    <value>Изменения</value>
+  </data>
+  <data name="close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="coffeeFund" xml:space="preserve">
+    <value>Кофейный фонд</value>
+  </data>
   <data name="colortheme" xml:space="preserve">
     <value>Цветовая схема</value>
   </data>
@@ -158,6 +173,9 @@
   </data>
   <data name="creditAmount" xml:space="preserve">
     <value>Зачислите сумму!</value>
+  </data>
+  <data name="current" xml:space="preserve">
+    <value>Текущий</value>
   </data>
   <data name="currentlySelected" xml:space="preserve">
     <value>выбранный в данный момент</value>
@@ -179,6 +197,9 @@
   </data>
   <data name="email" xml:space="preserve">
     <value>e-mail</value>
+  </data>
+  <data name="emailAdminContact" xml:space="preserve">
+    <value>Электронная почта для связи с администратором</value>
   </data>
   <data name="emailCashManagement" xml:space="preserve">
     <value>правление вашим кассовым аппаратом</value>
@@ -203,6 +224,9 @@
   </data>
   <data name="english" xml:space="preserve">
     <value>Английский</value>
+  </data>
+  <data name="entered" xml:space="preserve">
+    <value>Зарегистрированный</value>
   </data>
   <data name="error" xml:space="preserve">
     <value>Ошибка</value>
@@ -240,11 +264,20 @@
   <data name="light" xml:space="preserve">
     <value>Свет</value>
   </data>
+  <data name="limitValuePositivBalance" xml:space="preserve">
+    <value>Предельное значение для положительного баланса</value>
+  </data>
   <data name="loadData" xml:space="preserve">
     <value>Данные о нагрузке</value>
   </data>
+  <data name="modifyEntity" xml:space="preserve">
+    <value>Записи об изменениях</value>
+  </data>
   <data name="name" xml:space="preserve">
     <value>Имя</value>
+  </data>
+  <data name="negativeValuePayout" xml:space="preserve">
+    <value>Отрицательные значения включают выплаты!</value>
   </data>
   <data name="no" xml:space="preserve">
     <value>Нет</value>
@@ -252,8 +285,14 @@
   <data name="notEntered" xml:space="preserve">
     <value>Не зарегистрирован...</value>
   </data>
+  <data name="notRequested" xml:space="preserve">
+    <value>Не запрашивается</value>
+  </data>
   <data name="noticeable" xml:space="preserve">
     <value>Заметный</value>
+  </data>
+  <data name="notify" xml:space="preserve">
+    <value>Уведомить</value>
   </data>
   <data name="order" xml:space="preserve">
     <value>заказ</value>
@@ -288,6 +327,9 @@
   <data name="removeAnEntry" xml:space="preserve">
     <value>Удалить запись</value>
   </data>
+  <data name="request" xml:space="preserve">
+    <value>Запрос</value>
+  </data>
   <data name="russian" xml:space="preserve">
     <value>Русский</value>
   </data>
@@ -306,6 +348,9 @@
   <data name="success" xml:space="preserve">
     <value>Успех</value>
   </data>
+  <data name="successfullyTransmitted" xml:space="preserve">
+    <value>Успешно передано!</value>
+  </data>
   <data name="toastAdd" xml:space="preserve">
     <value>добавлено.</value>
   </data>
@@ -318,6 +363,9 @@
   <data name="toastAdminCall" xml:space="preserve">
     <value>Пожалуйста, свяжитесь с администратором.</value>
   </data>
+  <data name="toastAdminEmailEntered" xml:space="preserve">
+    <value>Электронная почта администратора успешно введена!</value>
+  </data>
   <data name="toastColorThemePre" xml:space="preserve">
     <value>Цветовая схема</value>
   </data>
@@ -326,6 +374,9 @@
   </data>
   <data name="toastConnectionError" xml:space="preserve">
     <value>Ошибка при передаче...</value>
+  </data>
+  <data name="toastEventErrorRememberProcedurePlease" xml:space="preserve">
+    <value>В случае ошибок, пожалуйста, запомните процедуру регулировки!</value>
   </data>
   <data name="toastFilterPeronOff" xml:space="preserve">
     <value>Фильтр для отключенных людей!</value>
@@ -342,6 +393,9 @@
   <data name="toastGuidNotThere" xml:space="preserve">
     <value>Guid не прощает!</value>
   </data>
+  <data name="toastLimitToValueSet" xml:space="preserve">
+    <value>Предельное значение установлено на:</value>
+  </data>
   <data name="toastMoneyFormatInvalid" xml:space="preserve">
     <value>Сумма недействительна!</value>
   </data>
@@ -350,6 +404,9 @@
   </data>
   <data name="toastNoChanges" xml:space="preserve">
     <value>Без изменений</value>
+  </data>
+  <data name="toastNoEmailEntered" xml:space="preserve">
+    <value>Электронная почта не введена!</value>
   </data>
   <data name="toastNoGuidThere" xml:space="preserve">
     <value>Никакого Гида!</value>
@@ -381,6 +438,9 @@
   <data name="toastSomethingWrong" xml:space="preserve">
     <value>Что-то пошло не так!</value>
   </data>
+  <data name="toastSuccessRequestedAndSaved" xml:space="preserve">
+    <value>AccessToken успешно получен и введен!</value>
+  </data>
   <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
     <value>успешно установлен для загрузки депозитов.</value>
   </data>
@@ -393,8 +453,17 @@
   <data name="toastSuccessfullyRemoved" xml:space="preserve">
     <value>успешно удалены!</value>
   </data>
+  <data name="toastUpdateSuccessful" xml:space="preserve">
+    <value>Обновление прошло успешно!</value>
+  </data>
+  <data name="tokenForChange" xml:space="preserve">
+    <value>Токен для изменений</value>
+  </data>
   <data name="turnOn" xml:space="preserve">
     <value>включить</value>
+  </data>
+  <data name="typ" xml:space="preserve">
+    <value>Тип</value>
   </data>
   <data name="viewCompleteHistory" xml:space="preserve">
     <value>Посмотреть полную историю</value>
