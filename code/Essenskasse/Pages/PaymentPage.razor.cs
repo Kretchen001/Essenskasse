@@ -103,6 +103,7 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 paymentsOfSelectedPerson = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+                paymentsOfSelectedPerson.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
@@ -121,7 +122,7 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),
                 Headers = {
                     {"referencedPerson", SelectedPerson.ToString()},
-                    {"comment", comment}
+                    {"comment", Uri.EscapeDataString(comment)}
                 },
                 Content = new StringContent(JsonConvert.SerializeObject(Money), Encoding.UTF8, "application/json")
             };
