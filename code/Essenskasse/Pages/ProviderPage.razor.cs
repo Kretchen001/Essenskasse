@@ -84,8 +84,9 @@ namespace Essenskasse.Pages {
                         Method = HttpMethod.Delete,
                         RequestUri = new Uri(Config["API-Adress"] + "provider/remove"),
                         Headers = {
-                        {"guid", providerToDeleteGuid}
-                    }
+                            {"guid", providerToDeleteGuid},
+                            {"per", false.ToString()}
+                        }
                     };
 
                     HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
