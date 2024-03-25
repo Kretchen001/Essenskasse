@@ -1,5 +1,4 @@
-﻿using LiteDB;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Modells {
 
@@ -7,7 +6,7 @@ namespace Modells {
     public class TransactionProcedure {
 
         /// <summary>When the transaction took place.</summary>
-        [JsonInclude, BsonId]
+        [JsonInclude]
         public DateTime DateTime { get; set; }
         /// <summary>How much money is added to the chest.</summary>
         [JsonInclude]

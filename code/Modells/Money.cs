@@ -6,10 +6,10 @@ namespace Modells {
     public class Money {
 
         /// <summary>long as a pre-decimal number</summary>
-        [JsonInclude]
+        [JsonInclude, JsonPropertyName("Euro")]
         public long Euro { get; set; } = 0;
         /// <summary>short as a post-decimal number</summary>
-        [JsonInclude]
+        [JsonInclude, JsonPropertyName("Cent")]
         public short Cent { get; set; } = 0;
 
         /// <summary>Empty ctor.</summary>
