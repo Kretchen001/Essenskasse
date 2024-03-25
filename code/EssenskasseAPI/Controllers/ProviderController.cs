@@ -156,8 +156,8 @@ namespace EssenskasseAPI.Controllers {
         [HttpDelete, Route("remove")]
         public IActionResult RemoveProvider([FromHeader] Guid? guid,
                                                 [FromHeader] bool per = false) {
-            using (Operation.Time("TaskDuration")) {
-                Log.Information("RemoveProvider called");
+            using (Operation.Time("RemoveProvider")) {
+                Log.Information($"RemoveProvider called with per={per}");
                 if (guid is not null) {
                     string queryString = $"" +
                         $"SELECT * " +
@@ -180,7 +180,7 @@ namespace EssenskasseAPI.Controllers {
                             string queryStringDelete = $"" +
                                 $"DELETE " +
                                 $"FROM essenskasse.Provider" +
-                                $"WHERE Guid={guid};";
+                                $"WHERE Guid='{guid}';";
                             QueryExecuterAtMySql(queryStringDelete);
                             Log.Information($"{provider[0].Designation} with {provider[0].Guid} successfully removed");
                             return Ok(JsonConvert.SerializeObject(provider[0]));

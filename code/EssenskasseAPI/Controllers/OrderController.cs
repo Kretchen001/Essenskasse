@@ -190,7 +190,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpPut, Route("update")]
         public IActionResult UpdateOrder([FromHeader] Guid? accessToken,
                                             [FromHeader] long? dateAsLong,
-                                            [FromBody] Tuple<Money?, Provider?, Guid?> values) {
+                                            [FromBody] MoneyProviderGuidData values) {
             using (Operation.Time("Update Order")) {
                 Log.Information("UpdateOrder called");
                 if (accessToken is not null) {
@@ -218,19 +218,19 @@ namespace EssenskasseAPI.Controllers {
                         
                         bool hasChanges = false;
                         Money temp = orders[0].Money;
-                        if (values.Item1 is not null) {
-                            Log.Information($"Order updated from {orders[0].Money} to {values.Item1}");
-                            orders[0].Money = values.Item1;
+                        if (values.Money is not null) {
+                            Log.Information($"Order updated from {orders[0].Money} to {values.Money}");
+                            orders[0].Money = values.Money;
                             hasChanges = true;
                         }
-                        if (values.Item2 is not null) {
-                            Log.Information($"Order updated from {orders[0].Provider} to {values.Item2}");
-                            orders[0].Provider = values.Item2;
+                        if (values.Provider is not null) {
+                            Log.Information($"Order updated from {orders[0].Provider} to {values.Provider}");
+                            orders[0].Provider = values.Provider;
                             hasChanges = true;
                         }
-                        if (values.Item3 is not null) {
-                            Log.Information($"Order updated from {orders[0].ReferencedPerson} to {values.Item3}");
-                            orders[0].ReferencedPerson = values.Item3 ?? new Guid();
+                        if (values.ReferencedPerson is not null) {
+                            Log.Information($"Order updated from {orders[0].ReferencedPerson} to {values.ReferencedPerson}");
+                            orders[0].ReferencedPerson = values.ReferencedPerson ?? new Guid();
                             hasChanges = true;
                         }
                         if (hasChanges) {

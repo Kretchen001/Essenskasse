@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Modells {
 
@@ -6,10 +7,10 @@ namespace Modells {
     public class Provider {
 
         /// <summary>Id of the provider</summary>
-        [JsonInclude, JsonPropertyName("Guid")]
+        [JsonInclude, JsonPropertyName("Guid"), JsonProperty(nameof(Guid))]
         public Guid Guid { get; set; } = new Guid();
         /// <summary>Name of the provider</summary>
-        [JsonInclude, JsonPropertyName("Designation")]
+        [JsonInclude, JsonPropertyName("Designation"), JsonProperty(nameof(Designation))]
         public string Designation { get; set; } = default!;
 
         /// <summary></summary>
@@ -18,7 +19,7 @@ namespace Modells {
         /// <summary></summary>
         /// <param name="Guid"></param>
         /// <param name="designation"></param>
-        [JsonConstructor]
+        [System.Text.Json.Serialization.JsonConstructor]
         public Provider(Guid Guid, string designation) {
             this.Guid = Guid;
             this.Designation = designation;

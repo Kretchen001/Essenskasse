@@ -76,7 +76,7 @@
                         <PersonOrderHistoryCard Orders="shownOrders[i]" />
                         <div class="row" style="margin: 0.25rem;">
                             <div class="col-lg-12">
-                                <button class="float-end" @onclick="() => HistoryLoadInModal(i)">
+                                <button type="button" class="btn btn-info float-end" style="border-radius:8px; width: fit-content;" @onclick="() => HistoryLoadInModal(i)">
                                     @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
                                 </button>
                             </div>

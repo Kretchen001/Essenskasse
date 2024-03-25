@@ -114,7 +114,7 @@
             </datalist>
         </div>
         <div class="col-lg-2" style="vertical-align: middle;">
-            <button @onclick="() => DeleteAnbieter()">
+            <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => DeleteAnbieter()">
                 @_loc[nameof(RessourceAppStrings.remove)]!
             </button>
         </div>

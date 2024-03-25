@@ -300,7 +300,7 @@ namespace EssenskasseAPI.Controllers {
             return dataTable;
         }
 
-        private List<Payment> DataTableToListOfPayments(DataTable dataTable) {
+        private static List<Payment> DataTableToListOfPayments(DataTable dataTable) {
             List<Payment> paymentList = [];
             foreach (DataRow row in dataTable.Rows) {
                 paymentList.Add(new Payment(
@@ -316,7 +316,7 @@ namespace EssenskasseAPI.Controllers {
             return paymentList;
         }
 
-        private Person DataTableToPerson(DataTable DataTablePersonToUpdate) {
+        private static Person DataTableToPerson(DataTable DataTablePersonToUpdate) {
             return new Person(
                 guid: new Guid(DataTablePersonToUpdate.Rows[0]["Guid"].ToString()!),
                 name: DataTablePersonToUpdate.Rows[0]["Name"].ToString()!,

@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using System.Text;
 
 namespace Essenskasse.Pages {
-    
+
     public partial class ChangeEntitiesPage {
 
         List<string> types = [];
@@ -180,20 +180,26 @@ namespace Essenskasse.Pages {
             if (Orders[index].Item1.Money.Equals(ChangedOrders[index].Money)) {
                 a = null;
             }
-            if (Orders[index].Item1.Provider.Equals(ChangedOrders[index].Provider)) {
+            if (Orders[index].Item1.Provider.Equals(ChangedOrders[index].Provider) || Providers.Exists(x => x.Guid.Equals(ChangedOrders[index].Provider.Guid))) {
                 b = null;
             }
             if (Orders[index].Item1.ReferencedPerson.Equals(ChangedOrders[index].ReferencedPerson)) {
                 c = null;
             }
+            MoneyProviderGuidData data = new MoneyProviderGuidData() { 
+                Money = a,
+                Provider = b,
+                ReferencedPerson = c
+            };
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Put,
                 RequestUri = new Uri(Config["API-Adress"] + "order/update"),
                 Headers = {
                     { "accessToken", AppData.AccessToken.ToString() },
-                    { "dateAsLong", ChangedOrders[index].DateTime.Ticks.ToString() }
+                    { "dateAsLong", ChangedOrders[index].DateTime.Ticks.ToString() },
+                    { "referencedPerson", c.ToString() }
                 },
-                Content = new StringContent(JsonConvert.SerializeObject(new Tuple<Money?, Provider?, Guid?>(item1: a, item2: b, item3: c)), Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json")
             };
 
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
