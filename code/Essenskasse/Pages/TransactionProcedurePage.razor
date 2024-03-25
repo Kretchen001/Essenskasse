@@ -24,9 +24,9 @@
     }
 </style>
 
-<PageTitle>Kaffeekasse</PageTitle>
+<PageTitle>@_loc[nameof(RessourceAppStrings.coffeeFund)]</PageTitle>
 
-<h3>Kaffeekasse</h3>
+<h3>@_loc[nameof(RessourceAppStrings.coffeeFund)]</h3>
 
 <br />
 <div class="row">
@@ -55,7 +55,7 @@
     </div>
     <div class="col-lg-3 align-self-center">
         <label>
-            Negative Werte beinhalten Auszahlungen!
+            @_loc[nameof(RessourceAppStrings.negativeValuePayout)]
         </label>
     </div>
 </div>
@@ -72,8 +72,8 @@
 </div>
 <br />
 <div class="row">
-        Einsenden
     <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="() => InsertNewTransaction()">
+        @_loc[nameof(RessourceAppStrings.submit)]
     </button>
 </div>
 <br />

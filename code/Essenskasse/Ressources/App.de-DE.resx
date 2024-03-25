@@ -144,8 +144,17 @@
   <data name="cashBalanceCurrent" xml:space="preserve">
     <value>Kassenstand (Ist)</value>
   </data>
+  <data name="change" xml:space="preserve">
+    <value>Ändern</value>
+  </data>
+  <data name="changes" xml:space="preserve">
+    <value>Änderungen</value>
+  </data>
   <data name="close" xml:space="preserve">
     <value>Schließen</value>
+  </data>
+  <data name="coffeeFund" xml:space="preserve">
+    <value>Kaffeekasse</value>
   </data>
   <data name="colortheme" xml:space="preserve">
     <value>Farbschema</value>
@@ -164,6 +173,9 @@
   </data>
   <data name="creditAmount" xml:space="preserve">
     <value>Betrag gutschreiben!</value>
+  </data>
+  <data name="current" xml:space="preserve">
+    <value>Akutell</value>
   </data>
   <data name="currentlySelected" xml:space="preserve">
     <value>aktuell ausgewählt</value>
@@ -185,6 +197,9 @@
   </data>
   <data name="email" xml:space="preserve">
     <value>E-Mail</value>
+  </data>
+  <data name="emailAdminContact" xml:space="preserve">
+    <value>E-Mail für Admin-Kontakt</value>
   </data>
   <data name="emailCashManagement" xml:space="preserve">
     <value>Ihre Kassenverwaltung</value>
@@ -209,6 +224,9 @@
   </data>
   <data name="english" xml:space="preserve">
     <value>Englisch</value>
+  </data>
+  <data name="entered" xml:space="preserve">
+    <value>Eingetragen</value>
   </data>
   <data name="error" xml:space="preserve">
     <value>Fehler</value>
@@ -246,6 +264,9 @@
   <data name="light" xml:space="preserve">
     <value>Hell</value>
   </data>
+  <data name="limitValuePositivBalance" xml:space="preserve">
+    <value>Grenzwert für Positives Saldo</value>
+  </data>
   <data name="loadData" xml:space="preserve">
     <value>Daten laden</value>
   </data>
@@ -255,14 +276,23 @@
   <data name="name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="negativeValuePayout" xml:space="preserve">
+    <value>Negative Werte beinhalten Auszahlungen!</value>
+  </data>
   <data name="no" xml:space="preserve">
     <value>Nein</value>
   </data>
   <data name="notEntered" xml:space="preserve">
     <value>Nicht eingetragen...</value>
   </data>
+  <data name="notRequested" xml:space="preserve">
+    <value>Nicht angefordert</value>
+  </data>
   <data name="noticeable" xml:space="preserve">
     <value>Auffällig</value>
+  </data>
+  <data name="notify" xml:space="preserve">
+    <value>Benachrichtigen</value>
   </data>
   <data name="order" xml:space="preserve">
     <value>Bestellung</value>
@@ -296,6 +326,9 @@
   </data>
   <data name="removeAnEntry" xml:space="preserve">
     <value>Entfernen eines Eintrages</value>
+  </data>
+  <data name="request" xml:space="preserve">
+    <value>Anfordern</value>
   </data>
   <data name="russian" xml:space="preserve">
     <value>Russisch</value>
@@ -422,6 +455,9 @@
   </data>
   <data name="toastUpdateSuccessful" xml:space="preserve">
     <value>Update erfolgreich!</value>
+  </data>
+  <data name="tokenForChange" xml:space="preserve">
+    <value>Token für Änderungen</value>
   </data>
   <data name="turnOn" xml:space="preserve">
     <value>anschalten</value>

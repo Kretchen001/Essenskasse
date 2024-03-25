@@ -144,8 +144,17 @@
   <data name="cashBalanceCurrent" xml:space="preserve">
     <value>Остаток денежных средств (фактический)</value>
   </data>
+  <data name="change" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="changes" xml:space="preserve">
+    <value>Изменения</value>
+  </data>
   <data name="close" xml:space="preserve">
     <value>Закрыть</value>
+  </data>
+  <data name="coffeeFund" xml:space="preserve">
+    <value>Кофейный фонд</value>
   </data>
   <data name="colortheme" xml:space="preserve">
     <value>Цветовая схема</value>
@@ -164,6 +173,9 @@
   </data>
   <data name="creditAmount" xml:space="preserve">
     <value>Зачислите сумму!</value>
+  </data>
+  <data name="current" xml:space="preserve">
+    <value>Текущий</value>
   </data>
   <data name="currentlySelected" xml:space="preserve">
     <value>выбранный в данный момент</value>
@@ -185,6 +197,9 @@
   </data>
   <data name="email" xml:space="preserve">
     <value>e-mail</value>
+  </data>
+  <data name="emailAdminContact" xml:space="preserve">
+    <value>Электронная почта для связи с администратором</value>
   </data>
   <data name="emailCashManagement" xml:space="preserve">
     <value>правление вашим кассовым аппаратом</value>
@@ -209,6 +224,9 @@
   </data>
   <data name="english" xml:space="preserve">
     <value>Английский</value>
+  </data>
+  <data name="entered" xml:space="preserve">
+    <value>Зарегистрированный</value>
   </data>
   <data name="error" xml:space="preserve">
     <value>Ошибка</value>
@@ -246,6 +264,9 @@
   <data name="light" xml:space="preserve">
     <value>Свет</value>
   </data>
+  <data name="limitValuePositivBalance" xml:space="preserve">
+    <value>Предельное значение для положительного баланса</value>
+  </data>
   <data name="loadData" xml:space="preserve">
     <value>Данные о нагрузке</value>
   </data>
@@ -255,14 +276,23 @@
   <data name="name" xml:space="preserve">
     <value>Имя</value>
   </data>
+  <data name="negativeValuePayout" xml:space="preserve">
+    <value>Отрицательные значения включают выплаты!</value>
+  </data>
   <data name="no" xml:space="preserve">
     <value>Нет</value>
   </data>
   <data name="notEntered" xml:space="preserve">
     <value>Не зарегистрирован...</value>
   </data>
+  <data name="notRequested" xml:space="preserve">
+    <value>Не запрашивается</value>
+  </data>
   <data name="noticeable" xml:space="preserve">
     <value>Заметный</value>
+  </data>
+  <data name="notify" xml:space="preserve">
+    <value>Уведомить</value>
   </data>
   <data name="order" xml:space="preserve">
     <value>заказ</value>
@@ -296,6 +326,9 @@
   </data>
   <data name="removeAnEntry" xml:space="preserve">
     <value>Удалить запись</value>
+  </data>
+  <data name="request" xml:space="preserve">
+    <value>Запрос</value>
   </data>
   <data name="russian" xml:space="preserve">
     <value>Русский</value>
@@ -422,6 +455,9 @@
   </data>
   <data name="toastUpdateSuccessful" xml:space="preserve">
     <value>Обновление прошло успешно!</value>
+  </data>
+  <data name="tokenForChange" xml:space="preserve">
+    <value>Токен для изменений</value>
   </data>
   <data name="turnOn" xml:space="preserve">
     <value>включить</value>

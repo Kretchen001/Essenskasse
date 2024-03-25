@@ -110,5 +110,17 @@
         close,
         commentField,
         successfullyTransmitted,
+        coffeeFund,
+        negativeValuePayout,
+        changes,
+        limitValuePositivBalance,
+        current,
+        tokenForChange,
+        entered,
+        change,
+        notRequested,
+        request,
+        emailAdminContact,
+        notify,
     }
 }
