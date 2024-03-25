@@ -29,8 +29,7 @@
 <h4>@_loc[nameof(RessourceAppStrings.add)]</h4>
 <div class="row" style="margin-top: 1rem;">
     @if (!accessToAdd) {
-        <button style="width: fit-content;"
-                @onclick="() => {accessToAdd = true;}">
+        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToAdd = true;}">
             @_loc[nameof(RessourceAppStrings.addNewProvider)]
         </button>
     }
@@ -95,8 +94,7 @@
         @_loc[nameof(RessourceAppStrings.removeAnEntry)]
     </h4>
     @if (!accessToDelete) {
-        <button style="width: fit-content;"
-                @onclick="() => {accessToDelete = true;}">
+        <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToDelete = true;}">
             @_loc[nameof(RessourceAppStrings.provider)] @_loc[nameof(RessourceAppStrings.remove)]?
         </button>
     }

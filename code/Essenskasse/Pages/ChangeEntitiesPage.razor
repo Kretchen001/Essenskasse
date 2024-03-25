@@ -56,7 +56,7 @@
                 </label>
             </div>
             <div class="col-lg-2">
-                <button @onclick="() => CommitChangesP(indexP)">
+                <button type="button" class="btn-warning" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => CommitChangesP(indexP)">
                     @_loc[nameof(RessourceAppStrings.submit)]
                 </button>
             </div>
@@ -107,7 +107,7 @@ else if (SelectedType == types[1]) { // Bestellungen/Orders
                 </select>
             </div>
             <div class="col-lg-2">
-                <button @onclick="() => CommitChangesO(x.Item2)">
+                <button type="button" class="btn-warning" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => CommitChangesO(x.Item2)">
                     @_loc[nameof(RessourceAppStrings.submit)]
                 </button>
             </div>

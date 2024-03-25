@@ -91,7 +91,7 @@
 <br />
 
 <div class="row justify-content-between">
-    <button @onclick="PostOrderForTheDay">
+    <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="PostOrderForTheDay">
         @_loc[nameof(RessourceAppStrings.submit)] @_loc[nameof(RessourceAppStrings.order)]
     </button>
 </div>

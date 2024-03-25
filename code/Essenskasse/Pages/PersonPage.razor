@@ -33,8 +33,7 @@
         @_loc[nameof(RessourceAppStrings.addPerson)]
     </h4>
     @if (!accessToAdd) {
-        <button style="width: fit-content;"
-        @onclick="() => {accessToAdd = true;}">
+        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToAdd = true;}">
             @_loc[nameof(RessourceAppStrings.addPerson)]
         </button>
     }
