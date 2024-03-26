@@ -1,5 +1,7 @@
 # Essenskasse
 
+[![CI-CD](https://github.com/Kretchen001/Essenskasse/actions/workflows/build-and-test.yml/badge.svg?branch=master)](https://github.com/Kretchen001/Essenskasse/actions/workflows/build-and-test.yml)
+
 ## Inhaltsverzeichnis / Table of Content
 - [Inhaltsverzeichnis / Table of Content](#inhaltsverzeichnis--table-of-content)
 - [Beschreibung Deutsch](#beschreibung-deutsch)
