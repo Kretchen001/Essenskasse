@@ -34,9 +34,24 @@ DB_PASSWORD=p
 ```
 API-`appsettings.json`
 ```json
-    "ConnectionStrings": {
-        "essenskasse": "Server=database;Port=3306;Uid=u;Pwd=p;Database=essenskasse;SslMode=None;"
-    }
+"ConnectionStrings": {
+    "essenskasse": "Server=database;Port=3306;Uid=u;Pwd=p;Database=essenskasse;SslMode=None;"
+}
 ```
 Server should be the service name of the MySql-Docker-Container.
 The Uid is the User and Pwd is the password, that is set in the `.env`-file.
+
+After editing these two files can the build be started.
+For that is [Docker](https://www.docker.com/) required.
+
+The command to start the application is the following - but first move to the code folder:
+```bash
+cd code
+docker-compose up -d --build
+```
+This will start the download of the MySQL-Database, create the Container for this and then build the applications.
+Because of the settings in the `docker-compose.yml` the essentiell port for calling the PWA after the docker-compose is finished is the following: (Windows-notation)
+```cmd
+start http://localhost:8009
+```
+This will call the Dashboard.
