@@ -226,8 +226,8 @@ namespace Essenskasse.Pages {
             
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Put,
-                    RequestUri = new Uri(Config["API-Adress"] + "token/requestNewAccessToken")
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "token/requestNewAccessToken"),
                     Headers = {
                         { "identity", identity }
                     }

@@ -22,7 +22,7 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region Controller
-        [HttpPut, Route("requestNewAccessToken")]
+        [HttpPost, Route("requestNewAccessToken")]
         public IActionResult RequestNewAccessToken([FromHeader] string? identity) {
             Log.Information("RequestNewAccessToken called");
             if (identity == null) {
