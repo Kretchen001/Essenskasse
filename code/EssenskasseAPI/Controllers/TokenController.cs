@@ -22,16 +22,20 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region Controller
-        [HttpGet, Route("requestNewAccessToken")]
-        public IActionResult RequestNewAccessToken() {
+        [HttpPost, Route("requestNewAccessToken")]
+        public IActionResult RequestNewAccessToken([FromHeader] string? identity) {
             Log.Information("RequestNewAccessToken called");
+            if (identity == null) {
+                Log.Warning("No identity found!");
+                return NoContent();
+            }
             long a = DateTime.Now.Ticks;
             Guid guid = Guid.NewGuid();
 
             string queryStringInsert = $"" +
-                $"INSERT INTO essenskasse.TokenForChange (DateTime, Guid) " +
+                $"INSERT INTO essenskasse.TokenForChange (DateTime, Guid, Identity) " +
                 $"VALUES (" +
-                $"{a}, '{guid}');";
+                $"{a}, '{guid}', '{identity}');";
             QueryExecuterAtMySql(queryStringInsert);
 
             return Ok(JsonConvert.SerializeObject(guid));

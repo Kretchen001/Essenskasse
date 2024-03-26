@@ -218,10 +218,19 @@ namespace Essenskasse.Pages {
         }
 
         private async Task RequestAccessTokenForChanges() {
+            string identity = await JsRuntime.InvokeAsync<string>("prompt", "Bitte Namen eintragen") ?? "";
+            if (identity.Equals("")) {
+                ToastService.ShowToast("Keinen Namen angegen!", ToastLevel.Warning);
+                return;
+            }
+            
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri(Config["API-Adress"] + "token/requestNewAccessToken")
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "token/requestNewAccessToken"),
+                    Headers = {
+                        { "identity", identity }
+                    }
                 };
 
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
