@@ -7,8 +7,10 @@ using Newtonsoft.Json;
 namespace Essenskasse.Pages {
 
     public partial class ProviderPage {
+
         private bool accessToAdd = false;
         private bool accessToDelete = false;
+        private bool IsASC = true;
 
         private string newProviderDesignation = "";
         private string providerToDeleteGuid = "";
@@ -19,6 +21,11 @@ namespace Essenskasse.Pages {
         private List<Provider> shownProviderList = new List<Provider>();
 
         protected override async Task OnInitializedAsync() {
+            IsASC = await LocalStorage.GetItemAsync<bool>("ProviderIsASC");
+            await RequestAllProviderFromApiAsync();
+        }
+
+        private async Task RequestAllProviderFromApiAsync() {
             // Request all providers, that are saved in the database.
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -33,6 +40,7 @@ namespace Essenskasse.Pages {
                 providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
                 providers = providers.OrderBy(x => x.Designation).ToList();
                 shownProviderList.AddRange(providers);
+                SortProviderList();
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
@@ -58,7 +66,7 @@ namespace Essenskasse.Pages {
                 providers.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
                 providers = providers.OrderBy(x => x.Designation).ToList();
                 shownProviderList.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
-                shownProviderList = shownProviderList.OrderBy(x => x.Designation).ToList();
+                SortProviderList();
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.provider)] + " " + newProviderDesignation + " " + _loc[nameof(RessourceAppStrings.toastAdd)], ToastLevel.Success);
             }
 
@@ -128,6 +136,26 @@ namespace Essenskasse.Pages {
                     }
                 }
             }
+        }
+
+        private void ToggleAscDesc() {
+            IsASC = !IsASC;
+            _ = SaveAscStatus();
+            SortProviderList();
+            base.StateHasChanged();
+        }
+
+        private void SortProviderList() {
+            if (IsASC) {
+                shownProviderList = shownProviderList.OrderBy(x => x.Designation).ToList();
+            }
+            else {
+                shownProviderList = shownProviderList.OrderByDescending(x => x.Designation).ToList();
+            }
+        }
+
+        public async Task SaveAscStatus() {
+            await LocalStorage.SetItemAsync<bool>("ProviderIsASC", IsASC);
         }
     }
 }
