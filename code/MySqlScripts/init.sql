@@ -60,5 +60,6 @@ CREATE TABLE IF NOT EXISTS essenskasse.TransactionProcedure (
 -- Erstelle die Tabelle für TransactionProcedure
 CREATE TABLE IF NOT EXISTS essenskasse.TokenForChange (
     DateTime BIGINT PRIMARY KEY,
-    Guid CHAR(36)
+    Guid CHAR(36),
+    Identity VARCHAR(255)
 );
