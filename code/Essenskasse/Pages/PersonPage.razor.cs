@@ -9,6 +9,7 @@ namespace Essenskasse.Pages {
     public partial class PersonPage {
 
         private bool accessToAdd = false;
+        private bool IsASC = true;
 
         private string newPersonName = "";
         private string newPersonEmail = "";
@@ -19,6 +20,7 @@ namespace Essenskasse.Pages {
         private List<Person> shownPersonList = new List<Person>();
 
         protected override async Task OnInitializedAsync() {
+            IsASC = await LocalStorage.GetItemAsync<bool>("PersonIsASC");
             await RequestAllPersonFromApiAsync();
         }
 
@@ -37,6 +39,7 @@ namespace Essenskasse.Pages {
                 person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
                 person = person.OrderBy(x => x.Name).ToList();
                 shownPersonList.AddRange(person);
+                SortPersonList();
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
@@ -78,9 +81,9 @@ namespace Essenskasse.Pages {
                     shownPersonList.Add(temp);
                     ToastService.ShowToast(newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedAndAvailable)], ToastLevel.Success);
                     accessToAdd = false;
-                    newPersonName = newPersonEmail = "";
+                    newPersonName = newPersonEmail = ""; 
                     person = person.OrderBy(x => x.Name).ToList();
-                    shownPersonList = shownPersonList.OrderBy(x => x.Name).ToList();
+                    SortPersonList();
                     base.StateHasChanged();
                 }
                 else {
@@ -120,6 +123,26 @@ namespace Essenskasse.Pages {
                     }
                 }
             }
+        }
+
+        private void ToggleAscDesc() {
+            IsASC = !IsASC;
+            _ = SaveAscStatus();
+            SortPersonList();
+            base.StateHasChanged();
+        }
+
+        private void SortPersonList() {
+            if (IsASC) {
+                shownPersonList = shownPersonList.OrderBy(x => x.Name).ToList();
+            }
+            else {
+                shownPersonList = shownPersonList.OrderByDescending(x => x.Name).ToList();
+            }
+        }
+
+        public async Task SaveAscStatus() {
+            await LocalStorage.SetItemAsync<bool>("PersonIsASC", IsASC);
         }
     }
 }
