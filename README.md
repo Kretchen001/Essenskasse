@@ -44,6 +44,13 @@ The Uid is the User and Pwd is the password, that is set in the `.env`-file.
 After editing these two files can the build be started.
 For that is [Docker](https://www.docker.com/) required.
 
+Also check please the `appsettings.json` in the code/Essenskasse/wwwroot/ folder for the URL of the API
+```json
+{
+  "API-Adress": "http://localhost:8010/api/"
+}
+```
+
 The command to start the application is the following - but first move to the code folder:
 ```bash
 cd code
