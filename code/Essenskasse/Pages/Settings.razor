@@ -14,150 +14,210 @@
 
 <h3>@_loc[nameof(RessourceAppStrings.settings)]</h3>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.language)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <CultureSelector />
+        <div class="row">
+            <div class="col-lg-6" align="right">
+                <CultureSelector />
+            </div>
+            <div class="col-lg-6">
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.colortheme)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <select @bind="@CurrentTheme">
-            @foreach (var entity in themeList) {
-                <option value="@entity.Key">@entity.Value</option>
-            }
-        </select>
-        <button @onclick="() => SaveUserThemePersistentAsync()">
-            @_loc[nameof(RessourceAppStrings.savePermanent)]
-        </button>
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">   
+                <select @bind="@CurrentTheme">
+                    @foreach (var entity in themeList) {
+                        <option value="@entity.Key">@entity.Value</option>
+                    }
+                </select> 
+            </div>
+            <div class="col-lg-6" align="center">
+                <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="() => SaveUserThemePersistentAsync()">
+                    @_loc[nameof(RessourceAppStrings.savePermanent)]
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.singleColumn)] (@_loc[nameof(RessourceAppStrings.currentlySelected)])
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="IsSingleListWish">
-        <label class="form-check-label" for="flexSwitchCheckChecked">@ReturnListWish</label>
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="IsSingleListWish">
+            </div>
+            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+                <label class="form-check-label" for="flexSwitchCheckChecked">@ReturnListWish</label>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
-    <div class="col-lg-4">
-        <label>
-            @_loc[nameof(RessourceAppStrings.paymentsToBeLoaded)]
-        </label>
-    </div>
-    <div class="col-lg-8" align="center">
-        <input type="number" @bind="LoadAmountPayments" />
-    </div>
-</div>
-
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
-    <div class="col-lg-4">
-        <label>
-            @_loc[nameof(RessourceAppStrings.ordersToBeLoaded)]
-        </label>
-    </div>
-    <div class="col-lg-8" align="center">
-        <input type="number" @bind="LoadAmountOrders" />
-    </div>
-</div>
-
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.provider)]) @_loc[nameof(RessourceAppStrings.turnOn)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowProvider">
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowProvider">
+            </div>
+            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+                <label class="form-check-label" for="flexSwitchCheckChecked">@FilterShowProviderString</label>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.person)]) @_loc[nameof(RessourceAppStrings.turnOn)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowPerson">
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowPerson">
+            </div>
+            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+                <label class="form-check-label" for="flexSwitchCheckChecked">@FilterShowPersonString</label>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
-    <div class="col-lg-6">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+    <div class="col-lg-4">
+        <label>
+            @_loc[nameof(RessourceAppStrings.paymentsToBeLoaded)]
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
+                <input type="number" @bind="LoadAmountPayments" />
+            </div>
+            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+    <div class="col-lg-4">
+        <label>
+            @_loc[nameof(RessourceAppStrings.ordersToBeLoaded)]
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
+                <input type="number" @bind="LoadAmountOrders" />
+            </div>
+            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+    <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.limitValuePositivBalance)]
         </label>
     </div>
-    <div class="col-lg-2" align="center">
-        <label>
-            @_loc[nameof(RessourceAppStrings.current)]: @DashboardMoneyLimit.ToString()
-        </label>
-    </div>
-    <div class="col-lg-2" align="center">
-        <input type="number" @bind="DashboardMoneyLimitInt">
-    </div>
-    <div class="col-lg-2">
+    <div class="col-lg-8" align="center">
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
+                <input type="number" @bind="DashboardMoneyLimitInt">
+            </div>
+            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+                <label>
+                    @_loc[nameof(RessourceAppStrings.current)]: @DashboardMoneyLimit.ToString()
+                </label>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.tokenForChange)]
         </label>
     </div>
     <div class="col-lg-8" align="center">
-        @if (ExistAccessToken) {
-            <label>
-                @_loc[nameof(RessourceAppStrings.entered)]
-            </label>
-            <button @onclick="() => ToastService.ShowToast(currentlyNotSupported, ToastLevel.Info)">
-                @_loc[nameof(RessourceAppStrings.change)]?
-            </button>
-        }
-        else {
-            <label>
-                @_loc[nameof(RessourceAppStrings.notRequested)]
-            </label>
-            <button @onclick="() => RequestAccessTokenForChanges()">
-                @_loc[nameof(RessourceAppStrings.request)]
-            </button>
-        }
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
+                @if (ExistAccessToken) {
+                    <label>
+                        @_loc[nameof(RessourceAppStrings.entered)]
+                    </label>
+                }                
+                else {
+                    <label>
+                        @_loc[nameof(RessourceAppStrings.notRequested)]
+                    </label>
+                }
+            </div>
+            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+                @if (ExistAccessToken) {
+                    <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px" @onclick="() => ToastService.ShowToast(currentlyNotSupported, ToastLevel.Info)">
+                        @_loc[nameof(RessourceAppStrings.change)]?
+                    </button>
+                }
+                else {
+                    <button type="button" class="btn-warning" data-dismiss="modal" style="border-radius:8px" @onclick="() => RequestAccessTokenForChanges()">
+                        @_loc[nameof(RessourceAppStrings.request)]
+                    </button>
+                }
+            </div>
+        </div>
     </div>
 </div>
 @code { // only for the div row above
         string currentlyNotSupported = "Aktuell leider noch nicht verfügbar. Bitte beim Admin melden für Hilfestellungen!";
 }
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh;">
+<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label>
             @_loc[nameof(RessourceAppStrings.emailAdminContact)]
         </label>
     </div>
-    <div class="col-lg-4" align="right">
-        <input type="text" style="width: 50%;" @bind-value="AdminEmail">
-    </div>
-    <div class="col-lg-4" align="left">
-        <button @onclick="SendMessageToAdmin">
-            @_loc[nameof(RessourceAppStrings.notify)]
-        </button>
+    <div class="col-lg-8" align="center">
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
+                <input type="text" style="width: 50%;" @bind-value="AdminEmail">
+            </div>
+            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+                <button type="button" class="btn-outline-success" data-dismiss="modal" style="border-radius:8px" @onclick="SendMessageToAdmin">
+                    @_loc[nameof(RessourceAppStrings.notify)]
+                </button>
+            </div>
+        </div>
     </div>
 </div>
