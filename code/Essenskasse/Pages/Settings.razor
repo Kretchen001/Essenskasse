@@ -14,9 +14,35 @@
 
 <h3>@_loc[nameof(RessourceAppStrings.settings)]</h3>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<style>
+    #lila {
+        background: rgb(200,116,217);
+        background: linear-gradient(90deg, rgba(200,116,217,1) 0%, rgba(200,116,217,1) 35%, rgba(197,52,224,1) 45%, rgba(128,7,144,1) 70%, rgba(110,9,121,1) 90%, rgba(62,0,98,1) 100%);
+    }
+    #orange {
+        background: rgb(217,194,116);
+        background: linear-gradient(90deg, rgba(217,194,116,1) 0%, rgba(217,189,116,1) 35%, rgba(224,187,52,1) 45%, rgba(144,113,7,1) 70%, rgba(121,97,9,1) 90%, rgba(98,90,0,1) 100%);
+    }
+    #green {
+        background: rgb(116,217,196);
+        background: linear-gradient(90deg, rgba(116,217,196,1) 0%, rgba(116,217,192,1) 35%, rgba(52,224,176,1) 45%, rgba(7,144,108,1) 70%, rgba(9,121,88,1) 90%, rgba(0,98,71,1) 100%);
+    }
+    #red {
+        background: rgb(217,116,116);
+        background: linear-gradient(90deg, rgba(217,116,116,1) 0%, rgba(217,116,116,1) 35%, rgba(224,52,52,1) 45%, rgba(144,7,7,1) 70%, rgba(121,9,9,1) 90%, rgba(98,0,0,1) 100%);
+    }
+    #gray {
+        background: rgb(224,222,222);
+        background: linear-gradient(90deg, rgba(224,222,222,1) 0%, rgba(224,222,222,1) 35%, rgba(212,212,212,1) 45%, rgba(153,153,153,1) 70%, rgba(107,107,107,1) 90%, rgba(106,106,106,1) 100%);
+    }
+    #labelcolor {
+        color: rgb(10,10,10);
+    }
+</style>
+
+<div class="row align-items-center" id="gray" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.language)]
         </label>
     </div>
@@ -31,9 +57,9 @@
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="gray" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.colortheme)]
         </label>
     </div>
@@ -55,9 +81,9 @@
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="green" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.singleColumn)] (@_loc[nameof(RessourceAppStrings.currentlySelected)])
         </label>
     </div>
@@ -67,15 +93,15 @@
                 <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="IsSingleListWish">
             </div>
             <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                <label class="form-check-label" for="flexSwitchCheckChecked">@ReturnListWish</label>
+                <label class="form-check-label" for="flexSwitchCheckChecked" style="color: white">@ReturnListWish</label>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="green" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.provider)]) @_loc[nameof(RessourceAppStrings.turnOn)]
         </label>
     </div>
@@ -85,15 +111,15 @@
                 <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowProvider">
             </div>
             <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                <label class="form-check-label" for="flexSwitchCheckChecked">@FilterShowProviderString</label>
+                <label class="form-check-label" for="flexSwitchCheckChecked" style="color: white">@FilterShowProviderString</label>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="green" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.person)]) @_loc[nameof(RessourceAppStrings.turnOn)]
         </label>
     </div>
@@ -103,15 +129,15 @@
                 <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowPerson">
             </div>
             <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                <label class="form-check-label" for="flexSwitchCheckChecked">@FilterShowPersonString</label>
+                <label class="form-check-label" for="flexSwitchCheckChecked" style="color: white">@FilterShowPersonString</label>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="orange" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.paymentsToBeLoaded)]
         </label>
     </div>
@@ -126,9 +152,9 @@
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="orange" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.ordersToBeLoaded)]
         </label>
     </div>
@@ -143,9 +169,9 @@
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="red" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.limitValuePositivBalance)]
         </label>
     </div>
@@ -155,7 +181,7 @@
                 <input type="number" @bind="DashboardMoneyLimitInt">
             </div>
             <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                <label>
+                <label style="color: white">
                     @_loc[nameof(RessourceAppStrings.current)]: @DashboardMoneyLimit.ToString()
                 </label>
             </div>
@@ -163,9 +189,9 @@
     </div>
 </div>
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="red" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.tokenForChange)]
         </label>
     </div>
@@ -173,12 +199,12 @@
         <div class="row">
             <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
                 @if (ExistAccessToken) {
-                    <label>
+                    <label style="color: white">
                         @_loc[nameof(RessourceAppStrings.entered)]
                     </label>
                 }                
                 else {
-                    <label>
+                    <label style="color: white">
                         @_loc[nameof(RessourceAppStrings.notRequested)]
                     </label>
                 }
@@ -202,9 +228,9 @@
         string currentlyNotSupported = "Aktuell leider noch nicht verfügbar. Bitte beim Admin melden für Hilfestellungen!";
 }
 
-<div class="row align-items-center" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="red" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
-        <label>
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.emailAdminContact)]
         </label>
     </div>
