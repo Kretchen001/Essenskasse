@@ -65,6 +65,10 @@ namespace Essenskasse.Pages {
         }
 
         private async Task InsertNewTransaction() {
+            if (amountMoney.Equals(new Money(0, 0))) {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastMoneyFormatInvalid)], ToastLevel.Warning);
+                return;
+            }
             // Request all Person, that are saved in the database
             TransactionProcedure temp = new TransactionProcedure() {
                 DateTime = DateTime.Now,
