@@ -56,12 +56,12 @@
         <div class="col-lg-2">
         </div>
         <div class="col-lg-4">
-            <button @onclick="() => requestPersonFromTheGuidInput()">
+            <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px" @onclick="() => requestPersonFromTheGuidInput()">
                 @_loc[nameof(RessourceAppStrings.loadData)]
             </button>
         </div>
         <div class="col-lg-4">
-            <button disabled="@dataNotLoadYet" @onclick="() => commitChangesToApi()">
+            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" disabled="@dataNotLoadYet" @onclick="() => commitChangesToApi()">
                 @_loc[nameof(RessourceAppStrings.acceptChanges)]
             </button>
         </div>
