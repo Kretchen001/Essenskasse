@@ -53,7 +53,14 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "transactionprocedure/all")
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 transactions.Clear();
@@ -81,7 +88,14 @@ namespace Essenskasse.Pages {
                 Content = new StringContent(JsonConvert.SerializeObject(temp), Encoding.UTF8, "application/json")
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.successfullyTransmitted)], ToastLevel.Success);

@@ -31,7 +31,14 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
@@ -59,7 +66,14 @@ namespace Essenskasse.Pages {
                     }
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 string tempGuid = await response.Content.ReadAsStringAsync();

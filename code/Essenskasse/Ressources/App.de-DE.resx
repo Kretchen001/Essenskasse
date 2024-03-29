@@ -366,6 +366,9 @@
   <data name="toastAdminEmailEntered" xml:space="preserve">
     <value>Admin-E-Mail erfolgreich eingetragen!</value>
   </data>
+  <data name="toastColorThemePost" xml:space="preserve">
+    <value>gespeichert!</value>
+  </data>
   <data name="toastColorThemePre" xml:space="preserve">
     <value>Farbschema</value>
   </data>

@@ -88,21 +88,21 @@
             @for (int i = 0; i < paymentsOfSelectedPerson.Count; i += 1) {
                 @if (paymentsOfSelectedPerson[i].Amount.IsPositiv()) {
                     @if (i % 3 == 0) {
-                        <tr style ="background-color: #EEEEEE">
+                        <tr style ="background-color: #EEEEEE; color: rgb(10,10,10);">
                             <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
                             <td>@paymentsOfSelectedPerson[i].Comment</td>
                             <td>@paymentsOfSelectedPerson[i].Amount</td>
                         </tr>
                     }
                     else if (i % 3 == 1) {
-                        <tr style="background-color: #DDDDDD">
+                        <tr style="background-color: #DDDDDD; color: rgb(10,10,10);">
                             <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
                             <td>@paymentsOfSelectedPerson[i].Comment</td>
                             <td>@paymentsOfSelectedPerson[i].Amount</td>
                         </tr>
                     }
                     else if (i % 3 == 2) {
-                        <tr style="background-color: #CCCCCC">
+                        <tr style="background-color: #CCCCCC; color: rgb(10,10,10);">
                             <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
                             <td>@paymentsOfSelectedPerson[i].Comment</td>
                             <td>@paymentsOfSelectedPerson[i].Amount</td>
@@ -110,7 +110,7 @@
                     }
                 }
                 else {
-                    <tr style="background-color: #F55D52">
+                    <tr style="background-color: #F55D52; color: rgb(10,10,10);">
                         <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
                         <td>@paymentsOfSelectedPerson[i].Comment</td>
                         <td>@paymentsOfSelectedPerson[i].Amount</td>

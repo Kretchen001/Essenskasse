@@ -93,6 +93,30 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
+        private string FilterShowProviderString {
+            get {
+                if (AppData.FilterShowProvider) {
+                    return _loc[nameof(RessourceAppStrings.yes)];
+                }
+                else {
+                    return _loc[nameof(RessourceAppStrings.no)];
+                }
+            }
+        }
+
+        /// <summary></summary>
+        private string FilterShowPersonString {
+            get {
+                if (AppData.FilterShowPerson) {
+                    return _loc[nameof(RessourceAppStrings.yes)];
+                }
+                else {
+                    return _loc[nameof(RessourceAppStrings.no)];
+                }
+            }
+        }
+
         private decimal DashboardMoneyLimitInt {
             get {
                 decimal temp = AppData.DashboardMoneyLimit.Euro;

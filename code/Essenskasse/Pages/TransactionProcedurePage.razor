@@ -87,12 +87,21 @@
                     <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
                     <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
                 </tr>
-                @foreach(TransactionProcedure x in transactions) {
-                    <tr style="border-bottom: groove lightgray">
-                        <td>@x.DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                        <td>@x.Comment</td>
-                        <td>@x.Amount</td>
-                    </tr>
+                @foreach (TransactionProcedure x in transactions) {
+                    @if(x.Amount.IsPositiv()) {
+                        <tr style="border-bottom: groove lightgray">
+                            <td>@x.DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                            <td>@x.Comment</td>
+                            <td>@x.Amount</td>
+                        </tr>
+                    }
+                    else {
+                        <tr style="border-bottom: groove lightgray; background-color: #F55D52">
+                            <td>@x.DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                            <td>@x.Comment</td>
+                            <td>@x.Amount</td>
+                        </tr>
+                    }
                 }
             </table>
         </div>
