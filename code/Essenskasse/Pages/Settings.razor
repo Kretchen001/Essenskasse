@@ -15,23 +15,27 @@
 <h3>@_loc[nameof(RessourceAppStrings.settings)]</h3>
 
 <style>
-    #lila {
+    #lilaRow {
         background: rgb(200,116,217);
         background: linear-gradient(90deg, rgba(200,116,217,1) 0%, rgba(200,116,217,1) 35%, rgba(197,52,224,1) 45%, rgba(128,7,144,1) 70%, rgba(110,9,121,1) 90%, rgba(62,0,98,1) 100%);
     }
-    #orange {
+
+    #orangeRow {
         background: rgb(217,194,116);
         background: linear-gradient(90deg, rgba(217,194,116,1) 0%, rgba(217,189,116,1) 35%, rgba(224,187,52,1) 45%, rgba(144,113,7,1) 70%, rgba(121,97,9,1) 90%, rgba(98,90,0,1) 100%);
     }
-    #green {
+
+    #greenRow {
         background: rgb(116,217,196);
         background: linear-gradient(90deg, rgba(116,217,196,1) 0%, rgba(116,217,192,1) 35%, rgba(52,224,176,1) 45%, rgba(7,144,108,1) 70%, rgba(9,121,88,1) 90%, rgba(0,98,71,1) 100%);
     }
-    #red {
+
+    #redRow {
         background: rgb(217,116,116);
         background: linear-gradient(90deg, rgba(217,116,116,1) 0%, rgba(217,116,116,1) 35%, rgba(224,52,52,1) 45%, rgba(144,7,7,1) 70%, rgba(121,9,9,1) 90%, rgba(98,0,0,1) 100%);
     }
-    #gray {
+
+    #grayRow {
         background: rgb(224,222,222);
         background: linear-gradient(90deg, rgba(224,222,222,1) 0%, rgba(224,222,222,1) 35%, rgba(212,212,212,1) 45%, rgba(153,153,153,1) 70%, rgba(107,107,107,1) 90%, rgba(106,106,106,1) 100%);
     }
@@ -40,7 +44,7 @@
     }
 </style>
 
-<div class="row align-items-center" id="gray" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="grayRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.language)]
@@ -57,7 +61,7 @@
     </div>
 </div>
 
-<div class="row align-items-center" id="gray" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="grayRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.colortheme)]
@@ -81,7 +85,7 @@
     </div>
 </div>
 
-<div class="row align-items-center" id="green" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="greenRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.singleColumn)] (@_loc[nameof(RessourceAppStrings.currentlySelected)])
@@ -99,7 +103,7 @@
     </div>
 </div>
 
-<div class="row align-items-center" id="green" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="greenRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.provider)]) @_loc[nameof(RessourceAppStrings.turnOn)]
@@ -117,7 +121,7 @@
     </div>
 </div>
 
-<div class="row align-items-center" id="green" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="greenRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.person)]) @_loc[nameof(RessourceAppStrings.turnOn)]
@@ -135,7 +139,7 @@
     </div>
 </div>
 
-<div class="row align-items-center" id="orange" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="orangeRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.paymentsToBeLoaded)]
@@ -152,7 +156,7 @@
     </div>
 </div>
 
-<div class="row align-items-center" id="orange" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="orangeRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.ordersToBeLoaded)]
@@ -169,7 +173,7 @@
     </div>
 </div>
 
-<div class="row align-items-center" id="red" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="redRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.limitValuePositivBalance)]
@@ -189,7 +193,7 @@
     </div>
 </div>
 
-<div class="row align-items-center" id="red" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="redRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.tokenForChange)]
@@ -228,7 +232,7 @@
         string currentlyNotSupported = "Aktuell leider noch nicht verfügbar. Bitte beim Admin melden für Hilfestellungen!";
 }
 
-<div class="row align-items-center" id="red" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+<div class="row align-items-center" id="redRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.emailAdminContact)]
