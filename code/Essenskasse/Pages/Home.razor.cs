@@ -79,7 +79,14 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "person/updateDatabasePersonSaldo")
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 await RequestAllPerson();

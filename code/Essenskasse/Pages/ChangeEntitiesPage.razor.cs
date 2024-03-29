@@ -39,7 +39,14 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 PersonList = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
@@ -58,7 +65,14 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "provider/requestAll")
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) { // success?
                                                 // deserialize the result-JSON with Newtownsoft to the List
@@ -80,7 +94,14 @@ namespace Essenskasse.Pages {
                 }
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 Payments = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
@@ -105,7 +126,14 @@ namespace Essenskasse.Pages {
                 }
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 List<Order> orderS = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
@@ -149,7 +177,14 @@ namespace Essenskasse.Pages {
                 Content = new StringContent(JsonConvert.SerializeObject(ChangedPayments[index].Amount), Encoding.UTF8, "application/json")
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
@@ -202,7 +237,14 @@ namespace Essenskasse.Pages {
                 Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json")
             };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
