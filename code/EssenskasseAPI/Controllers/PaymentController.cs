@@ -102,6 +102,45 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        [HttpGet, Route("requestNextAmountFromPerson")]
+        public IActionResult GetNextAmountOfPaymentsFromPerson([FromHeader] Guid? guid,
+                                                                [FromHeader] int? amount,
+                                                                [FromHeader] int? alreadyLoaded) {
+            using (Operation.Time("Request next amount of Payments")) {
+                Log.Information("GetNextAmountOfPaymentsFromPerson called");
+                if (guid is null) {
+                    Log.Warning("Guid Header empty");
+                    return BadRequest();
+                }
+                if (amount is null) {
+                    Log.Warning("GetAmountOfPayments with empty amount Header called");
+                    return BadRequest();
+                }
+                if (alreadyLoaded is null) {
+                    Log.Warning("GetAmountOfPayments with empty alreadyLoaded Header called");
+                    return BadRequest();
+                }
+                string queryString = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.Payment " +
+                    $"WHERE ReferencedPerson='{guid}' " +
+                    $"ORDER BY DateTime DESC " +
+                    $"LIMIT {amount} OFFSET {alreadyLoaded};";
+
+                DataTable dataTablePayments = QueryExecuterAtMySql(queryString);
+                List<Payment> payments = DataTableToListOfPayments(dataTablePayments);
+
+                if (payments.Count != 0) {
+                    Log.Information(payments.Count + " next Payments requested");
+                    return Ok(JsonConvert.SerializeObject(payments));
+                }
+                else {
+                    Log.Warning("No Data response (GetAmountOfPayments)");
+                    return NoContent();
+                }
+            }
+        }
+
         [HttpGet, Route("singlePerDate")]
         public IActionResult GetPaymentPerDate([FromHeader] string? dateString) {
             using (Operation.Time("TaskDuration")) {
