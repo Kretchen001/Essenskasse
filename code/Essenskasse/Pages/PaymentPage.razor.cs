@@ -162,5 +162,9 @@ namespace Essenskasse.Pages {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNotAdded)] + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
             }
         }
+
+        private async Task LoadNextAmountOfPayments() {
+
+        }
     }
 }
