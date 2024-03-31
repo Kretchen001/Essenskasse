@@ -138,6 +138,9 @@
   <data name="available" xml:space="preserve">
     <value>Доступно</value>
   </data>
+  <data name="buttonLoadMore" xml:space="preserve">
+    <value>загружать больше</value>
+  </data>
   <data name="cannotBeChanged" xml:space="preserve">
     <value>(Изменить нельзя!)</value>
   </data>
@@ -371,9 +374,6 @@
   </data>
   <data name="toastColorThemePre" xml:space="preserve">
     <value>Цветовая схема</value>
-  </data>
-  <data name="toastColorthemePost" xml:space="preserve">
-    <value>Успешно создана.</value>
   </data>
   <data name="toastConnectionError" xml:space="preserve">
     <value>Ошибка при передаче...</value>

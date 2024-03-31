@@ -122,5 +122,6 @@
         request,
         emailAdminContact,
         notify,
+        buttonLoadMore,
     }
 }

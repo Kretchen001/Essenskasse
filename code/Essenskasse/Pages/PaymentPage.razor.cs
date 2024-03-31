@@ -96,7 +96,7 @@ namespace Essenskasse.Pages {
         }
 
         private async void RequestPaymentsOfPerson() {
-            // Request last 10 payments of a person
+            // Request last payments of a person
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/fromPerson"),
@@ -164,7 +164,36 @@ namespace Essenskasse.Pages {
         }
 
         private async Task LoadNextAmountOfPayments() {
+            // Request last payments of a person
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "payment/requestNextAmountFromPerson"),
+                Headers = {
+                    { "guid", SelectedPerson.ToString() },
+                    { "amount", Amount.ToString() },
+                    { "alreadyLoaded", paymentsOfSelectedPerson.Count.ToString()}
+                }
+            };
 
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
+
+            if (response.IsSuccessStatusCode) {
+                List<Payment> getted = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+                getted.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
+                paymentsOfSelectedPerson.AddRange(getted);
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+            }
+
+            base.StateHasChanged();
         }
     }
 }
