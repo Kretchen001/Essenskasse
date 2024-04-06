@@ -1,4 +1,5 @@
 ﻿using Essenskasse.Client;
+using Essenskasse.Client.Services;
 using Essenskasse.Ressources;
 using Modells;
 using Newtonsoft.Json;
@@ -274,6 +275,43 @@ namespace Essenskasse.Pages {
                 cent = (short)((OrderAmount[index] - euro) * 100);
             }
             return new Money(euro, cent).ToString();
+        }
+
+        private async void LoadNextAmountOfPayments() {
+            // Request last payments of a person
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "payment/requestNextAmount"),
+                Headers = {
+                    { "amount", AppData.LoadAmountPayment.ToString() },
+                    { "alreadyLoaded", Payments.Count.ToString()}
+                }
+            };
+
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
+
+            if (response.IsSuccessStatusCode) {
+                List<Payment> getted = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+                getted.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
+                Payments.AddRange(getted);
+                ChangedPayments.AddRange(getted);
+                Payments.ForEach(x => {
+                    decimal temp = x.Amount.Euro + (decimal)(x.Amount.Cent * 0.01);
+                    PaymentAmount.Add(temp);
+                });
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+            }
+
+            base.StateHasChanged();
         }
     }
 }

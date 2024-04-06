@@ -67,6 +67,39 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        [HttpGet, Route("requestNextAmount")]
+        public IActionResult GetNextAmountOfPayments([FromHeader] int? amount,
+                                                                [FromHeader] int? alreadyLoaded) {
+            using (Operation.Time("Request next amount of Payments")) {
+                Log.Information("GetNextAmountOfPayments called");
+                if (amount is null) {
+                    Log.Warning("GetNextAmountOfPayments with empty amount Header called");
+                    return BadRequest();
+                }
+                if (alreadyLoaded is null) {
+                    Log.Warning("GetAmountOfPayments with empty alreadyLoaded Header called");
+                    return BadRequest();
+                }
+                string queryString = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.Payment " +
+                    $"ORDER BY DateTime DESC " +
+                    $"LIMIT {amount} OFFSET {alreadyLoaded};";
+
+                DataTable dataTablePayments = QueryExecuterAtMySql(queryString);
+                List<Payment> payments = DataTableToListOfPayments(dataTablePayments);
+
+                if (payments.Count != 0) {
+                    Log.Information(payments.Count + " next Payments requested");
+                    return Ok(JsonConvert.SerializeObject(payments));
+                }
+                else {
+                    Log.Warning("No Data response (GetAmountOfPayments)");
+                    return NoContent();
+                }
+            }
+        }
+
         [HttpGet, Route("fromPerson")]
         public IActionResult GetPaymentsFromPersonPerGuid([FromHeader] Guid? guid,
                                                             [FromHeader] int? amount) {
@@ -113,11 +146,11 @@ namespace EssenskasseAPI.Controllers {
                     return BadRequest();
                 }
                 if (amount is null) {
-                    Log.Warning("GetAmountOfPayments with empty amount Header called");
+                    Log.Warning("GetNextAmountOfPaymentsFromPerson with empty amount Header called");
                     return BadRequest();
                 }
                 if (alreadyLoaded is null) {
-                    Log.Warning("GetAmountOfPayments with empty alreadyLoaded Header called");
+                    Log.Warning("GetNextAmountOfPaymentsFromPerson with empty alreadyLoaded Header called");
                     return BadRequest();
                 }
                 string queryString = $"" +
