@@ -21,8 +21,8 @@ namespace EssenskasseAPI.Controllers {
 
         #region Controller
         [HttpGet, Route("all")]
-        public IActionResult GetAllProcedures() {
-            using (Operation.Time("GetAllProcedures")) {
+        public IActionResult TransactionProcedure() {
+            using (Operation.Time("TransactionProcedure")) {
                 string queryString = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.TransactionProcedure;";

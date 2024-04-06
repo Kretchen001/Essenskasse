@@ -48,10 +48,15 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) { // success?
                                                 // deserialize the result-JSON with Newtownsoft to the List
-                providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
+                providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? [];
                 providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
                 providers = providers.OrderBy(x => x.Designation).ToList();
-                selectedProvider = providers[0].Guid;
+                if (providers.Count > 0) {
+                    selectedProvider = providers[0].Guid;
+                }
+                else {
+                    ToastService.ShowToast("Keine Anbieter verfügbar!\nBitte vorher eintragen!", ToastLevel.Info);
+                }
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
