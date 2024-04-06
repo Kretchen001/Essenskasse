@@ -29,7 +29,7 @@ namespace EssenskasseAPI.Controllers {
 
                 DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
                 List<Order> ordersList = DataTableToListOfOrders(dataTableOrders);
-                
+
                 if (ordersList is not null) {
                     Log.Information(ordersList.Count + " Orders requested");
                     return Ok(JsonConvert.SerializeObject(ordersList));
@@ -62,6 +62,39 @@ namespace EssenskasseAPI.Controllers {
                 }
                 else {
                     Log.Warning("No Data response (GetAmountOfOrders)");
+                    return NoContent();
+                }
+            }
+        }
+
+        [HttpGet, Route("requestNextAmount")]
+        public IActionResult GetNextAmountOfOrders([FromHeader] int? amount,
+                                                    [FromHeader] int? alreadyLoaded) {
+            using (Operation.Time("Request next amount of Payments")) {
+                Log.Information("GetNextAmountOfOrders called");
+                if (amount is null) {
+                    Log.Warning("GetNextAmountOfOrders with empty amount Header called");
+                    return BadRequest();
+                }
+                if (alreadyLoaded is null) {
+                    Log.Warning("GetNextAmountOfOrders with empty alreadyLoaded Header called");
+                    return BadRequest();
+                }
+                string queryString = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.Order " +
+                    $"ORDER BY DateTime DESC " +
+                    $"LIMIT {amount} OFFSET {alreadyLoaded};";
+
+                DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
+                List<Order> oders = DataTableToListOfOrders(dataTableOrders);
+
+                if (oders.Count != 0) {
+                    Log.Information(oders.Count + " next Order requested");
+                    return Ok(JsonConvert.SerializeObject(oders));
+                }
+                else {
+                    Log.Warning("No Data response (GetNextAmountOfOrders)");
                     return NoContent();
                 }
             }
@@ -215,7 +248,7 @@ namespace EssenskasseAPI.Controllers {
                             Log.Warning($"At {dateAsLong} no Order found");
                             return NotFound("Keine Bestellung zum angegebenen Datum gefunden.");
                         }
-                        
+
                         bool hasChanges = false;
                         Money temp = orders[0].Money;
                         if (values.Money is not null) {
@@ -346,7 +379,7 @@ namespace EssenskasseAPI.Controllers {
                 guid: new Guid(DataTablePersonToUpdate.Rows[0]["Guid"].ToString()!),
                 name: DataTablePersonToUpdate.Rows[0]["Name"].ToString()!,
                 email: DataTablePersonToUpdate.Rows[0]["Email"].ToString()!,
-                money : new Money(
+                money: new Money(
                     euro: long.Parse(DataTablePersonToUpdate.Rows[0]["SaldoEuro"].ToString()!),
                     cent: short.Parse(DataTablePersonToUpdate.Rows[0]["SaldoCent"].ToString()!)
                     )

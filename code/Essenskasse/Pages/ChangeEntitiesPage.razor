@@ -121,4 +121,12 @@ else if (SelectedType == types[1]) { // Bestellungen/Orders
             </div>
         </div>
     }
+    <br />
+    <div class="row">
+        <div class="col-lg-12" align="right">
+            <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px" @onclick="() => LoadNextAmountOfOrders()">
+                @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+            </button>
+        </div>
+    </div>
 }

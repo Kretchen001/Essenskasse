@@ -313,5 +313,41 @@ namespace Essenskasse.Pages {
 
             base.StateHasChanged();
         }
+
+        private async void LoadNextAmountOfOrders() {
+            // Request last payments of a person
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "order/requestNextAmount"),
+                Headers = {
+                        { "amount", AppData.LoadAmountOrder.ToString() },
+                        { "alreadyLoaded", Orders.Count.ToString()}
+                    }
+            };
+
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
+
+            if (response.IsSuccessStatusCode) {
+                List<Order> getted = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? [];
+                foreach (Order x in getted) {
+                    Orders.Add(new Tuple<Order, int>(x, Orders.Count));
+                    ChangedOrders.Add(x);
+                    decimal temp = x.Money.Euro + (decimal)(x.Money.Cent * 0.01);
+                    OrderAmount.Add(temp);
+                }
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+            }
+
+            base.StateHasChanged();
+        }
     }
 }
