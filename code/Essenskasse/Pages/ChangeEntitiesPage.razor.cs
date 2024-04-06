@@ -122,7 +122,7 @@ namespace Essenskasse.Pages {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "order/requestAmount"),
                 Headers = {
-                    { "amount", AppData.LoadAmountPayment.ToString() }
+                    { "amount", AppData.LoadAmountOrder.ToString() }
                 }
             };
 
