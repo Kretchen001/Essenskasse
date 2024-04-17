@@ -58,10 +58,16 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        private static Money ConvertToMoney(decimal value) {
-            long euro = (long)value;
-            short cent = (short)((value - euro) * 100);
-            return new Money(euro, cent);
+        private Money ConvertToMoney(decimal value) {
+            try {
+                long euro = (long)value;
+                short cent = (short)((value - euro) * 100);
+                return new Money(euro, cent);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastMoneyFormatInvalid)], ToastLevel.Warning);
+                return new Money(0, 0);
+            }
         }
 
         private async Task RefreshPersonList() {
