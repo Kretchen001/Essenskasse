@@ -222,7 +222,7 @@ namespace Essenskasse.Pages {
             if (Orders[index].Item1.ReferencedPerson.Equals(ChangedOrders[index].ReferencedPerson)) {
                 c = null;
             }
-            MoneyProviderGuidData data = new MoneyProviderGuidData() { 
+            MoneyProviderGuidData data = new MoneyProviderGuidData() {
                 Money = a,
                 Provider = b,
                 ReferencedPerson = c
@@ -299,13 +299,18 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 List<Payment> getted = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
-                getted.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
-                Payments.AddRange(getted);
-                ChangedPayments.AddRange(getted);
-                Payments.ForEach(x => {
-                    decimal temp = x.Amount.Euro + (decimal)(x.Amount.Cent * 0.01);
-                    PaymentAmount.Add(temp);
-                });
+                if (getted.Count == 0) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNothingToLoad)], ToastLevel.Info);
+                }
+                else {
+                    getted.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
+                    Payments.AddRange(getted);
+                    ChangedPayments.AddRange(getted);
+                    Payments.ForEach(x => {
+                        decimal temp = x.Amount.Euro + (decimal)(x.Amount.Cent * 0.01);
+                        PaymentAmount.Add(temp);
+                    });
+                }
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
@@ -336,11 +341,16 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 List<Order> getted = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? [];
-                foreach (Order x in getted) {
-                    Orders.Add(new Tuple<Order, int>(x, Orders.Count));
-                    ChangedOrders.Add(x);
-                    decimal temp = x.Money.Euro + (decimal)(x.Money.Cent * 0.01);
-                    OrderAmount.Add(temp);
+                if (getted.Count == 0) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNothingToLoad)], ToastLevel.Info);
+                }
+                else {
+                    foreach (Order x in getted) {
+                        Orders.Add(new Tuple<Order, int>(x, Orders.Count));
+                        ChangedOrders.Add(x);
+                        decimal temp = x.Money.Euro + (decimal)(x.Money.Cent * 0.01);
+                        OrderAmount.Add(temp);
+                    }
                 }
             }
             else {

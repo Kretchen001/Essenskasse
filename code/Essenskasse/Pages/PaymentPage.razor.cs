@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using System.Text;
 
 namespace Essenskasse.Pages {
-    
+
     public partial class PaymentPage {
 
         private List<Person>? person = new List<Person>();
@@ -158,7 +158,7 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessfullyAdded)], ToastLevel.Success);
-                paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!); 
+                paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!);
                 paymentsOfSelectedPerson.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
                 paymentsOfSelectedPerson = paymentsOfSelectedPerson.OrderByDescending(x => x.DateTime).ToList();
                 base.StateHasChanged();
@@ -192,8 +192,13 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 List<Payment> getted = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
-                getted.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
-                paymentsOfSelectedPerson.AddRange(getted);
+                if (getted.Count == 0) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNothingToLoad)], ToastLevel.Info);
+                }
+                else {
+                    getted.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
+                    paymentsOfSelectedPerson.AddRange(getted);
+                }
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);

@@ -123,5 +123,6 @@
         emailAdminContact,
         notify,
         buttonLoadMore,
+        toastNothingToLoad,
     }
 }
