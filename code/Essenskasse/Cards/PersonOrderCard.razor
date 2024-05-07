@@ -29,7 +29,7 @@
             return _orderAmount;
         }
         set {
-            if (value != 0) {
+            if (value > 0) {
                 long euro = (long)value;
                 short cent = (short)((value - euro) * 100);
                 if (cent < 100) {
@@ -38,6 +38,9 @@
                 else {
                     // nothing
                 }
+            }
+            else {
+                _orderAmount = 0;
             }
         }
     }
