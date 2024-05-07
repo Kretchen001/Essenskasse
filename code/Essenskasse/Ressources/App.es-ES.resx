@@ -426,6 +426,9 @@
   <data name="toastNothingRequested" xml:space="preserve">
     <value>¡Nada recuperado!</value>
   </data>
+  <data name="toastNothingToLoad" xml:space="preserve">
+    <value>No hay nada más disponible.</value>
+  </data>
   <data name="toastOrderSended" xml:space="preserve">
     <value>Órdenes transmitidas.</value>
   </data>

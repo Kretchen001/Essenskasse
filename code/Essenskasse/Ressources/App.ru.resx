@@ -426,6 +426,9 @@
   <data name="toastNothingRequested" xml:space="preserve">
     <value>Ничего не найдено!</value>
   </data>
+  <data name="toastNothingToLoad" xml:space="preserve">
+    <value>Больше ничего нет в наличии!</value>
+  </data>
   <data name="toastOrderSended" xml:space="preserve">
     <value>Приказы переданы.</value>
   </data>

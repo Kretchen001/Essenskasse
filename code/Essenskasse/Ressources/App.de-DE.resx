@@ -426,6 +426,9 @@
   <data name="toastNothingRequested" xml:space="preserve">
     <value>Nichts abgerufen!</value>
   </data>
+  <data name="toastNothingToLoad" xml:space="preserve">
+    <value>Nichts weiter abrufbar!</value>
+  </data>
   <data name="toastOrderSended" xml:space="preserve">
     <value>Bestellungen übermittelt.</value>
   </data>
