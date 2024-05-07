@@ -13,3 +13,5 @@ artifacts/
 TestResults
 
 .env
+
+localhost_*.html
