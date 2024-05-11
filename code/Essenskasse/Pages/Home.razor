@@ -46,24 +46,51 @@
     </div>
 }
 else {
-    <div class="row">
-        <div class="col-lg-6">
-            <h3><u>@_loc[nameof(RessourceAppStrings.inconspicuous)]</u></h3>
-            @for (int i = 0; i < person.Count; i += 1) {
-                @if (positivSaldo.Contains(i)) {
-                    <ShowPersonCard Person="person[i]" PositivSaldo="true" />
-                }
-            }
-        </div>
-        <div class="col-lg-6">
-            <h3><u>@_loc[nameof(RessourceAppStrings.noticeable)]</u></h3>
-            @for (int i = 0; i < person.Count; i += 1) {
-                @if (!positivSaldo.Contains(i)) {
-                    <ShowPersonCard Person="person[i]" PositivSaldo="false" />
-                }
-            }
-        </div>
+    <div class="row" style="margin-bottom: 1vh; padding-left: 20%; padding-right: 20%">
+        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px;">
+            Spalten vertauschen
+        </button>
     </div>
+    @if (NoticeableOnRightSide) {
+        <div class="row">
+            <div class="col-lg-6">
+                <h3><u>@_loc[nameof(RessourceAppStrings.inconspicuous)]</u></h3>
+                @for (int i = 0; i < person.Count; i += 1) {
+                    @if (positivSaldo.Contains(i)) {
+                        <ShowPersonCard Person="person[i]" PositivSaldo="true" />
+                    }
+                }
+            </div>
+            <div class="col-lg-6">
+                <h3><u>@_loc[nameof(RessourceAppStrings.noticeable)]</u></h3>
+                @for (int i = 0; i < person.Count; i += 1) {
+                    @if (!positivSaldo.Contains(i)) {
+                        <ShowPersonCard Person="person[i]" PositivSaldo="false" />
+                    }
+                }
+            </div>
+        </div>
+    }
+    else {
+        <div class="row">
+            <div class="col-lg-6">
+                <h3><u>@_loc[nameof(RessourceAppStrings.noticeable)]</u></h3>
+                @for (int i = 0; i < person.Count; i += 1) {
+                    @if (!positivSaldo.Contains(i)) {
+                        <ShowPersonCard Person="person[i]" PositivSaldo="false" />
+                    }
+                }
+            </div>
+            <div class="col-lg-6">
+                <h3><u>@_loc[nameof(RessourceAppStrings.inconspicuous)]</u></h3>
+                @for (int i = 0; i < person.Count; i += 1) {
+                    @if (positivSaldo.Contains(i)) {
+                        <ShowPersonCard Person="person[i]" PositivSaldo="true" />
+                    }
+                }
+            </div>
+        </div>
+    }
 }
 <br />
 <hr />

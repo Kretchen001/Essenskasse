@@ -17,6 +17,15 @@ namespace Essenskasse.Pages {
             }
         }
 
+        private bool NoticeableOnRightSide {
+            get {
+                return true;
+            }
+            set {
+                //
+            }
+        }
+
         private string ReturnListWish {
             get {
                 if (IsSingleListWish) {
