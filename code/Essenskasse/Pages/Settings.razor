@@ -106,6 +106,24 @@
 <div class="row align-items-center" id="greenRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
     <div class="col-lg-4">
         <label id="labelcolor">
+            @_loc[nameof(RessourceAppStrings.showNoticeablePersonRightDashboard)]
+        </label>
+    </div>
+    <div class="col-lg-8" align="center">
+        <div class="row">
+            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="NoticeableOnRightSide">
+            </div>
+            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+                <label class="form-check-label" for="flexSwitchCheckChecked" style="color: white">@ReturnNoticeableSide</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row align-items-center" id="greenRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
+    <div class="col-lg-4">
+        <label id="labelcolor">
             @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.provider)]) @_loc[nameof(RessourceAppStrings.turnOn)]
         </label>
     </div>

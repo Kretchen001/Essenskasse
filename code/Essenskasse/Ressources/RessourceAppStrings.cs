@@ -124,5 +124,7 @@
         notify,
         buttonLoadMore,
         toastNothingToLoad,
+        showNoticeablePersonRightDashboard,
+        swapColumns,
     }
 }

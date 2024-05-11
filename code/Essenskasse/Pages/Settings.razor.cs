@@ -35,6 +35,29 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary> </summary>
+        private bool NoticeableOnRightSide {
+            get {
+                return AppData.NoticeableOnRightSide;
+            }
+            set {
+                AppData.NoticeableOnRightSide = value;
+                WriteNoticableSideToLocalStorage(value);
+            }
+        }
+
+        /// <summary></summary>
+        private string ReturnNoticeableSide{
+            get {
+                if (AppData.NoticeableOnRightSide) {
+                    return _loc[nameof(RessourceAppStrings.yes)];
+                }
+                else {
+                    return _loc[nameof(RessourceAppStrings.no)];
+                }
+            }
+        }
+
         /// <summary></summary>
         private void ChangeTheme(string value) {
             if (value.Equals("Dark")) {
@@ -194,6 +217,12 @@ namespace Essenskasse.Pages {
         /// <param name="value">new listwish bool</param>
         private async void WriteWishListToLocalStorage(bool value) {
             await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
+        }
+
+        /// <summary></summary>
+        /// <param name="value"></param>
+        private async void WriteNoticableSideToLocalStorage(bool value) {
+            await LocalStorage.SetItemAsync<bool>("NoticeableOnRightSide", value);
         }
 
         /// <summary></summary>

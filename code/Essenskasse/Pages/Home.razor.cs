@@ -23,7 +23,7 @@ namespace Essenskasse.Pages {
             }
             set {
                 AppData.NoticeableOnRightSide = value;
-                WriteWishListToLocalStorage(value);
+                WriteNoticableSideToLocalStorage(value);
             }
         }
 
@@ -130,6 +130,10 @@ namespace Essenskasse.Pages {
 
         private void ToggleColumnInView() {
             NoticeableOnRightSide = !NoticeableOnRightSide;
+        }
+
+        private async void WriteNoticableSideToLocalStorage(bool value) {
+            await LocalStorage.SetItemAsync<bool>("NoticeableOnRightSide", value);
         }
     }
 }

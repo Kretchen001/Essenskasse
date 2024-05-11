@@ -29,6 +29,7 @@ namespace Essenskasse.Layout {
         /// <summary>Read all Key-Value Pairs from the LocalStorage and bring it to its necessary place.</summary>
         private async Task ReadLocalStorage() {
             AppData.IsSingleListWishDashboard = await LocalStorage.GetItemAsync<bool>("IsSingleWishListDashboard");
+            AppData.NoticeableOnRightSide = await LocalStorage.GetItemAsync<bool>("NoticeableOnRightSide");
             AppData.LoadAmountPayment = await LocalStorage.GetItemAsync<int>("loadAmountOfPayments") == 0 ? 10 : await LocalStorage.GetItemAsync<int>("loadAmountOfPayments");
             AppData.LoadAmountOrder = await LocalStorage.GetItemAsync<int>("loadAmountOfOrders") == 0 ? 25 : await LocalStorage.GetItemAsync<int>("loadAmountOfOrders");
             AppData.FilterShowProvider = await LocalStorage.GetItemAsync<bool>("filterShowProvider");
