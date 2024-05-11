@@ -342,6 +342,9 @@
   <data name="settings" xml:space="preserve">
     <value>Settings</value>
   </data>
+  <data name="showNoticeablePersonRightDashboard" xml:space="preserve">
+    <value>Show conspicuous persons on the right/bottom of the dashboard</value>
+  </data>
   <data name="singleColumn" xml:space="preserve">
     <value>Single column</value>
   </data>
@@ -353,6 +356,9 @@
   </data>
   <data name="successfullyTransmitted" xml:space="preserve">
     <value>Successfully transmitted!</value>
+  </data>
+  <data name="swapColumns" xml:space="preserve">
+    <value>swap columns</value>
   </data>
   <data name="toastAdd" xml:space="preserve">
     <value>added.</value>

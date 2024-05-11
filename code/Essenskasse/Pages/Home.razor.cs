@@ -17,6 +17,16 @@ namespace Essenskasse.Pages {
             }
         }
 
+        private bool NoticeableOnRightSide {
+            get {
+                return AppData.NoticeableOnRightSide;
+            }
+            set {
+                AppData.NoticeableOnRightSide = value;
+                WriteNoticableSideToLocalStorage(value);
+            }
+        }
+
         private string ReturnListWish {
             get {
                 if (IsSingleListWish) {
@@ -116,6 +126,14 @@ namespace Essenskasse.Pages {
                     currentCashBalance = new Money().CalculateMoney(CalculationOperation.Substraction, currentCashBalance, temp) ?? new Money(0, 0);
                 }
             }
+        }
+
+        private void ToggleColumnInView() {
+            NoticeableOnRightSide = !NoticeableOnRightSide;
+        }
+
+        private async void WriteNoticableSideToLocalStorage(bool value) {
+            await LocalStorage.SetItemAsync<bool>("NoticeableOnRightSide", value);
         }
     }
 }
