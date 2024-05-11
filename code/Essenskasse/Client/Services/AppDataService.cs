@@ -29,5 +29,8 @@ namespace Essenskasse.Client.Services {
 
         /// <summary></summary>
         public string AdminEmail { get; set; } = "";
+
+        /// <summary></summary>
+        public bool NoticeableOnRightSide { get; set; } = true;
     }
 }

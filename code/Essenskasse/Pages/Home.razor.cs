@@ -19,10 +19,11 @@ namespace Essenskasse.Pages {
 
         private bool NoticeableOnRightSide {
             get {
-                return true;
+                return AppData.NoticeableOnRightSide;
             }
             set {
-                //
+                AppData.NoticeableOnRightSide = value;
+                WriteWishListToLocalStorage(value);
             }
         }
 
@@ -125,6 +126,10 @@ namespace Essenskasse.Pages {
                     currentCashBalance = new Money().CalculateMoney(CalculationOperation.Substraction, currentCashBalance, temp) ?? new Money(0, 0);
                 }
             }
+        }
+
+        private void ToggleColumnInView() {
+            NoticeableOnRightSide = !NoticeableOnRightSide;
         }
     }
 }
