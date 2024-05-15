@@ -13,7 +13,7 @@
 </div>
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
+    <nav class="d-flex flex-column h-100">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span aria-hidden="true">
@@ -90,8 +90,16 @@
                 </NavLink>
             </div>
         }
+        @* Leerbereich füllen, um div nach unten zu schieben *@
+        <div class="flex-grow-1"></div>
+        <div class="p-3 d-flex justify-content-md-start justify-content-end">
+            <label style="color: lightgray">
+                v1.0.2
+            </label>
+        </div>
     </nav>
 </div>
+
 
 @code {
     private bool collapseNavMenu = true;
