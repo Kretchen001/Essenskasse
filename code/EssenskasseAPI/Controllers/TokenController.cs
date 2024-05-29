@@ -55,7 +55,7 @@ namespace EssenskasseAPI.Controllers {
                         $"FROM essenskasse.TokenForChange " +
                         $"WHERE Guid='{accessToken}';";
                     DataTable datatableInsert = QueryExecuterAtMySql(queryStringInsert);
-                    List<Tuple<DateTime, Guid>> res = DataTableToListOfPerson(datatableInsert);
+                    List<Tuple<DateTime, Guid, string>> res = DataTableToListOfToken(datatableInsert);
                     if (res.Count == 1) {
                         Log.Information("CheckAccessToken called successfull");
                         return Ok();
@@ -86,12 +86,13 @@ namespace EssenskasseAPI.Controllers {
             return dataTable;
         }
 
-        private static List<Tuple<DateTime, Guid>> DataTableToListOfPerson(DataTable dataTable) {
-            List<Tuple<DateTime, Guid>> tokenList = [];
+        private static List<Tuple<DateTime, Guid, string>> DataTableToListOfToken(DataTable dataTable) {
+            List<Tuple<DateTime, Guid, string>> tokenList = [];
             foreach (DataRow row in dataTable.Rows) {
-                tokenList.Add(new Tuple<DateTime, Guid>(
+                tokenList.Add(new Tuple<DateTime, Guid, string>(
                     item1: new DateTime(long.Parse(row["DateTime"].ToString()!)),
-                    item2: new Guid(row["Guid"].ToString()!)
+                    item2: new Guid(row["Guid"].ToString()!),
+                    item3: row["Identity"].ToString()!
                     ));
             }
             return tokenList;
