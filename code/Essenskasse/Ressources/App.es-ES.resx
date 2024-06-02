@@ -306,6 +306,9 @@
   <data name="ordersToBeLoaded" xml:space="preserve">
     <value>Órdenes pendientes de carga</value>
   </data>
+  <data name="overview" xml:space="preserve">
+    <value>visión general</value>
+  </data>
   <data name="payment" xml:space="preserve">
     <value>Depósito</value>
   </data>

@@ -1,11 +1,35 @@
 ﻿@page "/orderCreate"
 
+@using Microsoft.AspNetCore.Components.QuickGrid;
+
 @inject HttpClient HttpClient
 @inject IJSRuntime JSRuntime
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
 @inject AppDataService AppData
 @inject ToastService ToastService
+
+<style>
+    /* Fix height and enable scrolling */
+    .overViewGrid {
+        max-height: 90vh;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+    /* Sticky header while scrolling */
+    .overViewGrid thead {
+        position: sticky;
+        top: 0;
+        background-color: #eee;
+        border-bottom: solid 0.1rem black;
+    }
+
+    /* Subtle stripe effect */
+    .overViewGrid tr:nth-child(even) {
+        background: rgba(205,205,205,0.4);
+    }
+</style>
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.createNewOrder)]</PageTitle>
 
@@ -122,23 +146,25 @@
         </HistoryModalCard>
 
     </BlazorXTabs.XTab>
-    <BlazorXTabs.XTab Title="Übersicht">
+    <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.overview)]">
 
-        <h2>Übersicht</h2>
-
-        <div class="grid">
+        <h2>@_loc[nameof(RessourceAppStrings.overview)]</h2>
+        <div class="overViewGrid">
             @if (orderListForOverview.Count != 0) {
-                <Microsoft.AspNetCore.Components.QuickGrid.QuickGrid Items="@orderListForOverview.AsQueryable()">
-                    <Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="@(p => p.DateTime.ToString("d"))" Title="@(orderListForOverview[0].Head[0])" />
+                <QuickGrid Items="@orderListForOverview.AsQueryable()">
+                    <PropertyColumn Property="@(p => p.DateTime.ToString("d"))"
+                                    Title="@(orderListForOverview[0].Head[0])" />
                     @foreach (int i in Enumerable.Range(0, person.Count)) {
-                        <Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="@(p => (p.Orders[i] ?? new Order()).Money.ToString())" Title="@(orderListForOverview[0].Head[i+1])" />
+                        <PropertyColumn Property="@(p => (p.Orders[i] ?? new Order()).Money.ToString())"
+                                        Title="@(orderListForOverview[0].Head[i+1])"
+                                        Class="text-center" />
                     }
-                </Microsoft.AspNetCore.Components.QuickGrid.QuickGrid>
+                </QuickGrid>
             }
         </div>
-
-        <button @onclick="LoadOrdersForOverview">
-            weitere Laden
+                
+        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; margin-top: 1rem" @onclick="LoadOrdersForOverview">
+            @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
         </button>
 
     </BlazorXTabs.XTab>

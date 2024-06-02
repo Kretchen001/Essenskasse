@@ -126,5 +126,6 @@
         toastNothingToLoad,
         showNoticeablePersonRightDashboard,
         swapColumns,
+        overview,
     }
 }

@@ -259,13 +259,12 @@ namespace Essenskasse.Pages {
                     while (order.Count != 0) {
                         List<Order?> dayOrders = new List<Order?>();
                         // initialize day with null && the head
-                        List<string> head = ["Datum"];
+                        List<string> head = [_loc[nameof(RessourceAppStrings.date)]];
                         for (int i = 0; i < person.Count; i += 1) {
                             dayOrders.Add(null);
                             head.Add(person[i].Name);
                         }
                         // if order at day insert it
-                        Console.WriteLine(order[0].DateTime.Date + " - " + referenceDate.Date);
                         while (order[0].DateTime.Date == referenceDate.Date) {
                             // insert the order to person-row
                             dayOrders[person.FindIndex(x => x.Guid.Equals(order[0].ReferencedPerson))] = order[0];
