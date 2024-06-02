@@ -19,6 +19,10 @@ namespace Essenskasse.Pages {
         private List<Order> completeHistoryFromOne = [];
         private List<PersonOrderCard> personOrderCards = [];
 
+        private record DateAndOrder(DateTime DateTime, List<Order?> Orders);
+        private List<DateAndOrder> orderListForOverview = [];
+        private DateTime referenceDate = DateTime.Now;
+
         private string ModalTitle = "";
 
         private DateTime selectedDate = DateTime.Now;
@@ -227,6 +231,60 @@ namespace Essenskasse.Pages {
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
+            }
+        }
+
+        private async void LoadOrdersForOverview() {
+            if (orderListForOverview.Count == 0) {
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "order/requestAmount"),
+                    Headers = {
+                        { "amount", 500.ToString() }
+                    }
+                };
+
+                HttpResponseMessage? response;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+
+                if (response.IsSuccessStatusCode) {
+                    List<Order> order = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+
+                    while (order.Count != 0) {
+                        List<Order?> dayOrders = new List<Order?>();
+                        // initialize day with null
+                        for (int i = 0; i < person.Count; i += 1) {
+                            dayOrders.Add(null);
+                        }
+                        // if order at day insert it
+                        Console.WriteLine(order[0].DateTime.Date + " - " + referenceDate.Date);
+                        while (order[0].DateTime.Date == referenceDate.Date) {
+                            // insert the order to person-row
+                            dayOrders[person.FindIndex(x => x.Guid.Equals(order[0].ReferencedPerson))] = order[0];
+                            order.RemoveAt(0);
+                            if (order.Count == 0) {
+                                break;
+                            }
+                        }
+                        // add the day-orders
+                        orderListForOverview.Add(new DateAndOrder(
+                            DateTime: referenceDate,
+                            Orders: dayOrders)
+                        );
+                        // go to the day before
+                        referenceDate = referenceDate.AddDays(-1);
+                    }
+                    base.StateHasChanged();
+                }
+                else {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+                }
             }
         }
     }
