@@ -126,5 +126,20 @@
 
         <h2>Übersicht</h2>
 
+        <div class="grid">
+            @if (orderListForOverview.Count != 0) {
+                <Microsoft.AspNetCore.Components.QuickGrid.QuickGrid Items="@orderListForOverview.AsQueryable()">
+                    <Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="@(p => p.DateTime.ToString("d"))" Title="@(orderListForOverview[0].Head[0])" />
+                    @foreach (int i in Enumerable.Range(0, person.Count)) {
+                        <Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="@(p => (p.Orders[i] ?? new Order()).Money.ToString())" Title="@(orderListForOverview[0].Head[i+1])" />
+                    }
+                </Microsoft.AspNetCore.Components.QuickGrid.QuickGrid>
+            }
+        </div>
+
+        <button @onclick="LoadOrdersForOverview">
+            weitere Laden
+        </button>
+
     </BlazorXTabs.XTab>
 </BlazorXTabs.XTabs>

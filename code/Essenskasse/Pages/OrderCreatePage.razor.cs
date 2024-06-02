@@ -19,7 +19,7 @@ namespace Essenskasse.Pages {
         private List<Order> completeHistoryFromOne = [];
         private List<PersonOrderCard> personOrderCards = [];
 
-        private record DateAndOrder(DateTime DateTime, List<Order?> Orders);
+        private record DateAndOrder(List<string> Head, DateTime DateTime, List<Order?> Orders);
         private List<DateAndOrder> orderListForOverview = [];
         private DateTime referenceDate = DateTime.Now;
 
@@ -258,9 +258,11 @@ namespace Essenskasse.Pages {
 
                     while (order.Count != 0) {
                         List<Order?> dayOrders = new List<Order?>();
-                        // initialize day with null
+                        // initialize day with null && the head
+                        List<string> head = ["Datum"];
                         for (int i = 0; i < person.Count; i += 1) {
                             dayOrders.Add(null);
+                            head.Add(person[i].Name);
                         }
                         // if order at day insert it
                         Console.WriteLine(order[0].DateTime.Date + " - " + referenceDate.Date);
@@ -274,6 +276,7 @@ namespace Essenskasse.Pages {
                         }
                         // add the day-orders
                         orderListForOverview.Add(new DateAndOrder(
+                            Head: head,
                             DateTime: referenceDate,
                             Orders: dayOrders)
                         );
