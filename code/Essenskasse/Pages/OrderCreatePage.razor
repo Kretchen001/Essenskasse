@@ -17,18 +17,18 @@
         overflow-x: auto;
     }
 
-    /* Sticky header while scrolling */
-    .overViewGrid thead {
-        position: sticky;
-        top: 0;
-        background-color: #eee;
-        border-bottom: solid 0.1rem black;
-    }
+        /* Sticky header while scrolling */
+        .overViewGrid thead {
+            position: sticky;
+            top: 0;
+            background-color: #eee;
+            border-bottom: solid 0.1rem black;
+        }
 
-    /* Subtle stripe effect */
-    .overViewGrid tr:nth-child(even) {
-        background: rgba(205,205,205,0.4);
-    }
+        /* Subtle stripe effect */
+        .overViewGrid tr:nth-child(even) {
+            background: rgba(205,205,205,0.4);
+        }
 </style>
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.createNewOrder)]</PageTitle>
@@ -155,14 +155,14 @@
                     <PropertyColumn Property="@(p => p.DateTime.ToString("d"))"
                                     Title="@(orderListForOverview[0].Head[0])" />
                     @foreach (int i in Enumerable.Range(0, person.Count)) {
-                        <PropertyColumn Property="@(p => (p.Orders[i] ?? new Order()).Money.ToString())"
+                        <PropertyColumn Property="@(p => OverviewCellFill(p.Orders[i]))"
                                         Title="@(orderListForOverview[0].Head[i+1])"
                                         Class="text-center" />
                     }
                 </QuickGrid>
             }
         </div>
-                
+
         <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; margin-top: 1rem" @onclick="LoadOrdersForOverview">
             @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
         </button>

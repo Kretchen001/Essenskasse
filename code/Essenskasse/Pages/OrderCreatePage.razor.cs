@@ -289,5 +289,12 @@ namespace Essenskasse.Pages {
                 }
             }
         }
+
+        /// <summary>
+        /// Check which content should be printed in the cell.
+        /// </summary>
+        /// <param name="x">Order, that contain the Money-Value or is null if not</param>
+        /// <returns>if Money-Value is null => "-" and otherwise the Money.ToString()</returns>
+        private static string OverviewCellFill(Order? x) => (x is null) ? "-" : x!.Money.ToString();
     }
 }
