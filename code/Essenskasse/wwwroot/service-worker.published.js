@@ -7,8 +7,8 @@ self.addEventListener('activate', event => event.waitUntil(onActivate(event)));
 self.addEventListener('fetch', event => event.respondWith(onFetch(event)));
 
 const cacheNamePrefix = 'offline-cache-';
-const Cache_Version = '1.0.2.10'; // letzte Nummer anpassen für den Build, die anderen bei Versionen
-const cacheName = `${cacheNamePrefix}${Cache_Version}`;
+let Cache_Version;
+let cacheName = `${cacheNamePrefix}${Cache_Version}`;
 const offlineAssetsInclude = [ /\.dll$/, /\.pdb$/, /\.wasm/, /\.html/, /\.js$/, /\.json$/, /\.css$/, /\.woff$/, /\.png$/, /\.jpe?g$/, /\.gif$/, /\.ico$/, /\.blat$/, /\.dat$/ ];
 const offlineAssetsExclude = [ /^service-worker\.js$/ ];
 
@@ -19,7 +19,19 @@ const manifestUrlList = self.assetsManifest.assets.map(asset => new URL(asset.ur
 
 async function onInstall(event) {
     console.info('Service worker: Install');
-
+    (async () => {
+        try {
+            const response = await fetch('/appsettings.json');
+            if (!response.ok) {
+                throw new Error('Netzwerkantwort war nicht ok');
+            }
+            const data = await response.json();
+            Cache_Version = data.Version;
+            console.log('Version:', Cache_Version);
+        } catch (error) {
+            console.error('Fehler beim Abrufen der Version:', error);
+        }
+    })()
     // Fetch and cache all matching items from the assets manifest
     const assetsRequests = self.assetsManifest.assets
         .filter(asset => offlineAssetsInclude.some(pattern => pattern.test(asset.url)))

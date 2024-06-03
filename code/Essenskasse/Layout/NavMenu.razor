@@ -1,5 +1,6 @@
 ﻿@inject IStringLocalizer<App> _loc
 @inject AppDataService AppData
+@inject IConfiguration Config
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -94,7 +95,7 @@
         <div class="flex-grow-1"></div>
         <div class="p-3 d-flex justify-content-md-start justify-content-end">
             <label style="color: lightgray">
-                v1.0.2
+                v @Config["Version"]![0..@Config["Version"]!.LastIndexOf(".")]
             </label>
         </div>
     </nav>
