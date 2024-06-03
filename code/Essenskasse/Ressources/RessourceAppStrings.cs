@@ -127,5 +127,6 @@
         showNoticeablePersonRightDashboard,
         swapColumns,
         overview,
+        lastDayMaybyIncomplete,
     }
 }

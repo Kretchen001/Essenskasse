@@ -264,6 +264,9 @@
   <data name="language" xml:space="preserve">
     <value>Sprache</value>
   </data>
+  <data name="lastDayMaybyIncomplete" xml:space="preserve">
+    <value>Letzter Tag könnte unvollständig sein!</value>
+  </data>
   <data name="light" xml:space="preserve">
     <value>Hell</value>
   </data>

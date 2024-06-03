@@ -22,6 +22,7 @@ namespace Essenskasse.Pages {
         private record DateAndOrder(List<string> Head, DateTime DateTime, List<Order?> Orders);
         private List<DateAndOrder> orderListForOverview = [];
         private DateTime referenceDate = DateTime.Now;
+        private int overviewOrderAlreadyLoadCount = 0;
 
         private string ModalTitle = "";
 
@@ -35,12 +36,14 @@ namespace Essenskasse.Pages {
             get => AppData.LoadAmountOrder;
         }
 
+        /// <summary></summary>
         protected override async Task OnInitializedAsync() {
             await RequestAllProvider();
             await RequestAllPerson();
             base.StateHasChanged();
         }
 
+        /// <summary></summary>
         private async Task RequestAllProvider() {
             // Request all providers, that are saved in the database.
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -67,6 +70,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private async Task RequestAllPerson() {
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -94,6 +98,9 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
+        /// <param name="index"></param>
+        /// <param name="changedValues"></param>
         private void HandleValuesChanged(int index, Money changedValues) {
             // Access to the changed Money
             Money newMoney = changedValues;
@@ -102,6 +109,7 @@ namespace Essenskasse.Pages {
             money[index] = newMoney;
         }
 
+        /// <summary></summary>
         private async Task PostOrderForTheDay() {
             // request Date
             HttpRequestMessage httpRequestMessageDate = new HttpRequestMessage() {
@@ -178,6 +186,9 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         private async Task LoadAndShowHistory(int index) {
             // toggle preview
             showHistory[index] = !showHistory[index];
@@ -206,6 +217,8 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
+        /// <param name="index"></param>
         private async void HistoryLoadInModal(int index) {
             completeHistoryFromOne.Clear();
 
@@ -234,32 +247,36 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async void LoadOrdersForOverview() {
-            if (orderListForOverview.Count == 0) {
-                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri(Config["API-Adress"] + "order/requestAmount"),
-                    Headers = {
-                        { "amount", 500.ToString() }
-                    }
-                };
-
-                HttpResponseMessage? response;
-                try {
-                    response = await HttpClient.SendAsync(httpRequestMessage);
+        /// <summary></summary>
+        private async Task LoadOrdersForOverview() {
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "order/requestNextAmount"),
+                Headers = {
+                    { "amount", 100.ToString() },
+                    { "alreadyLoaded", overviewOrderAlreadyLoadCount.ToString() }
                 }
-                catch {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                    return;
-                }
+            };
 
-                if (response.IsSuccessStatusCode) {
-                    List<Order> order = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+            HttpResponseMessage? response;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
 
-                    while (order.Count != 0) {
-                        List<Order?> dayOrders = new List<Order?>();
-                        // initialize day with null && the head
+            if (response.IsSuccessStatusCode) {
+                List<Order> order = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+                overviewOrderAlreadyLoadCount += order.Count;
+                referenceDate = referenceDate.AddDays(1); // for the next load essential
+
+                while (order.Count != 0) {
+                    List<Order?> dayOrders = new List<Order?>();
+                    if (!orderListForOverview.Exists(x => x.DateTime.Date == referenceDate.Date)) {
                         List<string> head = [_loc[nameof(RessourceAppStrings.date)]];
+                        // initialize day with null && the head
                         for (int i = 0; i < person.Count; i += 1) {
                             dayOrders.Add(null);
                             head.Add(person[i].Name);
@@ -279,14 +296,24 @@ namespace Essenskasse.Pages {
                             DateTime: referenceDate,
                             Orders: dayOrders)
                         );
-                        // go to the day before
-                        referenceDate = referenceDate.AddDays(-1);
                     }
-                    base.StateHasChanged();
+                    else { // day already exist -> update cells at last day, other should be irrelevant
+                        while (order[0].DateTime.Date == referenceDate.Date) {
+                            int i = person.FindIndex(x => x.Guid.Equals(order[0].ReferencedPerson));
+                            orderListForOverview[^1].Orders[i] = order[0];
+                            order.RemoveAt(0);
+                            if (order.Count == 0) {
+                                break;
+                            }
+                        }
+                    }
+                    // go to the day before
+                    referenceDate = referenceDate.AddDays(-1);
                 }
-                else {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
-                }
+                base.StateHasChanged();
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
             }
         }
 

@@ -12,7 +12,7 @@
 <style>
     /* Fix height and enable scrolling */
     .overViewGrid {
-        max-height: 90vh;
+        max-height: 70vh;
         overflow-y: auto;
         overflow-x: auto;
     }
@@ -166,6 +166,12 @@
         <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; margin-top: 1rem" @onclick="LoadOrdersForOverview">
             @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
         </button>
+
+        <hr />
+
+        <label>
+            @_loc[nameof(RessourceAppStrings.lastDayMaybyIncomplete)]
+        </label>
 
     </BlazorXTabs.XTab>
 </BlazorXTabs.XTabs>
