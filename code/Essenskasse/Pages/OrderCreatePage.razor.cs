@@ -19,6 +19,11 @@ namespace Essenskasse.Pages {
         private List<Order> completeHistoryFromOne = [];
         private List<PersonOrderCard> personOrderCards = [];
 
+        private record DateAndOrder(List<string> Head, DateTime DateTime, List<Order?> Orders);
+        private List<DateAndOrder> orderListForOverview = [];
+        private DateTime referenceDate = DateTime.Now;
+        private int overviewOrderAlreadyLoadCount = 0;
+
         private string ModalTitle = "";
 
         private DateTime selectedDate = DateTime.Now;
@@ -31,12 +36,14 @@ namespace Essenskasse.Pages {
             get => AppData.LoadAmountOrder;
         }
 
+        /// <summary></summary>
         protected override async Task OnInitializedAsync() {
             await RequestAllProvider();
             await RequestAllPerson();
             base.StateHasChanged();
         }
 
+        /// <summary></summary>
         private async Task RequestAllProvider() {
             // Request all providers, that are saved in the database.
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -63,6 +70,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private async Task RequestAllPerson() {
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -90,6 +98,9 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
+        /// <param name="index"></param>
+        /// <param name="changedValues"></param>
         private void HandleValuesChanged(int index, Money changedValues) {
             // Access to the changed Money
             Money newMoney = changedValues;
@@ -98,6 +109,7 @@ namespace Essenskasse.Pages {
             money[index] = newMoney;
         }
 
+        /// <summary></summary>
         private async Task PostOrderForTheDay() {
             // request Date
             HttpRequestMessage httpRequestMessageDate = new HttpRequestMessage() {
@@ -174,6 +186,9 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         private async Task LoadAndShowHistory(int index) {
             // toggle preview
             showHistory[index] = !showHistory[index];
@@ -202,6 +217,8 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
+        /// <param name="index"></param>
         private async void HistoryLoadInModal(int index) {
             completeHistoryFromOne.Clear();
 
@@ -229,5 +246,82 @@ namespace Essenskasse.Pages {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
             }
         }
+
+        /// <summary></summary>
+        private async Task LoadOrdersForOverview() {
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "order/requestNextAmount"),
+                Headers = {
+                    { "amount", 100.ToString() },
+                    { "alreadyLoaded", overviewOrderAlreadyLoadCount.ToString() }
+                }
+            };
+
+            HttpResponseMessage? response;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
+
+            if (response.IsSuccessStatusCode) {
+                List<Order> order = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
+                overviewOrderAlreadyLoadCount += order.Count;
+                referenceDate = referenceDate.AddDays(1); // for the next load essential
+
+                while (order.Count != 0) {
+                    List<Order?> dayOrders = new List<Order?>();
+                    if (!orderListForOverview.Exists(x => x.DateTime.Date == referenceDate.Date)) {
+                        List<string> head = [_loc[nameof(RessourceAppStrings.date)]];
+                        // initialize day with null && the head
+                        for (int i = 0; i < person.Count; i += 1) {
+                            dayOrders.Add(null);
+                            head.Add(person[i].Name);
+                        }
+                        // if order at day insert it
+                        while (order[0].DateTime.Date == referenceDate.Date) {
+                            // insert the order to person-row
+                            dayOrders[person.FindIndex(x => x.Guid.Equals(order[0].ReferencedPerson))] = order[0];
+                            order.RemoveAt(0);
+                            if (order.Count == 0) {
+                                break;
+                            }
+                        }
+                        // add the day-orders
+                        orderListForOverview.Add(new DateAndOrder(
+                            Head: head,
+                            DateTime: referenceDate,
+                            Orders: dayOrders)
+                        );
+                    }
+                    else { // day already exist -> update cells at last day, other should be irrelevant
+                        while (order[0].DateTime.Date == referenceDate.Date) {
+                            int i = person.FindIndex(x => x.Guid.Equals(order[0].ReferencedPerson));
+                            orderListForOverview[^1].Orders[i] = order[0];
+                            order.RemoveAt(0);
+                            if (order.Count == 0) {
+                                break;
+                            }
+                        }
+                    }
+                    // go to the day before
+                    referenceDate = referenceDate.AddDays(-1);
+                }
+                base.StateHasChanged();
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+            }
+        }
+
+        /// <summary>
+        /// Check which content should be printed in the cell.
+        /// </summary>
+        /// <param name="x">Order, that contain the Money-Value or is null if not</param>
+        /// <returns>if Money-Value is null => "-" and otherwise the Money.ToString()</returns>
+        private static string OverviewCellFill(Order? x) => (x is null) ? "-" : x!.Money.ToString();
     }
 }

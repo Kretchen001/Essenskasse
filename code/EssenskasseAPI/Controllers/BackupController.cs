@@ -68,8 +68,8 @@ namespace EssenskasseAPI.Controllers {
                     $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
                     $"VALUES (" +
                     $"'{x.Guid}'," +
-                    $"'{x.Name}', " +
-                    $"'{x.Email}', " +
+                    $"'{Uri.UnescapeDataString(x.Name)}', " +
+                    $"'{Uri.UnescapeDataString(x.Email)}', " +
                     $"{x.Saldo.Euro}, " +
                     $"{x.Saldo.Cent});";
                 QueryExecuterAtMySql(queryStringInsert);

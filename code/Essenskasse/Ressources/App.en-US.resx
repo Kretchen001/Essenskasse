@@ -264,6 +264,9 @@
   <data name="language" xml:space="preserve">
     <value>Language</value>
   </data>
+  <data name="lastDayMaybyIncomplete" xml:space="preserve">
+    <value>Last day could be incomplete!</value>
+  </data>
   <data name="light" xml:space="preserve">
     <value>Light</value>
   </data>
@@ -305,6 +308,9 @@
   </data>
   <data name="ordersToBeLoaded" xml:space="preserve">
     <value>Orders to be loaded</value>
+  </data>
+  <data name="overview" xml:space="preserve">
+    <value>Overview</value>
   </data>
   <data name="payment" xml:space="preserve">
     <value>Payment</value>

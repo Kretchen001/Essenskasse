@@ -126,5 +126,7 @@
         toastNothingToLoad,
         showNoticeablePersonRightDashboard,
         swapColumns,
+        overview,
+        lastDayMaybyIncomplete,
     }
 }

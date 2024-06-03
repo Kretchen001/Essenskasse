@@ -7,7 +7,7 @@ self.addEventListener('activate', event => event.waitUntil(onActivate(event)));
 self.addEventListener('fetch', event => event.respondWith(onFetch(event)));
 
 const cacheNamePrefix = 'offline-cache-';
-const Cache_Version = '1.0.2.8'; // letzte Nummer anpassen für den Build, die anderen bei Versionen
+const Cache_Version = '1.0.2.10'; // letzte Nummer anpassen für den Build, die anderen bei Versionen
 const cacheName = `${cacheNamePrefix}${Cache_Version}`;
 const offlineAssetsInclude = [ /\.dll$/, /\.pdb$/, /\.wasm/, /\.html/, /\.js$/, /\.json$/, /\.css$/, /\.woff$/, /\.png$/, /\.jpe?g$/, /\.gif$/, /\.ico$/, /\.blat$/, /\.dat$/ ];
 const offlineAssetsExclude = [ /^service-worker\.js$/ ];

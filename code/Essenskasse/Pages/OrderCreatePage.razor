@@ -1,5 +1,7 @@
 ﻿@page "/orderCreate"
 
+@using Microsoft.AspNetCore.Components.QuickGrid;
+
 @inject HttpClient HttpClient
 @inject IJSRuntime JSRuntime
 @inject IConfiguration Config
@@ -7,113 +9,169 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 
+<style>
+    /* Fix height and enable scrolling */
+    .overViewGrid {
+        max-height: 70vh;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+        /* Sticky header while scrolling */
+        .overViewGrid thead {
+            position: sticky;
+            top: 0;
+            background-color: #eee;
+            border-bottom: solid 0.1rem black;
+        }
+
+        /* Subtle stripe effect */
+        .overViewGrid tr:nth-child(even) {
+            background: rgba(205,205,205,0.4);
+        }
+</style>
+
 <PageTitle>@_loc[nameof(RessourceAppStrings.createNewOrder)]</PageTitle>
 
-<h2>@_loc[nameof(RessourceAppStrings.createNewOrder)]</h2>
+<BlazorXTabs.XTabs>
+    <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.createNewOrder)]">
 
-<div class="row" style="margin-bottom: 1rem; margin-top: 1rem;">
-    <div class="col-lg-3 align-self-center">
-        <label>
-            @_loc[nameof(RessourceAppStrings.date)]
-        </label>
-    </div>
-    <div class="col-lg-9 align-self-center">
-        <input type="date" @bind-value="selectedDate" />
-    </div>
-</div>
+        <h2>@_loc[nameof(RessourceAppStrings.createNewOrder)]</h2>
 
-<br />
-
-<div class="row" style="margin-bottom: 1rem;">
-    <div class="col-lg-3 align-self-center">
-        <label>
-            @_loc[nameof(RessourceAppStrings.provider)]
-        </label>
-    </div>
-    <div class="col-lg-9">
-        <select class="form-select" @bind="@selectedProvider">
-            @foreach (var x in providers) {
-                <option value="@x.Guid">@x.Designation</option>
-            }
-        </select>
-    </div>
-</div>
-
-<br />
-
-@foreach (int i in Enumerable.Range(0, person.Count)) {
-    <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
-        <div class="col-lg-12">
-            <div class="row">
-                <div class="col-lg-8">
-                    <PersonOrderCard @ref="@personOrderCards[i]" PersonName="@person[i].Name" Money="@money[i]"
-                        OnValuesChanged="(ChangedValues => HandleValuesChanged(i, ChangedValues))">
-                    </PersonOrderCard>
-                </div>
-                <div class="col-lg-2 align-self-center">
-                    <label>
-                        @money[i].ToString()
-                    </label>
-                </div>
-                <div class="col-lg-2 align-self-center">
-                    @if (showHistory[i]) {
-                        <button @onclick="() => LoadAndShowHistory(i)">
-                            @_loc[nameof(RessourceAppStrings.orderHistory)] @_loc[nameof(RessourceAppStrings.hide)]
-                        </button>
-                    }
-                    else {
-                        <button @onclick="() => LoadAndShowHistory(i)">
-                            @_loc[nameof(RessourceAppStrings.orderHistory)]
-                        </button>
-                    }
-                </div>
+        <div class="row" style="margin-bottom: 1rem; margin-top: 1rem;">
+            <div class="col-lg-3 align-self-center">
+                <label>
+                    @_loc[nameof(RessourceAppStrings.date)]
+                </label>
+            </div>
+            <div class="col-lg-9 align-self-center">
+                <input type="date" @bind-value="selectedDate" />
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-12">
-                @if (showHistory[i]) {
-                    <div style="border: 0.5rem ridge; margin: 0.5rem;">
-                        <PersonOrderHistoryCard Orders="shownOrders[i]" />
-                        <div class="row" style="margin: 0.25rem;">
-                            <div class="col-lg-12">
-                                <button type="button" class="btn btn-info float-end" style="border-radius:8px; width: fit-content;" @onclick="() => HistoryLoadInModal(i)">
-                                    @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
+
+        <br />
+
+        <div class="row" style="margin-bottom: 1rem;">
+            <div class="col-lg-3 align-self-center">
+                <label>
+                    @_loc[nameof(RessourceAppStrings.provider)]
+                </label>
+            </div>
+            <div class="col-lg-9">
+                <select class="form-select" @bind="@selectedProvider">
+                    @foreach (var x in providers) {
+                        <option value="@x.Guid">@x.Designation</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <br />
+
+        @foreach (int i in Enumerable.Range(0, person.Count)) {
+            <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <PersonOrderCard @ref="@personOrderCards[i]" PersonName="@person[i].Name" Money="@money[i]"
+                                             OnValuesChanged="(ChangedValues => HandleValuesChanged(i, ChangedValues))">
+                            </PersonOrderCard>
+                        </div>
+                        <div class="col-lg-2 align-self-center">
+                            <label>
+                                @money[i].ToString()
+                            </label>
+                        </div>
+                        <div class="col-lg-2 align-self-center">
+                            @if (showHistory[i]) {
+                                <button @onclick="() => LoadAndShowHistory(i)">
+                                    @_loc[nameof(RessourceAppStrings.orderHistory)] @_loc[nameof(RessourceAppStrings.hide)]
                                 </button>
-                            </div>
+                            }
+                            else {
+                                <button @onclick="() => LoadAndShowHistory(i)">
+                                    @_loc[nameof(RessourceAppStrings.orderHistory)]
+                                </button>
+                            }
                         </div>
                     </div>
-                }
-            </div>
-        </div>
-    </div>
-}
-
-<br />
-
-<div class="row justify-content-between">
-    <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="PostOrderForTheDay">
-        @_loc[nameof(RessourceAppStrings.submit)] @_loc[nameof(RessourceAppStrings.order)]
-    </button>
-</div>
-
-@*<button class="btn btn-primary" @onclick="() => ModalDialog.Open()">Click me!</button>*@
-<HistoryModalCard @ref="@ModalDialog" Title="@ModalTitle">
-    <div class="row">
-        <div style="height: 70vh; overflow: scroll">
-            @foreach (Order x in completeHistoryFromOne) {
-                <div class="row" style="margin-left: 1rem; margin-right: 1rem; border-color: black; border-bottom: solid 0.2px">
-                    <div class="col-lg-5">
-                        @x.DateTime.ToString("dddd, dd MMMM yyyy")
-                    </div>
-                    <div class="col-lg-2">
-                        @x.Money.ToString()
-                    </div>
-                    <div class="col-lg-5">
-                        @x.Provider.Designation
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        @if (showHistory[i]) {
+                            <div style="border: 0.5rem ridge; margin: 0.5rem;">
+                                <PersonOrderHistoryCard Orders="shownOrders[i]" />
+                                <div class="row" style="margin: 0.25rem;">
+                                    <div class="col-lg-12">
+                                        <button type="button" class="btn btn-info float-end" style="border-radius:8px; width: fit-content;" @onclick="() => HistoryLoadInModal(i)">
+                                            @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
+            </div>
+        }
+
+        <br />
+
+        <div class="row justify-content-between">
+            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="PostOrderForTheDay">
+                @_loc[nameof(RessourceAppStrings.submit)] @_loc[nameof(RessourceAppStrings.order)]
+            </button>
+        </div>
+
+        @*<button class="btn btn-primary" @onclick="() => ModalDialog.Open()">Click me!</button>*@
+        <HistoryModalCard @ref="@ModalDialog" Title="@ModalTitle">
+            <div class="row">
+                <div style="height: 70vh; overflow: scroll">
+                    @foreach (Order x in completeHistoryFromOne) {
+                        <div class="row" style="margin-left: 1rem; margin-right: 1rem; border-color: black; border-bottom: solid 0.2px">
+                            <div class="col-lg-5">
+                                @x.DateTime.ToString("dddd, dd MMMM yyyy")
+                            </div>
+                            <div class="col-lg-2">
+                                @x.Money.ToString()
+                            </div>
+                            <div class="col-lg-5">
+                                @x.Provider.Designation
+                            </div>
+                        </div>
+                    }
+                </div>
+                <button class="btn btn-primary" @onclick="() => ModalDialog!.Close()">Close</button>
+            </div>
+        </HistoryModalCard>
+
+    </BlazorXTabs.XTab>
+    <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.overview)]">
+
+        <h2>@_loc[nameof(RessourceAppStrings.overview)]</h2>
+        <div class="overViewGrid">
+            @if (orderListForOverview.Count != 0) {
+                <QuickGrid Items="@orderListForOverview.AsQueryable()">
+                    <PropertyColumn Property="@(p => p.DateTime.ToString("d"))"
+                                    Title="@(orderListForOverview[0].Head[0])" />
+                    @foreach (int i in Enumerable.Range(0, person.Count)) {
+                        <PropertyColumn Property="@(p => OverviewCellFill(p.Orders[i]))"
+                                        Title="@(orderListForOverview[0].Head[i+1])"
+                                        Class="text-center" />
+                    }
+                </QuickGrid>
             }
         </div>
-        <button class="btn btn-primary" @onclick="() => ModalDialog!.Close()">Close</button>
-    </div>
-</HistoryModalCard>
+
+        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; margin-top: 1rem" @onclick="LoadOrdersForOverview">
+            @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+        </button>
+
+        <hr />
+
+        <label>
+            @_loc[nameof(RessourceAppStrings.lastDayMaybyIncomplete)]
+        </label>
+
+    </BlazorXTabs.XTab>
+</BlazorXTabs.XTabs>
