@@ -270,6 +270,8 @@ namespace Essenskasse.Pages {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastLimitToValueSet)] + $" {limitToSave}", ToastLevel.Success);
         }
 
+        /// <summary></summary>
+        /// <returns></returns>
         private async Task RequestAccessTokenForChanges() {
             string identity = await JsRuntime.InvokeAsync<string>("prompt", "Bitte Namen eintragen") ?? "";
             if (identity.Equals("")) {
@@ -296,6 +298,14 @@ namespace Essenskasse.Pages {
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+            }
+        }
+
+        /// <summary></summary>
+        /// <returns></returns>
+        private async Task RequestNewAccessTokenForChanges() {
+            if (await JsRuntime.InvokeAsync<bool>("confirm", "Sicher, daß Sie einen neuen beantragen wollen?")) {
+                await RequestAccessTokenForChanges();
             }
         }
 
