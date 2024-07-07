@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Essenskasse.Client.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Essenskasse {
     public class Program {
@@ -40,6 +41,10 @@ namespace Essenskasse {
             
             // add access to the toast's
             builder.Services.AddScoped<ToastService>();
+
+            builder.Services.AddAuthorizationCore();
+            builder.Services.AddScoped<AuthStateProvivder>();
+            builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<AuthStateProvivder>());
 
             //await builder.Build().RunAsync(); // <- Old Version
             WebAssemblyHost host = builder.Build();

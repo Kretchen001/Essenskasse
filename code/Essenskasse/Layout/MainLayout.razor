@@ -5,6 +5,8 @@
 @inject ThemeService themeService
 @inject NavigationManager Navi
 
+@inject Client.AuthStateProvivder AuthStateProvider
+
 <ToastCard />
 
 <div class="page">
@@ -13,8 +15,48 @@
     </div>
 
     <main>
+        <div class="top-row px-4 auth">
+            <AuthorizeView>
+                <NotAuthorized>
+                    <div>
+                        Not authorized
+                    </div>
+                    <button @onclick="@(() => UpdateAuthentication(true))">
+                        Authentifiziere dich!
+                    </button>
+                </NotAuthorized>
+                <Authorizing>
+                    Authorizing
+                </Authorizing>
+                <Authorized>
+                    Authorized
+                    <button @onclick="@(() => UpdateAuthentication(false))">
+                        Tschüss
+                    </button>
+                </Authorized>
+            </AuthorizeView>
+        </div>
+
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code
+{
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    private void UpdateAuthentication(bool? isAuthenticated) {
+        if (!isAuthenticated.HasValue) {
+            AuthStateProvivder.IsAuthenticating = true;
+        }
+        else {
+            AuthStateProvivder.IsAuthenticating = false;
+            AuthStateProvivder.IsAuthenticated = isAuthenticated.Value;
+        }
+
+        AuthStateProvider.NotifyAuthenticationStateChanged();
+    }
+}
