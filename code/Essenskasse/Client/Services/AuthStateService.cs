@@ -3,7 +3,7 @@ using System.Security.Claims;
 
 namespace Essenskasse.Client {
 
-    public class AuthStateProvivder : AuthenticationStateProvider {
+    public class AuthStateService : AuthenticationStateProvider {
 
         public static bool IsAuthenticated { get; set; }
         public static bool IsAuthenticating { get; set; }

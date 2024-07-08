@@ -43,8 +43,8 @@ namespace Essenskasse {
             builder.Services.AddScoped<ToastService>();
 
             builder.Services.AddAuthorizationCore();
-            builder.Services.AddScoped<AuthStateProvivder>();
-            builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<AuthStateProvivder>());
+            builder.Services.AddScoped<AuthStateService>();
+            builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<AuthStateService>());
 
             //await builder.Build().RunAsync(); // <- Old Version
             WebAssemblyHost host = builder.Build();

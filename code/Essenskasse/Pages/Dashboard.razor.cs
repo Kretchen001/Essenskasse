@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Essenskasse.Pages {
 
-    public partial class Home {
+    public partial class Dashboard {
 
         private bool IsSingleListWish {
             get {

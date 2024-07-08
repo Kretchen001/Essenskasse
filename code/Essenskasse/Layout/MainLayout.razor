@@ -5,7 +5,7 @@
 @inject ThemeService themeService
 @inject NavigationManager Navi
 
-@inject Client.AuthStateProvivder AuthStateProvider
+@inject AuthStateService AuthState
 
 <ToastCard />
 
@@ -50,13 +50,13 @@
 
     private void UpdateAuthentication(bool? isAuthenticated) {
         if (!isAuthenticated.HasValue) {
-            AuthStateProvivder.IsAuthenticating = true;
+            AuthStateService.IsAuthenticating = true;
         }
         else {
-            AuthStateProvivder.IsAuthenticating = false;
-            AuthStateProvivder.IsAuthenticated = isAuthenticated.Value;
+            AuthStateService.IsAuthenticating = false;
+            AuthStateService.IsAuthenticated = isAuthenticated.Value;
         }
 
-        AuthStateProvider.NotifyAuthenticationStateChanged();
+        AuthState.NotifyAuthenticationStateChanged();
     }
 }
