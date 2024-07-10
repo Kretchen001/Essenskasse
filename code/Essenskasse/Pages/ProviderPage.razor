@@ -7,134 +7,155 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 @inject ILocalStorageService LocalStorage
+@inject NavigationManager Nav
 
 <style>
     table, th, td {
         border: 1px solid gray;
     }
 
-    /* Width of the rows */
-    th:nth-child(1), td:nth-child(1) {
-        width: 33% !important; /* first row 33% of the table*/
-    }
+        /* Width of the rows */
+        th:nth-child(1), td:nth-child(1) {
+            width: 33% !important; /* first row 33% of the table*/
+        }
 
-    th:nth-child(2), td:nth-child(2) {
-        width: 67% !important; /* secound row 67% of the table*/
-    }
+        th:nth-child(2), td:nth-child(2) {
+            width: 67% !important; /* secound row 67% of the table*/
+        }
 </style>
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.provider)]</PageTitle>
 
-<h2>@_loc[nameof(RessourceAppStrings.provider)]</h2>
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="row">
+            <div class="col-lg-3">
+                Zugriff verweigert!
+            </div>
+            <div class="col-lg-9">
+                <button @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    Rückkehr zum Dashboard
+                </button>
+            </div>
+        </div>
+    </NotAuthorized>
+    <Authorized>
+        <h2>@_loc[nameof(RessourceAppStrings.provider)]</h2>
 
-<h4>@_loc[nameof(RessourceAppStrings.add)]</h4>
-<div class="row" style="margin-top: 1rem;">
-    @if (!accessToAdd) {
-        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToAdd = true;}">
-            @_loc[nameof(RessourceAppStrings.addNewProvider)]
-        </button>
-    }
-    else {
-        <div class="col-lg-2">
-            <label style="vertical-align: middle;">
-                @_loc[nameof(RessourceAppStrings.add)]
-            </label>
-        </div>
-        <div class="col-lg-8">
-            <input type="text" style="width: 100%;" @bind-value="newProviderDesignation">
-        </div>
-        <div class="col-lg-2">
-            <button @onclick="() => AddNewAnbieter()">
-                @_loc[nameof(RessourceAppStrings.submit)]!
-            </button>
-        </div>
-    }
-</div>
-
-<br />
-
-<h4>@_loc[nameof(RessourceAppStrings.available)]</h4>
-@if (AppData.FilterShowProvider) {
-    <div class="row" style="margin-top: 1rem;">
-        <div class="col-lg-2">
-            <label>
-                @_loc[nameof(RessourceAppStrings.filter)]
-            </label>
-        </div>
-        <div class="col-lg-10 align-self-center">
-            <input @bind="filter" @bind:event="oninput" @onkeyup="ChangeProviderShownList" />
-        </div>
-    </div>
-}
-<div class="row" style="margin-top: 1rem;">
-    <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
-        <tr>
-            @if (IsASC) {
-                <th style="padding-left: 5px;">
-                    @_loc[nameof(RessourceAppStrings.designator)]&nbsp;&nbsp;
-                    <button type="button" class="btn btn-primary" @onclick="ToggleAscDesc">
-                        <i style="border: solid black; border-width: 0 3px 3px 0; display: inline-block; padding: 3px;
-                                    transform: rotate(-135deg); -webkit-transform: rotate(-135deg);"></i>
-                    </button>
-                </th>
+        <h4>@_loc[nameof(RessourceAppStrings.add)]</h4>
+        <div class="row" style="margin-top: 1rem;">
+            @if (!accessToAdd) {
+                <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToAdd = true;}">
+                    @_loc[nameof(RessourceAppStrings.addNewProvider)]
+                </button>
             }
             else {
-                <th style="padding-left: 5px;">
-                    @_loc[nameof(RessourceAppStrings.designator)]&nbsp;&nbsp;
-                    <button type="button" class="btn btn-primary" @onclick="ToggleAscDesc">
-                        <i style="border: solid black; border-width: 0 3px 3px 0; display: inline-block; padding: 3px;
-                                        transform: rotate(45deg); -webkit-transform: rotate(45deg);"></i>
+                <div class="col-lg-2">
+                    <label style="vertical-align: middle;">
+                        @_loc[nameof(RessourceAppStrings.add)]
+                    </label>
+                </div>
+                <div class="col-lg-8">
+                    <input type="text" style="width: 100%;" @bind-value="newProviderDesignation">
+                </div>
+                <div class="col-lg-2">
+                    <button @onclick="() => AddNewAnbieter()">
+                        @_loc[nameof(RessourceAppStrings.submit)]!
                     </button>
-                </th>
+                </div>
             }
-        </tr>
-        @foreach (Provider x in shownProviderList) {
-            <tr>
-                <td style="padding-left: 5px;">
-                    @x.Designation
-                    <button style="border: none;" title="@_loc[nameof(RessourceAppStrings.copy)]: @x.Guid" @onclick="async () => await CopyToClipboard(x.Guid.ToString())">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7" />
-                            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z" />
-                            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z" />
-                        </svg>
-                    </button>
-                </td>
-            </tr>
+        </div>
+
+        <br />
+
+        <h4>@_loc[nameof(RessourceAppStrings.available)]</h4>
+        @if (AppData.FilterShowProvider) {
+            <div class="row" style="margin-top: 1rem;">
+                <div class="col-lg-2">
+                    <label>
+                        @_loc[nameof(RessourceAppStrings.filter)]
+                    </label>
+                </div>
+                <div class="col-lg-10 align-self-center">
+                    <input @bind="filter" @bind:event="oninput" @onkeyup="ChangeProviderShownList" />
+                </div>
+            </div>
         }
-    </table>
-</div>
-
-<br />
-
-<div class="row">
-    <h4 style="margin-top: 1rem;">
-        @_loc[nameof(RessourceAppStrings.removeAnEntry)]
-    </h4>
-    @if (!accessToDelete) {
-        <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToDelete = true;}">
-            @_loc[nameof(RessourceAppStrings.provider)] @_loc[nameof(RessourceAppStrings.remove)]?
-        </button>
-    }
-    else {
-        <div class="col-lg-2">
-            <label style="vertical-align: middle;">
-                @_loc[nameof(RessourceAppStrings.GuidofTheProviderToBeRemoved)]
-            </label>
-        </div>
-        <div class="col-lg-8">
-            <input type="text" style="width: 100%; vertical-align: middle;"
-                   @bind-value="providerToDeleteGuid" list="suggestions">
-            <datalist id="suggestions">
-                @foreach (Provider x in providers) {
-                    <option value="@x.Guid" />
+        <div class="row" style="margin-top: 1rem;">
+            <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
+                <tr>
+                    @if (IsASC) {
+                        <th style="padding-left: 5px;">
+                            @_loc[nameof(RessourceAppStrings.designator)]&nbsp;&nbsp;
+                            <button type="button" class="btn btn-primary" @onclick="ToggleAscDesc">
+                                <i style="border: solid black; border-width: 0 3px 3px 0; display: inline-block; padding: 3px;
+                                    transform: rotate(-135deg); -webkit-transform: rotate(-135deg);"></i>
+                            </button>
+                        </th>
+                    }
+                    else {
+                        <th style="padding-left: 5px;">
+                            @_loc[nameof(RessourceAppStrings.designator)]&nbsp;&nbsp;
+                            <button type="button" class="btn btn-primary" @onclick="ToggleAscDesc">
+                                <i style="border: solid black; border-width: 0 3px 3px 0; display: inline-block; padding: 3px;
+                                        transform: rotate(45deg); -webkit-transform: rotate(45deg);"></i>
+                            </button>
+                        </th>
+                    }
+                </tr>
+                @foreach (Provider x in shownProviderList) {
+                    <tr>
+                        <td style="padding-left: 5px;">
+                            @x.Designation
+                            <button style="border: none;" title="@_loc[nameof(RessourceAppStrings.copy)]: @x.Guid" @onclick="async () => await CopyToClipboard(x.Guid.ToString())">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7" />
+                                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z" />
+                                    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
                 }
-            </datalist>
+            </table>
         </div>
-        <div class="col-lg-2" style="vertical-align: middle;">
-            <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => DeleteAnbieter()">
-                @_loc[nameof(RessourceAppStrings.remove)]!
-            </button>
+
+        <br />
+
+        <div class="row">
+            <h4 style="margin-top: 1rem;">
+                @_loc[nameof(RessourceAppStrings.removeAnEntry)]
+            </h4>
+            @if (!accessToDelete) {
+                <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToDelete = true;}">
+                    @_loc[nameof(RessourceAppStrings.provider)] @_loc[nameof(RessourceAppStrings.remove)]?
+                </button>
+            }
+            else {
+                <div class="col-lg-2">
+                    <label style="vertical-align: middle;">
+                        @_loc[nameof(RessourceAppStrings.GuidofTheProviderToBeRemoved)]
+                    </label>
+                </div>
+                <div class="col-lg-8">
+                    <input type="text" style="width: 100%; vertical-align: middle;"
+                           @bind-value="providerToDeleteGuid" list="suggestions">
+                    <datalist id="suggestions">
+                        @foreach (Provider x in providers) {
+                            <option value="@x.Guid" />
+                        }
+                    </datalist>
+                </div>
+                <div class="col-lg-2" style="vertical-align: middle;">
+                    <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => DeleteAnbieter()">
+                        @_loc[nameof(RessourceAppStrings.remove)]!
+                    </button>
+                </div>
+            }
         </div>
-    }
-</div>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    string dashboardLink = "/";
+}

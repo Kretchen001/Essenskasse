@@ -6,127 +6,148 @@
 @inject IStringLocalizer<App> _loc
 @inject AppDataService AppData
 @inject ToastService ToastService
+@inject NavigationManager Nav
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.modifyEntity)]</PageTitle>
 
-<h2>@_loc[nameof(RessourceAppStrings.modifyEntity)]</h2>
-
-<div class="row" style="height: fit-content; margin-bottom: 1rem;">
-    <div class="col-lg-3 align-self-center">
-        <label>
-            @_loc[nameof(RessourceAppStrings.typ)]
-        </label>
-    </div>
-    <div class="col-lg-9">
-        <select class="form-select" @bind="@SelectedType">
-            @foreach (string x in types) {
-                <option value="@x">@x</option>
-            }
-        </select>
-    </div>
-</div>
-
-@if (SelectedType == types[0]) { // Einzahlungen/Payments
-    @foreach(int indexP in Enumerable.Range(0, Payments.Count)) {
-        <div class="row" style="border: 2px dotted gray; margin: 2px">
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="row">
             <div class="col-lg-3">
-                @GetTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
+                Zugriff verweigert!
             </div>
-            <div class="col-lg-4">
-                @Payments[indexP].DateTime.ToString("dddd, dd. MMMM yyyy")
-            </div>
-            <div class="col-lg-3">
-                @Payments[indexP].Amount.ToString()
-            </div>
-            <div class="col-lg-2">
-            </div>
-            <br />
-            <div class="col-lg-3">
-                @GetTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
-            </div>
-            <div class="col-lg-4">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.date)] @_loc[nameof(RessourceAppStrings.cannotBeChanged)]
-                </label>
-            </div>
-            <div class="col-lg-3">
-                <input style="width: 59%" type="number" @bind="PaymentAmount[indexP]" placeholder="Euro,Cent -> 1000 = 10,00€">
-                <label style="width: 39%">
-                    @ShowMoney(indexP)
-                </label>
-            </div>
-            <div class="col-lg-2">
-                <button type="button" class="btn-warning" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => CommitChangesP(indexP)">
-                    @_loc[nameof(RessourceAppStrings.submit)]
+            <div class="col-lg-9">
+                <button @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    Rückkehr zum Dashboard
                 </button>
             </div>
         </div>
-    }
-    <br />
-    <div class="row">
-        <div class="col-lg-12" align="right">
-            <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px" @onclick="() => LoadNextAmountOfPayments()">
-                @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
-            </button>
-        </div>
-    </div>
-}
-else if (SelectedType == types[1]) { // Bestellungen/Orders
-    @foreach (Tuple<Order, int> x in Orders) {
-        <div class="row" style="border: 2px dotted gray; margin: 2px">
-            <div class="col-lg-3">
-                <strong>
-                    @GetTheDesignationOfPerson(x.Item1.ReferencedPerson)
-                </strong>
+    </NotAuthorized>
+    <Authorized>
+        <h2>@_loc[nameof(RessourceAppStrings.modifyEntity)]</h2>
+
+        <div class="row" style="height: fit-content; margin-bottom: 1rem;">
+            <div class="col-lg-3 align-self-center">
+                <label>
+                    @_loc[nameof(RessourceAppStrings.typ)]
+                </label>
             </div>
-            <div class="col-lg-3">
-                @x.Item1.DateTime.ToString("dddd, dd. MMMM yyyy")
-            </div>
-            <div class="col-lg-2">
-                @x.Item1.Money.ToString()
-            </div>
-            <div class="col-lg-2">
-                @x.Item1.Provider.Designation
-            </div>
-            <br />
-            <div class="col-lg-3">
-                <select class="form-select" style="margin: 0.2rem;" @bind="@ChangedOrders[x.Item2].ReferencedPerson">
-                    @foreach (Person y in PersonList) {
-                        <option value="@y.Guid">@y.Name</option>
+            <div class="col-lg-9">
+                <select class="form-select" @bind="@SelectedType">
+                    @foreach (string x in types) {
+                        <option value="@x">@x</option>
                     }
                 </select>
             </div>
-            <div class="col-lg-3">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.date)] @_loc[nameof(RessourceAppStrings.cannotBeChanged)]
-                </label>
-            </div>
-            <div class="col-lg-2">
-                <input style="width: 59%" type="number" @bind="OrderAmount[x.Item2]" placeholder="Euro,Cent -> 1000 = 10,00€">
-                <label style="width: 39%">
-                    @ShowMoney(x.Item2)
-                </label>
-            </div>
-            <div class="col-lg-2">
-                <select class="form-select" style="margin: 0.2rem;" value="@ChangedOrders[x.Item2].Provider.Guid" @onchange="(e) => {ChangedOrders[x.Item2].Provider = Providers.First(x => x.Guid.Equals(new Guid(e.Value!.ToString()!)));}">
-                    @foreach (Provider z in Providers) {
-                        <option value="@z.Guid">@z.Designation</option>
-                    } 
-                </select>
-            </div>
-            <div class="col-lg-2">
-                <button type="button" class="btn-warning" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => CommitChangesO(x.Item2)">
-                    @_loc[nameof(RessourceAppStrings.submit)]
-                </button>
-            </div>
         </div>
-    }
-    <br />
-    <div class="row">
-        <div class="col-lg-12" align="right">
-            <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px" @onclick="() => LoadNextAmountOfOrders()">
-                @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
-            </button>
-        </div>
-    </div>
+
+        @if (SelectedType == types[0]) { // Einzahlungen/Payments
+            @foreach (int indexP in Enumerable.Range(0, Payments.Count)) {
+                <div class="row" style="border: 2px dotted gray; margin: 2px">
+                    <div class="col-lg-3">
+                        @GetTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
+                    </div>
+                    <div class="col-lg-4">
+                        @Payments[indexP].DateTime.ToString("dddd, dd. MMMM yyyy")
+                    </div>
+                    <div class="col-lg-3">
+                        @Payments[indexP].Amount.ToString()
+                    </div>
+                    <div class="col-lg-2">
+                    </div>
+                    <br />
+                    <div class="col-lg-3">
+                        @GetTheDesignationOfPerson(Payments[indexP].ReferencedPerson)
+                    </div>
+                    <div class="col-lg-4">
+                        <label>
+                            @_loc[nameof(RessourceAppStrings.date)] @_loc[nameof(RessourceAppStrings.cannotBeChanged)]
+                        </label>
+                    </div>
+                    <div class="col-lg-3">
+                        <input style="width: 59%" type="number" @bind="PaymentAmount[indexP]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                        <label style="width: 39%">
+                            @ShowMoney(indexP)
+                        </label>
+                    </div>
+                    <div class="col-lg-2">
+                        <button type="button" class="btn-warning" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => CommitChangesP(indexP)">
+                            @_loc[nameof(RessourceAppStrings.submit)]
+                        </button>
+                    </div>
+                </div>
+            }
+            <br />
+            <div class="row">
+                <div class="col-lg-12" align="right">
+                    <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px" @onclick="() => LoadNextAmountOfPayments()">
+                        @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+                    </button>
+                </div>
+            </div>
+        }
+        else if (SelectedType == types[1]) { // Bestellungen/Orders
+            @foreach (Tuple<Order, int> x in Orders) {
+                <div class="row" style="border: 2px dotted gray; margin: 2px">
+                    <div class="col-lg-3">
+                        <strong>
+                            @GetTheDesignationOfPerson(x.Item1.ReferencedPerson)
+                        </strong>
+                    </div>
+                    <div class="col-lg-3">
+                        @x.Item1.DateTime.ToString("dddd, dd. MMMM yyyy")
+                    </div>
+                    <div class="col-lg-2">
+                        @x.Item1.Money.ToString()
+                    </div>
+                    <div class="col-lg-2">
+                        @x.Item1.Provider.Designation
+                    </div>
+                    <br />
+                    <div class="col-lg-3">
+                        <select class="form-select" style="margin: 0.2rem;" @bind="@ChangedOrders[x.Item2].ReferencedPerson">
+                            @foreach (Person y in PersonList) {
+                                <option value="@y.Guid">@y.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label>
+                            @_loc[nameof(RessourceAppStrings.date)] @_loc[nameof(RessourceAppStrings.cannotBeChanged)]
+                        </label>
+                    </div>
+                    <div class="col-lg-2">
+                        <input style="width: 59%" type="number" @bind="OrderAmount[x.Item2]" placeholder="Euro,Cent -> 1000 = 10,00€">
+                        <label style="width: 39%">
+                            @ShowMoney(x.Item2)
+                        </label>
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="form-select" style="margin: 0.2rem;" value="@ChangedOrders[x.Item2].Provider.Guid" @onchange="(e) => {ChangedOrders[x.Item2].Provider = Providers.First(x => x.Guid.Equals(new Guid(e.Value!.ToString()!)));}">
+                            @foreach (Provider z in Providers) {
+                                <option value="@z.Guid">@z.Designation</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <button type="button" class="btn-warning" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => CommitChangesO(x.Item2)">
+                            @_loc[nameof(RessourceAppStrings.submit)]
+                        </button>
+                    </div>
+                </div>
+            }
+            <br />
+            <div class="row">
+                <div class="col-lg-12" align="right">
+                    <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px" @onclick="() => LoadNextAmountOfOrders()">
+                        @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+                    </button>
+                </div>
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    string dashboardLink = "/";
 }

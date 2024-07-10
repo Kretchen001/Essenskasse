@@ -52,7 +52,13 @@ namespace Essenskasse.Pages {
         }
 
         protected override async Task OnInitializedAsync() {
-            await RefreshPersonList();
+            if (!AuthStateService.IsAuthenticated) {
+                Nav.NavigateTo("/");
+            }
+            else {
+                await RefreshPersonList();
+            }
+            base.StateHasChanged();
         }
 
         /// <summary></summary>

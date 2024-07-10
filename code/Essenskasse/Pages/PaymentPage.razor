@@ -6,6 +6,7 @@
 @inject IStringLocalizer<App> _loc
 @inject AppDataService AppData
 @inject ToastService ToastService
+@inject NavigationManager Nav
 
 <style>
     th:nth-child(1), td:nth-child(1) {
@@ -23,108 +24,128 @@
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.payment)]</PageTitle>
 
-<h2>@_loc[nameof(RessourceAppStrings.payment)]</h2>
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="row">
+            <div class="col-lg-3">
+                Zugriff verweigert!
+            </div>
+            <div class="col-lg-9">
+                <button @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    Rückkehr zum Dashboard
+                </button>
+            </div>
+        </div>
+    </NotAuthorized>
+    <Authorized>
+        <h2>@_loc[nameof(RessourceAppStrings.payment)]</h2>
 
-<div class="row">
-    <div class="col-lg-3 align-self-center">
-        <label>
-            @_loc[nameof(RessourceAppStrings.person)]
-        </label>
-    </div>
-    <div class="col-lg-9">
-        <select class="form-select" @bind="@SelectedPerson">
-            @if (person is not null) {
-                @foreach (var x in person) {
-                    <option value="@x.Guid">@x.Name</option>
-                }
-            }
-        </select>
-    </div>
-</div>
-<br />
-<div class="row">
-    <div class="col-lg-3 align-self-center">
-        <label>
-            @_loc[nameof(RessourceAppStrings.amount)]
-        </label>
-    </div>
-    <div class="col-lg-4 align-self-center" style="width: 25%">
-        <input style="width: 100%" type="number" @bind="Payment" placeholder="Euro,Cent -> 10,00€">
-    </div>
-    <div class="col-lg-5 align-self-center">
-        <label>
-            @Money.ToString()
-        </label>
-    </div>
-</div>
-<br />
-<div class="row">
-    <div class="col-lg-3">
-        <label>
-            @_loc[nameof(RessourceAppStrings.comment)]
-        </label>
-    </div>
-    <div class="col-lg-9" style="width: 75%">
-        <input type="text" style="width: 100%" @bind="comment"/>
-    </div>
-</div>
-<br />
-<div class="row">
-    <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="() => InsertPayment()">
-        @_loc[nameof(RessourceAppStrings.creditAmount)]
-    </button>
-</div>
-<br />
-<hr />
-<br />
-<div class="row">
-    <div class="col-lg-12">
-        <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
-            <tr>
-                <th>@_loc[nameof(RessourceAppStrings.date)]</th>
-                <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
-                <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
-            </tr>
-            @for (int i = 0; i < paymentsOfSelectedPerson.Count; i += 1) {
-                @if (paymentsOfSelectedPerson[i].Amount.IsPositiv()) {
-                    @if (i % 3 == 0) {
-                        <tr style ="background-color: #EEEEEE; color: rgb(10,10,10);">
-                            <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                            <td>@paymentsOfSelectedPerson[i].Comment</td>
-                            <td>@paymentsOfSelectedPerson[i].Amount</td>
-                        </tr>
+        <div class="row">
+            <div class="col-lg-3 align-self-center">
+                <label>
+                    @_loc[nameof(RessourceAppStrings.person)]
+                </label>
+            </div>
+            <div class="col-lg-9">
+                <select class="form-select" @bind="@SelectedPerson">
+                    @if (person is not null) {
+                        @foreach (var x in person) {
+                            <option value="@x.Guid">@x.Name</option>
+                        }
                     }
-                    else if (i % 3 == 1) {
-                        <tr style="background-color: #DDDDDD; color: rgb(10,10,10);">
-                            <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                            <td>@paymentsOfSelectedPerson[i].Comment</td>
-                            <td>@paymentsOfSelectedPerson[i].Amount</td>
-                        </tr>
-                    }
-                    else if (i % 3 == 2) {
-                        <tr style="background-color: #CCCCCC; color: rgb(10,10,10);">
-                            <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                            <td>@paymentsOfSelectedPerson[i].Comment</td>
-                            <td>@paymentsOfSelectedPerson[i].Amount</td>
-                        </tr>
-                    }
-                }
-                else {
-                    <tr style="background-color: #F55D52; color: rgb(10,10,10);">
-                        <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                        <td>@paymentsOfSelectedPerson[i].Comment</td>
-                        <td>@paymentsOfSelectedPerson[i].Amount</td>
+                </select>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-lg-3 align-self-center">
+                <label>
+                    @_loc[nameof(RessourceAppStrings.amount)]
+                </label>
+            </div>
+            <div class="col-lg-4 align-self-center" style="width: 25%">
+                <input style="width: 100%" type="number" @bind="Payment" placeholder="Euro,Cent -> 10,00€">
+            </div>
+            <div class="col-lg-5 align-self-center">
+                <label>
+                    @Money.ToString()
+                </label>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-lg-3">
+                <label>
+                    @_loc[nameof(RessourceAppStrings.comment)]
+                </label>
+            </div>
+            <div class="col-lg-9" style="width: 75%">
+                <input type="text" style="width: 100%" @bind="comment" />
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="() => InsertPayment()">
+                @_loc[nameof(RessourceAppStrings.creditAmount)]
+            </button>
+        </div>
+        <br />
+        <hr />
+        <br />
+        <div class="row">
+            <div class="col-lg-12">
+                <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
+                    <tr>
+                        <th>@_loc[nameof(RessourceAppStrings.date)]</th>
+                        <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
+                        <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
                     </tr>
-                }
-            }
-        </table>
-    </div>
-</div>
-<br />
-<div class="row">
-    <div class="col-lg-12" align="right">
-        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px" @onclick="() => LoadNextAmountOfPayments()">
-            @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
-        </button>
-    </div>
-</div>
+                    @for (int i = 0; i < paymentsOfSelectedPerson.Count; i += 1) {
+                        @if (paymentsOfSelectedPerson[i].Amount.IsPositiv()) {
+                            @if (i % 3 == 0) {
+                                <tr style="background-color: #EEEEEE; color: rgb(10,10,10);">
+                                    <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                                    <td>@paymentsOfSelectedPerson[i].Comment</td>
+                                    <td>@paymentsOfSelectedPerson[i].Amount</td>
+                                </tr>
+                            }
+                            else if (i % 3 == 1) {
+                                <tr style="background-color: #DDDDDD; color: rgb(10,10,10);">
+                                    <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                                    <td>@paymentsOfSelectedPerson[i].Comment</td>
+                                    <td>@paymentsOfSelectedPerson[i].Amount</td>
+                                </tr>
+                            }
+                            else if (i % 3 == 2) {
+                                <tr style="background-color: #CCCCCC; color: rgb(10,10,10);">
+                                    <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                                    <td>@paymentsOfSelectedPerson[i].Comment</td>
+                                    <td>@paymentsOfSelectedPerson[i].Amount</td>
+                                </tr>
+                            }
+                        }
+                        else {
+                            <tr style="background-color: #F55D52; color: rgb(10,10,10);">
+                                <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
+                                <td>@paymentsOfSelectedPerson[i].Comment</td>
+                                <td>@paymentsOfSelectedPerson[i].Amount</td>
+                            </tr>
+                        }
+                    }
+                </table>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-lg-12" align="right">
+                <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px" @onclick="() => LoadNextAmountOfPayments()">
+                    @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+                </button>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    string dashboardLink = "/";
+}

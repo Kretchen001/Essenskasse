@@ -38,8 +38,13 @@ namespace Essenskasse.Pages {
 
         /// <summary></summary>
         protected override async Task OnInitializedAsync() {
-            await RequestAllProvider();
-            await RequestAllPerson();
+            if (!AuthStateService.IsAuthenticated) {
+                Nav.NavigateTo("/");
+            }
+            else {
+                await RequestAllProvider();
+                await RequestAllPerson();
+            }
             base.StateHasChanged();
         }
 
