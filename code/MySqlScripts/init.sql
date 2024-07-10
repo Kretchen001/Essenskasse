@@ -63,3 +63,13 @@ CREATE TABLE IF NOT EXISTS essenskasse.TokenForChange (
     Guid CHAR(36),
     Identity VARCHAR(255)
 );
+
+-- Erstelle die Tabelle für Benutzer
+CREATE TABLE IF NOT EXISTS essenskasse.User (
+    Guid CHAR(36) PRIMARY KEY,
+    Name VARCHAR(255),
+    UserName VARCHAR(255),
+    Pwd VARCHAR(255),
+    Email VARCHAR(255),
+    Role SMALLINT
+);

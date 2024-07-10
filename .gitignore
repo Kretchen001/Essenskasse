@@ -15,3 +15,6 @@ TestResults
 .env
 
 localhost_*.html
+
+*.key
+*.crt
