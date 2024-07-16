@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   database:
-    container_name: MySql_DB
+    container_name: EssenskasseDB
     image: mysql:8.0.2
     environment:
         MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
@@ -14,7 +14,7 @@ services:
       - dbdata:/var/lib/mysql
       - ./MySqlScripts/init.sql:/docker-entrypoint-initdb.d/1.sql:ro # 1 weil damit als erstes ausgefüht, alle anderen danach (wenn welche da sind)
       # - ./MySqlScripts/demoData.sql:/docker-entrypoint-initdb.d/2.sql:ro
-    restart: on-failure
+    restart: always
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
@@ -25,6 +25,8 @@ services:
 
   pwa:
     container_name: EssenskassePWA
+    image: essenskassepwa
+    restart: always
     build:
       context: .
       dockerfile: Essenskasse/Dockerfile
@@ -35,6 +37,8 @@ services:
 
   api:
     container_name: EssenskasseAPI
+    image: essenskasseapi
+    restart: always
     build: 
       context: .
       dockerfile: EssenskasseAPI/Dockerfile
