@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using SerilogTimings;
 using System.Data;
 using U = Modells.User;
@@ -65,8 +66,28 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpGet, Route("exist")]
         public IActionResult CheckIfExist([FromHeader] string name = "", [FromHeader] string userName = "",
-                                            [FromHeader] string email = "") {
-            return Ok();
+                                            [FromHeader] string email = "", [FromHeader] bool withResult = false) {
+            using (Operation.Time($"Check if User exist: {name}, {userName}, {email}")) {
+                string queryStringInsert = $"" +
+                    $"SELECT Name, UserName, Email, Role " +
+                    $"FROM essenskasse.User " +
+                    $"WHERE Name='{name}' OR " +
+                    $"UserName='{userName}' OR" +
+                    $"Email='{email}';";
+                DataTable dataTableUser = QueryExecuterAtMySql(queryStringInsert);
+                List<U.User> user = DataTableToListOfUser(dataTableUser);
+                if (withResult) {
+                    return Ok(JsonConvert.SerializeObject(user));
+                }
+                else {
+                    if (user.Count > 0) {
+                        return Ok();
+                    }
+                    else {
+                        return NoContent();
+                    }
+                }
+            }
         }
 
         [HttpPost, Route("newTokenForUser")]
