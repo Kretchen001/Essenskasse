@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS essenskasse.User (
 -- Erstelle die Tabelle für die SessionToken
 CREATE TABLE IF NOT EXISTS essenskasse.SessionToken (
     Guid CHAR(36) PRIMARY KEY,
-    UserGuid VARCHAR(255) FOREIGN KEY REFERENCES essenskasse.User(Guid),
+    UserGuid CHAR(36),
+    FOREIGN KEY (UserGuid) REFERENCES essenskasse.User(Guid),
     ExpaireDate BIGINT
 );

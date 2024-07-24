@@ -93,7 +93,29 @@ namespace EssenskasseAPI.Controllers {
         [HttpPost, Route("newTokenForUser")]
         public IActionResult GetNewSessionToken([FromHeader] string name = "", [FromHeader] string pwd = "",
                                                     [FromHeader] int role = short.MaxValue) {
-            return Ok();
+            using (Operation.Time($"Get Token for: {name}")) {
+                string queryStringInsert = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.User " +
+                    $"WHERE Name='{name}' AND " +
+                    $"Pwd='{pwd}';";
+                DataTable dataTableUser = QueryExecuterAtMySql(queryStringInsert);
+                List<U.User> user = DataTableToListOfUser(dataTableUser);
+                if (user.Count == 1) {
+                    U.SessionToken token = new U.SessionToken(Guid.NewGuid(), user[0].Guid, DateTime.Now.AddDays(14).Ticks);
+                    string queryStringInsertToken = $"" +
+                        $"INSERT INTO essenskasse.SessionToken (Guid, UserGuid, ExpaireDate) " +
+                        $"VALUES (" +
+                        $"'{token.Guid}'," +
+                        $"'{token.UserGuid}'," +
+                        $"{token.ExpaireDate});";
+                    QueryExecuterAtMySql(queryStringInsertToken);
+                    return Ok(token.Guid);
+                }
+                else {
+                    return NoContent();
+                }
+            }
         }
 
         [HttpGet, Route("checkTokenForUser")]
