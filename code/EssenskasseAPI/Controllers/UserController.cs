@@ -120,7 +120,43 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpGet, Route("checkTokenForUser")]
         public IActionResult CheckSessionToken([FromHeader] string name = "", [FromHeader] Guid sessionToken = default) {
-            return Ok();
+            using (Operation.Time($"Check Token |{sessionToken}| for: {name}")) {
+                string queryStringRequestName = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.User " +
+                    $"WHERE Name='{name}';";
+                DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestName);
+                List<U.User> user = DataTableToListOfUser(dataTableUser);
+                if (user.Count == 1) {
+                    string queryStringRequestToken = $"" +
+                        $"SELECT ExpaireDate " +
+                        $"FROM essenskasse.SessionToken " +
+                        $"WHERE Guid='{sessionToken}' AND " +
+                        $"UserGuid='{user[0].Guid}';";
+                    DataTable tempRes = QueryExecuterAtMySql(queryStringRequestToken);
+                    if (tempRes.Rows.Count == 1) {
+                        long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
+                        if (DateTime.Now.Ticks < s) { // is under expaire
+                            if (DateTime.Now.AddDays(4).Ticks > s) { // get new one
+                                U.SessionToken newS = new U.SessionToken(Guid.NewGuid(), user[0].Guid, DateTime.Now.AddDays(14).Ticks);
+                                string queryStringInsertToken = $"" +
+                                    $"INSERT INTO essenskasse.SessionToken (Guid, UserGuid, ExpaireDate) " +
+                                    $"VALUES (" +
+                                    $"'{newS.Guid}'," +
+                                    $"'{newS.UserGuid}'," +
+                                    $"{newS.ExpaireDate});";
+                                QueryExecuterAtMySql(queryStringInsertToken);
+                                return Ok(newS.Guid); // return new Token because under 4 day barrier
+                            }
+                            return Ok(); // return without new Token because it is not time for it
+                        }
+                        else {
+                            return Ok();
+                        }
+                    }
+                }
+                return NoContent();
+            }
         }
         #endregion
 
