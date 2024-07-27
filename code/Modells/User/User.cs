@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Modells.User {
 
+    /// <summary></summary>
     public class User {
 
         /// <summary></summary>

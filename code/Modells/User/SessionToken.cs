@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Modells.User {
 
+    /// <summary></summary>
     public class SessionToken {
 
         /// <summary></summary>
@@ -22,6 +23,7 @@ namespace Modells.User {
         /// <param name="guid"></param>
         /// <param name="userGuid"></param>
         /// <param name="exaireDate"></param>
+        [System.Text.Json.Serialization.JsonConstructor]
         public SessionToken(Guid guid, Guid userGuid, long exaireDate) {
             Guid = guid;
             UserGuid = userGuid;
