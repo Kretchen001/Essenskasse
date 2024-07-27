@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   database:
-    container_name: MySql_DB
+    container_name: EssenskasseDB
     image: mysql:8.0.2
     environment:
         MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"

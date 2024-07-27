@@ -15,3 +15,7 @@ TestResults
 .env
 
 localhost_*.html
+
+*.key
+*.crt
+/code/EssenskasseAPI/Log

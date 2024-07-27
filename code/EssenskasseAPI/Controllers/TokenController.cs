@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Modells;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using Serilog;
 using SerilogTimings;
-using System;
 using System.Data;
 
 namespace EssenskasseAPI.Controllers {
