@@ -236,6 +236,9 @@ dotnet_diagnostic.IDE0290.severity = none
 # CA1816: Dispose-Methoden müssen SuppressFinalize aufrufen
 dotnet_diagnostic.CA1816.severity = none
 
+# IDE0001: Namen vereinfachen
+dotnet_diagnostic.IDE0001.severity = none
+
 [*.{cs,vb}]
 dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_null_propagation = true:suggestion

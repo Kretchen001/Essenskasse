@@ -1,15 +1,67 @@
 ﻿using Essenskasse.Client;
+using Essenskasse.Client.Services;
+using Essenskasse.Ressources;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Modells;
 
 namespace Essenskasse.Layout {
 
     public partial class MainLayout {
+
         private NavMenu navMenu;
 
+        private LoginModal? LoginModel { get; set; }
+
+        [CascadingParameter]
+        private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
         protected override async Task OnInitializedAsync() {
+            await CheckLogin();
             await CollectUserThemeAsync();
             await ReadLocalStorage();
             await navMenu.ReloadNavMenu();
+        }
+
+        private void ShowLoginModal() {
+            LoginModel!.Open();
+        }
+
+        private async Task CheckLogin() {
+            Guid currentSessionToken = await LocalStorage.GetItemAsync<Guid>("SessionToken");
+            string currentNameOfUser = await LocalStorage.GetItemAsync<string>("NameOfUser") ?? "";
+
+            if (currentNameOfUser != "" && !currentSessionToken.Equals(new Guid())) {
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "user/checkTokenForUser"),
+                    Headers = {
+                        { "name", currentNameOfUser },
+                        { "sessionToken", currentSessionToken.ToString() }
+                    }
+                };
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+                        AuthStateService.IsAuthenticated = true;
+                        string newToken = await response.Content.ReadAsStringAsync();
+                        if (newToken.Length > 0) {
+                            await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken));
+                        }
+                    }
+                    else {
+                        AuthStateService.IsAuthenticated = false;
+                        ToastService.ShowToast("Anmeldung fehlgeschlagen, bitte Anmeldedaten neu eingeben!", ToastLevel.Error);
+                    }
+
+                    AuthState.NotifyAuthenticationStateChanged();
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+            }
         }
 
         /// <summary> Request the LocalStorage for a saved theme. If no one is found is the light-theme selected. </summary>
@@ -40,6 +92,18 @@ namespace Essenskasse.Layout {
                 AppData.AccessToken = null;
             }
             AppData.AdminEmail = await LocalStorage.GetItemAsync<string>("AdminEmail") ?? "";
+        }
+
+        private void UpdateAuthentication(bool? isAuthenticated) {
+            if (!isAuthenticated.HasValue) {
+                AuthStateService.IsAuthenticating = true;
+            }
+            else {
+                AuthStateService.IsAuthenticating = false;
+                AuthStateService.IsAuthenticated = isAuthenticated.Value;
+            }
+
+            AuthState.NotifyAuthenticationStateChanged();
         }
     }
 }
