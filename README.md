@@ -8,6 +8,7 @@
 - [Beschreibung Deutsch](#beschreibung-deutsch)
 - [Description English](#description-english)
 - [Installation and Run](#installation-and-run)
+- [Contribution](#contribution)
 
 ## Beschreibung Deutsch
 In dieser Kasse können mehrere Anbieter und Personen eingespeichert werden, um die Verwaltung des Mittagsgeldes des Personals zentral zu gestalten.
@@ -63,3 +64,6 @@ Because of the settings in the `docker-compose.yml` the essentiell port for call
 start http://localhost:8009
 ```
 This will call the Dashboard.
+
+## Contribution
+Source of the icon: [www.flaticon.com/free-icon](https://www.flaticon.com/free-icon/cost_11645186?related_id=11645144&origin=search)
