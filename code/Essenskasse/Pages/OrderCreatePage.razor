@@ -163,7 +163,7 @@
             }
         </div>
 
-        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; margin-top: 1rem" @onclick="LoadOrdersForOverview">
+        <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; margin-top: 1rem; opacity: @OpacityOfNoMoreToLoad%" disabled="@noMoreToLoad" @onclick="LoadOrdersForOverview">
             @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
         </button>
 
