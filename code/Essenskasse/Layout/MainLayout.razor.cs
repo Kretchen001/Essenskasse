@@ -12,6 +12,8 @@ namespace Essenskasse.Layout {
         private NavMenu navMenu;
 
         private LoginModal? LoginModel { get; set; }
+        private string nameToLogin = string.Empty;
+        private string passwordToLogin = string.Empty;
 
         [CascadingParameter]
         private Task<AuthenticationState> AuthenticationStateTask { get; set; }
@@ -104,6 +106,39 @@ namespace Essenskasse.Layout {
             }
 
             AuthState.NotifyAuthenticationStateChanged();
+        }
+
+        private async Task LoginUser() {
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(Config["API-Adress"] + "user/newTokenForUser"),
+                Headers = {
+                        { "name", nameToLogin },
+                        { "pwd", passwordToLogin },
+                        { "role", 10.ToString() }
+                    }
+            };
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(httpRequestMessage);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+                    AuthStateService.IsAuthenticated = true;
+                    string newToken = await response.Content.ReadAsStringAsync();
+                    await LocalStorage.SetItemAsync<string>("User", nameToLogin);
+                    await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken[1..(newToken.Length - 1)]));
+                    ToastService.ShowToast("Herzlich willkommen", ToastLevel.Success);
+                }
+                else {
+                    AuthStateService.IsAuthenticated = false;
+                    ToastService.ShowToast("Anmeldung fehlgeschlagen, bitte Anmeldedaten neu eingeben!", ToastLevel.Error);
+                }
+
+                AuthState.NotifyAuthenticationStateChanged();
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
         }
     }
 }

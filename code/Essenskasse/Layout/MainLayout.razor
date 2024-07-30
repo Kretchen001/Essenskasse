@@ -31,7 +31,7 @@
                                 Benutzername
                             </div>
                             <div class="col-lg-8">
-                                <input />
+                                <input @bind=nameToLogin/>
                             </div>
                         </div>
                         <div class="row">
@@ -39,12 +39,12 @@
                                 Passwort
                             </div>
                             <div class="col-lg-8">
-                                <input />
+                                <input @bind=passwordToLogin/>
                             </div>
                         </div>
                         <hr />
                         <div class="row">
-                            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px;" @onclick="() => UpdateAuthentication(true)">
+                            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px;" @onclick="() => LoginUser()">
                                 Anmelden
                             </button>
                         </div>
