@@ -32,6 +32,14 @@ namespace Essenskasse.Pages {
 
         private List<bool> showHistory = new List<bool>();
 
+        private bool noMoreToLoad = false;
+
+        private int OpacityOfNoMoreToLoad {
+            get {
+                return noMoreToLoad ? 50 : 100;
+            }
+        }
+
         private int Amount {
             get => AppData.LoadAmountOrder;
         }
@@ -272,6 +280,12 @@ namespace Essenskasse.Pages {
                 overviewOrderAlreadyLoadCount += order.Count;
                 referenceDate = referenceDate.AddDays(1); // for the next load essential
 
+                if (order.Count == 0) {
+                    ToastService.ShowToast("Keine weiteren Daten zu laden!", ToastLevel.Info);
+                    noMoreToLoad = true;
+                    base.StateHasChanged();
+                    return;
+                }
                 while (order.Count != 0) {
                     List<Order?> dayOrders = new List<Order?>();
                     if (!orderListForOverview.Exists(x => x.DateTime.Date == referenceDate.Date)) {
