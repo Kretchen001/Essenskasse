@@ -58,6 +58,27 @@ namespace Essenskasse.Pages {
             }
         }
 
+        private bool SendConfirmationMail {
+            get {
+                return AppData.SendConfirmationMail;
+            }
+            set {
+                AppData.SendConfirmationMail = value;
+                WriteSendConfirmationMailToLocalStorage(value);
+            }
+        }
+
+        private string ReturnSendConfirmationMail {
+            get {
+                if (SendConfirmationMail) {
+                    return _loc[nameof(RessourceAppStrings.yes)];
+                }
+                else {
+                    return _loc[nameof(RessourceAppStrings.no)];
+                }
+            }
+        }
+
         /// <summary></summary>
         private void ChangeTheme(string value) {
             if (value.Equals("Dark")) {
@@ -223,6 +244,12 @@ namespace Essenskasse.Pages {
         /// <param name="value"></param>
         private async void WriteNoticableSideToLocalStorage(bool value) {
             await LocalStorage.SetItemAsync<bool>("NoticeableOnRightSide", value);
+        }
+        
+        /// <summary></summary>
+        /// <param name="value"></param>
+        private async void WriteSendConfirmationMailToLocalStorage(bool value) {
+            await LocalStorage.SetItemAsync<bool>("SendConfirmationMail", value);
         }
 
         /// <summary></summary>

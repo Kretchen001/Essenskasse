@@ -40,6 +40,7 @@ namespace Essenskasse.Layout {
                 AppData.AccessToken = null;
             }
             AppData.AdminEmail = await LocalStorage.GetItemAsync<string>("AdminEmail") ?? "";
+            AppData.SendConfirmationMail = await LocalStorage.GetItemAsync<bool>("SendConfirmationMail");
         }
     }
 }

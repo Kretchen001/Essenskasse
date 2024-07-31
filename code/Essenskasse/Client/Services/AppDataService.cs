@@ -32,5 +32,8 @@ namespace Essenskasse.Client.Services {
 
         /// <summary></summary>
         public bool NoticeableOnRightSide { get; set; } = true;
+        
+        /// <summary></summary>
+        public bool SendConfirmationMail { get; set; } = true;
     }
 }
