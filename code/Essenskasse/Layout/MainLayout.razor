@@ -42,6 +42,14 @@
                                 <input @bind=passwordToLogin/>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                Berechtigungsebene
+                            </div>
+                            <div class="col-lg-8">
+                                <input @bind=roleToLogin type="number"/>
+                            </div>
+                        </div>
                         <hr />
                         <div class="row">
                             <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px;" @onclick="() => LoginUser()">
@@ -57,7 +65,7 @@
                 </Authorizing>
                 <Authorized>
                     <div class="d-flex align-items-center">
-                        <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px;" @onclick="@(() => UpdateAuthentication(false))">
+                        <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px;" @onclick="() => LogoutUser()">
                             Abmelden
                         </button>
                     </div>

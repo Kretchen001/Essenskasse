@@ -14,6 +14,7 @@ namespace Essenskasse.Layout {
         private LoginModal? LoginModel { get; set; }
         private string nameToLogin = string.Empty;
         private string passwordToLogin = string.Empty;
+        private int roleToLogin = short.MaxValue;
 
         [CascadingParameter]
         private Task<AuthenticationState> AuthenticationStateTask { get; set; }
@@ -56,7 +57,6 @@ namespace Essenskasse.Layout {
                         AuthStateService.IsAuthenticated = false;
                         ToastService.ShowToast("Anmeldung fehlgeschlagen, bitte Anmeldedaten neu eingeben!", ToastLevel.Error);
                     }
-
                     AuthState.NotifyAuthenticationStateChanged();
                 }
                 catch {
@@ -97,6 +97,16 @@ namespace Essenskasse.Layout {
             AppData.SendConfirmationMail = await LocalStorage.GetItemAsync<bool>("SendConfirmationMail");
         }
 
+        private async Task LogoutUser() {
+            await LocalStorage.RemoveItemAsync("NameOfUser");
+            await LocalStorage.RemoveItemAsync("SessionToken");
+            AuthStateService.IsAuthenticating = false;
+            AuthStateService.IsAuthenticated = false;
+            AuthState.NotifyAuthenticationStateChanged();
+            ToastService.ShowToast("Abgemeldet!", ToastLevel.Info);
+        }
+
+        #region oldCode - Remember
         private void UpdateAuthentication(bool? isAuthenticated) {
             if (!isAuthenticated.HasValue) {
                 AuthStateService.IsAuthenticating = true;
@@ -108,6 +118,7 @@ namespace Essenskasse.Layout {
 
             AuthState.NotifyAuthenticationStateChanged();
         }
+        #endregion
 
         private async Task LoginUser() {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -116,7 +127,7 @@ namespace Essenskasse.Layout {
                 Headers = {
                         { "name", nameToLogin },
                         { "pwd", passwordToLogin },
-                        { "role", 10.ToString() }
+                        { "role", roleToLogin.ToString() }
                     }
             };
             HttpResponseMessage? response = null;
@@ -125,7 +136,7 @@ namespace Essenskasse.Layout {
                 if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                     AuthStateService.IsAuthenticated = true;
                     string newToken = await response.Content.ReadAsStringAsync();
-                    await LocalStorage.SetItemAsync<string>("User", nameToLogin);
+                    await LocalStorage.SetItemAsync<string>("NameOfUser", nameToLogin);
                     await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken[1..(newToken.Length - 1)]));
                     ToastService.ShowToast("Herzlich willkommen", ToastLevel.Success);
                 }
@@ -133,7 +144,9 @@ namespace Essenskasse.Layout {
                     AuthStateService.IsAuthenticated = false;
                     ToastService.ShowToast("Anmeldung fehlgeschlagen, bitte Anmeldedaten neu eingeben!", ToastLevel.Error);
                 }
-
+                nameToLogin = "";
+                passwordToLogin = "";
+                roleToLogin = short.MaxValue;
                 AuthState.NotifyAuthenticationStateChanged();
             }
             catch {
