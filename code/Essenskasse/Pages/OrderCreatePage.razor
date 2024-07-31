@@ -29,7 +29,7 @@
 
         /* Subtle stripe effect */
         .overViewGrid tr:nth-child(even) {
-            background: rgba(205,205,205,0.4);
+            background: rgba(205, 205, 205, 0.4);
         }
 </style>
 
@@ -90,7 +90,8 @@
                         <div class="col-lg-12">
                             <div class="row">
                                 <div class="col-lg-8">
-                                    <PersonOrderCard @ref="@personOrderCards[i]" PersonName="@person[i].Name" Money="@money[i]"
+                                    <PersonOrderCard @ref="@personOrderCards[i]" PersonName="@person[i].Name"
+                                                     Money="@money[i]"
                                                      OnValuesChanged="(ChangedValues => HandleValuesChanged(i, ChangedValues))">
                                     </PersonOrderCard>
                                 </div>
@@ -102,7 +103,8 @@
                                 <div class="col-lg-2 align-self-center">
                                     @if (showHistory[i]) {
                                         <button @onclick="() => LoadAndShowHistory(i)">
-                                            @_loc[nameof(RessourceAppStrings.orderHistory)] @_loc[nameof(RessourceAppStrings.hide)]
+                                            @_loc[nameof(RessourceAppStrings.orderHistory)]
+                                            @_loc[nameof(RessourceAppStrings.hide)]
                                         </button>
                                     }
                                     else {
@@ -120,7 +122,9 @@
                                         <PersonOrderHistoryCard Orders="shownOrders[i]" />
                                         <div class="row" style="margin: 0.25rem;">
                                             <div class="col-lg-12">
-                                                <button type="button" class="btn btn-info float-end" style="border-radius:8px; width: fit-content;" @onclick="() => HistoryLoadInModal(i)">
+                                                <button type="button" class="btn btn-info float-end"
+                                                        style="border-radius:8px; width: fit-content;"
+                                                        @onclick="() => HistoryLoadInModal(i)">
                                                     @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
                                                 </button>
                                             </div>
@@ -135,7 +139,8 @@
                 <br />
 
                 <div class="row justify-content-between">
-                    <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="PostOrderForTheDay">
+                    <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px"
+                            @onclick="PostOrderForTheDay">
                         @_loc[nameof(RessourceAppStrings.submit)] @_loc[nameof(RessourceAppStrings.order)]
                     </button>
                 </div>
@@ -145,7 +150,8 @@
                     <div class="row">
                         <div style="height: 70vh; overflow: scroll">
                             @foreach (Order x in completeHistoryFromOne) {
-                                <div class="row" style="margin-left: 1rem; margin-right: 1rem; border-color: black; border-bottom: solid 0.2px">
+                                <div class="row"
+                                     style="margin-left: 1rem; margin-right: 1rem; border-color: black; border-bottom: solid 0.2px">
                                     <div class="col-lg-5">
                                         @x.DateTime.ToString("dddd, dd MMMM yyyy")
                                     </div>
@@ -173,14 +179,15 @@
                                             Title="@(orderListForOverview[0].Head[0])" />
                             @foreach (int i in Enumerable.Range(0, person.Count)) {
                                 <PropertyColumn Property="@(p => OverviewCellFill(p.Orders[i]))"
-                                                Title="@(orderListForOverview[0].Head[i+1])"
-                                                Class="text-center" />
+                                                Title="@(orderListForOverview[0].Head[i+1])" Class="text-center" />
                             }
                         </QuickGrid>
                     }
                 </div>
 
-                <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; margin-top: 1rem" @onclick="LoadOrdersForOverview">
+                <button type="button" class="btn-primary" data-dismiss="modal"
+                        style="border-radius:8px; margin-top: 1rem; opacity: @OpacityOfNoMoreToLoad%"
+                        disabled="@noMoreToLoad" @onclick="LoadOrdersForOverview">
                     @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
                 </button>
 
