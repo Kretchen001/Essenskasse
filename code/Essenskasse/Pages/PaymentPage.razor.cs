@@ -162,6 +162,31 @@ namespace Essenskasse.Pages {
                 paymentsOfSelectedPerson.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
                 paymentsOfSelectedPerson = paymentsOfSelectedPerson.OrderByDescending(x => x.DateTime).ToList();
                 base.StateHasChanged();
+                if (AppData.SendConfirmationMail) {
+                    if (person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Email.Equals("")) {
+                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoEmailEntered)], ToastLevel.Info);
+                    }
+                    else {
+                        ToastService.ShowToast("Bestätigungsmail versenden...", ToastLevel.Info);
+                        Payment d = paymentsOfSelectedPerson[0];
+                        string subject = "Bestätigung einer Einzahlung | \"Essenkasse\"";
+                        string body = $"Sehr geehrte(r) {person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Name}\n" +
+                            $"Hiermit wird Ihnen bestätigt, daß am heutigen " +
+                            $"Tage {d.DateTime.ToString("d")} um {d.DateTime.ToString("t")} " +
+                            $"eine Einzahlung in der Höhe {d.Amount.ToString()} erfolgte!\n" +
+                            $"Anmerkung des Eintrages: {d.Comment}" +
+                            $"\n\n" +
+                            $"Ihre Kassenverwaltung";
+                        await JSRuntime.InvokeAsync<object>(
+                            "blazorExtensions.SendLocalEmail",
+                            new object[] {
+                                person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Email,
+                                subject,
+                                body
+                            }
+                        );
+                    }
+                }
                 return;
             }
             else {

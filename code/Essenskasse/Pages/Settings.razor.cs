@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace Essenskasse.Pages {
 
+    /// <summary></summary>
     public partial class Settings {
 
         #region Variable
@@ -58,6 +59,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private bool SendConfirmationMail {
             get {
                 return AppData.SendConfirmationMail;
@@ -68,6 +70,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private string ReturnSendConfirmationMail {
             get {
                 if (SendConfirmationMail) {
@@ -113,6 +116,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private int LoadAmountOrders {
             get => AppData.LoadAmountOrder;
             set {
@@ -121,6 +125,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private bool FilterShowProvider {
             get => AppData.FilterShowProvider;
             set {
@@ -129,6 +134,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private bool FilterShowPerson {
             get => AppData.FilterShowPerson;
             set {
@@ -161,6 +167,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private decimal DashboardMoneyLimitInt {
             get {
                 decimal temp = AppData.DashboardMoneyLimit.Euro;
@@ -179,6 +186,7 @@ namespace Essenskasse.Pages {
                 }
             }
         }
+        /// <summary></summary>
         private Money DashboardMoneyLimit {
             get => AppData.DashboardMoneyLimit;
             set {
@@ -187,6 +195,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private bool ExistAccessToken {
             get {
                 if (AppData.AccessToken is not null) {
@@ -198,6 +207,7 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
         private string AdminEmail {
             get => AppData.AdminEmail;
             set {
