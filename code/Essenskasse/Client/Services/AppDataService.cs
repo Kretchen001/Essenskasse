@@ -1,4 +1,5 @@
 ﻿using Modells;
+using U = Modells.User;
 
 namespace Essenskasse.Client.Services {
 
@@ -35,5 +36,20 @@ namespace Essenskasse.Client.Services {
         
         /// <summary></summary>
         public bool SendConfirmationMail { get; set; } = true;
+
+        public U.Settings GetAppDataAsSettingsObject() {
+            return new U.Settings(
+                isSingleListWishDashboard: IsSingleListWishDashboard,
+                loadAmountPayment: LoadAmountPayment,
+                loadAmountOrder: LoadAmountOrder,
+                filterShowProvider: FilterShowProvider,
+                dashboardMoneyLimit: DashboardMoneyLimit,
+                filterShowPerson: FilterShowPerson,
+                accessToken: AccessToken,
+                adminEmail: AdminEmail,
+                noticeableOnRightSide: NoticeableOnRightSide,
+                sendConfirmationMail: SendConfirmationMail
+                );
+        }
     }
 }

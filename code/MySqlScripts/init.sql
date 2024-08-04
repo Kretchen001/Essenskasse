@@ -65,3 +65,18 @@ CREATE TABLE IF NOT EXISTS essenskasse.SessionToken (
     FOREIGN KEY (UserGuid) REFERENCES essenskasse.User(Guid),
     ExpaireDate BIGINT
 );
+
+-- Erstelle die Tabelle für die SessionToken
+CREATE TABLE IF NOT EXISTS essenskasse.SettingsUser (
+    UserGuid CHAR(36) PRIMARY KEY,
+    isSingleListWishDashboard BOOLEAN DEFAULT false,
+    loadAmountPayment INT,
+    loadAmountOrder INT,
+    filterShowProvider BOOLEAN DEFAULT true,
+    dashboardMoneyLimit VARCHAR(255), -- ToString to code, ToMoney to decode
+    filterShowPerson BOOLEAN DEFAULT true,
+    accessToken CHAR(36) DEFAULT "",
+    adminEmail VARCHAR(255),
+    noticeableOnRightSide BOOLEAN DEFAULT false,
+    sendConfirmationMail BOOLEAN DEFAULT true
+);

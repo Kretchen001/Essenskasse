@@ -193,6 +193,11 @@ namespace EssenskasseAPI.Controllers {
                 return NoContent();
             }
         }
+
+        [HttpPost, Route("saveSettingsForUser")]
+        public IActionResult SaveSettingsForUser([FromHeader] Guid sessionToken, [FromHeader] string name, [FromBody] U.Settings settings) {
+            return Ok();
+        }
         #endregion
 
         #region InternalFunctions

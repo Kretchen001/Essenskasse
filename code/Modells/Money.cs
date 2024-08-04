@@ -50,6 +50,14 @@ namespace Modells {
             }
         }
 
+        /// <summary>Convert a given String to a Money.</summary>
+        /// <param name="ToStringMoney">String that contain the Money</param>
+        /// <returns>A Money Object.</returns>
+        public Money ToMoney(string ToStringMoney) {
+            int i = ToStringMoney.IndexOf(",");
+            return new Money(long.Parse(ToStringMoney[0..i]), short.Parse(ToStringMoney[(i + 1)..(ToStringMoney.Length - 2)]));
+        }
+
         /// <summary>Is the current Money-value positiv?</summary>
         /// <returns>Positiv or not</returns>
         public bool IsPositiv() {

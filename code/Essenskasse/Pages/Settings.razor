@@ -291,5 +291,20 @@
                 </div>
             </div>
         </div>
+
+        <hr />
+
+        <div class="row align-items-center" style="margin-bottom: 0.5vh; padding: 0.25vh;">
+            <div class="col-lg-6" align="center">
+                <button type="button" class="btn-outline-warning" data-dismiss="modal" style="border-radius:8px; width: 80%;" @onclick="() => RequestOnlineSettingsForThisUser()">
+                    Einstellungen abfragen
+                </button>
+            </div>
+            <div class="col-lg-6" align="center">
+                <button type="button" class="btn-outline-warning" data-dismiss="modal" style="border-radius:8px; width: 80%;" @onclick="() => SaveSettingsForThisUserOnline()">
+                    Einstellungen sichern
+                </button>
+            </div>
+        </div>
     </Authorized>
 </AuthorizeView>

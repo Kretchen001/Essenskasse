@@ -3,6 +3,8 @@ using Essenskasse.Ressources;
 using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
+using System;
+using System.Text;
 
 namespace Essenskasse.Pages {
 
@@ -377,6 +379,49 @@ namespace Essenskasse.Pages {
                         body
                     }
                 );
+            }
+        }
+
+        private async Task RequestOnlineSettingsForThisUser() {
+            if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen VOM Server abfragen und lokale überschreiben?")) {
+
+            }
+        }
+
+        private async Task SaveSettingsForThisUserOnline() {
+            if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen ZUM Server übertragen und online überschreiben?")) {
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "user/saveSettingsForUser"),
+                    Headers = {
+                        { "sessionToken", (await LocalStorage.GetItemAsync<Guid>("SessionToken")).ToString() },
+                        { "name", await LocalStorage.GetItemAsync<string>("NameOfUser") },
+                    },
+                    Content = new StringContent(JsonConvert.SerializeObject(AppData.GetAppDataAsSettingsObject()), Encoding.UTF8, "application/json")
+                };
+
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+
+                if (response.IsSuccessStatusCode) {
+                    //person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
+                    //person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
+                    //person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+                    //person = person.OrderBy(x => x.Name).ToList();
+
+                    //if (person.Count > 0) {
+                    //    SelectedPerson = person[0].Guid;
+                    //}
+                }
+                else {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+                }
             }
         }
         #endregion
