@@ -178,8 +178,8 @@ namespace Essenskasse.Pages {
                         string subject = "Bestätigung einer Einzahlung | \"Essenkasse\"";
                         string body = $"Sehr geehrte(r) {person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Name}\n" +
                             $"Hiermit wird Ihnen bestätigt, daß am heutigen " +
-                            $"Tage {d.DateTime.ToString("d")} um {d.DateTime.ToString("t")} " +
-                            $"eine Einzahlung in der Höhe {d.Amount.ToString()} erfolgte!\n" +
+                            $"Tage {d.DateTime:d} um {d.DateTime:t} " +
+                            $"eine Einzahlung in der Höhe {d.Amount} erfolgte!\n" +
                             $"Anmerkung des Eintrages: {d.Comment}" +
                             $"\n\n" +
                             $"Ihre Kassenverwaltung";

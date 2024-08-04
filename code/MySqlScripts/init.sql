@@ -1,19 +1,3 @@
-CREATE TABLE IF NOT EXISTS essenskasse.Test (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    UserName VARCHAR(30) NOT NULL,
-    Hobbies VARCHAR(30) NOT NULL,
-    Location VARCHAR(50)
-);
-
-INSERT INTO Test (UserName, Hobbies, Location)
-VALUES
-('Finn', 'Tafelwischen', 'Mond'),
-('Albert', 'Bouling', 'Erde'),
-('Odin', 'Wachen', 'Asgard'),
-('Rah', 'Scheinen', 'Sonne'),
-('Poseidon', 'Schwimmen', 'Olymp'),
-('Kain', 'sd', 'Eden');
-
 CREATE TABLE IF NOT EXISTS essenskasse.Person (
     Guid CHAR(36) PRIMARY KEY,
     Name VARCHAR(511),
