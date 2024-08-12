@@ -51,5 +51,18 @@ namespace Essenskasse.Client.Services {
                 sendConfirmationMail: SendConfirmationMail
                 );
         }
+
+        public void SettingsToAppData(U.Settings settings) {
+            IsSingleListWishDashboard = settings.IsSingleListWishDashboard;
+            LoadAmountPayment = settings.LoadAmountPayment;
+            LoadAmountOrder = settings.LoadAmountOrder;
+            FilterShowProvider = settings.FilterShowProvider;
+            DashboardMoneyLimit = settings.DashboardMoneyLimit;
+            FilterShowPerson = settings.FilterShowPerson;
+            AccessToken = settings.AccessToken;
+            AdminEmail = settings.AdminEmail;
+            NoticeableOnRightSide = settings.NoticeableOnRightSide;
+            SendConfirmationMail = settings.SendConfirmationMail;
+        }
     }
 }

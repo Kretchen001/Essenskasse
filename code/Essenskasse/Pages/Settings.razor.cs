@@ -2,8 +2,8 @@
 using Essenskasse.Ressources;
 using Microsoft.JSInterop;
 using Modells;
+using U = Modells.User;
 using Newtonsoft.Json;
-using System;
 using System.Text;
 
 namespace Essenskasse.Pages {
@@ -384,7 +384,25 @@ namespace Essenskasse.Pages {
 
         private async Task RequestOnlineSettingsForThisUser() {
             if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen VOM Server abfragen und lokale überschreiben?")) {
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "user/loadSettingsForUser"),
+                    Headers = {
+                        { "sessionToken", (await LocalStorage.GetItemAsync<Guid>("SessionToken")).ToString() },
+                        { "name", await LocalStorage.GetItemAsync<string>("NameOfUser") },
+                    }
+                };
 
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+
+                    AppData.SettingsToAppData(JsonConvert.DeserializeObject<U.Settings>(await response.Content.ReadAsStringAsync()) ?? new U.Settings());
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
             }
         }
 

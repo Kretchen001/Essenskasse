@@ -194,6 +194,11 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        [HttpPost, Route("loadSettingsForUser")]
+        public IActionResult LoadSettingsForUser([FromHeader] Guid sessionToken, [FromHeader] string name) {
+            return Ok();
+        }
+
         [HttpPost, Route("saveSettingsForUser")]
         public IActionResult SaveSettingsForUser([FromHeader] Guid sessionToken, [FromHeader] string name, [FromBody] U.Settings settings) {
             return Ok();
