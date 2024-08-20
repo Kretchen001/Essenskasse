@@ -385,7 +385,7 @@ namespace Essenskasse.Pages {
         private async Task RequestOnlineSettingsForThisUser() {
             if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen VOM Server abfragen und lokale überschreiben?")) {
                 HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Post,
+                    Method = HttpMethod.Get,
                     RequestUri = new Uri(Config["API-Adress"] + "user/loadSettingsForUser"),
                     Headers = {
                         { "sessionToken", (await LocalStorage.GetItemAsync<Guid>("SessionToken")).ToString() },

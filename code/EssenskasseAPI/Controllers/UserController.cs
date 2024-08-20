@@ -186,7 +186,7 @@ namespace EssenskasseAPI.Controllers {
                             return Ok(); // return without new Token because it is not time for it
                         }
                         else {
-                            return Ok();
+                            return BadRequest();
                         }
                     }
                 }
@@ -194,14 +194,75 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpPost, Route("loadSettingsForUser")]
+        [HttpGet, Route("loadSettingsForUser")]
         public IActionResult LoadSettingsForUser([FromHeader] Guid sessionToken, [FromHeader] string name) {
-            return Ok();
+            string queryStringRequestName = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.User " +
+                    $"WHERE Name='{name}';";
+            DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestName);
+            List<U.User> user = DataTableToListOfUser(dataTableUser);
+            if (user.Count == 1) {
+                string queryStringRequestToken = $"" +
+                    $"SELECT ExpaireDate " +
+                    $"FROM essenskasse.SessionToken " +
+                    $"WHERE Guid='{sessionToken}' AND " +
+                    $"UserGuid='{user[0].Guid}';";
+                DataTable tempRes = QueryExecuterAtMySql(queryStringRequestToken);
+                if (tempRes.Rows.Count == 1) {
+                    long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
+                    if (DateTime.Now.Ticks < s) { // is under expaire
+                        string queryStringRequestSettings = $"" +
+                            $"SELECT * " +
+                            $"FROM essenskasse.SettingsUser " +
+                            $"WHERE UserGuid='{user[0].Guid}';";
+                        DataTable tempSettings = QueryExecuterAtMySql(queryStringRequestSettings);
+                        return Ok(DataTableToSettings(tempSettings));
+                    }
+                }
+            }
+            return BadRequest();
         }
 
         [HttpPost, Route("saveSettingsForUser")]
         public IActionResult SaveSettingsForUser([FromHeader] Guid sessionToken, [FromHeader] string name, [FromBody] U.Settings settings) {
-            return Ok();
+            string queryStringRequestName = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.User " +
+                    $"WHERE Name='{name}';";
+            DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestName);
+            List<U.User> user = DataTableToListOfUser(dataTableUser);
+            if (user.Count == 1) {
+                string queryStringRequestToken = $"" +
+                    $"SELECT ExpaireDate " +
+                    $"FROM essenskasse.SessionToken " +
+                    $"WHERE Guid='{sessionToken}' AND " +
+                    $"UserGuid='{user[0].Guid}';";
+                DataTable tempRes = QueryExecuterAtMySql(queryStringRequestToken);
+                if (tempRes.Rows.Count == 1) {
+                    long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
+                    if (DateTime.Now.Ticks < s) { // is under expaire
+                        string insertQueryString = $"" +
+                            $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, loadAmountPayment, " +
+                            $"loadAmountOrder, filterShowProvider, dashboardMoneyLimit, filterShowPerson, accessToken, adminEmail, " +
+                            $"noticeableOnRightSide, sendConfirmationMail) " +
+                            $"VALUES (" +
+                            $"'{user[0].Guid}'," +
+                            $"{settings.IsSingleListWishDashboard}," +
+                            $"{settings.LoadAmountPayment}," +
+                            $"{settings.LoadAmountOrder}," +
+                            $"{settings.FilterShowProvider}," +
+                            $"'{settings.DashboardMoneyLimit}'," +
+                            $"{settings.FilterShowPerson}," +
+                            $"'{settings.AccessToken}'," +
+                            $"'{settings.AdminEmail}'," +
+                            $"{settings.NoticeableOnRightSide}," +
+                            $"{settings.SendConfirmationMail});";
+                        return Ok();
+                    }
+                }
+            }
+            return BadRequest();
         }
         #endregion
 
@@ -235,6 +296,21 @@ namespace EssenskasseAPI.Controllers {
                 });
             }
             return userList;
+        }
+
+        private static U.Settings DataTableToSettings(DataTable dataTable) {
+            return new U.Settings(
+                bool.Parse(dataTable.Rows[0]["isSingleListWishDashboard"].ToString() ?? "false"),
+                int.Parse(dataTable.Rows[0]["loadAmountPayment"].ToString() ?? "25"),
+                int.Parse(dataTable.Rows[0]["loadAmountOrder"].ToString() ?? "50"),
+                bool.Parse(dataTable.Rows[0]["filterShowProvider"].ToString() ?? "false"),
+                new Modells.Money().ToMoney(dataTable.Rows[0]["dashboardMoneyLimit"].ToString() ?? "0,00€"),
+                bool.Parse(dataTable.Rows[0]["filterShowPerson"].ToString() ?? "false"),
+                new Guid(dataTable.Rows[0]["accessToken"].ToString() ?? "BDE9A542-1331-471E-899C-35F37879F457"),
+                dataTable.Rows[0]["adminEmail"].ToString() ?? "",
+                bool.Parse(dataTable.Rows[0]["noticeableOnRightSide"].ToString() ?? "false"),
+                bool.Parse(dataTable.Rows[0]["sendConfirmationMail"].ToString() ?? "true")
+                );
         }
         #endregion
     }
