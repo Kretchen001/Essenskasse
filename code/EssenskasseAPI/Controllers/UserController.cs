@@ -243,9 +243,10 @@ namespace EssenskasseAPI.Controllers {
                     long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
                     if (DateTime.Now.Ticks < s) { // is under expaire
                         string insertQueryString = $"" +
-                            $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, loadAmountPayment, " +
-                            $"loadAmountOrder, filterShowProvider, dashboardMoneyLimit, filterShowPerson, accessToken, adminEmail, " +
-                            $"noticeableOnRightSide, sendConfirmationMail) " +
+                            $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
+                                        $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
+                                        $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
+                                        $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
                             $"VALUES (" +
                             $"'{user[0].Guid}'," +
                             $"{settings.IsSingleListWishDashboard}," +

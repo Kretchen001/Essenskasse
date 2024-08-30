@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Modells;
+using Modells.User;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
@@ -36,6 +37,7 @@ namespace EssenskasseAPI.Controllers {
             List<Order> orders = DataTableToListOfOrders(QueryExecuterAtMySql("SELECT * FROM essenskasse.Order"));
             List<TransactionProcedure> transactionProcedures = DataTableToListOfTransactionProcedure(QueryExecuterAtMySql("SELECT * FROM essenskasse.TransactionProcedure"));
             List<Tuple<DateTime, Guid, string>> tokens = DataTableToListOfToken(QueryExecuterAtMySql("SELECT * FROM essenskasse.TokenForChange"));
+            List<Tuple<Guid, Settings>> settings = DataTableToListOfSettings(QueryExecuterAtMySql("SELECT * FROM essenskasse.SettingsUser"));
 
             //save all as json
             System.IO.File.WriteAllText(dirForBackup + "/person.json", JsonConvert.SerializeObject(persons));
@@ -44,6 +46,7 @@ namespace EssenskasseAPI.Controllers {
             System.IO.File.WriteAllText(dirForBackup + "/order.json", JsonConvert.SerializeObject(orders));
             System.IO.File.WriteAllText(dirForBackup + "/transactionProcedure.json", JsonConvert.SerializeObject(transactionProcedures));
             System.IO.File.WriteAllText(dirForBackup + "/token.json", JsonConvert.SerializeObject(tokens));
+            System.IO.File.WriteAllText(dirForBackup + "/settings.json", JsonConvert.SerializeObject(settings));
 
             return Ok(identifier);
         }
@@ -60,6 +63,7 @@ namespace EssenskasseAPI.Controllers {
             List<Order> orders = JsonConvert.DeserializeObject<List<Order>>(System.IO.File.ReadAllText(dirForBackup + "/order.json")) ?? [];
             List<TransactionProcedure> transactionProcedures = JsonConvert.DeserializeObject<List<TransactionProcedure>>(System.IO.File.ReadAllText(dirForBackup + "/transactionProcedure.json")) ?? [];
             List<Tuple<DateTime, Guid, string>> tokens = JsonConvert.DeserializeObject<List<Tuple<DateTime, Guid, string>>>(System.IO.File.ReadAllText(dirForBackup + "/token.json")) ?? [];
+            List<Tuple<Guid, Settings>> settings = JsonConvert.DeserializeObject<List<Tuple<Guid, Settings>>>(System.IO.File.ReadAllText(dirForBackup + "/settings.json")) ?? [];
 
             //restore
             QueryExecuterAtMySql("TRUNCATE essenskasse.Person;");
@@ -132,6 +136,27 @@ namespace EssenskasseAPI.Controllers {
                     $"{x.Item1.Ticks}, " +
                     $"'{x.Item2}', " +
                     $"'{x.Item3}');";
+                QueryExecuterAtMySql(queryStringInsert);
+            }
+            QueryExecuterAtMySql("TRUNCATE essenskasse.SettingsUser;");
+            foreach (Tuple<Guid, Settings> x in settings) {
+                string queryStringInsert = $"" +
+                    $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
+                                        $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
+                                        $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
+                                        $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
+                    $"VALUES (" +
+                    $"'{x.Item1}', " +
+                    $"{x.Item2.IsSingleListWishDashboard}, " +
+                    $"{x.Item2.LoadAmountPayment}, " +
+                    $"{x.Item2.LoadAmountOrder}, " +
+                    $"{x.Item2.FilterShowProvider}, " +
+                    $"'{x.Item2.DashboardMoneyLimit}', " +
+                    $"{x.Item2.FilterShowPerson}, " +
+                    $"'{x.Item2.AccessToken}', " +
+                    $"'{x.Item2.AdminEmail}', " +
+                    $"{x.Item2.NoticeableOnRightSide}, " +
+                    $"{x.Item2.SendConfirmationMail});";
                 QueryExecuterAtMySql(queryStringInsert);
             }
 
@@ -249,6 +274,28 @@ namespace EssenskasseAPI.Controllers {
                 });
             }
             return providerController;
+        }
+
+        private static List<Tuple<Guid, Settings>> DataTableToListOfSettings(DataTable dataTable) {
+            List<Tuple<Guid, Settings>> settings = [];
+            foreach (DataRow row in dataTable.Rows) {
+                settings.Add(new Tuple<Guid, Settings>(
+                    new Guid(row["UserGuid"].ToString()!),
+                    new Settings(
+                            bool.Parse(row["isSingleListWishDashboard"].ToString()!),
+                            int.Parse(row["loadAmountPayment"].ToString()!),
+                            int.Parse(row["loadAmountOrder"].ToString()!),
+                            bool.Parse(row["filterShowProvider"].ToString()!),
+                            new Money().ToMoney(row["dashboardMoneyLimit"].ToString()!),
+                            bool.Parse(row["filterShowPerson"].ToString()!),
+                            row["accessToken"].ToString() is null ? null : new Guid(row["accessToken"].ToString()!),
+                            row["adminEmail"].ToString()!,
+                            bool.Parse(row["noticeableOnRightSide"].ToString()!),
+                            bool.Parse(row["sendConfirmationMail"].ToString()!)
+                    )
+                ));
+            }
+            return settings;
         }
         #endregion
     }
