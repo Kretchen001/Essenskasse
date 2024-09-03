@@ -73,9 +73,9 @@ CREATE TABLE IF NOT EXISTS essenskasse.SettingsUser (
     loadAmountPayment INT,
     loadAmountOrder INT,
     filterShowProvider BOOLEAN DEFAULT true,
-    dashboardMoneyLimit VARCHAR(255), -- ToString to code, ToMoney to decode
+    dashboardMoneyLimit VARCHAR(255), -- ToString to encode, ToMoney to decode
     filterShowPerson BOOLEAN DEFAULT true,
-    accessToken CHAR(36) DEFAULT "",
+    accessToken CHAR(36) DEFAULT "00000000-0000-0000-0000-000000000000",
     adminEmail VARCHAR(255),
     noticeableOnRightSide BOOLEAN DEFAULT false,
     sendConfirmationMail BOOLEAN DEFAULT true

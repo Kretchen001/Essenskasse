@@ -362,6 +362,8 @@ namespace Essenskasse.Pages {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminEmailEntered)] + "\n" + _loc[nameof(RessourceAppStrings.toastEventErrorRememberProcedurePlease)], ToastLevel.Success);
         }
 
+        /// <summary></summary>
+        /// <returns></returns>
         private async Task SendMessageToAdmin() {
             if (AdminEmail.Equals("")) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoEmailEntered)], ToastLevel.Info);
@@ -382,6 +384,8 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
+        /// <returns></returns>
         private async Task RequestOnlineSettingsForThisUser() {
             if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen VOM Server abfragen und lokale überschreiben?")) {
                 HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -397,7 +401,26 @@ namespace Essenskasse.Pages {
                 try {
                     response = await HttpClient.SendAsync(httpRequestMessage);
 
-                    AppData.SettingsToAppData(JsonConvert.DeserializeObject<U.Settings>(await response.Content.ReadAsStringAsync()) ?? new U.Settings());
+                    U.Settings? backupSettings = JsonConvert.DeserializeObject<U.Settings>(await response.Content.ReadAsStringAsync());
+
+                    if (backupSettings is null) {
+                        ToastService.ShowToast("Keine Einstellungen wiederherstellbar! Bitte beim Admin melden.", ToastLevel.Warning);
+                        return;
+                    }
+                    AppData.SettingsToAppData(backupSettings!);
+
+                    //save to local storage
+                    SaveAmountOfPaymentsPersistentAsync(AppData.LoadAmountPayment);
+                    SaveAmountOfOrderPersistentAsync(AppData.LoadAmountOrder);
+                    SaveFilterShowPerson(AppData.FilterShowPerson);
+                    SaveFilterShowProvider(AppData.FilterShowProvider);
+                    SaveDashboardMoneyLimit(AppData.DashboardMoneyLimit);
+                    if (AppData.AccessToken is not null) {
+                        SaveAccessToken(AppData.AccessToken ?? default);
+                    }
+                    SaveAdminEmail(AppData.AdminEmail);
+
+                    ToastService.ShowToast("Einstellungen erfolgreich vom Server wiederhergestellt!", ToastLevel.Success);
                 }
                 catch {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
@@ -406,6 +429,8 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary></summary>
+        /// <returns></returns>
         private async Task SaveSettingsForThisUserOnline() {
             if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen ZUM Server übertragen und online überschreiben?")) {
                 HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -428,14 +453,7 @@ namespace Essenskasse.Pages {
                 }
 
                 if (response.IsSuccessStatusCode) {
-                    //person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
-                    //person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
-                    //person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
-                    //person = person.OrderBy(x => x.Name).ToList();
-
-                    //if (person.Count > 0) {
-                    //    SelectedPerson = person[0].Guid;
-                    //}
+                    ToastService.ShowToast("Übertragung erfolgreich!", ToastLevel.Success);
                 }
                 else {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
