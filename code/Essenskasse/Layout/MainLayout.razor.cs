@@ -14,7 +14,7 @@ namespace Essenskasse.Layout {
         private LoginModal? LoginModel { get; set; }
         private string nameToLogin = string.Empty;
         private string passwordToLogin = string.Empty;
-        private int roleToLogin = short.MaxValue;
+        private int roleToLogin = 10;
 
         [CascadingParameter]
         private Task<AuthenticationState> AuthenticationStateTask { get; set; }

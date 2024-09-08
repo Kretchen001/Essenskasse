@@ -284,6 +284,49 @@ namespace EssenskasseAPI.Controllers {
                 return BadRequest();
             }
         }
+
+        [HttpGet, Route("accessToken/get")]
+        public IActionResult RequestAccessTokenForUser([FromHeader] Guid sessionToken = default, [FromHeader] string name = "") {
+            using (Operation.Time($"RequestAccessTokenForUser called")) {
+                string queryStringRequestName = $"" +
+                        $"SELECT * " +
+                        $"FROM essenskasse.User " +
+                        $"WHERE Name='{name}';";
+                DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestName);
+                List<U.User> user = DataTableToListOfUser(dataTableUser);
+                if (user.Count == 1) {
+                    string queryStringRequestToken = $"" +
+                        $"SELECT ExpaireDate " +
+                        $"FROM essenskasse.SessionToken " +
+                        $"WHERE Guid='{sessionToken}' AND " +
+                        $"UserGuid='{user[0].Guid}';";
+                    DataTable tempRes = QueryExecuterAtMySql(queryStringRequestToken);
+                    if (tempRes.Rows.Count == 1) {
+                        long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
+                        if (DateTime.Now.Ticks < s) { // is under expaire
+                            //check if User has no token, so create new and send them
+                            if (user[0].TokenForChange.Equals(new Guid("00000000-0000-0000-0000-000000000000"))) {
+                                Guid newToken = Guid.NewGuid();
+                                string queryInsertNewToken = $"" +
+                                    $"UPDATE essenskasse.User " +
+                                    $"SET TokenForChange='{newToken}' " +
+                                    $"WHERE Guid='{user[0].Guid}';";
+                                QueryExecuterAtMySql(queryInsertNewToken);
+                                return Ok(newToken);
+                            }
+                            else { // send the "old" token
+                                return Ok(user[0].TokenForChange);
+                            }
+                        }
+                    }
+                    Log.Warning($"{name} called with wrong sessionToken!");
+                }
+                else {
+                    Log.Information($"{name} has called, but not exist.");
+                }
+            }
+            return BadRequest();
+        }
         #endregion
 
         #region InternalFunctions

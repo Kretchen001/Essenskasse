@@ -5,6 +5,7 @@ using Modells;
 using U = Modells.User;
 using Newtonsoft.Json;
 using System.Text;
+using System.Net.Http.Json;
 
 namespace Essenskasse.Pages {
 
@@ -312,27 +313,27 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <returns></returns>
         private async Task RequestAccessTokenForChanges() {
-            string identity = await JsRuntime.InvokeAsync<string>("prompt", "Bitte Namen eintragen") ?? "";
-            if (identity.Equals("")) {
-                ToastService.ShowToast("Keinen Namen angegen!", ToastLevel.Warning);
+            if (!await JsRuntime.InvokeAsync<bool>("confirm", "Mit diesem Token können Änderungen an bestehenden Datensätzen vollzogen werden." +
+                "\n" +
+                "HINWEIS: Zur Rückverfolgbarkeit wird jede Änderung inklusive des Initiators im Log der Essenskasse getrackt!")) {
                 return;
             }
             
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(Config["API-Adress"] + "token/requestNewAccessToken"),
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "user/accessToken/get"),
                     Headers = {
-                        { "identity", identity }
+                        { "sessionToken", await LocalStorage.GetItemAsync<string>("SessionToken") ?? "" },
+                        { "name", await LocalStorage.GetItemAsync<string>("NameOfUser") ?? "" }
                     }
                 };
 
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                Guid token = JsonConvert.DeserializeObject<Guid>(await response.Content.ReadAsStringAsync());
-                AppData.AccessToken = token;
-                SaveAccessToken(token);
+                AppData.AccessToken = new Guid((await response.Content.ReadAsStringAsync())[1..^1]); // ()[1..^1] remove first and last character of String
+                SaveAccessToken(AppData.AccessToken ?? new Guid("00000000-0000-0000-0000-000000000000"));
                 base.StateHasChanged();
             }
             else {

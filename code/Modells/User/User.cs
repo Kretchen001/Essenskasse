@@ -24,6 +24,10 @@ namespace Modells.User {
         /// <summary></summary>
         [JsonInclude, JsonPropertyName("Role"), JsonProperty(nameof(Role))]
         public int Role { get; set; } = 0;
+        /// <summary></summary>
+        [JsonInclude, JsonPropertyName("TokenForChange"), JsonProperty(nameof(TokenForChange))]
+        public Guid TokenForChange { get; set; } = new Guid("00000000-0000-0000-0000-000000000000");
+
 
         /// <summary></summary>
         public User() { }

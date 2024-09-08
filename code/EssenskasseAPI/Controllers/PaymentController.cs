@@ -248,10 +248,11 @@ namespace EssenskasseAPI.Controllers {
                 if (accessToken is not null) {
                     string queryStringToken = $"" +
                             $"SELECT COUNT(*) " +
-                            $"FROM essenskasse.TokenForChange " +
-                            $"WHERE Guid='{accessToken}';";
+                            $"FROM essenskasse.User " +
+                            $"WHERE TokenForChange='{accessToken}';";
                     DataTable dataTableTokenCount = QueryExecuterAtMySql(queryStringToken);
                     if (dataTableTokenCount.Rows.Count == 1) {
+                        Log.Information($"{accessToken} called UpdatePayment.");
                         if (dateAsLong is null) {
                             Log.Warning("No dateString in Header");
                             return BadRequest("Kein Datum angegeben!");

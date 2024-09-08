@@ -41,13 +41,6 @@ CREATE TABLE IF NOT EXISTS essenskasse.TransactionProcedure (
     Comment TEXT
 );
 
--- Erstelle die Tabelle für TransactionProcedure
-CREATE TABLE IF NOT EXISTS essenskasse.TokenForChange (
-    DateTime BIGINT PRIMARY KEY,
-    Guid CHAR(36),
-    Identity VARCHAR(255)
-);
-
 -- Erstelle die Tabelle für Benutzer
 CREATE TABLE IF NOT EXISTS essenskasse.User (
     Guid CHAR(36) PRIMARY KEY,
@@ -55,7 +48,8 @@ CREATE TABLE IF NOT EXISTS essenskasse.User (
     UserName VARCHAR(255),
     Pwd VARCHAR(255),
     Email VARCHAR(255),
-    Role SMALLINT
+    Role SMALLINT DEFAULT 100,
+    TokenForChange CHAR(36) DEFAULT "00000000-0000-0000-0000-000000000000"
 );
 
 -- Erstelle die Tabelle für die SessionToken

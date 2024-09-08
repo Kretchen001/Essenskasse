@@ -257,12 +257,7 @@
                         }
                     </div>
                     <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                        @if (ExistAccessToken) {
-                            <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px" @onclick="() => RequestNewAccessTokenForChanges()">
-                                @_loc[nameof(RessourceAppStrings.change)]?
-                            </button>
-                        }
-                        else {
+                        @if (!ExistAccessToken) {
                             <button type="button" class="btn-warning" data-dismiss="modal" style="border-radius:8px" @onclick="() => RequestAccessTokenForChanges()">
                                 @_loc[nameof(RessourceAppStrings.request)]
                             </button>
