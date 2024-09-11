@@ -20,8 +20,14 @@ namespace Essenskasse.Pages {
         private List<Person> shownPersonList = new List<Person>();
 
         protected override async Task OnInitializedAsync() {
-            IsASC = await LocalStorage.GetItemAsync<bool>("PersonIsASC");
-            await RequestAllPersonFromApiAsync();
+            if (!AuthStateService.IsAuthenticated) {
+                Nav.NavigateTo("/");
+            }
+            else {
+                IsASC = await LocalStorage.GetItemAsync<bool>("PersonIsASC");
+                await RequestAllPersonFromApiAsync();
+            }
+            base.StateHasChanged();
         }
 
         private async Task RequestAllPersonFromApiAsync() {

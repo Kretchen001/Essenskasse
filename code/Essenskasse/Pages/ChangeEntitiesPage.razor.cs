@@ -24,13 +24,18 @@ namespace Essenskasse.Pages {
         List<decimal> OrderAmount { get; set; } = [];
 
         protected override async Task OnInitializedAsync() {
-            types.Add(_loc[nameof(RessourceAppStrings.payment)]);
-            types.Add(_loc[nameof(RessourceAppStrings.order)]);
-            await RequestPerson();
-            await RequestProvider();
-            await RequestPayments();
-            await RequestOrders();
-            SelectedType = types[0];
+            if (!AuthStateService.IsAuthenticated) {
+                Nav.NavigateTo("/");
+            }
+            else {
+                types.Add(_loc[nameof(RessourceAppStrings.payment)]);
+                types.Add(_loc[nameof(RessourceAppStrings.order)]);
+                await RequestPerson();
+                await RequestProvider();
+                await RequestPayments();
+                await RequestOrders();
+                SelectedType = types[0];
+            }
             base.StateHasChanged();
         }
 

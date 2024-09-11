@@ -33,8 +33,27 @@
         * Money : Money
     }
 
-    Order ||-right-o{ Person : n..1
-    Payment ||-left-o{ Person : 1..m
-    Order ||-down-|| Provider : n..1
+    entity User <<Benutzer>> {
+        * Guid : Guid <<PK>>
+        --
+        * Name : string
+        * UserName : string
+        * Pwd : string
+        * Email : string
+        * Role : short
+    }
+
+    entity SessionToken {
+        * Guid : Guid <<PK>>
+        --
+        * UserGuid : Guid <<FK>>
+        * ExpaireDate : DateTime
+    }
+
+    Order }o-right-|| Person : n..1
+    Payment }o-left-|| Person : 1..m
+    Order }o-down-|| Provider : n..1
+
+    SessionToken }o--|| User : 1..m
 
 @enduml

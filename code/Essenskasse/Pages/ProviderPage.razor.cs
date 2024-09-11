@@ -21,8 +21,14 @@ namespace Essenskasse.Pages {
         private List<Provider> shownProviderList = new List<Provider>();
 
         protected override async Task OnInitializedAsync() {
-            IsASC = await LocalStorage.GetItemAsync<bool>("ProviderIsASC");
-            await RequestAllProviderFromApiAsync();
+            if (!AuthStateService.IsAuthenticated) {
+                Nav.NavigateTo("/");
+            }
+            else {
+                IsASC = await LocalStorage.GetItemAsync<bool>("ProviderIsASC");
+                await RequestAllProviderFromApiAsync();
+            }
+            base.StateHasChanged();
         }
 
         private async Task RequestAllProviderFromApiAsync() {

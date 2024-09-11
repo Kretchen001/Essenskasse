@@ -44,7 +44,7 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpGet, Route("perGuid")]
         public IActionResult GetPerGuidPerson([FromHeader] Guid guid) {
-            using (Operation.Time("TaskDuration")) {
+            using (Operation.Time("GetPerGuidPerson")) {
                 Log.Information("GetPerGuidPerson called");
                 string queryString = $"" +
                     $"SELECT * " +
@@ -68,7 +68,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpPost, Route("new")]
         public IActionResult AddNewPerson([FromHeader] string? name,
                                             [FromHeader] string? email) {
-            using (Operation.Time("TaskDuration")) {
+            using (Operation.Time("AddNewPerson")) {
                 Log.Information("AddNewPerson called");
                 if (name is null) {
                     if (email is null) {
@@ -99,7 +99,7 @@ namespace EssenskasseAPI.Controllers {
         public IActionResult UpdatePerson([FromHeader] Guid guid,
                                             [FromHeader] string? name,
                                             [FromHeader] string? email) {
-            using (Operation.Time("TaskDuration")) {
+            using (Operation.Time("UpdatePerson")) {
                 Log.Information("UpdatePerson called");
 
                 string queryStringRequestPerson = $"" +
@@ -193,7 +193,7 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpDelete, Route("remove")]
         public IActionResult RemovePerson([FromHeader] Guid? guid, bool per = false) {
-            using (Operation.Time("TaskDuration")) {
+            using (Operation.Time("RemovePerson")) {
                 Log.Information("RemovePerson called");
                 if (guid is not null) {
                     string queryString = $"" +

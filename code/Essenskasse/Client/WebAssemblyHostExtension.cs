@@ -8,7 +8,7 @@ namespace Essenskasse.Client {
 
         public async static Task SetDefaultCulture(this WebAssemblyHost host) {
             ILocalStorageService localStorage = host.Services.GetRequiredService<ILocalStorageService>();
-            string cultureString = await localStorage.GetItemAsync<string>("culture");
+            string? cultureString = await localStorage.GetItemAsync<string>("culture");
 
             CultureInfo cultureInfo;
 

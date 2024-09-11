@@ -2,7 +2,10 @@
 using Essenskasse.Ressources;
 using Microsoft.JSInterop;
 using Modells;
+using U = Modells.User;
 using Newtonsoft.Json;
+using System.Text;
+using System.Net.Http.Json;
 
 namespace Essenskasse.Pages {
 
@@ -310,27 +313,27 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <returns></returns>
         private async Task RequestAccessTokenForChanges() {
-            string identity = await JsRuntime.InvokeAsync<string>("prompt", "Bitte Namen eintragen") ?? "";
-            if (identity.Equals("")) {
-                ToastService.ShowToast("Keinen Namen angegen!", ToastLevel.Warning);
+            if (!await JsRuntime.InvokeAsync<bool>("confirm", "Mit diesem Token können Änderungen an bestehenden Datensätzen vollzogen werden." +
+                "\n" +
+                "HINWEIS: Zur Rückverfolgbarkeit wird jede Änderung inklusive des Initiators im Log der Essenskasse getrackt!")) {
                 return;
             }
             
             // Request all Person, that are saved in the database
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(Config["API-Adress"] + "token/requestNewAccessToken"),
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "user/accessToken/get"),
                     Headers = {
-                        { "identity", identity }
+                        { "sessionToken", await LocalStorage.GetItemAsync<string>("SessionToken") ?? "" },
+                        { "name", await LocalStorage.GetItemAsync<string>("NameOfUser") ?? "" }
                     }
                 };
 
             HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
 
             if (response.IsSuccessStatusCode) {
-                Guid token = JsonConvert.DeserializeObject<Guid>(await response.Content.ReadAsStringAsync());
-                AppData.AccessToken = token;
-                SaveAccessToken(token);
+                AppData.AccessToken = new Guid((await response.Content.ReadAsStringAsync())[1..^1]); // ()[1..^1] remove first and last character of String
+                SaveAccessToken(AppData.AccessToken ?? new Guid("00000000-0000-0000-0000-000000000000"));
                 base.StateHasChanged();
             }
             else {
@@ -360,6 +363,8 @@ namespace Essenskasse.Pages {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminEmailEntered)] + "\n" + _loc[nameof(RessourceAppStrings.toastEventErrorRememberProcedurePlease)], ToastLevel.Success);
         }
 
+        /// <summary></summary>
+        /// <returns></returns>
         private async Task SendMessageToAdmin() {
             if (AdminEmail.Equals("")) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoEmailEntered)], ToastLevel.Info);
@@ -377,6 +382,83 @@ namespace Essenskasse.Pages {
                         body
                     }
                 );
+            }
+        }
+
+        /// <summary></summary>
+        /// <returns></returns>
+        private async Task RequestOnlineSettingsForThisUser() {
+            if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen VOM Server abfragen und lokale überschreiben?")) {
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "user/loadSettingsForUser"),
+                    Headers = {
+                        { "sessionToken", (await LocalStorage.GetItemAsync<Guid>("SessionToken")).ToString() },
+                        { "name", await LocalStorage.GetItemAsync<string>("NameOfUser") },
+                    }
+                };
+
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+
+                    U.Settings? backupSettings = JsonConvert.DeserializeObject<U.Settings>(await response.Content.ReadAsStringAsync());
+
+                    if (backupSettings is null) {
+                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.noSettingsAvailable)], ToastLevel.Warning);
+                        return;
+                    }
+                    AppData.SettingsToAppData(backupSettings!);
+
+                    //save to local storage
+                    SaveAmountOfPaymentsPersistentAsync(AppData.LoadAmountPayment);
+                    SaveAmountOfOrderPersistentAsync(AppData.LoadAmountOrder);
+                    SaveFilterShowPerson(AppData.FilterShowPerson);
+                    SaveFilterShowProvider(AppData.FilterShowProvider);
+                    SaveDashboardMoneyLimit(AppData.DashboardMoneyLimit);
+                    if (AppData.AccessToken is not null) {
+                        SaveAccessToken(AppData.AccessToken ?? default);
+                    }
+                    SaveAdminEmail(AppData.AdminEmail);
+
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.settingsSuccsessfullyRestored)], ToastLevel.Success);
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+            }
+        }
+
+        /// <summary></summary>
+        /// <returns></returns>
+        private async Task SaveSettingsForThisUserOnline() {
+            if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen ZUM Server übertragen und online überschreiben?")) {
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "user/saveSettingsForUser"),
+                    Headers = {
+                        { "sessionToken", (await LocalStorage.GetItemAsync<Guid>("SessionToken")).ToString() },
+                        { "name", await LocalStorage.GetItemAsync<string>("NameOfUser") },
+                    },
+                    Content = new StringContent(JsonConvert.SerializeObject(AppData.GetAppDataAsSettingsObject()), Encoding.UTF8, "application/json")
+                };
+
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+
+                if (response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.successfullyTransmitted)], ToastLevel.Success);
+                }
+                else {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+                }
             }
         }
         #endregion

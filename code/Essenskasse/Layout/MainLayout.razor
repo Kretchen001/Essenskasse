@@ -1,9 +1,15 @@
 ﻿@inherits LayoutComponentBase
 
-@inject AppDataService AppData
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Config
+@inject IStringLocalizer<App> _loc
 @inject ILocalStorageService LocalStorage
+@inject AppDataService AppData
+@inject ToastService ToastService
 @inject ThemeService themeService
-@inject NavigationManager Navi
+
+@inject AuthStateService AuthState
 
 <ToastCard />
 
@@ -13,6 +19,60 @@
     </div>
 
     <main>
+        <div class="top-row px-4 auth">
+            <AuthorizeView>
+                <NotAuthorized>
+                    <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px;" @onclick="() => ShowLoginModal()">
+                        Anmelden
+                    </button>
+                    <LoginModal @ref="LoginModel">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                Benutzername
+                            </div>
+                            <div class="col-lg-8">
+                                <input @bind=nameToLogin/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                Passwort
+                            </div>
+                            <div class="col-lg-8">
+                                <input @bind=passwordToLogin/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                Berechtigungsebene
+                            </div>
+                            <div class="col-lg-8">
+                                <input @bind=roleToLogin type="number"/>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row">
+                            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px;" @onclick="() => LoginUser()">
+                                Anmelden
+                            </button>
+                        </div>
+                    </LoginModal>
+                </NotAuthorized>
+                <Authorizing>
+                    <div class="d-flex align-items-center">
+                        Authorizing
+                    </div>
+                </Authorizing>
+                <Authorized>
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px;" @onclick="() => LogoutUser()">
+                            Abmelden
+                        </button>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+        </div>
+
         <article class="content px-4">
             @Body
         </article>

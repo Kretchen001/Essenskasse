@@ -1,19 +1,3 @@
-CREATE TABLE IF NOT EXISTS essenskasse.Test (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    UserName VARCHAR(30) NOT NULL,
-    Hobbies VARCHAR(30) NOT NULL,
-    Location VARCHAR(50)
-);
-
-INSERT INTO Test (UserName, Hobbies, Location)
-VALUES
-('Finn', 'Tafelwischen', 'Mond'),
-('Albert', 'Bouling', 'Erde'),
-('Odin', 'Wachen', 'Asgard'),
-('Rah', 'Scheinen', 'Sonne'),
-('Poseidon', 'Schwimmen', 'Olymp'),
-('Kain', 'sd', 'Eden');
-
 CREATE TABLE IF NOT EXISTS essenskasse.Person (
     Guid CHAR(36) PRIMARY KEY,
     Name VARCHAR(511),
@@ -57,9 +41,36 @@ CREATE TABLE IF NOT EXISTS essenskasse.TransactionProcedure (
     Comment TEXT
 );
 
--- Erstelle die Tabelle für TransactionProcedure
-CREATE TABLE IF NOT EXISTS essenskasse.TokenForChange (
-    DateTime BIGINT PRIMARY KEY,
-    Guid CHAR(36),
-    Identity VARCHAR(255)
+-- Erstelle die Tabelle für Benutzer
+CREATE TABLE IF NOT EXISTS essenskasse.User (
+    Guid CHAR(36) PRIMARY KEY,
+    Name VARCHAR(255),
+    UserName VARCHAR(255),
+    Pwd VARCHAR(255),
+    Email VARCHAR(255),
+    Role SMALLINT DEFAULT 100,
+    TokenForChange CHAR(36) DEFAULT "00000000-0000-0000-0000-000000000000"
+);
+
+-- Erstelle die Tabelle für die SessionToken
+CREATE TABLE IF NOT EXISTS essenskasse.SessionToken (
+    Guid CHAR(36) PRIMARY KEY,
+    UserGuid CHAR(36),
+    FOREIGN KEY (UserGuid) REFERENCES essenskasse.User(Guid),
+    ExpaireDate BIGINT
+);
+
+-- Erstelle die Tabelle für die SessionToken
+CREATE TABLE IF NOT EXISTS essenskasse.SettingsUser (
+    UserGuid CHAR(36) PRIMARY KEY,
+    isSingleListWishDashboard BOOLEAN DEFAULT false,
+    loadAmountPayment INT,
+    loadAmountOrder INT,
+    filterShowProvider BOOLEAN DEFAULT true,
+    dashboardMoneyLimit VARCHAR(255), -- ToString to encode, ToMoney to decode
+    filterShowPerson BOOLEAN DEFAULT true,
+    accessToken CHAR(36) DEFAULT "00000000-0000-0000-0000-000000000000",
+    adminEmail VARCHAR(255),
+    noticeableOnRightSide BOOLEAN DEFAULT false,
+    sendConfirmationMail BOOLEAN DEFAULT true
 );
