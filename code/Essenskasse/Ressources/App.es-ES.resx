@@ -276,6 +276,12 @@
   <data name="loadData" xml:space="preserve">
     <value>Datos de carga</value>
   </data>
+  <data name="loginFailedRetry" xml:space="preserve">
+    <value>Error en el inicio de sesión. Vuelva a introducir sus datos de inicio de sesión.</value>
+  </data>
+  <data name="logout" xml:space="preserve">
+    <value>¡Cancelado!</value>
+  </data>
   <data name="modifyEntity" xml:space="preserve">
     <value>Modificar entradas</value>
   </data>
@@ -288,11 +294,20 @@
   <data name="no" xml:space="preserve">
     <value>No</value>
   </data>
+  <data name="noProviderPleaseInsertBefore" xml:space="preserve">
+    <value>No hay proveedores disponibles.\n¡Regístrese primero!</value>
+  </data>
+  <data name="noSettingsAvailable" xml:space="preserve">
+    <value>No se puede restablecer la configuración. Póngase en contacto con el administrador.</value>
+  </data>
   <data name="notEntered" xml:space="preserve">
     <value>No registrado...</value>
   </data>
   <data name="notRequested" xml:space="preserve">
     <value>No solicitado</value>
+  </data>
+  <data name="nothingMoreToLoad" xml:space="preserve">
+    <value>No hay más datos que cargar.</value>
   </data>
   <data name="noticeable" xml:space="preserve">
     <value>Conspicuo</value>
@@ -347,6 +362,9 @@
   </data>
   <data name="settings" xml:space="preserve">
     <value>Ajustes</value>
+  </data>
+  <data name="settingsSuccsessfullyRestored" xml:space="preserve">
+    <value>Configuración restaurada correctamente desde el servidor.</value>
   </data>
   <data name="showNoticeablePersonRightDashboard" xml:space="preserve">
     <value>Mostrar personas visibles a la derecha o en la parte inferior del salpicadero</value>
@@ -488,6 +506,9 @@
   </data>
   <data name="warning" xml:space="preserve">
     <value>Advertencia</value>
+  </data>
+  <data name="welcome" xml:space="preserve">
+    <value>Una cálida bienvenida</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Sí</value>

@@ -128,5 +128,12 @@
         swapColumns,
         overview,
         lastDayMaybyIncomplete,
+        loginFailedRetry,
+        logout,
+        welcome,
+        nothingMoreToLoad,
+        noProviderPleaseInsertBefore,
+        noSettingsAvailable,
+        settingsSuccsessfullyRestored,
     }
 }

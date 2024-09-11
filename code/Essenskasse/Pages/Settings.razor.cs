@@ -405,7 +405,7 @@ namespace Essenskasse.Pages {
                     U.Settings? backupSettings = JsonConvert.DeserializeObject<U.Settings>(await response.Content.ReadAsStringAsync());
 
                     if (backupSettings is null) {
-                        ToastService.ShowToast("Keine Einstellungen wiederherstellbar! Bitte beim Admin melden.", ToastLevel.Warning);
+                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.noSettingsAvailable)], ToastLevel.Warning);
                         return;
                     }
                     AppData.SettingsToAppData(backupSettings!);
@@ -421,7 +421,7 @@ namespace Essenskasse.Pages {
                     }
                     SaveAdminEmail(AppData.AdminEmail);
 
-                    ToastService.ShowToast("Einstellungen erfolgreich vom Server wiederhergestellt!", ToastLevel.Success);
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.settingsSuccsessfullyRestored)], ToastLevel.Success);
                 }
                 catch {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
@@ -454,7 +454,7 @@ namespace Essenskasse.Pages {
                 }
 
                 if (response.IsSuccessStatusCode) {
-                    ToastService.ShowToast("Übertragung erfolgreich!", ToastLevel.Success);
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.successfullyTransmitted)], ToastLevel.Success);
                 }
                 else {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);

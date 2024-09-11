@@ -55,7 +55,7 @@ namespace Essenskasse.Layout {
                     }
                     else {
                         AuthStateService.IsAuthenticated = false;
-                        ToastService.ShowToast("Anmeldung fehlgeschlagen, bitte Anmeldedaten neu eingeben!", ToastLevel.Error);
+                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.loginFailedRetry)], ToastLevel.Error);
                     }
                     AuthState.NotifyAuthenticationStateChanged();
                 }
@@ -103,7 +103,7 @@ namespace Essenskasse.Layout {
             AuthStateService.IsAuthenticating = false;
             AuthStateService.IsAuthenticated = false;
             AuthState.NotifyAuthenticationStateChanged();
-            ToastService.ShowToast("Abgemeldet!", ToastLevel.Info);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.logout)], ToastLevel.Info);
         }
 
         #region oldCode - Remember
@@ -138,11 +138,11 @@ namespace Essenskasse.Layout {
                     string newToken = await response.Content.ReadAsStringAsync();
                     await LocalStorage.SetItemAsync<string>("NameOfUser", nameToLogin);
                     await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken[1..(newToken.Length - 1)]));
-                    ToastService.ShowToast("Herzlich willkommen", ToastLevel.Success);
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.welcome)], ToastLevel.Success);
                 }
                 else {
                     AuthStateService.IsAuthenticated = false;
-                    ToastService.ShowToast("Anmeldung fehlgeschlagen, bitte Anmeldedaten neu eingeben!", ToastLevel.Error);
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.loginFailedRetry)], ToastLevel.Error);
                 }
                 nameToLogin = "";
                 passwordToLogin = "";

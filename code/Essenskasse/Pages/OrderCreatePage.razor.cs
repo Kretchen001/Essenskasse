@@ -4,6 +4,7 @@ using Essenskasse.Ressources;
 using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
+using System.Collections.Specialized;
 using System.Text;
 
 namespace Essenskasse.Pages {
@@ -75,7 +76,7 @@ namespace Essenskasse.Pages {
                     selectedProvider = providers[0].Guid;
                 }
                 else {
-                    ToastService.ShowToast("Keine Anbieter verfügbar!\nBitte vorher eintragen!", ToastLevel.Info);
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.noProviderPleaseInsertBefore)], ToastLevel.Info);
                 }
             }
             else {
@@ -286,7 +287,7 @@ namespace Essenskasse.Pages {
                 referenceDate = referenceDate.AddDays(1); // for the next load essential
 
                 if (order.Count == 0) {
-                    ToastService.ShowToast("Keine weiteren Daten zu laden!", ToastLevel.Info);
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.nothingMoreToLoad)], ToastLevel.Info);
                     noMoreToLoad = true;
                     base.StateHasChanged();
                     return;
