@@ -18,6 +18,10 @@ namespace EssenskasseAPI.Controllers {
         }
         #endregion
 
+        /// <summary>
+        /// SessionToken not backup/restore!
+        /// </summary>
+        /// <returns></returns>
         #region Controller
         [HttpPost, Route("newNow")]
         public IActionResult CreateNewBackupFromDb() {
@@ -36,7 +40,6 @@ namespace EssenskasseAPI.Controllers {
             List<Payment> payments = DataTableToListOfPayments(QueryExecuterAtMySql("SELECT * FROM essenskasse.Payment"));
             List<Order> orders = DataTableToListOfOrders(QueryExecuterAtMySql("SELECT * FROM essenskasse.Order"));
             List<TransactionProcedure> transactionProcedures = DataTableToListOfTransactionProcedure(QueryExecuterAtMySql("SELECT * FROM essenskasse.TransactionProcedure"));
-            List<Tuple<DateTime, Guid, string>> tokens = DataTableToListOfToken(QueryExecuterAtMySql("SELECT * FROM essenskasse.TokenForChange"));
             List<Tuple<Guid, Settings>> settings = DataTableToListOfSettings(QueryExecuterAtMySql("SELECT * FROM essenskasse.SettingsUser"));
 
             //save all as json
@@ -45,121 +48,133 @@ namespace EssenskasseAPI.Controllers {
             System.IO.File.WriteAllText(dirForBackup + "/payment.json", JsonConvert.SerializeObject(payments));
             System.IO.File.WriteAllText(dirForBackup + "/order.json", JsonConvert.SerializeObject(orders));
             System.IO.File.WriteAllText(dirForBackup + "/transactionProcedure.json", JsonConvert.SerializeObject(transactionProcedures));
-            System.IO.File.WriteAllText(dirForBackup + "/token.json", JsonConvert.SerializeObject(tokens));
             System.IO.File.WriteAllText(dirForBackup + "/settings.json", JsonConvert.SerializeObject(settings));
 
             return Ok(identifier);
         }
 
+        /// <summary>
+        /// SessionToken not backup/restore!
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
         [HttpPost, Route("restore")]
         public IActionResult RestoreSpecificBackup([FromHeader] string identifier) {
             // identifier -> "yyyy_MM_dd_HH_mm"
             string dirForBackup = $"{AppDomain.CurrentDomain.BaseDirectory}backup/{identifier}";
 
-            //read all json's
-            List<Person> persons = JsonConvert.DeserializeObject<List<Person>>(System.IO.File.ReadAllText(dirForBackup + "/person.json")) ?? [];
-            List<Tuple<Provider, bool>> providers = JsonConvert.DeserializeObject<List<Tuple<Provider, bool>>>(System.IO.File.ReadAllText(dirForBackup + "/provider.json")) ?? [];
-            List<Payment> payments = JsonConvert.DeserializeObject<List<Payment>>(System.IO.File.ReadAllText(dirForBackup + "/payment.json")) ?? [];
-            List<Order> orders = JsonConvert.DeserializeObject<List<Order>>(System.IO.File.ReadAllText(dirForBackup + "/order.json")) ?? [];
-            List<TransactionProcedure> transactionProcedures = JsonConvert.DeserializeObject<List<TransactionProcedure>>(System.IO.File.ReadAllText(dirForBackup + "/transactionProcedure.json")) ?? [];
-            List<Tuple<DateTime, Guid, string>> tokens = JsonConvert.DeserializeObject<List<Tuple<DateTime, Guid, string>>>(System.IO.File.ReadAllText(dirForBackup + "/token.json")) ?? [];
-            List<Tuple<Guid, Settings>> settings = JsonConvert.DeserializeObject<List<Tuple<Guid, Settings>>>(System.IO.File.ReadAllText(dirForBackup + "/settings.json")) ?? [];
+            //check if the backup-files exist -> if not then add false and so ignore them
+            List<bool> fileExist = [];
+            fileExist.Add(System.IO.File.Exists(dirForBackup + "/person.json"));
+            fileExist.Add(System.IO.File.Exists(dirForBackup + "/provider.json"));
+            fileExist.Add(System.IO.File.Exists(dirForBackup + "/payment.json"));
+            fileExist.Add(System.IO.File.Exists(dirForBackup + "/order.json"));
+            fileExist.Add(System.IO.File.Exists(dirForBackup + "/transactionProcedure.json"));
+            fileExist.Add(System.IO.File.Exists(dirForBackup + "/settings.json"));
 
-            //restore
-            QueryExecuterAtMySql("TRUNCATE essenskasse.Person;");
-            foreach (Person x in persons) {
-                string queryStringInsert = $"" +
-                    $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
-                    $"VALUES (" +
-                    $"'{x.Guid}'," +
-                    $"'{Uri.UnescapeDataString(x.Name)}', " +
-                    $"'{Uri.UnescapeDataString(x.Email)}', " +
-                    $"{x.Saldo.Euro}, " +
-                    $"{x.Saldo.Cent});";
-                QueryExecuterAtMySql(queryStringInsert);
-            }
-            QueryExecuterAtMySql("TRUNCATE essenskasse.Payment;");
-            foreach (Payment x in payments) {
-                string queryStringInsert = $"" +
-                    $"INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment) " +
-                    $"VALUES (" +
-                    $"{x.DateTime.Ticks}, " +
-                    $"{x.Amount.Euro}, " +
-                    $"{x.Amount.Cent}, " +
-                    $"'{x.ReferencedPerson}', " +
-                    $"'{x.Comment}');";
-                QueryExecuterAtMySql(queryStringInsert);
-            }
-            QueryExecuterAtMySql("TRUNCATE essenskasse.Provider;");
-            foreach (Tuple<Provider, bool> x in providers) {
-                string v = "false";
-                if (x.Item2) {
-                    v = "true";
+            //read json's if there and restore
+            if (fileExist[0]) {
+                List<Person> persons = JsonConvert.DeserializeObject<List<Person>>(System.IO.File.ReadAllText(dirForBackup + "/person.json")) ?? [];
+                QueryExecuterAtMySql("TRUNCATE essenskasse.Person;");
+                foreach (Person x in persons) {
+                    string queryStringInsert = $"" +
+                        $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
+                        $"VALUES (" +
+                        $"'{x.Guid}'," +
+                        $"'{Uri.UnescapeDataString(x.Name)}', " +
+                        $"'{Uri.UnescapeDataString(x.Email)}', " +
+                        $"{x.Saldo.Euro}, " +
+                        $"{x.Saldo.Cent});";
+                    QueryExecuterAtMySql(queryStringInsert);
                 }
-                string queryStringInsert = $"" +
-                    $"INSERT INTO essenskasse.Provider (Guid, Designation, Sichtbar)" +
-                    $"VALUES (" +
-                    $"'{x.Item1.Guid}', " +
-                    $"'{x.Item1.Designation}', " +
-                    $"{v})";
-                QueryExecuterAtMySql(queryStringInsert);
             }
-            QueryExecuterAtMySql("TRUNCATE essenskasse.Order;");
-            foreach (Order x in orders) {
-                string queryStringInsert = $"" +
-                    $"INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson) " +
-                    $"VALUES (" +
-                    $"{x.DateTime.Ticks}, " +
-                    $"{x.Money.Euro}, " +
-                    $"{x.Money.Cent}, " +
-                    $"'{x.Provider.Guid}', " +
-                    $"'{x.Provider.Designation}', " +
-                    $"'{x.ReferencedPerson}');";
-                QueryExecuterAtMySql(queryStringInsert);
+            if (fileExist[1]) {
+                List<Tuple<Provider, bool>> providers = JsonConvert.DeserializeObject<List<Tuple<Provider, bool>>>(System.IO.File.ReadAllText(dirForBackup + "/provider.json")) ?? [];
+                QueryExecuterAtMySql("TRUNCATE essenskasse.Provider;");
+                foreach (Tuple<Provider, bool> x in providers) {
+                    string v = "false";
+                    if (x.Item2) {
+                        v = "true";
+                    }
+                    string queryStringInsert = $"" +
+                        $"INSERT INTO essenskasse.Provider (Guid, Designation, Sichtbar)" +
+                        $"VALUES (" +
+                        $"'{x.Item1.Guid}', " +
+                        $"'{x.Item1.Designation}', " +
+                        $"{v})";
+                    QueryExecuterAtMySql(queryStringInsert);
+                }
             }
-            QueryExecuterAtMySql("TRUNCATE essenskasse.TransactionProcedure");
-            foreach (TransactionProcedure x in transactionProcedures) {
-                string queryStringInsert = $"" +
-                    $"INSERT INTO essenskasse.TransactionProcedure (DateTime, AmountEuro, AmountCent, Comment) " +
-                    $"VALUES (" +
-                    $"{x.DateTime.Ticks}, " +
-                    $"{x.Amount.Euro}, " +
-                    $"{x.Amount.Cent}, " +
-                    $"'{x.Comment}');";
-                QueryExecuterAtMySql(queryStringInsert);
+            if (fileExist[2]) {
+                List<Payment> payments = JsonConvert.DeserializeObject<List<Payment>>(System.IO.File.ReadAllText(dirForBackup + "/payment.json")) ?? [];
+                QueryExecuterAtMySql("TRUNCATE essenskasse.Payment;");
+                foreach (Payment x in payments) {
+                    string queryStringInsert = $"" +
+                        $"INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment) " +
+                        $"VALUES (" +
+                        $"{x.DateTime.Ticks}, " +
+                        $"{x.Amount.Euro}, " +
+                        $"{x.Amount.Cent}, " +
+                        $"'{x.ReferencedPerson}', " +
+                        $"'{x.Comment}');";
+                    QueryExecuterAtMySql(queryStringInsert);
+                }
             }
-            QueryExecuterAtMySql("TRUNCATE essenskasse.TokenForChange;");
-            foreach (Tuple<DateTime, Guid, string> x in tokens) {
-                string queryStringInsert = $"" +
-                    $"INSERT INTO essenskasse.TokenForChange (DateTime, Guid, Identity) " +
-                    $"VALUES (" +
-                    $"{x.Item1.Ticks}, " +
-                    $"'{x.Item2}', " +
-                    $"'{x.Item3}');";
-                QueryExecuterAtMySql(queryStringInsert);
+            if (fileExist[3]) {
+                List<Order> orders = JsonConvert.DeserializeObject<List<Order>>(System.IO.File.ReadAllText(dirForBackup + "/order.json")) ?? [];
+                QueryExecuterAtMySql("TRUNCATE essenskasse.Order;");
+                foreach (Order x in orders) {
+                    string queryStringInsert = $"" +
+                        $"INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson) " +
+                        $"VALUES (" +
+                        $"{x.DateTime.Ticks}, " +
+                        $"{x.Money.Euro}, " +
+                        $"{x.Money.Cent}, " +
+                        $"'{x.Provider.Guid}', " +
+                        $"'{x.Provider.Designation}', " +
+                        $"'{x.ReferencedPerson}');";
+                    QueryExecuterAtMySql(queryStringInsert);
+                }
             }
-            QueryExecuterAtMySql("TRUNCATE essenskasse.SettingsUser;");
-            foreach (Tuple<Guid, Settings> x in settings) {
-                string queryStringInsert = $"" +
-                    $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
-                                        $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
-                                        $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
-                                        $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
-                    $"VALUES (" +
-                    $"'{x.Item1}', " +
-                    $"{x.Item2.IsSingleListWishDashboard}, " +
-                    $"{x.Item2.LoadAmountPayment}, " +
-                    $"{x.Item2.LoadAmountOrder}, " +
-                    $"{x.Item2.FilterShowProvider}, " +
-                    $"'{x.Item2.DashboardMoneyLimit}', " +
-                    $"{x.Item2.FilterShowPerson}, " +
-                    $"'{x.Item2.AccessToken}', " +
-                    $"'{x.Item2.AdminEmail}', " +
-                    $"{x.Item2.NoticeableOnRightSide}, " +
-                    $"{x.Item2.SendConfirmationMail});";
-                QueryExecuterAtMySql(queryStringInsert);
-            }
+            if (fileExist[4]) {
+                List<TransactionProcedure> transactionProcedures = JsonConvert.DeserializeObject<List<TransactionProcedure>>(System.IO.File.ReadAllText(dirForBackup + "/transactionProcedure.json")) ?? [];
 
+                QueryExecuterAtMySql("TRUNCATE essenskasse.TransactionProcedure");
+                foreach (TransactionProcedure x in transactionProcedures) {
+                    string queryStringInsert = $"" +
+                        $"INSERT INTO essenskasse.TransactionProcedure (DateTime, AmountEuro, AmountCent, Comment) " +
+                        $"VALUES (" +
+                        $"{x.DateTime.Ticks}, " +
+                        $"{x.Amount.Euro}, " +
+                        $"{x.Amount.Cent}, " +
+                        $"'{x.Comment}');";
+                    QueryExecuterAtMySql(queryStringInsert);
+                }
+            }
+            if (fileExist[5]) {
+                List<Tuple<Guid, Settings>> settings = JsonConvert.DeserializeObject<List<Tuple<Guid, Settings>>>(System.IO.File.ReadAllText(dirForBackup + "/settings.json")) ?? [];
+                QueryExecuterAtMySql("TRUNCATE essenskasse.SettingsUser;");
+                foreach (Tuple<Guid, Settings> x in settings) {
+                    string queryStringInsert = $"" +
+                        $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
+                                            $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
+                                            $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
+                                            $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
+                        $"VALUES (" +
+                        $"'{x.Item1}', " +
+                        $"{x.Item2.IsSingleListWishDashboard}, " +
+                        $"{x.Item2.LoadAmountPayment}, " +
+                        $"{x.Item2.LoadAmountOrder}, " +
+                        $"{x.Item2.FilterShowProvider}, " +
+                        $"'{x.Item2.DashboardMoneyLimit}', " +
+                        $"{x.Item2.FilterShowPerson}, " +
+                        $"'{x.Item2.AccessToken}', " +
+                        $"'{x.Item2.AdminEmail}', " +
+                        $"{x.Item2.NoticeableOnRightSide}, " +
+                        $"{x.Item2.SendConfirmationMail});";
+                    QueryExecuterAtMySql(queryStringInsert);
+                }
+            }
             return Ok();
         }
         #endregion
