@@ -166,10 +166,8 @@
                         <button class="btn btn-primary" @onclick="() => ModalDialog!.Close()">Close</button>
                     </div>
                 </HistoryModalCard>
-
             </BlazorXTabs.XTab>
             <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.overview)]">
-
                 <h2>@_loc[nameof(RessourceAppStrings.overview)]</h2>
                 <div class="overViewGrid">
                     @if (orderListForOverview.Count != 0) {

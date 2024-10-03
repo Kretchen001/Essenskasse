@@ -11,6 +11,18 @@ namespace Essenskasse.Pages {
     public partial class ChangeEntitiesPage {
 
         private bool Loaded = false;
+        private bool noMorePaymentsToLoad = false;
+        private bool noMoreOrderToLoad = false;
+        private int OpacityOfNoMorePaymentToLoad {
+            get {
+                return noMorePaymentsToLoad ? 50 : 100;
+            }
+        }
+        private int OpacityOfNoMoreOrderToLoad {
+            get {
+                return noMoreOrderToLoad ? 50 : 100;
+            }
+        }
 
         List<string> types = [];
         string SelectedType { get; set; } = string.Empty;
@@ -177,12 +189,18 @@ namespace Essenskasse.Pages {
             return "";
         }
 
-        private async Task CommitChangesP(int index) {
-            long euro = (long)PaymentAmount[index];
-            short cent = (short)((PaymentAmount[index] - euro) * 100);
-            ChangedPayments[index].Amount = new Money(euro, cent);
-            if (Payments[index].Amount.Equals(ChangedPayments[index].Amount) &&
-                Payments[index].DateTime.Equals(ChangedPayments[index].DateTime)) {
+        private async Task CommitChangesP() {
+            ModalDialogP!.Close();
+            long euro = (long) newMoneyAmount;
+            short cent = (short)((newMoneyAmount - euro) * 100);
+            Payment newPayment = new Payment() {
+                DateTime = Payments[currentPaymentChangeIndex].DateTime,
+                ReferencedPerson = Payments[currentPaymentChangeIndex].ReferencedPerson,
+                Amount = new Money(euro, cent),
+                Comment = newComment
+            };
+            if (Payments[currentPaymentChangeIndex].Amount.Equals(newPayment.Amount) &&
+                Payments[currentPaymentChangeIndex].Comment.Equals(newPayment.Comment)) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
                 return;
             }
@@ -191,9 +209,9 @@ namespace Essenskasse.Pages {
                 RequestUri = new Uri(Config["API-Adress"] + "payment/update"),
                 Headers = {
                     { "accessToken", AppData.AccessToken.ToString() },
-                    { "dateAsLong", ChangedPayments[index].DateTime.Ticks.ToString() }
+                    { "dateAsLong", newPayment.DateTime.Ticks.ToString() }
                 },
-                Content = new StringContent(JsonConvert.SerializeObject(ChangedPayments[index].Amount), Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonConvert.SerializeObject(newPayment.Amount), Encoding.UTF8, "application/json")
             };
 
             HttpResponseMessage? response = null;
@@ -207,51 +225,49 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
-                Payments[index] = new Payment() {
-                    ReferencedPerson = Payments[index].ReferencedPerson,
-                    DateTime = ChangedPayments[index].DateTime,
-                    Amount = ChangedPayments[index].Amount
-                };
-                base.StateHasChanged();
-                return;
+                Payments[currentPaymentChangeIndex] = newPayment;
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
             }
+
+            // reset temps
+            newMoneyAmount = 0;
+            newComment = "";
+            base.StateHasChanged();
+            return;
         }
 
-        private async Task CommitChangesO(int index) {
-            long euro = (long)OrderAmount[index];
-            short cent = (short)((OrderAmount[index] - euro) * 100);
-            ChangedOrders[index].Money = new Money(euro, cent);
-            if (Orders[index].Equals(ChangedOrders[index])) {
+        private async Task CommitChangesO() {
+            ModalDialogO!.Close();
+            long euro = (long)newMoneyAmount;
+            short cent = (short)((newMoneyAmount - euro) * 100);
+            Order newOrder = new Order() {
+                DateTime = Orders[currentOrderChangeIndex].DateTime,
+                Money = new Money(euro, cent),
+                ReferencedPerson = Orders[currentOrderChangeIndex].ReferencedPerson
+            };
+            if (!newSelectedProvider.Equals(Guid.Empty) && Providers.Exists(x => x.Guid.Equals(newSelectedProvider))) {
+                newOrder.Provider = Providers.First(x => x.Guid.Equals(newSelectedProvider));
+            }
+            else {
+                newOrder.Provider = Orders[currentOrderChangeIndex].Provider;
+            }
+            if (Orders[currentOrderChangeIndex].Equals(newOrder)) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
                 return;
             }
-            Money? a = ChangedOrders[index].Money;
-            Provider? b = ChangedOrders[index].Provider;
-            Guid? c = ChangedOrders[index].ReferencedPerson;
-            if (Orders[index].Money.Equals(ChangedOrders[index].Money)) {
-                a = null;
-            }
-            if (Orders[index].Provider.Equals(ChangedOrders[index].Provider) || Providers.Exists(x => x.Guid.Equals(ChangedOrders[index].Provider.Guid))) {
-                b = null;
-            }
-            if (Orders[index].ReferencedPerson.Equals(ChangedOrders[index].ReferencedPerson)) {
-                c = null;
-            }
             MoneyProviderGuidData data = new MoneyProviderGuidData() {
-                Money = a,
-                Provider = b,
-                ReferencedPerson = c
+                Money = newOrder.Money,
+                Provider = newOrder.Provider,
+                ReferencedPerson = newOrder.ReferencedPerson
             };
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Put,
                 RequestUri = new Uri(Config["API-Adress"] + "order/update"),
                 Headers = {
                     { "accessToken", AppData.AccessToken.ToString() },
-                    { "dateAsLong", ChangedOrders[index].DateTime.Ticks.ToString() },
-                    { "referencedPerson", c.ToString() }
+                    { "dateAsLong", newOrder.DateTime.Ticks.ToString() }
                 },
                 Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json")
             };
@@ -267,18 +283,18 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
-                Orders[index] = new Order() {
-                    DateTime = ChangedOrders[index].DateTime,
-                    Provider = ChangedOrders[index].Provider,
-                    Money = ChangedOrders[index].Money,
-                    ReferencedPerson = ChangedOrders[index].ReferencedPerson
-                };
-                base.StateHasChanged();
-                return;
+                Orders[currentOrderChangeIndex] = newOrder;
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
             }
+
+            // reset temps
+            newMoneyAmount = 0;
+            newComment = "";
+            newSelectedProvider = Guid.Empty;
+            base.StateHasChanged();
+            return;
         }
 
         private string ShowMoney(int index) {
@@ -318,6 +334,7 @@ namespace Essenskasse.Pages {
                 List<Payment> getted = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
                 if (getted.Count == 0) {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNothingToLoad)], ToastLevel.Info);
+                    noMorePaymentsToLoad = true;
                 }
                 else {
                     getted.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
@@ -332,7 +349,6 @@ namespace Essenskasse.Pages {
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
             }
-
             base.StateHasChanged();
         }
 
@@ -360,6 +376,7 @@ namespace Essenskasse.Pages {
                 List<Order> getted = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? [];
                 if (getted.Count == 0) {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNothingToLoad)], ToastLevel.Info);
+                    noMoreOrderToLoad = true;
                 }
                 else {
                     foreach (Order x in getted) {

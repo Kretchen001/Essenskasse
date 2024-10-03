@@ -36,6 +36,17 @@
                         </ShowPaymentCard>
                     </div>
                 }
+                <div class="row">
+                    <div class="col-lg-12" align="right">
+                        <button type="button" class="btn-primary" 
+                                data-dismiss="modal"
+                                style="border-radius:8px; margin-top: 1rem; opacity: @OpacityOfNoMorePaymentToLoad%"
+                                disabled="@noMorePaymentsToLoad" 
+                                @onclick="() => LoadNextAmountOfPayments()">
+                            @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+                        </button>
+                    </div>
+                </div>
                 @if (Loaded) {
                     <HistoryModalCard @ref="@ModalDialogP" Title="Änderung Einzahlung">
                         <div class="row">
@@ -70,7 +81,7 @@
                         </div>
                         <br />
                         <div class="row">
-                            <button class="btn btn-success" @onclick="() => ModalDialogP!.Close()">
+                            <button class="btn btn-success" @onclick="() => CommitChangesP()">
                                 @_loc[nameof(RessourceAppStrings.acceptChanges)]
                             </button>
                         </div>
@@ -93,6 +104,17 @@
                         </ShowOrderCard>
                     </div>
                 }
+                <div class="row">
+                    <div class="col-lg-12" align="right">
+                        <button type="button" class="btn-primary" 
+                                data-dismiss="modal"
+                                style="border-radius:8px; margin-top: 1rem; opacity: @OpacityOfNoMoreOrderToLoad%"
+                                disabled="@noMoreOrderToLoad"
+                                @onclick="() => LoadNextAmountOfOrders()">
+                            @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+                        </button>
+                    </div>
+                </div>
                 @if (Loaded) {
                     <HistoryModalCard @ref="@ModalDialogO" Title="Änderung Bestellung">
                         <div class="row">
@@ -129,7 +151,7 @@
                         </div>
                         <br />
                         <div class="row">
-                            <button class="btn btn-success" @onclick="() => ModalDialogO!.Close()">
+                            <button class="btn btn-success" @onclick="() => CommitChangesO()">
                                 @_loc[nameof(RessourceAppStrings.acceptChanges)]
                             </button>
                         </div>
