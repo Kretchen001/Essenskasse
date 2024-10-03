@@ -1,4 +1,5 @@
-﻿using Essenskasse.Client;
+﻿using Essenskasse.Cards;
+using Essenskasse.Client;
 using Essenskasse.Client.Services;
 using Essenskasse.Ressources;
 using Modells;
@@ -9,19 +10,30 @@ namespace Essenskasse.Pages {
 
     public partial class ChangeEntitiesPage {
 
+        private bool Loaded = false;
+
         List<string> types = [];
         string SelectedType { get; set; } = string.Empty;
 
         List<Person> PersonList { get; set; } = [];
         List<Provider> Providers { get; set; } = [];
         List<Payment> Payments { get; set; } = [];
-        List<Tuple<Order, int>> Orders { get; set; } = [];
+        List<Order> Orders { get; set; } = [];
 
         List<Payment> ChangedPayments { get; set; } = [];
         List<decimal> PaymentAmount { get; set; } = [];
 
         List<Order> ChangedOrders { get; set; } = [];
         List<decimal> OrderAmount { get; set; } = [];
+
+        private HistoryModalCard? ModalDialogP { get; set; }
+        private HistoryModalCard? ModalDialogO { get; set; }
+
+        private decimal newMoneyAmount = 0;
+        private string newComment = "";
+        private Guid newSelectedProvider = Guid.Empty;
+        private int currentPaymentChangeIndex = 0;
+        private int currentOrderChangeIndex = 0;
 
         protected override async Task OnInitializedAsync() {
             if (!AuthStateService.IsAuthenticated) {
@@ -35,6 +47,7 @@ namespace Essenskasse.Pages {
                 await RequestPayments();
                 await RequestOrders();
                 SelectedType = types[0];
+                Loaded = true;
             }
             base.StateHasChanged();
         }
@@ -147,7 +160,7 @@ namespace Essenskasse.Pages {
                 for (int i = 0; i < orderS.Count; i += 1) {
                     decimal temp = ChangedOrders[i].Money.Euro + (decimal)(ChangedOrders[i].Money.Cent * 0.01);
                     OrderAmount.Add(temp);
-                    Orders.Add(new Tuple<Order, int>(orderS[i], i));
+                    Orders.Add(orderS[i]);
                 }
             }
             else {
@@ -211,20 +224,20 @@ namespace Essenskasse.Pages {
             long euro = (long)OrderAmount[index];
             short cent = (short)((OrderAmount[index] - euro) * 100);
             ChangedOrders[index].Money = new Money(euro, cent);
-            if (Orders[index].Item1.Equals(ChangedOrders[index])) {
+            if (Orders[index].Equals(ChangedOrders[index])) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
                 return;
             }
             Money? a = ChangedOrders[index].Money;
             Provider? b = ChangedOrders[index].Provider;
             Guid? c = ChangedOrders[index].ReferencedPerson;
-            if (Orders[index].Item1.Money.Equals(ChangedOrders[index].Money)) {
+            if (Orders[index].Money.Equals(ChangedOrders[index].Money)) {
                 a = null;
             }
-            if (Orders[index].Item1.Provider.Equals(ChangedOrders[index].Provider) || Providers.Exists(x => x.Guid.Equals(ChangedOrders[index].Provider.Guid))) {
+            if (Orders[index].Provider.Equals(ChangedOrders[index].Provider) || Providers.Exists(x => x.Guid.Equals(ChangedOrders[index].Provider.Guid))) {
                 b = null;
             }
-            if (Orders[index].Item1.ReferencedPerson.Equals(ChangedOrders[index].ReferencedPerson)) {
+            if (Orders[index].ReferencedPerson.Equals(ChangedOrders[index].ReferencedPerson)) {
                 c = null;
             }
             MoneyProviderGuidData data = new MoneyProviderGuidData() {
@@ -254,13 +267,12 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
-                Orders[index] = new Tuple<Order, int>(new Order() {
+                Orders[index] = new Order() {
                     DateTime = ChangedOrders[index].DateTime,
                     Provider = ChangedOrders[index].Provider,
                     Money = ChangedOrders[index].Money,
                     ReferencedPerson = ChangedOrders[index].ReferencedPerson
-                },
-                index);
+                };
                 base.StateHasChanged();
                 return;
             }
@@ -351,7 +363,7 @@ namespace Essenskasse.Pages {
                 }
                 else {
                     foreach (Order x in getted) {
-                        Orders.Add(new Tuple<Order, int>(x, Orders.Count));
+                        Orders.Add(x);
                         ChangedOrders.Add(x);
                         decimal temp = x.Money.Euro + (decimal)(x.Money.Cent * 0.01);
                         OrderAmount.Add(temp);
@@ -363,6 +375,16 @@ namespace Essenskasse.Pages {
             }
 
             base.StateHasChanged();
+        }
+
+        private void ShowPaymentChangeModal(int index) {
+            currentPaymentChangeIndex = index;
+            ModalDialogP!.Open();
+        }
+
+        private void ShowOrderChangeModal(int index) {
+            currentOrderChangeIndex = index;
+            ModalDialogO!.Open();
         }
     }
 }
