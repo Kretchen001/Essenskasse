@@ -354,11 +354,17 @@
   <data name="request" xml:space="preserve">
     <value>Запрос</value>
   </data>
+  <data name="requestSavedSettings" xml:space="preserve">
+    <value>Настройки запросов</value>
+  </data>
   <data name="russian" xml:space="preserve">
     <value>Русский</value>
   </data>
   <data name="savePermanent" xml:space="preserve">
     <value>Сохранить навсегда</value>
+  </data>
+  <data name="saveSettings" xml:space="preserve">
+    <value>Сохранить настройки</value>
   </data>
   <data name="settings" xml:space="preserve">
     <value>Настройки</value>

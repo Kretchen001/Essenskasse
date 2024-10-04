@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using Newtonsoft.Json;
 using Serilog;
 using SerilogTimings;
@@ -243,7 +244,7 @@ namespace EssenskasseAPI.Controllers {
                         $"WHERE Name='{name}';";
                 DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestName);
                 List<U.User> user = DataTableToListOfUser(dataTableUser);
-                if (user.Count == 1) {
+                if (user.Count == 1) { // user exist
                     string queryStringRequestToken = $"" +
                         $"SELECT ExpaireDate " +
                         $"FROM essenskasse.SessionToken " +
@@ -253,25 +254,49 @@ namespace EssenskasseAPI.Controllers {
                     if (tempRes.Rows.Count == 1) {
                         long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
                         if (DateTime.Now.Ticks < s) { // is under expaire
+                            string queryCheckIfSettingsSaved = $"" +
+                                $"SELECT * " +
+                                $"FROM essenskasse.SettingsUser " +
+                                $"WHERE UserGuid='{user[0].Guid}';";
+                            DataTable tempSettings = QueryExecuterAtMySql(queryCheckIfSettingsSaved);
                             settings.AccessToken ??= new Guid("00000000-0000-0000-0000-000000000000");
-                            string insertQueryString = $"" +
-                                $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
-                                            $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
-                                            $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
-                                            $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
-                                $"VALUES (" +
-                                $"'{user[0].Guid}'," +
-                                $"{settings.IsSingleListWishDashboard}," +
-                                $"{settings.LoadAmountPayment}," +
-                                $"{settings.LoadAmountOrder}," +
-                                $"{settings.FilterShowProvider}," +
-                                $"'{settings.DashboardMoneyLimit}'," +
-                                $"{settings.FilterShowPerson}," +
-                                $"'{settings.AccessToken}'," +
-                                $"'{settings.AdminEmail}'," +
-                                $"{settings.NoticeableOnRightSide}," +
-                                $"{settings.SendConfirmationMail});";
-                            QueryExecuterAtMySql(insertQueryString);
+                            if (tempSettings.Rows.Count == 0) { // no settings there, so insert
+                                string insertQueryString = $"" +
+                                    $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
+                                                $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
+                                                $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
+                                                $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
+                                    $"VALUES (" +
+                                    $"'{user[0].Guid}'," +
+                                    $"{settings.IsSingleListWishDashboard}," +
+                                    $"{settings.LoadAmountPayment}," +
+                                    $"{settings.LoadAmountOrder}," +
+                                    $"{settings.FilterShowProvider}," +
+                                    $"'{settings.DashboardMoneyLimit}'," +
+                                    $"{settings.FilterShowPerson}," +
+                                    $"'{settings.AccessToken}'," +
+                                    $"'{settings.AdminEmail}'," +
+                                    $"{settings.NoticeableOnRightSide}," +
+                                    $"{settings.SendConfirmationMail});";
+                                QueryExecuterAtMySql(insertQueryString);
+                            }
+                            else { // settings saved, so update
+                                string queryUpdate = $"" +
+                                $"UPDATE essenskasse.SettingsUser " +
+                                    $"SET " +
+                                    $"isSingleListWishDashboard={settings.IsSingleListWishDashboard}, " +
+                                    $"loadAmountPayment={settings.LoadAmountPayment}, " +
+                                    $"loadAmountOrder={settings.LoadAmountOrder}, " +
+                                    $"filterShowProvider={settings.FilterShowProvider}, " +
+                                    $"dashboardMoneyLimit='{settings.DashboardMoneyLimit}', " +
+                                    $"filterShowPerson={settings.FilterShowPerson}, " +
+                                    $"accessToken='{settings.AccessToken}', " +
+                                    $"adminEmail='{settings.AdminEmail}', " +
+                                    $"noticeableOnRightSide={settings.NoticeableOnRightSide}, " +
+                                    $"sendConfirmationMail={settings.SendConfirmationMail} " +
+                                    $"WHERE UserGuid='{user[0].Guid}';";
+                                QueryExecuterAtMySql(queryUpdate);
+                            }
                             return Ok();
                         }
                         else {

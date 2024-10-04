@@ -135,5 +135,7 @@
         noProviderPleaseInsertBefore,
         noSettingsAvailable,
         settingsSuccsessfullyRestored,
+        requestSavedSettings,
+        saveSettings,
     }
 }
