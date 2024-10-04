@@ -354,11 +354,17 @@
   <data name="request" xml:space="preserve">
     <value>Anfordern</value>
   </data>
+  <data name="requestSavedSettings" xml:space="preserve">
+    <value>Einstellungen abfragen</value>
+  </data>
   <data name="russian" xml:space="preserve">
     <value>Russisch</value>
   </data>
   <data name="savePermanent" xml:space="preserve">
     <value>Permanent speichern</value>
+  </data>
+  <data name="saveSettings" xml:space="preserve">
+    <value>Einstellungen sichern</value>
   </data>
   <data name="settings" xml:space="preserve">
     <value>Einstellungen</value>
