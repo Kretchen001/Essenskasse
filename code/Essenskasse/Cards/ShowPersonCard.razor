@@ -53,13 +53,21 @@ else {
             string subject = _loc[nameof(RessourceAppStrings.emailSubject)];
             string body = _loc[nameof(RessourceAppStrings.emailDearSirMadam)] + " " + Person.Name + ",\n\n" +
                             _loc[nameof(RessourceAppStrings.emailYouAreCurrently)] + "\n" +
-                            "\xA0\xA0\xA0\xA0" + Person.Saldo.ToString() + "\n" +
-                            _loc[nameof(RessourceAppStrings.emailPositiv)] + "\n" +
+                            "\xA0\xA0\xA0\xA0" + Person.Saldo.ToString() + "\n";
+            if (Person.Saldo.IsPositiv()) {
+                subject = _loc[nameof(RessourceAppStrings.emailSubjectPositiv)]; // change the subject to Information when positiv Saldo
+                body += _loc[nameof(RessourceAppStrings.emailPositivButNotNegativ)] + "\n\n" +
+                            _loc[nameof(RessourceAppStrings.emailRemaining)] + "\n" +
+                            _loc[nameof(RessourceAppStrings.emailCashManagement)];
+            }
+            else {
+                body += _loc[nameof(RessourceAppStrings.emailPositiv)] + "\n" +
                             _loc[nameof(RessourceAppStrings.emailRemedy)] + "\n\n" +
                             _loc[nameof(RessourceAppStrings.emailRemaining)] + "\n" +
                             _loc[nameof(RessourceAppStrings.emailCashManagement)];
+            }
             await JSRuntime.InvokeAsync<object>(
-                "blazorExtensions.SendLocalEmail", 
+                "blazorExtensions.SendLocalEmail",
                 new object[] {
                     Person.Email,
                     subject,

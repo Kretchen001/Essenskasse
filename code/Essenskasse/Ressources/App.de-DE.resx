@@ -213,6 +213,9 @@
   <data name="emailPositiv" xml:space="preserve">
     <value>nicht mehr im Positiven.</value>
   </data>
+  <data name="emailPositivButNotNegativ" xml:space="preserve">
+    <value>nur noch knapp im Plus.</value>
+  </data>
   <data name="emailRemaining" xml:space="preserve">
     <value>Mit freundlichen Grüßen verbleibend</value>
   </data>
@@ -221,6 +224,9 @@
   </data>
   <data name="emailSubject" xml:space="preserve">
     <value>Zahlungsaufforderung Kasse</value>
+  </data>
+  <data name="emailSubjectPositiv" xml:space="preserve">
+    <value>Essenskasse - Information zum Kontostand</value>
   </data>
   <data name="emailYouAreCurrently" xml:space="preserve">
     <value>Sie befinden sich mit</value>

@@ -213,6 +213,9 @@
   <data name="emailPositiv" xml:space="preserve">
     <value>ya no es positivo.</value>
   </data>
+  <data name="emailPositivButNotNegativ" xml:space="preserve">
+    <value>apenas en territorio positivo.</value>
+  </data>
   <data name="emailRemaining" xml:space="preserve">
     <value>Le saluda atentamente</value>
   </data>
@@ -221,6 +224,9 @@
   </data>
   <data name="emailSubject" xml:space="preserve">
     <value>Solicitud de pago en ventanilla</value>
+  </data>
+  <data name="emailSubjectPositiv" xml:space="preserve">
+    <value>Essenskasse - Información sobre el saldo de la cuenta</value>
   </data>
   <data name="emailYouAreCurrently" xml:space="preserve">
     <value>Se encuentra con</value>
