@@ -31,21 +31,21 @@ namespace Modells {
         public override string ToString() {
             if (Math.Abs(Cent) < 10) {
                 if (Cent < 0) {
-                    return ("-" + Math.Abs(Euro).ToString() + ",0" + Math.Abs(Cent).ToString() + "€");
+                    return ("-" + Math.Abs(Euro).ToString() + ",0" + Math.Abs(Cent).ToString() + " €");
                 }
                 else {
-                    return (Euro.ToString() + ",0" + Math.Abs(Cent).ToString() + "€");
+                    return (Euro.ToString() + ",0" + Math.Abs(Cent).ToString() + " €");
                 }
             }
             else {
                 if (Cent < 0) {
-                    return ("-" + Math.Abs(Euro).ToString() + "," + Math.Abs(Cent).ToString() + "€");
+                    return ("-" + Math.Abs(Euro).ToString() + "," + Math.Abs(Cent).ToString() + " €");
                 }
                 else if (Euro < 0) {
-                    return (Euro.ToString() + "," + Cent.ToString() + "€");
+                    return (Euro.ToString() + "," + Cent.ToString() + " €");
                 }
                 else {
-                    return (Euro.ToString() + "," + Cent.ToString() + "€");
+                    return (Euro.ToString() + "," + Cent.ToString() + " €");
                 }
             }
         }
