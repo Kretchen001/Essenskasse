@@ -87,7 +87,7 @@
                 @foreach (int i in Enumerable.Range(0, person.Count)) {
                     <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
                         <div class="col-lg-12">
-                            <div class="row">
+                            <div class="row" style="background-color: @(money[i].Equals(new Money(0,0)) ? "transparent" : "#B3D9FF")">
                                 <div class="col-lg-8">
                                     <PersonOrderCard @ref="@personOrderCards[i]" PersonName="@person[i].Name"
                                                      Money="@money[i]"
