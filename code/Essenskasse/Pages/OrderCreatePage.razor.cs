@@ -4,7 +4,6 @@ using Essenskasse.Ressources;
 using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
-using System.Collections.Specialized;
 using System.Text;
 
 namespace Essenskasse.Pages {
@@ -342,6 +341,28 @@ namespace Essenskasse.Pages {
         /// </summary>
         /// <param name="x">Order, that contain the Money-Value or is null if not</param>
         /// <returns>if Money-Value is null => "-" and otherwise the Money.ToString()</returns>
-        private static string OverviewCellFill(Order? x) => (x is null) ? "-" : x!.Money.ToString();
+        private static string OverviewCellFillContent(Order? x) => (x is null) ? "-" : x!.Money.ToString();
+
+        private static string OverviewCellFill(DateAndOrder x) {
+            bool isWeekend = x.DateTime.DayOfWeek == DayOfWeek.Saturday || x.DateTime.DayOfWeek == DayOfWeek.Sunday;
+            bool hasOrder = x.Orders != null;
+
+            if (isWeekend) {
+                if (hasOrder) {
+                    return "background-color: #FFDDC1;";
+                }
+                else {
+                    return "background-color: #FFE4E1;";
+                }
+            }
+            else {
+                if (hasOrder) {
+                    return "background-color: #DFF0D8;";
+                }
+                else {
+                    return "background-color: #F9F9F9;";
+                }
+            }
+        }
     }
 }

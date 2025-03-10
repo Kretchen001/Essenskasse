@@ -175,7 +175,7 @@
                             <PropertyColumn Property="@(p => p.DateTime.ToString("d"))"
                                             Title="@(orderListForOverview[0].Head[0])" />
                             @foreach (int i in Enumerable.Range(0, person.Count)) {
-                                <PropertyColumn Property="@(p => OverviewCellFill(p.Orders[i]))"
+                                <PropertyColumn Property="@(p => OverviewCellFillContent(p.Orders[i]))"
                                                 Title="@(orderListForOverview[0].Head[i+1])" Class="text-center" />
                             }
                         </QuickGrid>
