@@ -25,7 +25,7 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("TransactionProcedure")) {
                 string queryString = $"" +
                     $"SELECT * " +
-                    $"FROM essenskasse.TransactionProcedure" +
+                    $"FROM essenskasse.TransactionProcedure " +
                     $"ORDER BY DateTime DESC;";
 
                 DataTable dataTableTransaction = QueryExecuterAtMySql(queryString);
