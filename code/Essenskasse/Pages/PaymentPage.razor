@@ -98,39 +98,24 @@
                     <tr>
                         <th>@_loc[nameof(RessourceAppStrings.date)]</th>
                         <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
-                        <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
+                        <th style="text-align: right">@_loc[nameof(RessourceAppStrings.amount)]</th>
                     </tr>
                     @for (int i = 0; i < paymentsOfSelectedPerson.Count; i += 1) {
-                        @if (paymentsOfSelectedPerson[i].Amount.IsPositiv()) {
-                            @if (i % 3 == 0) {
-                                <tr style="background-color: #EEEEEE; color: rgb(10,10,10);">
-                                    <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                                    <td>@paymentsOfSelectedPerson[i].Comment</td>
-                                    <td>@paymentsOfSelectedPerson[i].Amount</td>
-                                </tr>
-                            }
-                            else if (i % 3 == 1) {
-                                <tr style="background-color: #DDDDDD; color: rgb(10,10,10);">
-                                    <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                                    <td>@paymentsOfSelectedPerson[i].Comment</td>
-                                    <td>@paymentsOfSelectedPerson[i].Amount</td>
-                                </tr>
-                            }
-                            else if (i % 3 == 2) {
-                                <tr style="background-color: #CCCCCC; color: rgb(10,10,10);">
-                                    <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                                    <td>@paymentsOfSelectedPerson[i].Comment</td>
-                                    <td>@paymentsOfSelectedPerson[i].Amount</td>
-                                </tr>
-                            }
+                        var payment = paymentsOfSelectedPerson[i];
+                        string rowColor = (i % 3) switch {
+                            0 => "#EEEEEE", // Hellgrau
+                            1 => "#DDDDDD", // Mittelgrau
+                            2 => "#CCCCCC", // Dunkelgrau
+                            _ => "#FFFFFF"  // Default (White)
+                        };
+                        if (!payment.Amount.IsPositiv()) {
+                            rowColor = "#F55D52"; // Rot für negative Beträge
                         }
-                        else {
-                            <tr style="background-color: #F55D52; color: rgb(10,10,10);">
-                                <td>@paymentsOfSelectedPerson[i].DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                                <td>@paymentsOfSelectedPerson[i].Comment</td>
-                                <td>@paymentsOfSelectedPerson[i].Amount</td>
-                            </tr>
-                        }
+                        <tr style="background-color: @rowColor; color: rgb(10,10,10);">
+                            <td>@payment.DateTime.ToString("dddd, dd.MMMM.yyyy (HH:mm)")</td>
+                            <td>@payment.Comment</td>
+                            <td style="text-align: right">@payment.Amount</td>
+                        </tr>
                     }
                 </table>
             </div>
