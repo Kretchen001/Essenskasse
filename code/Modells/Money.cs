@@ -27,7 +27,7 @@ namespace Modells {
 
         /// <summary>Override the ToString so it returns a valid money String.
         /// For further information see documentation/pap/Money_ToString.puml</summary>
-        /// <returns>EURO,CENT€</returns>
+        /// <returns>EURO,CENT €</returns>
         public override string ToString() {
             if (Math.Abs(Cent) < 10) {
                 if (Cent < 0) {

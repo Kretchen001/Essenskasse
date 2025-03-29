@@ -89,24 +89,25 @@
             <tr style="border-bottom: groove lightgray">
                 <th>@_loc[nameof(RessourceAppStrings.date)]</th>
                 <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
-                <th>@_loc[nameof(RessourceAppStrings.amount)]</th>
+                <th style="text-align: right">@_loc[nameof(RessourceAppStrings.amount)]</th>
             </tr>
-            @foreach (TransactionProcedure x in transactions) {
-                @if (x.Amount.IsPositiv()) {
-                    <tr style="border-bottom: groove lightgray">
-                        <td>@x.DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                        <td>@x.Comment</td>
-                        <td>@x.Amount</td>
-                    </tr>
+            @for (int i = 0; i < transactions.Count; i += 1) {
+                var transaction = transactions[i];
+                string rowColor = (i % 3) switch {
+                    0 => "#EEEEEE", // Hellgrau
+                    1 => "#DDDDDD", // Mittelgrau
+                    2 => "#CCCCCC", // Dunkelgrau
+                    _ => "#FFFFFF"  // Default (White)
+                };
+                if (!transaction.Amount.IsPositiv()) {
+                    rowColor = "#F55D52"; // Rot für negative Beträge
                 }
-                else {
-                    <tr style="border-bottom: groove lightgray; background-color: #F55D52">
-                        <td>@x.DateTime.ToString("dddd, dd MMMM yyyy (HH:mm)")</td>
-                        <td>@x.Comment</td>
-                        <td>@x.Amount</td>
-                    </tr>
-                }
-            }
+                <tr style="background-color: @rowColor; color: rgb(10,10,10);">
+                    <td>@transaction.DateTime.ToString("dddd, dd.MMMM.yyyy (HH:mm)")</td>
+                    <td>@transaction.Comment</td>
+                    <td style="text-align: right">@transaction.Amount</td>
+                </tr>
+            }            
         </table>
     </div>
 </div>
