@@ -87,7 +87,8 @@
                 @foreach (int i in Enumerable.Range(0, person.Count)) {
                     <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
                         <div class="col-lg-12">
-                            <div class="row" style="background-color: @(money[i].Equals(new Money(0,0)) ? "transparent" : "#B3D9FF")">
+                            <div class="row"
+                                 style="background-color: @(money[i].Equals(new Money(0, 0)) ? "transparent" : "#B3D9FF")">
                                 <div class="col-lg-8">
                                     <PersonOrderCard @ref="@personOrderCards[i]" PersonName="@person[i].Name"
                                                      Money="@money[i]"
@@ -101,13 +102,16 @@
                                 </div>
                                 <div class="col-lg-2 align-self-center">
                                     @if (showHistory[i]) {
-                                        <button @onclick="() => LoadAndShowHistory(i)">
+                                        <button @onclick="() => LoadAndShowHistory(i)" type="button"
+                                                class="btn btn-info float-end" data-dismiss="modal"
+                                                style="border-radius:8px; margin-top: 2px;">
                                             @_loc[nameof(RessourceAppStrings.orderHistory)]
                                             @_loc[nameof(RessourceAppStrings.hide)]
                                         </button>
                                     }
                                     else {
-                                        <button @onclick="() => LoadAndShowHistory(i)">
+                                        <button @onclick="() => LoadAndShowHistory(i)" type="button"
+                                                class="btn btn-info float-end" data-dismiss="modal" style="border-radius:8px">
                                             @_loc[nameof(RessourceAppStrings.orderHistory)]
                                         </button>
                                     }
@@ -176,7 +180,7 @@
                                             Title="@(orderListForOverview[0].Head[0])" />
                             @foreach (int i in Enumerable.Range(0, person.Count)) {
                                 <PropertyColumn Property="@(p => OverviewCellFillContent(p.Orders[i]))"
-                                                Title="@(orderListForOverview[0].Head[i+1])" Class="text-center" />
+                                                Title="@(orderListForOverview[0].Head[i + 1])" Class="text-center" />
                             }
                         </QuickGrid>
                     }
