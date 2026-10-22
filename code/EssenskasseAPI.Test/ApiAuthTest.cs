@@ -35,7 +35,7 @@ namespace EssenskasseAPI.Test {
             { "DELETE", "api/provider/remove" },
             { "GET", "api/provider/statistics" },
             { "GET", "api/provider/testExist" },
-            { "GET", "api/transactionprocedure/all" },
+            // GET api/transactionprocedure/all ist bewusst oeffentlich (Anzeige der Kaffeekasse ohne Anmeldung).
             { "POST", "api/transactionprocedure/new" },
             { "PUT", "api/user/update" },
             { "GET", "api/user/exist" },
