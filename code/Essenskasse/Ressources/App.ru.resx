@@ -869,4 +869,25 @@
   <data name="coffeeRequired" xml:space="preserve">
     <value>Обязательно</value>
   </data>
+  <data name="settingsQuickAmounts" xml:space="preserve">
+    <value>Быстрые суммы в окне заказа</value>
+  </data>
+  <data name="settingsQuickAmountsHint" xml:space="preserve">
+    <value>Сколько угодно: минимум одна и максимум 12.</value>
+  </data>
+  <data name="quickAmountAdd" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="quickAmountReset" xml:space="preserve">
+    <value>Сбросить</value>
+  </data>
+  <data name="quickAmountRemove" xml:space="preserve">
+    <value>Удалить сумму</value>
+  </data>
+  <data name="quickAmountInvalid" xml:space="preserve">
+    <value>Введите сумму больше 0 (не более 12 быстрых сумм).</value>
+  </data>
+  <data name="quickAmountsSaved" xml:space="preserve">
+    <value>Быстрые суммы сохранены.</value>
+  </data>
 </root>

@@ -253,5 +253,12 @@
         coffeeBook,
         coffeeCommentRequired,
         coffeeRequired,
+        settingsQuickAmounts,
+        settingsQuickAmountsHint,
+        quickAmountAdd,
+        quickAmountReset,
+        quickAmountRemove,
+        quickAmountInvalid,
+        quickAmountsSaved,
     }
 }

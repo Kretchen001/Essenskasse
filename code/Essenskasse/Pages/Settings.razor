@@ -96,6 +96,32 @@
                     <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.ordersToBeLoaded)]</span></span>
                     <span class="ek-set-control"><input type="number" min="1" max="500" class="ek-input ek-set-num" @bind="LoadAmountOrders" /></span>
                 </label>
+                <div class="ek-set-row">
+                    <span class="ek-set-text">
+                        <span class="ek-set-label">@_loc[nameof(RessourceAppStrings.settingsQuickAmounts)]</span>
+                        <span class="ek-set-hint">@_loc[nameof(RessourceAppStrings.settingsQuickAmountsHint)]</span>
+                    </span>
+                    <span class="ek-set-control ek-set-quick">
+                        <span class="ek-set-chips">
+                            @foreach (long cents in QuickAmountList) {
+                                <span class="ek-set-chip">
+                                    <span>@Modells.QuickAmounts.Label(cents)</span>
+                                    <button type="button" class="ek-set-chip-x" disabled="@(QuickAmountList.Count <= 1)"
+                                            title="@_loc[nameof(RessourceAppStrings.quickAmountRemove)]"
+                                            aria-label="@_loc[nameof(RessourceAppStrings.quickAmountRemove)]: @Modells.QuickAmounts.Label(cents)"
+                                            @onclick="() => RemoveQuickAmount(cents)">✕</button>
+                                </span>
+                            }
+                        </span>
+                        <span class="ek-set-add">
+                            <input type="text" inputmode="decimal" autocomplete="off" class="ek-input ek-set-num" placeholder="2,50"
+                                   aria-label="@_loc[nameof(RessourceAppStrings.settingsQuickAmounts)]"
+                                   @bind="newQuickAmount" @bind:event="oninput" @onkeydown="OnQuickAmountKeyDown" />
+                            <button type="button" class="ek-btn" @onclick="AddQuickAmount">@_loc[nameof(RessourceAppStrings.quickAmountAdd)]</button>
+                            <button type="button" class="ek-btn" @onclick="ResetQuickAmounts">@_loc[nameof(RessourceAppStrings.quickAmountReset)]</button>
+                        </span>
+                    </span>
+                </div>
             </section>
         </Authorized>
     </AuthorizeView>

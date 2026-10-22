@@ -869,4 +869,25 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="coffeeRequired" xml:space="preserve">
     <value>Pflichtfeld</value>
   </data>
+  <data name="settingsQuickAmounts" xml:space="preserve">
+    <value>Schnellbeträge im Bestellfenster</value>
+  </data>
+  <data name="settingsQuickAmountsHint" xml:space="preserve">
+    <value>Wie viele Sie möchten, mindestens einen und höchstens 12.</value>
+  </data>
+  <data name="quickAmountAdd" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="quickAmountReset" xml:space="preserve">
+    <value>Zurücksetzen</value>
+  </data>
+  <data name="quickAmountRemove" xml:space="preserve">
+    <value>Betrag entfernen</value>
+  </data>
+  <data name="quickAmountInvalid" xml:space="preserve">
+    <value>Bitte einen Betrag über 0 eingeben (höchstens 12 Schnellbeträge).</value>
+  </data>
+  <data name="quickAmountsSaved" xml:space="preserve">
+    <value>Schnellbeträge gespeichert.</value>
+  </data>
 </root>

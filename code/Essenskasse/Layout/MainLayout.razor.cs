@@ -108,6 +108,14 @@ namespace Essenskasse.Layout {
             }
             AppData.AdminEmail = await LocalStorage.GetItemAsync<string>("AdminEmail") ?? "";
             AppData.SendConfirmationMail = await ReadConfirmationMailModeAsync();
+            try {
+                if (await LocalStorage.ContainKeyAsync("OrderQuickAmounts")) {
+                    AppData.QuickAmounts = QuickAmounts.Normalize(await LocalStorage.GetItemAsync<List<long>>("OrderQuickAmounts"));
+                }
+            }
+            catch {
+                AppData.QuickAmounts = [.. QuickAmounts.Default]; // beschaedigter Eintrag -> Voreinstellung
+            }
         }
 
         /// <summary>Liest die Einstellung neu (Schluessel "ConfirmationMailMode") oder uebernimmt den frueheren Ja/Nein-Wert.</summary>

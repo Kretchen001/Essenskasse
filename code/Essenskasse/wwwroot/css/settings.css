@@ -154,3 +154,57 @@
         min-height: 2.75rem;
     }
 }
+
+/* Schnellbetraege: Chips mit Entfernen-Knopf und Eingabe zum Hinzufuegen */
+.ek-set-quick {
+    flex: 1 1 22rem;
+    justify-content: flex-end;
+}
+
+.ek-set-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.ek-set-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.15rem 0.3rem 0.15rem 0.75rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 999px;
+    background: var(--ek-surface);
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-dash .ek-set .ek-set-chip-x {
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--ek-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+    .ek-dash .ek-set .ek-set-chip-x:hover:not(:disabled) {
+        background-color: var(--ek-bad-tint);
+        color: var(--ek-bad);
+    }
+
+    .ek-dash .ek-set .ek-set-chip-x:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+.ek-set-add {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}

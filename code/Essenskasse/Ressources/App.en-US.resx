@@ -869,4 +869,25 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="coffeeRequired" xml:space="preserve">
     <value>Required</value>
   </data>
+  <data name="settingsQuickAmounts" xml:space="preserve">
+    <value>Quick amounts in the order window</value>
+  </data>
+  <data name="settingsQuickAmountsHint" xml:space="preserve">
+    <value>As many as you like, at least one and at most 12.</value>
+  </data>
+  <data name="quickAmountAdd" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="quickAmountReset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="quickAmountRemove" xml:space="preserve">
+    <value>Remove amount</value>
+  </data>
+  <data name="quickAmountInvalid" xml:space="preserve">
+    <value>Please enter an amount above 0 (at most 12 quick amounts).</value>
+  </data>
+  <data name="quickAmountsSaved" xml:space="preserve">
+    <value>Quick amounts saved.</value>
+  </data>
 </root>

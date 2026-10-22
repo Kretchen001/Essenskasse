@@ -34,6 +34,9 @@ namespace Essenskasse.Client.Services {
         /// <summary></summary>
         public bool NoticeableOnRightSide { get; set; } = true;
         
+        /// <summary>Die Schnellbetraege (Chips) im Bestellfenster in Cent; mindestens einer.</summary>
+        public List<long> QuickAmounts { get; set; } = [.. Modells.QuickAmounts.Default];
+
         /// <summary></summary>
         public U.ConfirmationMailMode SendConfirmationMail { get; set; } = U.ConfirmationMailMode.Optional;
 

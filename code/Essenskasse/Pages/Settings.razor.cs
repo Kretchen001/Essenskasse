@@ -1,6 +1,7 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Modells;
 using U = Modells.User;
@@ -71,6 +72,49 @@ namespace Essenskasse.Pages {
             set {
                 AppData.SendConfirmationMail = value;
                 WriteSendConfirmationMailToLocalStorage(value);
+            }
+        }
+
+        /// <summary>Eingabe fuer einen neuen Schnellbetrag.</summary>
+        private string newQuickAmount = "";
+
+        /// <summary>Die aktuellen Schnellbetraege (Cent), aufsteigend.</summary>
+        private List<long> QuickAmountList => AppData.QuickAmounts;
+
+        private void OnQuickAmountKeyDown(KeyboardEventArgs e) {
+            if (e.Key == "Enter") {
+                AddQuickAmount();
+            }
+        }
+
+        private void AddQuickAmount() {
+            if (Modells.QuickAmounts.TryAdd(AppData.QuickAmounts, newQuickAmount, out List<long> result)) {
+                AppData.QuickAmounts = result;
+                newQuickAmount = "";
+                SaveQuickAmounts();
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.quickAmountInvalid)], ToastLevel.Warning);
+            }
+        }
+
+        private void RemoveQuickAmount(long cents) {
+            AppData.QuickAmounts = Modells.QuickAmounts.Remove(AppData.QuickAmounts, cents);
+            SaveQuickAmounts();
+        }
+
+        private void ResetQuickAmounts() {
+            AppData.QuickAmounts = [.. Modells.QuickAmounts.Default];
+            SaveQuickAmounts();
+        }
+
+        private async void SaveQuickAmounts() {
+            try {
+                await LocalStorage.SetItemAsync<List<long>>("OrderQuickAmounts", AppData.QuickAmounts);
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.quickAmountsSaved)], ToastLevel.Success);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSaveError)], ToastLevel.Error);
             }
         }
 

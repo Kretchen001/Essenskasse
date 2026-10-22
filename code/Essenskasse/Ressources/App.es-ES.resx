@@ -869,4 +869,25 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="coffeeRequired" xml:space="preserve">
     <value>Obligatorio</value>
   </data>
+  <data name="settingsQuickAmounts" xml:space="preserve">
+    <value>Importes rápidos en el pedido</value>
+  </data>
+  <data name="settingsQuickAmountsHint" xml:space="preserve">
+    <value>Los que quiera, al menos uno y como máximo 12.</value>
+  </data>
+  <data name="quickAmountAdd" xml:space="preserve">
+    <value>Añadir</value>
+  </data>
+  <data name="quickAmountReset" xml:space="preserve">
+    <value>Restablecer</value>
+  </data>
+  <data name="quickAmountRemove" xml:space="preserve">
+    <value>Quitar importe</value>
+  </data>
+  <data name="quickAmountInvalid" xml:space="preserve">
+    <value>Introduzca un importe superior a 0 (como máximo 12 importes rápidos).</value>
+  </data>
+  <data name="quickAmountsSaved" xml:space="preserve">
+    <value>Importes rápidos guardados.</value>
+  </data>
 </root>
