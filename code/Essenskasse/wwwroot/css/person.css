@@ -38,6 +38,51 @@
     font-variant-numeric: tabular-nums;
 }
 
+.ek-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.ek-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ek-text);
+    font: inherit;
+    font-size: 0.92rem;
+    cursor: pointer;
+}
+
+    .ek-chip:hover {
+        border-color: var(--ek-text);
+    }
+
+    .ek-chip.is-active {
+        border-color: transparent;
+        background: var(--ek-hero-bg);
+        color: var(--ek-hero-text);
+    }
+
+    .ek-chip:focus-visible {
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 2px;
+    }
+
+.ek-chip-count {
+    color: var(--ek-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-chip.is-active .ek-chip-count {
+    color: var(--ek-hero-muted);
+}
+
 .ek-select-wrap {
     display: inline-flex;
     align-items: center;

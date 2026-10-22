@@ -75,11 +75,22 @@
                        placeholder="@_loc[nameof(RessourceAppStrings.searchPersons)]"
                        aria-label="@_loc[nameof(RessourceAppStrings.searchPersons)]"
                        @bind="Filter" @bind:event="oninput" />
-                @if (Filter.Length > 0) {
+                @if (IsFiltered) {
                     <span class="ek-search-count">@_loc[nameof(RessourceAppStrings.shownOfTotal), shownPersonList.Count, person.Count]</span>
+                }
+                @if (Filter.Length > 0) {
                     <button type="button" class="ek-icon-btn" @onclick="ClearFilter"
                             title="@_loc[nameof(RessourceAppStrings.clearSearch)]"
                             aria-label="@_loc[nameof(RessourceAppStrings.clearSearch)]">✕</button>
+                }
+            </div>
+            <div class="ek-chips" role="group" aria-label="@_loc[nameof(RessourceAppStrings.filterByStatus)]">
+                @foreach (PersonStatusFilter chip in chipOrder) {
+                    <button type="button" class="ek-chip @(statusFilter == chip ? "is-active" : "")"
+                            aria-pressed="@((statusFilter == chip).ToString().ToLowerInvariant())"
+                            @onclick="() => SetStatusFilter(chip)">
+                        @ChipLabel(chip) <span class="ek-chip-count">@ChipCount(chip)</span>
+                    </button>
                 }
             </div>
         }

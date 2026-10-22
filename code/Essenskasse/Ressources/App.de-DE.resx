@@ -564,4 +564,13 @@
   <data name="sortNoEmailFirst" xml:space="preserve">
     <value>Ohne E-Mail zuerst</value>
   </data>
+  <data name="filterAll" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="filterNoEmail" xml:space="preserve">
+    <value>Ohne E-Mail</value>
+  </data>
+  <data name="filterByStatus" xml:space="preserve">
+    <value>Nach Stand filtern</value>
+  </data>
 </root>

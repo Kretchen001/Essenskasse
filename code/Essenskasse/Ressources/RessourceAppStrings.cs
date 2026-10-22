@@ -152,5 +152,8 @@
         sortSaldoAsc,
         sortSaldoDesc,
         sortNoEmailFirst,
+        filterAll,
+        filterNoEmail,
+        filterByStatus,
     }
 }

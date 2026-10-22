@@ -47,6 +47,37 @@ namespace Essenskasse.Pages {
             Filter = "";
         }
 
+        private PersonStatusFilter statusFilter = PersonStatusFilter.All;
+        private static readonly PersonStatusFilter[] chipOrder = {
+            PersonStatusFilter.All, PersonStatusFilter.Noticeable, PersonStatusFilter.Inconspicuous, PersonStatusFilter.NoEmail
+        };
+
+        private bool IsFiltered => filter.Trim().Length > 0 || statusFilter != PersonStatusFilter.All;
+
+        private void SetStatusFilter(PersonStatusFilter value) {
+            statusFilter = value;
+            ApplyFilterAndSort();
+        }
+
+        private string ChipLabel(PersonStatusFilter chip) {
+            return chip switch {
+                PersonStatusFilter.Noticeable => _loc[nameof(RessourceAppStrings.noticeable)],
+                PersonStatusFilter.Inconspicuous => _loc[nameof(RessourceAppStrings.inconspicuous)],
+                PersonStatusFilter.NoEmail => _loc[nameof(RessourceAppStrings.filterNoEmail)],
+                _ => _loc[nameof(RessourceAppStrings.filterAll)],
+            };
+        }
+
+        /// <summary>Anzahl aller Personen je Schnellfilter (unabhaengig vom Suchtext).</summary>
+        private int ChipCount(PersonStatusFilter chip) {
+            return chip switch {
+                PersonStatusFilter.Noticeable => person.Count(x => !IsInconspicuous(x)),
+                PersonStatusFilter.Inconspicuous => person.Count(x => IsInconspicuous(x)),
+                PersonStatusFilter.NoEmail => person.Count(x => x.Email.Length == 0),
+                _ => person.Count,
+            };
+        }
+
         private List<Person> person = new List<Person>();
         private List<Person> shownPersonList = new List<Person>();
 
@@ -173,6 +204,12 @@ namespace Essenskasse.Pages {
                 result = result.Where(x => x.Name.Contains(text, StringComparison.CurrentCultureIgnoreCase)
                                         || x.Email.Contains(text, StringComparison.CurrentCultureIgnoreCase));
             }
+            result = statusFilter switch {
+                PersonStatusFilter.Noticeable => result.Where(x => !IsInconspicuous(x)),
+                PersonStatusFilter.Inconspicuous => result.Where(x => IsInconspicuous(x)),
+                PersonStatusFilter.NoEmail => result.Where(x => x.Email.Length == 0),
+                _ => result,
+            };
             StringComparer byName = StringComparer.CurrentCultureIgnoreCase;
             shownPersonList = (sortMode switch {
                 PersonSortMode.NameDesc => result.OrderByDescending(x => x.Name, byName),
