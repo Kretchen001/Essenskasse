@@ -160,5 +160,8 @@
         nameRequired,
         unsaved,
         discard,
+        addAnyway,
+        duplicateName,
+        emailInvalid,
     }
 }

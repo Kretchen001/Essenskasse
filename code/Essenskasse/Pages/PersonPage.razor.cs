@@ -2,14 +2,17 @@
 using Essenskasse.Ressources;
 using Microsoft.JSInterop;
 using Modells;
+using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace Essenskasse.Pages {
     
     public partial class PersonPage {
 
         private string dashboardLink = "/";
-        private bool accessToAdd = false;
+        private bool isAdding = false;
+        private ElementReference newNameInput;
         private PersonSortMode sortMode = PersonSortMode.NameAsc;
 
         /// <summary>Gewaehlte Sortierung als Text fuer das Auswahlfeld; wird im Browser gemerkt.</summary>
@@ -120,29 +123,45 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async void AddNewPerson() {
-            if (newPersonName.Equals("")) {
+        private static readonly Regex EmailPattern = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
+
+        private bool NewNameEntered => newPersonName.Trim().Length > 0;
+        private bool NewEmailInvalid => newPersonEmail.Trim().Length > 0 && !EmailPattern.IsMatch(newPersonEmail.Trim());
+        private bool NewNameDuplicate => NewNameEntered
+            && person.Any(x => string.Equals(x.Name, newPersonName.Trim(), StringComparison.CurrentCultureIgnoreCase));
+        private bool CanAdd => NewNameEntered && !NewEmailInvalid && !isAdding;
+
+        private async Task AddNewPerson() {
+            if (!CanAdd) {
                 return;
             }
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(Config["API-Adress"] + "person/new"),
-                Headers = {
-                        {"name", Uri.EscapeDataString(newPersonName)},
-                        {"email", Uri.EscapeDataString(newPersonEmail)}
-                    }
-            };
-
-            HttpResponseMessage? response = null;
+            string name = newPersonName.Trim();
+            string email = newPersonEmail.Trim();
+            isAdding = true;
             try {
-                response = await HttpClient.SendAsync(httpRequestMessage);
-            }
-            catch {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
-            }
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "person/new"),
+                    Headers = {
+                        {"name", Uri.EscapeDataString(name)},
+                        {"email", Uri.EscapeDataString(email)}
+                    }
+                };
 
-            if (response.IsSuccessStatusCode) {
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+                    return;
+                }
+
                 string tempGuid = await response.Content.ReadAsStringAsync();
                 HttpRequestMessage httpRequestMessage2 = new HttpRequestMessage() {
                     Method = HttpMethod.Get,
@@ -151,7 +170,6 @@ namespace Essenskasse.Pages {
                         {"guid", tempGuid[1..(tempGuid.Length - 1)] }
                     }
                 };
-
                 HttpResponseMessage response2 = await HttpClient.SendAsync(httpRequestMessage2);
 
                 if (response2.IsSuccessStatusCode) {
@@ -159,23 +177,19 @@ namespace Essenskasse.Pages {
                     temp.Name = Uri.UnescapeDataString(temp.Name);
                     temp.Email = Uri.UnescapeDataString(temp.Email);
                     person.Add(temp);
-                    ToastService.ShowToast(newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedAndAvailable)], ToastLevel.Success);
-                    accessToAdd = false;
-                    newPersonName = newPersonEmail = ""; 
                     ApplyFilterAndSort();
-                    base.StateHasChanged();
+                    ToastService.ShowToast(name + " " + _loc[nameof(RessourceAppStrings.toastAddedAndAvailable)], ToastLevel.Success);
                 }
                 else {
-                    ToastService.ShowToast(newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedButNotAvailable)], ToastLevel.Warning);
-                    accessToAdd = false;
-                    newPersonName = "";
-                    newPersonEmail = "";
-                    base.StateHasChanged();
+                    ToastService.ShowToast(name + " " + _loc[nameof(RessourceAppStrings.toastAddedButNotAvailable)], ToastLevel.Warning);
                 }
+                newPersonName = "";
+                newPersonEmail = "";
             }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+            finally {
+                isAdding = false;
             }
+            await newNameInput.FocusAsync(); // direkt die naechste Person eingeben
         }
 
         /// <summary>Eine Kachel hat Name oder E-Mail gespeichert: Liste (Filter, Sortierung, Zaehler) neu aufbauen.</summary>

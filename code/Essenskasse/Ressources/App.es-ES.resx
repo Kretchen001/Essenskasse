@@ -588,4 +588,13 @@
   <data name="discard" xml:space="preserve">
     <value>Descartar</value>
   </data>
+  <data name="addAnyway" xml:space="preserve">
+    <value>Añadir de todos modos</value>
+  </data>
+  <data name="duplicateName" xml:space="preserve">
+    <value>Ya existe una persona con este nombre.</value>
+  </data>
+  <data name="emailInvalid" xml:space="preserve">
+    <value>La dirección de correo parece no válida.</value>
+  </data>
 </root>

@@ -30,42 +30,32 @@
     <Authorized>
         <div class="ek-dash">
         <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.person)]</h2>
-        <div class="row">
-            <h4 style="margin-top: 1rem;">
-                @_loc[nameof(RessourceAppStrings.addPerson)]
-            </h4>
-            @if (!accessToAdd) {
-                <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToAdd = true;}">
-                    @_loc[nameof(RessourceAppStrings.addPerson)]
+        <form class="ek-add" @onsubmit="AddNewPerson" @onsubmit:preventDefault>
+            <h3 class="ek-group-title">@_loc[nameof(RessourceAppStrings.addPerson)]</h3>
+            <div class="ek-add-fields">
+                <label class="ek-field">
+                    <span>@_loc[nameof(RessourceAppStrings.name)]</span>
+                    <input @ref="newNameInput" type="text" class="ek-input" autocomplete="off"
+                           @bind="newPersonName" @bind:event="oninput" />
+                </label>
+                <label class="ek-field">
+                    <span>@_loc[nameof(RessourceAppStrings.email)]</span>
+                    <input type="email" class="ek-input" autocomplete="off"
+                           @bind="newPersonEmail" @bind:event="oninput" />
+                </label>
+                <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@(!CanAdd)">
+                    @(NewNameDuplicate ? _loc[nameof(RessourceAppStrings.addAnyway)] : _loc[nameof(RessourceAppStrings.add)])
                 </button>
+            </div>
+            @if (NewNameDuplicate) {
+                <p class="ek-hint is-warn">@_loc[nameof(RessourceAppStrings.duplicateName)]</p>
             }
-            else {
-                <div class="col-lg-2">
-                    <label style="vertical-align: middle;">
-                        @_loc[nameof(RessourceAppStrings.add)]
-                    </label>
-                </div>
-                <div class="col-lg-8">
-                    <div class="row">
-                        <input type="text" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.name)]" id="idHinzuzufuegen"
-                               style="width: 100%;" @bind-value="newPersonName">
-                    </div>
-                    <div class="row">
-                        <input type="email" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.email)]" id="idHinzuzufuegen"
-                               style="width: 100%;" @bind-value="newPersonEmail">
-                    </div>
-                </div>
-                <div class="col-lg-2">
-                    <button @onclick="() => { AddNewPerson(); }">
-                        @_loc[nameof(RessourceAppStrings.submit)]!
-                    </button>
-                </div>
+            @if (NewEmailInvalid) {
+                <p class="ek-hint is-error">@_loc[nameof(RessourceAppStrings.emailInvalid)]</p>
             }
-        </div>
+        </form>
 
-        <br />
-
-        <h4>@_loc[nameof(RessourceAppStrings.personRegistered)]</h4>
+        <h3 class="ek-group-title ek-list-title">@_loc[nameof(RessourceAppStrings.personRegistered)]</h3>
         @if (AppData.FilterShowPerson) {
             <div class="ek-search">
                 <svg class="ek-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
