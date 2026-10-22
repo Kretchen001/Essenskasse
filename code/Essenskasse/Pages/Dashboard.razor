@@ -18,28 +18,42 @@
 <div class="ek-dash">
     <header class="ek-head">
         <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.dashboard)]</h2>
-        <label class="ek-switch">
-            <input type="checkbox" role="switch" @bind="IsSingleListWish" />
-            <span class="ek-switch-track" aria-hidden="true"></span>
-            <span>@_loc[nameof(RessourceAppStrings.singleColumn)]</span>
-        </label>
+        <div class="ek-actions">
+            <label class="ek-switch">
+                <input type="checkbox" role="switch" @bind="IsSingleListWish" />
+                <span class="ek-switch-track" aria-hidden="true"></span>
+                <span>@_loc[nameof(RessourceAppStrings.singleColumn)]</span>
+            </label>
+            @if (!IsSingleListWish) {
+                <button type="button" class="ek-btn" @onclick="ToggleColumnInView">
+                    @_loc[nameof(RessourceAppStrings.swapColumns)]
+                </button>
+            }
+            <button type="button" class="ek-btn" @onclick="RecalculateSaldos">
+                @_loc[nameof(RessourceAppStrings.recalculateSaldo)]
+            </button>
+        </div>
     </header>
 
     <section class="ek-hero" aria-labelledby="ek-cash-label">
-        <p id="ek-cash-label" class="ek-hero-label">@_loc[nameof(RessourceAppStrings.cashBalanceCurrent)]</p>
-        <p class="ek-hero-amount">@currentCashBalance.ToString()</p>
-        <div class="ek-roll" aria-hidden="true">
-            @foreach (Person p in noticeable) {
-                <span class="ek-pip ek-pip-bad" title="@p.Name"></span>
-            }
-            @foreach (Person p in inconspicuous) {
-                <span class="ek-pip ek-pip-ok" title="@p.Name"></span>
-            }
+        <div class="ek-hero-main">
+            <p id="ek-cash-label" class="ek-hero-label">@_loc[nameof(RessourceAppStrings.cashBalanceCurrent)]</p>
+            <p class="ek-hero-amount">@currentCashBalance.ToString()</p>
         </div>
-        <p class="ek-legend">
-            <span class="ek-legend-item"><span class="ek-dot ek-dot-bad"></span>@(noticeable.Count) @_loc[nameof(RessourceAppStrings.noticeable)]</span>
-            <span class="ek-legend-item"><span class="ek-dot ek-dot-ok"></span>@(inconspicuous.Count) @_loc[nameof(RessourceAppStrings.inconspicuous)]</span>
-        </p>
+        <div class="ek-hero-side">
+            <div class="ek-roll" aria-hidden="true">
+                @foreach (Person p in noticeable) {
+                    <span class="ek-pip ek-pip-bad" title="@p.Name"></span>
+                }
+                @foreach (Person p in inconspicuous) {
+                    <span class="ek-pip ek-pip-ok" title="@p.Name"></span>
+                }
+            </div>
+            <p class="ek-legend">
+                <span class="ek-legend-item"><span class="ek-dot ek-dot-bad"></span>@(noticeable.Count) @_loc[nameof(RessourceAppStrings.noticeable)]</span>
+                <span class="ek-legend-item"><span class="ek-dot ek-dot-ok"></span>@(inconspicuous.Count) @_loc[nameof(RessourceAppStrings.inconspicuous)]</span>
+            </p>
+        </div>
     </section>
 
     @if (IsSingleListWish) {
@@ -50,11 +64,6 @@
         </div>
     }
     else {
-        <div class="ek-tools">
-            <button type="button" class="ek-btn" @onclick="ToggleColumnInView">
-                @_loc[nameof(RessourceAppStrings.swapColumns)]
-            </button>
-        </div>
         <div class="ek-groups @(NoticeableOnRightSide ? "ek-swap" : "")">
             @if (noticeable.Count > 0) {
                 <section class="ek-group ek-group-bad">
@@ -78,10 +87,4 @@
             }
         </div>
     }
-
-    <footer class="ek-foot">
-        <button type="button" class="ek-btn" @onclick="RecalculateSaldos">
-            @_loc[nameof(RessourceAppStrings.recalculateSaldo)]
-        </button>
-    </footer>
 </div>
