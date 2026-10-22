@@ -17,6 +17,8 @@ namespace EssenskasseAPI.Test {
             { "GET", "api/person/perGuid" },
             { "POST", "api/person/new" },
             { "PUT", "api/person/update" },
+            { "GET", "api/person/requestHidden" },
+            { "PUT", "api/person/restore" },
             { "PUT", "api/person/updateDatabasePersonSaldo" },
             { "DELETE", "api/person/remove" },
             { "GET", "api/order/requestAll" },

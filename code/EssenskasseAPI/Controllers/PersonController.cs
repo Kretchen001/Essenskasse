@@ -145,6 +145,43 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        /// <summary>Ausgeblendete Personen (Sichtbar=false), damit sie wiederhergestellt werden koennen.</summary>
+        [HttpGet, Route("requestHidden")]
+        public IActionResult GetHiddenPerson() {
+            using (Operation.Time("Request hidden Persons")) {
+                string queryString = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.Person " +
+                    $"WHERE Sichtbar=false;";
+
+                DataTable dataTablePerson = _db.Query(queryString);
+                List<Person> persons = DataTableToListOfPerson(dataTablePerson);
+                Log.Information(persons.Count + " hidden Person requested");
+                return Ok(JsonConvert.SerializeObject(persons));
+            }
+        }
+
+        /// <summary>Blendet eine ausgeblendete Person wieder ein.</summary>
+        [HttpPut, Route("restore")]
+        public IActionResult RestorePerson([FromHeader] Guid? guid) {
+            using (Operation.Time("RestorePerson")) {
+                Log.Information("RestorePerson called");
+                if (guid is null) {
+                    Log.Warning("Nothing to restore");
+                    return BadRequest();
+                }
+                DataTable dataTable = _db.Query($"SELECT * FROM essenskasse.Person WHERE Guid=@guid;", Db.P("@guid", guid));
+                List<Person> persons = DataTableToListOfPerson(dataTable);
+                if (persons.Count != 1) {
+                    Log.Warning($"{guid} not found");
+                    return NotFound("Person konnte nicht gefunden werden!");
+                }
+                _db.Query($"UPDATE essenskasse.Person SET Sichtbar=true WHERE Guid=@guid;", Db.P("@guid", guid));
+                Log.Information($"{persons[0].Name} with {persons[0].Guid} successfully visible set");
+                return Ok(JsonConvert.SerializeObject(persons[0]));
+            }
+        }
+
         [HttpPut, Route("updateDatabasePersonSaldo")]
         public IActionResult UpdatePersonSaldoInDatabase() {
             using (Operation.Time("UpdatePersonSaldoInDatabase")) {
