@@ -6,6 +6,7 @@ using Modells.User;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace EssenskasseAPI.Controllers {
 
@@ -64,6 +65,10 @@ namespace EssenskasseAPI.Controllers {
         [HttpPost, Route("restore")]
         public IActionResult RestoreSpecificBackup([FromHeader] string identifier) {
             // identifier -> "yyyy_MM_dd_HH_mm"
+            // Nur dieses Format zulassen, sonst koennte ueber den Header (z. B. "../..") aus dem Backup-Ordner ausgebrochen werden.
+            if (!Regex.IsMatch(identifier, @"^\d{4}_\d{2}_\d{2}_\d{2}_\d{2}$")) {
+                return BadRequest("Ungültiger Backup-Bezeichner (erwartet: yyyy_MM_dd_HH_mm).");
+            }
             string dirForBackup = $"{AppDomain.CurrentDomain.BaseDirectory}backup/{identifier}";
 
             //check if the backup-files exist -> if not then add false and so ignore them
