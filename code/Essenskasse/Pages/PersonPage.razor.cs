@@ -17,6 +17,19 @@ namespace Essenskasse.Pages {
 
         private string filter = "";
 
+        /// <summary>Suchtext; jede Aenderung baut die Liste sofort neu auf.</summary>
+        private string Filter {
+            get => filter;
+            set {
+                filter = value ?? "";
+                ApplyFilterAndSort();
+            }
+        }
+
+        private void ClearFilter() {
+            Filter = "";
+        }
+
         private List<Person> person = new List<Person>();
         private List<Person> shownPersonList = new List<Person>();
 
@@ -124,10 +137,6 @@ namespace Essenskasse.Pages {
             base.StateHasChanged();
         }
 
-        private void ChangePersonShownList() {
-            ApplyFilterAndSort();
-        }
-
         private void ToggleAscDesc() {
             IsASC = !IsASC;
             _ = SaveAscStatus();
@@ -135,13 +144,14 @@ namespace Essenskasse.Pages {
             base.StateHasChanged();
         }
 
-        /// <summary>Baut die angezeigte Liste immer aus allen Personen, dem aktuellen Filter (ohne Beachtung der
+        /// <summary>Baut die angezeigte Liste immer aus allen Personen, dem aktuellen Filter (Name oder E-Mail, ohne Beachtung der
         /// Schreibweise) und der Sortierung neu auf. Alle Stellen, die die Liste aendern, rufen das auf.</summary>
         private void ApplyFilterAndSort() {
             IEnumerable<Person> result = person;
             string text = filter.Trim();
             if (text.Length > 0) {
-                result = result.Where(x => x.Name.Contains(text, StringComparison.CurrentCultureIgnoreCase));
+                result = result.Where(x => x.Name.Contains(text, StringComparison.CurrentCultureIgnoreCase)
+                                        || x.Email.Contains(text, StringComparison.CurrentCultureIgnoreCase));
             }
             shownPersonList = (IsASC
                 ? result.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase)

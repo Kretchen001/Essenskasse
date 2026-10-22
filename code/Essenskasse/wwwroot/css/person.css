@@ -2,6 +2,42 @@
 
 /* ---------- Personenliste ---------- */
 
+.ek-search {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 0.35rem 0.5rem 0.35rem 0.85rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 10px;
+    background: var(--ek-surface);
+    color: var(--ek-muted);
+}
+
+    .ek-search:focus-within {
+        border-color: var(--ek-focus);
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 1px;
+    }
+
+.ek-search-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.3rem 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--ek-text);
+    font: inherit;
+}
+
+.ek-search-count {
+    flex: none;
+    color: var(--ek-muted);
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+}
+
 .ek-people-tools {
     display: flex;
     flex-wrap: wrap;

@@ -143,5 +143,8 @@
         accessDeniedHint,
         signIn,
         backToDashboard,
+        searchPersons,
+        clearSearch,
+        shownOfTotal,
     }
 }

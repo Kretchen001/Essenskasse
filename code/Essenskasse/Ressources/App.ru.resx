@@ -537,4 +537,13 @@
   <data name="backToDashboard" xml:space="preserve">
     <value>К панели</value>
   </data>
+  <data name="searchPersons" xml:space="preserve">
+    <value>Поиск людей (имя или e-mail)</value>
+  </data>
+  <data name="clearSearch" xml:space="preserve">
+    <value>Очистить поиск</value>
+  </data>
+  <data name="shownOfTotal" xml:space="preserve">
+    <value>{0} из {1}</value>
+  </data>
 </root>

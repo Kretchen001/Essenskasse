@@ -537,4 +537,13 @@
   <data name="backToDashboard" xml:space="preserve">
     <value>Zum Dashboard</value>
   </data>
+  <data name="searchPersons" xml:space="preserve">
+    <value>Personen suchen (Name oder E-Mail)</value>
+  </data>
+  <data name="clearSearch" xml:space="preserve">
+    <value>Suche löschen</value>
+  </data>
+  <data name="shownOfTotal" xml:space="preserve">
+    <value>{0} von {1}</value>
+  </data>
 </root>

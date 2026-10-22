@@ -67,15 +67,20 @@
 
         <h4>@_loc[nameof(RessourceAppStrings.personRegistered)]</h4>
         @if (AppData.FilterShowPerson) {
-            <div class="row" style="margin-top: 1rem;">
-                <div class="col-lg-2">
-                    <label>
-                        @_loc[nameof(RessourceAppStrings.filter)]
-                    </label>
-                </div>
-                <div class="col-lg-10 align-self-center">
-                    <input @bind="filter" @bind:event="oninput" @onkeyup="ChangePersonShownList" />
-                </div>
+            <div class="ek-search">
+                <svg class="ek-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                </svg>
+                <input id="ek-person-search" type="text" inputmode="search" class="ek-search-input" autocomplete="off"
+                       placeholder="@_loc[nameof(RessourceAppStrings.searchPersons)]"
+                       aria-label="@_loc[nameof(RessourceAppStrings.searchPersons)]"
+                       @bind="Filter" @bind:event="oninput" />
+                @if (Filter.Length > 0) {
+                    <span class="ek-search-count">@_loc[nameof(RessourceAppStrings.shownOfTotal), shownPersonList.Count, person.Count]</span>
+                    <button type="button" class="ek-icon-btn" @onclick="ClearFilter"
+                            title="@_loc[nameof(RessourceAppStrings.clearSearch)]"
+                            aria-label="@_loc[nameof(RessourceAppStrings.clearSearch)]">✕</button>
+                }
             </div>
         }
         <div class="ek-people-tools">
