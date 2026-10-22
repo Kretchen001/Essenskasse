@@ -107,7 +107,20 @@ namespace Essenskasse.Layout {
                 AppData.AccessToken = null;
             }
             AppData.AdminEmail = await LocalStorage.GetItemAsync<string>("AdminEmail") ?? "";
-            AppData.SendConfirmationMail = await LocalStorage.GetItemAsync<bool>("SendConfirmationMail");
+            AppData.SendConfirmationMail = await ReadConfirmationMailModeAsync();
+        }
+
+        /// <summary>Liest die Einstellung neu (Schluessel "ConfirmationMailMode") oder uebernimmt den frueheren Ja/Nein-Wert.</summary>
+        private async Task<Modells.User.ConfirmationMailMode> ReadConfirmationMailModeAsync() {
+            if (await LocalStorage.ContainKeyAsync("ConfirmationMailMode")) {
+                return Modells.User.ConfirmationMailModes.Parse((await LocalStorage.GetItemAsync<int>("ConfirmationMailMode")).ToString());
+            }
+            if (await LocalStorage.ContainKeyAsync("SendConfirmationMail")) {
+                return await LocalStorage.GetItemAsync<bool>("SendConfirmationMail")
+                    ? Modells.User.ConfirmationMailMode.Optional
+                    : Modells.User.ConfirmationMailMode.Never;
+            }
+            return Modells.User.ConfirmationMailMode.Optional;
         }
 
         private async Task LogoutUser() {

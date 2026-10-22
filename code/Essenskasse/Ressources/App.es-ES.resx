@@ -821,4 +821,16 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="confirmationMailSetting" xml:space="preserve">
     <value>¿Enviar un correo de confirmación en los pagos?</value>
   </data>
+  <data name="confirmationMailNever" xml:space="preserve">
+    <value>Nunca</value>
+  </data>
+  <data name="confirmationMailOptional" xml:space="preserve">
+    <value>Seleccionable en cada pago</value>
+  </data>
+  <data name="confirmationMailAlways" xml:space="preserve">
+    <value>Siempre (obligatorio)</value>
+  </data>
+  <data name="confirmationMailAlwaysInfo" xml:space="preserve">
+    <value>Se prepara un correo de confirmación para cada pago.</value>
+  </data>
 </root>

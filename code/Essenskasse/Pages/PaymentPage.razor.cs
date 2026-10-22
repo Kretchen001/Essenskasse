@@ -6,6 +6,7 @@ using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
 using System.Text;
+using U = Modells.User;
 
 namespace Essenskasse.Pages {
 
@@ -195,7 +196,7 @@ namespace Essenskasse.Pages {
             amountText = "";
             comment = "";
             SelectedPerson = selected.Guid;
-            sendConfirmation = AppData.SendConfirmationMail && !selected.Email.Equals("");
+            sendConfirmation = AppData.SendConfirmationMail != U.ConfirmationMailMode.Never && !selected.Email.Equals("");
             focusAmount = true; // Cursor direkt ins Betragsfeld
         }
 
@@ -225,6 +226,12 @@ namespace Essenskasse.Pages {
 
         /// <summary>Soll fuer die naechste Buchung eine Bestaetigungsmail vorbereitet werden? Voreinstellung aus den Einstellungen.</summary>
         private bool sendConfirmation = false;
+        /// <summary>Nur bei der Einstellung "pro Einzahlung waehlbar" gibt es den Schalter.</summary>
+        private bool MailChoosable => AppData.SendConfirmationMail == U.ConfirmationMailMode.Optional;
+
+        /// <summary>Bei "immer" wird die Bestaetigungsmail zu jeder Einzahlung vorbereitet.</summary>
+        private bool MailAlways => AppData.SendConfirmationMail == U.ConfirmationMailMode.Always;
+
         private bool HasEmail => !(SelectedPersonData?.Email ?? "").Equals("");
 
         private bool isBooking = false;
@@ -290,7 +297,7 @@ namespace Essenskasse.Pages {
             }
             Guid bookedFor = SelectedPerson;
             Money booked = Money;
-            bool sendForThisBooking = sendConfirmation; // Wahl zum Zeitpunkt der Buchung festhalten
+            bool sendForThisBooking = MailAlways || (MailChoosable && sendConfirmation); // Wahl zum Zeitpunkt der Buchung festhalten
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),

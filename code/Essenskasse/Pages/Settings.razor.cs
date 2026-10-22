@@ -63,8 +63,8 @@ namespace Essenskasse.Pages {
             }
         }
 
-        /// <summary></summary>
-        private bool SendConfirmationMail {
+        /// <summary>Gibt an, ob und wie die Bestaetigungsmail bei Einzahlungen vorbereitet wird.</summary>
+        private U.ConfirmationMailMode SendConfirmationMail {
             get {
                 return AppData.SendConfirmationMail;
             }
@@ -74,16 +74,13 @@ namespace Essenskasse.Pages {
             }
         }
 
-        /// <summary></summary>
-        private string ReturnSendConfirmationMail {
-            get {
-                if (SendConfirmationMail) {
-                    return _loc[nameof(RessourceAppStrings.yes)];
-                }
-                else {
-                    return _loc[nameof(RessourceAppStrings.no)];
-                }
-            }
+        /// <summary>Beschriftung eines Modus in der gewaehlten Sprache.</summary>
+        private string MailModeText(U.ConfirmationMailMode mode) {
+            return mode switch {
+                U.ConfirmationMailMode.Never => _loc[nameof(RessourceAppStrings.confirmationMailNever)],
+                U.ConfirmationMailMode.Always => _loc[nameof(RessourceAppStrings.confirmationMailAlways)],
+                _ => _loc[nameof(RessourceAppStrings.confirmationMailOptional)]
+            };
         }
 
         /// <summary></summary>
@@ -260,8 +257,10 @@ namespace Essenskasse.Pages {
         
         /// <summary></summary>
         /// <param name="value"></param>
-        private async void WriteSendConfirmationMailToLocalStorage(bool value) {
-            await LocalStorage.SetItemAsync<bool>("SendConfirmationMail", value);
+        private async void WriteSendConfirmationMailToLocalStorage(U.ConfirmationMailMode value) {
+            await LocalStorage.SetItemAsync<int>("ConfirmationMailMode", (int)value);
+            await LocalStorage.RemoveItemAsync("SendConfirmationMail"); // alter Ja/Nein-Schluessel
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.confirmationMailSetting)] + ": " + MailModeText(value), ToastLevel.Success);
         }
 
         /// <summary></summary>
@@ -419,6 +418,7 @@ namespace Essenskasse.Pages {
                         SaveAccessToken(AppData.AccessToken ?? default);
                     }
                     SaveAdminEmail(AppData.AdminEmail);
+                    WriteSendConfirmationMailToLocalStorage(AppData.SendConfirmationMail);
 
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.settingsSuccsessfullyRestored)], ToastLevel.Success);
                 }

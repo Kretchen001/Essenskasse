@@ -115,13 +115,15 @@
         <AuthorizeView>
             <Authorized>
                 <label class="ek-set-row">
-                    <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.confirmationMailSetting)]</span></span>
+                    <span class="ek-set-text">
+                        <span class="ek-set-label">@_loc[nameof(RessourceAppStrings.confirmationMailSetting)]</span>
+                    </span>
                     <span class="ek-set-control">
-                        <span class="ek-switch">
-                            <input type="checkbox" @bind="SendConfirmationMail" />
-                            <span class="ek-switch-track"></span>
-                            <span>@ReturnSendConfirmationMail</span>
-                        </span>
+                        <select class="ek-select" @bind="SendConfirmationMail">
+                            <option value="@Modells.User.ConfirmationMailMode.Never">@_loc[nameof(RessourceAppStrings.confirmationMailNever)]</option>
+                            <option value="@Modells.User.ConfirmationMailMode.Optional">@_loc[nameof(RessourceAppStrings.confirmationMailOptional)]</option>
+                            <option value="@Modells.User.ConfirmationMailMode.Always">@_loc[nameof(RessourceAppStrings.confirmationMailAlways)]</option>
+                        </select>
                     </span>
                 </label>
                 <div class="ek-set-row">

@@ -821,4 +821,16 @@
   <data name="confirmationMailSetting" xml:space="preserve">
     <value>Отправлять подтверждение по e-mail при платежах?</value>
   </data>
+  <data name="confirmationMailNever" xml:space="preserve">
+    <value>Никогда</value>
+  </data>
+  <data name="confirmationMailOptional" xml:space="preserve">
+    <value>Выбор при каждом платеже</value>
+  </data>
+  <data name="confirmationMailAlways" xml:space="preserve">
+    <value>Всегда (обязательно)</value>
+  </data>
+  <data name="confirmationMailAlwaysInfo" xml:space="preserve">
+    <value>Для каждого платежа готовится письмо с подтверждением.</value>
+  </data>
 </root>

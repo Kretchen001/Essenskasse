@@ -321,7 +321,7 @@ namespace EssenskasseAPI.Controllers {
                                 Db.P("@accessToken", settings.AccessToken),
                                 Db.P("@adminEmail", settings.AdminEmail),
                                 Db.P("@rightSide", settings.NoticeableOnRightSide),
-                                Db.P("@sendMail", settings.SendConfirmationMail)
+                                Db.P("@sendMail", (int)settings.SendConfirmationMail)
                             ];
                             if (tempSettings.Rows.Count == 0) { // no settings there, so insert
                                 string insertQueryString = $"" +
@@ -443,7 +443,7 @@ namespace EssenskasseAPI.Controllers {
                 accessTokenGuid,
                 dataTable.Rows[0]["adminEmail"].ToString() ?? "",
                 bool.Parse(dataTable.Rows[0]["noticeableOnRightSide"].ToString() ?? "false"),
-                bool.Parse(dataTable.Rows[0]["sendConfirmationMail"].ToString() ?? "true")
+                U.ConfirmationMailModes.Parse(dataTable.Rows[0]["sendConfirmationMail"].ToString())
                 );
         }
         #endregion

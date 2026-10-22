@@ -96,12 +96,17 @@
                 @if (AmountEntered && !AmountValid) {
                     <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</p>
                 }
-                <label class="ek-switch ek-pay-mail">
-                    <input type="checkbox" @bind="sendConfirmation" disabled="@(!HasEmail)" />
-                    <span class="ek-switch-track"></span>
-                    <span>@_loc[nameof(RessourceAppStrings.sendConfirmation)]</span>
-                </label>
-                @if (!HasEmail) {
+                @if (MailChoosable) {
+                    <label class="ek-switch ek-pay-mail">
+                        <input type="checkbox" @bind="sendConfirmation" disabled="@(!HasEmail)" />
+                        <span class="ek-switch-track"></span>
+                        <span>@_loc[nameof(RessourceAppStrings.sendConfirmation)]</span>
+                    </label>
+                }
+                else if (MailAlways) {
+                    <p class="ek-hint">@_loc[nameof(RessourceAppStrings.confirmationMailAlwaysInfo)]</p>
+                }
+                @if (!HasEmail && AppData.SendConfirmationMail != Modells.User.ConfirmationMailMode.Never) {
                     <p class="ek-hint is-warn">@_loc[nameof(RessourceAppStrings.toastNoEmailEntered)]</p>
                 }
             </form>

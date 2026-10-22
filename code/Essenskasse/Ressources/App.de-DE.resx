@@ -821,4 +821,16 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="confirmationMailSetting" xml:space="preserve">
     <value>Bestätigungsmail bei Einzahlungen absenden?</value>
   </data>
+  <data name="confirmationMailNever" xml:space="preserve">
+    <value>Nie</value>
+  </data>
+  <data name="confirmationMailOptional" xml:space="preserve">
+    <value>Pro Einzahlung wählbar</value>
+  </data>
+  <data name="confirmationMailAlways" xml:space="preserve">
+    <value>Immer (verpflichtend)</value>
+  </data>
+  <data name="confirmationMailAlwaysInfo" xml:space="preserve">
+    <value>Zu jeder Einzahlung wird eine Bestätigungsmail vorbereitet.</value>
+  </data>
 </root>

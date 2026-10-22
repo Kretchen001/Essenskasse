@@ -821,4 +821,16 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="confirmationMailSetting" xml:space="preserve">
     <value>Send a confirmation email for payments?</value>
   </data>
+  <data name="confirmationMailNever" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="confirmationMailOptional" xml:space="preserve">
+    <value>Selectable per payment</value>
+  </data>
+  <data name="confirmationMailAlways" xml:space="preserve">
+    <value>Always (mandatory)</value>
+  </data>
+  <data name="confirmationMailAlwaysInfo" xml:space="preserve">
+    <value>A confirmation email is prepared for every payment.</value>
+  </data>
 </root>

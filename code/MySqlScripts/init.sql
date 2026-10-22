@@ -78,5 +78,5 @@ CREATE TABLE IF NOT EXISTS essenskasse.SettingsUser (
     accessToken CHAR(36) DEFAULT "00000000-0000-0000-0000-000000000000",
     adminEmail VARCHAR(255),
     noticeableOnRightSide BOOLEAN DEFAULT false,
-    sendConfirmationMail BOOLEAN DEFAULT true
+    sendConfirmationMail TINYINT NOT NULL DEFAULT 1 -- 0 = nie, 1 = pro Einzahlung waehlbar, 2 = immer
 );

@@ -45,7 +45,7 @@ namespace Modells.User {
 
         /// <summary></summary>
         [JsonInclude, JsonPropertyName("SendConfirmationMail"), JsonProperty(nameof(SendConfirmationMail))]
-        public bool SendConfirmationMail { get; set; } = true;
+        public ConfirmationMailMode SendConfirmationMail { get; set; } = ConfirmationMailMode.Optional;
 
         /// <summary></summary>
         public Settings() { }
@@ -63,7 +63,7 @@ namespace Modells.User {
         /// <param name="sendConfirmationMail"></param>
         [System.Text.Json.Serialization.JsonConstructor]
         public Settings(bool isSingleListWishDashboard, int loadAmountPayment, int loadAmountOrder, bool filterShowProvider, Money dashboardMoneyLimit,
-            bool filterShowPerson, Guid? accessToken, string adminEmail, bool noticeableOnRightSide, bool sendConfirmationMail) {
+            bool filterShowPerson, Guid? accessToken, string adminEmail, bool noticeableOnRightSide, ConfirmationMailMode sendConfirmationMail) {
             IsSingleListWishDashboard = isSingleListWishDashboard;
             LoadAmountPayment = loadAmountPayment;
             LoadAmountOrder = loadAmountOrder;

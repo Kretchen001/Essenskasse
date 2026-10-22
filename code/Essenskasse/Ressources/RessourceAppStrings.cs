@@ -237,5 +237,9 @@
         settingsCash,
         settingsServer,
         confirmationMailSetting,
+        confirmationMailNever,
+        confirmationMailOptional,
+        confirmationMailAlways,
+        confirmationMailAlwaysInfo,
     }
 }

@@ -176,7 +176,7 @@ namespace EssenskasseAPI.Controllers {
                         Db.P("@accessToken", x.Item2.AccessToken?.ToString() ?? "00000000-0000-0000-0000-000000000000"),
                         Db.P("@adminEmail", x.Item2.AdminEmail),
                         Db.P("@rightSide", x.Item2.NoticeableOnRightSide),
-                        Db.P("@sendMail", x.Item2.SendConfirmationMail));
+                        Db.P("@sendMail", (int)x.Item2.SendConfirmationMail));
                 }
             }
             tx.Commit();
@@ -304,7 +304,7 @@ namespace EssenskasseAPI.Controllers {
                             row["accessToken"].ToString() is null ? null : new Guid(row["accessToken"].ToString()!),
                             row["adminEmail"].ToString()!,
                             bool.Parse(row["noticeableOnRightSide"].ToString()!),
-                            bool.Parse(row["sendConfirmationMail"].ToString()!)
+                            ConfirmationMailModes.Parse(row["sendConfirmationMail"].ToString())
                     )
                 ));
             }
