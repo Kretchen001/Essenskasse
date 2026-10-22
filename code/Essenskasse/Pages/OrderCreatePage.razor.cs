@@ -27,7 +27,33 @@ namespace Essenskasse.Pages {
 
         private string ModalTitle = "";
 
-        private DateTime selectedDate = DateTime.Now;
+        private DateTime selectedDate = DateTime.Today;
+
+        private enum OrderView { Order, Overview }
+        private OrderView view = OrderView.Order;
+
+        /// <summary>Das Datum fuer das Datumsfeld; ungueltige oder geleerte Eingaben werden ignoriert.</summary>
+        private DateTime SelectedDateValue {
+            get => selectedDate;
+            set {
+                if (value.Year >= 2000) {
+                    selectedDate = value.Date;
+                }
+            }
+        }
+
+        private bool IsDate(int dayOffset) => selectedDate.Date == DateTime.Today.AddDays(dayOffset);
+
+        private void SetDateOffset(int dayOffset) {
+            selectedDate = DateTime.Today.AddDays(dayOffset);
+        }
+
+        private async Task ShowView(OrderView target) {
+            view = target;
+            if (target == OrderView.Overview && orderListForOverview.Count == 0 && !noMoreToLoad) {
+                await LoadOrdersForOverview();
+            }
+        }
 
         private Guid selectedProvider = new Guid();
 
@@ -47,10 +73,7 @@ namespace Essenskasse.Pages {
 
         /// <summary></summary>
         protected override async Task OnInitializedAsync() {
-            if (!AuthStateService.IsAuthenticated) {
-                Nav.NavigateTo("/");
-            }
-            else {
+            if (AuthStateService.IsAuthenticated) {
                 await RequestAllProvider();
                 await RequestAllPerson();
             }
@@ -165,7 +188,7 @@ namespace Essenskasse.Pages {
                 }
                 else {
                     orders.Add(new Order(
-                        dateTime: selectedDate.AddMilliseconds(orders.Count + res),
+                        dateTime: selectedDate.Date.AddMilliseconds(orders.Count + res),
                         money: money[i],
                         provider: p,
                         referencedPerson: person[i].Guid

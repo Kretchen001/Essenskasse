@@ -890,4 +890,13 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="quickAmountsSaved" xml:space="preserve">
     <value>Importes rápidos guardados.</value>
   </data>
+  <data name="orderDateToday" xml:space="preserve">
+    <value>Hoy</value>
+  </data>
+  <data name="orderDateYesterday" xml:space="preserve">
+    <value>Ayer</value>
+  </data>
+  <data name="orderTabOrder" xml:space="preserve">
+    <value>Pedir</value>
+  </data>
 </root>

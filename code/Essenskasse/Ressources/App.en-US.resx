@@ -890,4 +890,13 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="quickAmountsSaved" xml:space="preserve">
     <value>Quick amounts saved.</value>
   </data>
+  <data name="orderDateToday" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="orderDateYesterday" xml:space="preserve">
+    <value>Yesterday</value>
+  </data>
+  <data name="orderTabOrder" xml:space="preserve">
+    <value>Order</value>
+  </data>
 </root>

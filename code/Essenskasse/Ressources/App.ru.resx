@@ -890,4 +890,13 @@
   <data name="quickAmountsSaved" xml:space="preserve">
     <value>Быстрые суммы сохранены.</value>
   </data>
+  <data name="orderDateToday" xml:space="preserve">
+    <value>Сегодня</value>
+  </data>
+  <data name="orderDateYesterday" xml:space="preserve">
+    <value>Вчера</value>
+  </data>
+  <data name="orderTabOrder" xml:space="preserve">
+    <value>Заказать</value>
+  </data>
 </root>

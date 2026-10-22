@@ -1,0 +1,47 @@
+/* Bestellfenster */
+
+.ek-ord-page {
+    padding-bottom: 1rem;
+}
+
+.ek-ord-tabs {
+    margin: 0.25rem 0 0.9rem;
+}
+
+.ek-dash .ek-seg.ek-seg-neutral button.is-active {
+    background-color: var(--ek-focus);
+    color: #ffffff;
+    font-weight: 650;
+}
+
+.ek-ord-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 0.75rem 1.25rem;
+    margin-top: 0;
+}
+
+.ek-ord-date-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 719.98px) {
+    .ek-ord-head {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Uebersicht (vorlaeufig, wird mit der neuen Uebersicht ersetzt) */
+.overViewGrid {
+    max-height: 70vh;
+    overflow: auto;
+}
+
+    .overViewGrid thead {
+        position: sticky;
+        top: 0;
+        background-color: var(--ek-surface);
+    }

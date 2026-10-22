@@ -11,78 +11,53 @@
 @inject AuthStateService AuthState
 @inject NavigationManager Nav
 
-<style>
-    /* Fix height and enable scrolling */
-    .overViewGrid {
-        max-height: 70vh;
-        overflow-y: auto;
-        overflow-x: auto;
-    }
-
-        /* Sticky header while scrolling */
-        .overViewGrid thead {
-            position: sticky;
-            top: 0;
-            background-color: #eee;
-            border-bottom: solid 0.1rem black;
-        }
-
-        /* Subtle stripe effect */
-        .overViewGrid tr:nth-child(even) {
-            background: rgba(205, 205, 205, 0.4);
-        }
-</style>
-
 <PageTitle>@_loc[nameof(RessourceAppStrings.createNewOrder)]</PageTitle>
 
 <AuthorizeView>
     <NotAuthorized>
-        <div class="row">
-            <div class="col-lg-3">
-                Zugriff verweigert!
-            </div>
-            <div class="col-lg-9">
-                <button @onclick="() => Nav.NavigateTo(dashboardLink)">
-                    Rückkehr zum Dashboard
+        <div class="ek-dash ek-denied" role="alert">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.accessDenied)]</h2>
+            <p class="ek-denied-text">@_loc[nameof(RessourceAppStrings.accessDeniedHint)]</p>
+            <div class="ek-denied-actions">
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="AuthState.RequestLogin">
+                    @_loc[nameof(RessourceAppStrings.signIn)]
+                </button>
+                <button type="button" class="ek-btn" @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    @_loc[nameof(RessourceAppStrings.backToDashboard)]
                 </button>
             </div>
         </div>
     </NotAuthorized>
     <Authorized>
-        <BlazorXTabs.XTabs>
-            <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.createNewOrder)]">
+        <div class="ek-dash ek-ord-page">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.createNewOrder)]</h2>
 
-                <h2>@_loc[nameof(RessourceAppStrings.createNewOrder)]</h2>
+            <div class="ek-seg ek-seg-neutral ek-ord-tabs" role="tablist">
+                <button type="button" role="tab" class="@(view == OrderView.Order ? "is-active" : "")" aria-selected="@(view == OrderView.Order)"
+                        @onclick="() => ShowView(OrderView.Order)">@_loc[nameof(RessourceAppStrings.orderTabOrder)]</button>
+                <button type="button" role="tab" class="@(view == OrderView.Overview ? "is-active" : "")" aria-selected="@(view == OrderView.Overview)"
+                        @onclick="() => ShowView(OrderView.Overview)">@_loc[nameof(RessourceAppStrings.overview)]</button>
+            </div>
 
-                <div class="row" style="margin-bottom: 1rem; margin-top: 1rem;">
-                    <div class="col-lg-3 align-self-center">
-                        <label>
-                            @_loc[nameof(RessourceAppStrings.date)]
-                        </label>
+            @if (view == OrderView.Order) {
+                <div class="ek-add ek-ord-head">
+                    <div class="ek-field ek-ord-date">
+                        <span>@_loc[nameof(RessourceAppStrings.date)]</span>
+                        <div class="ek-ord-date-row">
+                            <button type="button" class="ek-chip @(IsDate(0) ? "is-active" : "")" @onclick="() => SetDateOffset(0)">@_loc[nameof(RessourceAppStrings.orderDateToday)]</button>
+                            <button type="button" class="ek-chip @(IsDate(-1) ? "is-active" : "")" @onclick="() => SetDateOffset(-1)">@_loc[nameof(RessourceAppStrings.orderDateYesterday)]</button>
+                            <input type="date" class="ek-input" aria-label="@_loc[nameof(RessourceAppStrings.date)]" @bind="SelectedDateValue" />
+                        </div>
                     </div>
-                    <div class="col-lg-9 align-self-center">
-                        <input type="date" @bind-value="selectedDate" />
-                    </div>
-                </div>
-
-                <br />
-
-                <div class="row" style="margin-bottom: 1rem;">
-                    <div class="col-lg-3 align-self-center">
-                        <label>
-                            @_loc[nameof(RessourceAppStrings.provider)]
-                        </label>
-                    </div>
-                    <div class="col-lg-9">
-                        <select class="form-select" @bind="@selectedProvider">
+                    <label class="ek-field ek-ord-provider">
+                        <span>@_loc[nameof(RessourceAppStrings.provider)]</span>
+                        <select class="ek-select" @bind="selectedProvider">
                             @foreach (var x in providers) {
                                 <option value="@x.Guid">@x.Designation</option>
                             }
                         </select>
-                    </div>
+                    </label>
                 </div>
-
-                <br />
 
                 @foreach (int i in Enumerable.Range(0, person.Count)) {
                     <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
@@ -170,9 +145,9 @@
                         <button class="btn btn-primary" @onclick="() => ModalDialog!.Close()">Close</button>
                     </div>
                 </HistoryModalCard>
-            </BlazorXTabs.XTab>
-            <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.overview)]">
-                <h2>@_loc[nameof(RessourceAppStrings.overview)]</h2>
+            }
+            else {
+                <h3 class="ek-group-title">@_loc[nameof(RessourceAppStrings.overview)]</h3>
                 <div class="overViewGrid">
                     @if (orderListForOverview.Count != 0) {
                         <QuickGrid Items="@orderListForOverview.AsQueryable()">
@@ -198,7 +173,7 @@
                     @_loc[nameof(RessourceAppStrings.lastDayMaybyIncomplete)]
                 </label>
 
-            </BlazorXTabs.XTab>
-        </BlazorXTabs.XTabs>
+            }
+        </div>
     </Authorized>
 </AuthorizeView>

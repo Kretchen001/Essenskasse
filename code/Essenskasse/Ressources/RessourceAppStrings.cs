@@ -260,5 +260,8 @@
         quickAmountRemove,
         quickAmountInvalid,
         quickAmountsSaved,
+        orderDateToday,
+        orderDateYesterday,
+        orderTabOrder,
     }
 }

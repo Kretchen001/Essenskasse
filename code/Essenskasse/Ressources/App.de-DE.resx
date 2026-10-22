@@ -890,4 +890,13 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="quickAmountsSaved" xml:space="preserve">
     <value>Schnellbeträge gespeichert.</value>
   </data>
+  <data name="orderDateToday" xml:space="preserve">
+    <value>Heute</value>
+  </data>
+  <data name="orderDateYesterday" xml:space="preserve">
+    <value>Gestern</value>
+  </data>
+  <data name="orderTabOrder" xml:space="preserve">
+    <value>Bestellen</value>
+  </data>
 </root>
