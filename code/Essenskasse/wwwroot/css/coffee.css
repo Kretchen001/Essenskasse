@@ -1,0 +1,204 @@
+/* Kaffeekasse: Kassenstand, Ein-/Auszahlung, Verlauf. */
+
+.ek-cash-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--ek-line);
+    border-left-width: 4px;
+    border-radius: 12px;
+    background: var(--ek-surface);
+}
+
+    .ek-cash-hero.ek-person-ok {
+        border-left-color: var(--ek-ok);
+    }
+
+    .ek-cash-hero.ek-person-bad {
+        border-left-color: var(--ek-bad);
+    }
+
+.ek-cash-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.ek-cash-label {
+    color: var(--ek-muted);
+    font-size: 0.9rem;
+}
+
+.ek-cash-balance {
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+}
+
+.ek-cash-hero.ek-person-ok .ek-cash-balance {
+    color: var(--ek-ok);
+}
+
+.ek-cash-hero.ek-person-bad .ek-cash-balance {
+    color: var(--ek-bad);
+}
+
+.ek-cash-sums {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    margin: 0;
+}
+
+    .ek-cash-sums dt {
+        color: var(--ek-muted);
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .ek-cash-sums dd {
+        margin: 0;
+        font-weight: 650;
+        font-variant-numeric: tabular-nums;
+    }
+
+        .ek-cash-sums dd.is-in {
+            color: var(--ek-ok);
+        }
+
+        .ek-cash-sums dd.is-out {
+            color: var(--ek-bad);
+        }
+
+/* Umschalter Einzahlung / Auszahlung */
+.ek-seg {
+    display: inline-flex;
+    margin-bottom: 0.8rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.ek-dash .ek-seg button {
+    padding: 0.5rem 1.1rem;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    color: var(--ek-text);
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+    .ek-dash .ek-seg button + button {
+        border-left: 1px solid var(--ek-line-strong);
+    }
+
+    .ek-dash .ek-seg button:hover {
+        background-color: rgba(128, 128, 128, 0.16);
+    }
+
+    .ek-dash .ek-seg button.is-in.is-active {
+        background-color: var(--ek-ok-tint);
+        color: var(--ek-ok);
+        font-weight: 650;
+    }
+
+    .ek-dash .ek-seg button.is-out.is-active {
+        background-color: var(--ek-bad-tint);
+        color: var(--ek-bad);
+        font-weight: 650;
+    }
+
+    .ek-dash .ek-seg button:focus-visible {
+        outline: 2px solid var(--ek-focus);
+        outline-offset: -2px;
+    }
+
+.ek-cash-fields {
+    grid-template-columns: minmax(8rem, 14rem) minmax(0, 1fr) auto;
+}
+
+.ek-cash-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 1rem;
+}
+
+    .ek-cash-note .ek-hint {
+        margin: 0;
+    }
+
+/* Verlauf: Ein- und Auszahlung mit gruen/rot-Signatur am Rand */
+.ek-cash-hist {
+    margin-top: 0.4rem;
+}
+
+    .ek-cash-hist li {
+        border-left: 4px solid transparent;
+    }
+
+        .ek-cash-hist li.is-in {
+            border-left-color: var(--ek-ok);
+        }
+
+        .ek-cash-hist li.is-out {
+            border-left-color: var(--ek-bad);
+            background: var(--ek-bad-tint);
+        }
+
+            .ek-cash-hist li.is-out .ek-hist-amount {
+                color: var(--ek-bad);
+            }
+
+        .ek-cash-hist li.is-in .ek-hist-amount {
+            color: var(--ek-ok);
+        }
+
+.ek-cash-dir {
+    flex: none;
+    width: 1rem;
+    font-weight: 700;
+}
+
+.ek-cash-hist li.is-in .ek-cash-dir {
+    color: var(--ek-ok);
+}
+
+.ek-cash-hist li.is-out .ek-cash-dir {
+    color: var(--ek-bad);
+}
+
+.ek-cash-kind {
+    margin-right: 0.5rem;
+    color: var(--ek-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+@media (max-width: 719.98px) {
+    .ek-cash-fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .ek-cash-balance {
+        font-size: 1.8rem;
+    }
+
+    .ek-seg {
+        display: flex;
+    }
+
+        .ek-seg button {
+            flex: 1;
+        }
+}
