@@ -82,6 +82,68 @@ namespace Modells.Test {
         }
 
         [Fact]
+        public void CalculateSubtraction_NegativeResult() {
+            Money result = new Money().CalculateMoney(CalculationOperation.Substraction,
+                                                        new Money(9, 95),
+                                                        new Money(10, 15))!;
+            Assert.True(result.Equals(new Money(0, -20)));
+            Assert.Equal("-0,20 €", result.ToString());
+            Assert.False(result.IsPositiv());
+        }
+
+        [Fact]
+        public void CalculateAddition_NegativeAndPositiv() {
+            Money result = new Money().CalculateMoney(CalculationOperation.Addition,
+                                                        new Money(-5, 0),
+                                                        new Money(2, 50))!;
+            Assert.True(result.Equals(new Money(-2, -50)));
+            Assert.Equal("-2,50 €", result.ToString());
+        }
+
+        [Fact]
+        public void CalculateAddition_CarryOverAndLargeValues() {
+            Money result = new Money().CalculateMoney(CalculationOperation.Addition,
+                                                        new Money(1_000_000_000, 99),
+                                                        new Money(0, 1))!;
+            Assert.True(result.Equals(new Money(1_000_000_001, 0)));
+        }
+
+        [Fact]
+        public void CalculateAddition_ThenSubtraction_GivesStartValue() {
+            // viele Buchungen hintereinander duerfen keinen Cent verlieren
+            Money saldo = new Money(0, 0);
+            for (int i = 0; i < 1000; i += 1) {
+                saldo = new Money().CalculateMoney(CalculationOperation.Addition, saldo, new Money(3, 33))!;
+            }
+            Assert.Equal(333_000, saldo.ToTotalCents());
+            for (int i = 0; i < 1000; i += 1) {
+                saldo = new Money().CalculateMoney(CalculationOperation.Substraction, saldo, new Money(3, 33))!;
+            }
+            Assert.Equal(0, saldo.ToTotalCents());
+        }
+
+        [Fact]
+        public void TotalCents_RoundTrip() {
+            foreach (long cents in new long[] { 0, 1, -1, 99, -99, 100, -100, 12345, -12345, 999_999_999_99 }) {
+                Assert.Equal(cents, Money.FromTotalCents(cents).ToTotalCents());
+            }
+            Assert.Equal(new Money(-2, -50).ToString(), Money.FromTotalCents(-250).ToString());
+        }
+
+        [Fact]
+        public void ToMoney_RoundTripWithToString() {
+            Assert.True(new Money(7, 40).Equals(new Money().ToMoney("7,40 €")));
+            Assert.True(new Money(0, 5).Equals(new Money().ToMoney("0,05 €")));
+            Assert.True(new Money(0, 0).Equals(new Money().ToMoney("0,00€")));
+            // das Vorzeichen darf nicht verloren gehen und gilt fuer Euro und Cent
+            Assert.True(new Money(0, -5).Equals(new Money().ToMoney("-0,05 €")));
+            Assert.True(new Money(-8, -30).Equals(new Money().ToMoney("-8,30 €")));
+            foreach (Money m in new Money[] { new Money(7, 40), new Money(0, 5), new Money(0, -5), new Money(-8, -30), new Money(-12, -3) }) {
+                Assert.Equal(m.ToTotalCents(), new Money().ToMoney(m.ToString()).ToTotalCents());
+            }
+        }
+
+        [Fact]
         public void CalculateDefaultBranch() {
             Money? a = new Money().CalculateMoney(null, new Money(40, 0), new Money(20, 0));
             Assert.True(a is null);

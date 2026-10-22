@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace Modells {
@@ -54,8 +55,27 @@ namespace Modells {
         /// <param name="ToStringMoney">String that contain the Money</param>
         /// <returns>A Money Object.</returns>
         public Money ToMoney(string ToStringMoney) {
-            int i = ToStringMoney.IndexOf(",");
-            return new Money(long.Parse(ToStringMoney[0..i]), short.Parse(ToStringMoney[(i + 1)..(ToStringMoney.Length - 2)]));
+            // Das Vorzeichen steht in ToString() nur einmal vorn ("-0,05 €"). Es gilt fuer Euro und Cent:
+            // sonst ginge es bei 0 Euro verloren und "-8,30 €" waere rechnerisch -7,70 €.
+            string text = ToStringMoney.Replace("€", "").Trim();
+            bool negative = text.StartsWith('-');
+            if (negative) {
+                text = text[1..];
+            }
+            int i = text.IndexOf(',');
+            long euro = long.Parse(i < 0 ? text : text[..i], CultureInfo.InvariantCulture);
+            short cent = i < 0 ? (short)0 : short.Parse(text[(i + 1)..], CultureInfo.InvariantCulture);
+            return negative ? new Money(-euro, (short)-cent) : new Money(euro, cent);
+        }
+
+        /// <summary>Der Betrag in Cent (Euro * 100 + Cent). Wirft eine OverflowException statt still zu ueberlaufen.</summary>
+        public long ToTotalCents() {
+            return checked((Euro * 100) + Cent);
+        }
+
+        /// <summary>Erzeugt aus einem Betrag in Cent ein Money; Euro und Cent haben dabei dasselbe Vorzeichen.</summary>
+        public static Money FromTotalCents(long totalCents) {
+            return new Money(totalCents / 100, (short)(totalCents % 100));
         }
 
         /// <summary>Is the current Money-value positiv?</summary>
@@ -74,24 +94,13 @@ namespace Modells {
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822")]
         public Money? CalculateMoney(CalculationOperation? method, Money money1, Money money2) {
+            // Es wird ausschliesslich mit ganzen Cent gerechnet (kein double).
             switch (method) {
                 case CalculationOperation.Addition: {
-                        Money saldo = new Money(0, 0);
-                        long temp1 = money1.Cent + (100 * money1.Euro);
-                        long temp2 = money2.Cent + (100 * money2.Euro);
-                        long tempR = temp1 + temp2;
-                        saldo.Cent = (short)(tempR % 100);
-                        saldo.Euro = (long)((tempR - saldo.Cent) * 0.01); // multiply is faster then divide
-                        return saldo;
+                        return FromTotalCents(checked(money1.ToTotalCents() + money2.ToTotalCents()));
                     }
                 case CalculationOperation.Substraction: {
-                        Money saldo = new Money(0, 0);
-                        long temp1 = money1.Cent + (100 * money1.Euro);
-                        long temp2 = money2.Cent + (100 * money2.Euro);
-                        long tempR = temp1 - temp2;
-                        saldo.Cent = (short)(tempR % 100);
-                        saldo.Euro = (long)((tempR - saldo.Cent) * 0.01); // multiply is faster then divide
-                        return saldo;
+                        return FromTotalCents(checked(money1.ToTotalCents() - money2.ToTotalCents()));
                     }
                 default: {
                         return null;
