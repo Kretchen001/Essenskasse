@@ -833,4 +833,34 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="confirmationMailAlwaysInfo" xml:space="preserve">
     <value>Se prepara un correo de confirmación para cada pago.</value>
   </data>
+  <data name="coffeeDeposit" xml:space="preserve">
+    <value>Ingreso</value>
+  </data>
+  <data name="coffeePayout" xml:space="preserve">
+    <value>Pago</value>
+  </data>
+  <data name="coffeeTotalIn" xml:space="preserve">
+    <value>Total ingresado</value>
+  </data>
+  <data name="coffeeTotalOut" xml:space="preserve">
+    <value>Total pagado</value>
+  </data>
+  <data name="coffeeBalanceAfter" xml:space="preserve">
+    <value>Saldo después</value>
+  </data>
+  <data name="coffeeWouldGoNegative" xml:space="preserve">
+    <value>Atención: el saldo quedaría negativo.</value>
+  </data>
+  <data name="coffeeSignInHint" xml:space="preserve">
+    <value>Sin iniciar sesión la caja del café es solo de lectura. Inicie sesión para registrar.</value>
+  </data>
+  <data name="coffeeNoEntries" xml:space="preserve">
+    <value>Aún no hay movimientos en la caja del café.</value>
+  </data>
+  <data name="coffeeLoadFailed" xml:space="preserve">
+    <value>No se pudo cargar la caja del café.</value>
+  </data>
+  <data name="coffeeBook" xml:space="preserve">
+    <value>Registrar</value>
+  </data>
 </root>

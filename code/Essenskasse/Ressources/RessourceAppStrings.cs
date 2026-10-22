@@ -241,5 +241,15 @@
         confirmationMailOptional,
         confirmationMailAlways,
         confirmationMailAlwaysInfo,
+        coffeeDeposit,
+        coffeePayout,
+        coffeeTotalIn,
+        coffeeTotalOut,
+        coffeeBalanceAfter,
+        coffeeWouldGoNegative,
+        coffeeSignInHint,
+        coffeeNoEntries,
+        coffeeLoadFailed,
+        coffeeBook,
     }
 }

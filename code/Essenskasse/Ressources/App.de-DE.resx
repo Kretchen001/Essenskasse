@@ -833,4 +833,34 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="confirmationMailAlwaysInfo" xml:space="preserve">
     <value>Zu jeder Einzahlung wird eine Bestätigungsmail vorbereitet.</value>
   </data>
+  <data name="coffeeDeposit" xml:space="preserve">
+    <value>Einzahlung</value>
+  </data>
+  <data name="coffeePayout" xml:space="preserve">
+    <value>Auszahlung</value>
+  </data>
+  <data name="coffeeTotalIn" xml:space="preserve">
+    <value>Eingezahlt gesamt</value>
+  </data>
+  <data name="coffeeTotalOut" xml:space="preserve">
+    <value>Ausgezahlt gesamt</value>
+  </data>
+  <data name="coffeeBalanceAfter" xml:space="preserve">
+    <value>Kassenstand danach</value>
+  </data>
+  <data name="coffeeWouldGoNegative" xml:space="preserve">
+    <value>Achtung: Der Kassenstand wäre danach negativ.</value>
+  </data>
+  <data name="coffeeSignInHint" xml:space="preserve">
+    <value>Die Kaffeekasse kann ohne Anmeldung nur angesehen werden. Zum Eintragen bitte anmelden.</value>
+  </data>
+  <data name="coffeeNoEntries" xml:space="preserve">
+    <value>Noch keine Buchungen in der Kaffeekasse.</value>
+  </data>
+  <data name="coffeeLoadFailed" xml:space="preserve">
+    <value>Die Kaffeekasse konnte nicht geladen werden.</value>
+  </data>
+  <data name="coffeeBook" xml:space="preserve">
+    <value>Buchen</value>
+  </data>
 </root>

@@ -833,4 +833,34 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="confirmationMailAlwaysInfo" xml:space="preserve">
     <value>A confirmation email is prepared for every payment.</value>
   </data>
+  <data name="coffeeDeposit" xml:space="preserve">
+    <value>Deposit</value>
+  </data>
+  <data name="coffeePayout" xml:space="preserve">
+    <value>Payout</value>
+  </data>
+  <data name="coffeeTotalIn" xml:space="preserve">
+    <value>Total deposited</value>
+  </data>
+  <data name="coffeeTotalOut" xml:space="preserve">
+    <value>Total paid out</value>
+  </data>
+  <data name="coffeeBalanceAfter" xml:space="preserve">
+    <value>Balance afterwards</value>
+  </data>
+  <data name="coffeeWouldGoNegative" xml:space="preserve">
+    <value>Note: the balance would be negative afterwards.</value>
+  </data>
+  <data name="coffeeSignInHint" xml:space="preserve">
+    <value>Without signing in the coffee fund is view-only. Sign in to add entries.</value>
+  </data>
+  <data name="coffeeNoEntries" xml:space="preserve">
+    <value>No entries in the coffee fund yet.</value>
+  </data>
+  <data name="coffeeLoadFailed" xml:space="preserve">
+    <value>The coffee fund could not be loaded.</value>
+  </data>
+  <data name="coffeeBook" xml:space="preserve">
+    <value>Book</value>
+  </data>
 </root>

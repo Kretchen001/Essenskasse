@@ -833,4 +833,34 @@
   <data name="confirmationMailAlwaysInfo" xml:space="preserve">
     <value>Для каждого платежа готовится письмо с подтверждением.</value>
   </data>
+  <data name="coffeeDeposit" xml:space="preserve">
+    <value>Взнос</value>
+  </data>
+  <data name="coffeePayout" xml:space="preserve">
+    <value>Выплата</value>
+  </data>
+  <data name="coffeeTotalIn" xml:space="preserve">
+    <value>Всего внесено</value>
+  </data>
+  <data name="coffeeTotalOut" xml:space="preserve">
+    <value>Всего выплачено</value>
+  </data>
+  <data name="coffeeBalanceAfter" xml:space="preserve">
+    <value>Баланс после</value>
+  </data>
+  <data name="coffeeWouldGoNegative" xml:space="preserve">
+    <value>Внимание: баланс после этого станет отрицательным.</value>
+  </data>
+  <data name="coffeeSignInHint" xml:space="preserve">
+    <value>Без входа кофейная касса доступна только для просмотра. Войдите, чтобы вносить записи.</value>
+  </data>
+  <data name="coffeeNoEntries" xml:space="preserve">
+    <value>В кофейной кассе пока нет записей.</value>
+  </data>
+  <data name="coffeeLoadFailed" xml:space="preserve">
+    <value>Не удалось загрузить кофейную кассу.</value>
+  </data>
+  <data name="coffeeBook" xml:space="preserve">
+    <value>Записать</value>
+  </data>
 </root>
