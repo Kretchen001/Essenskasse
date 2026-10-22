@@ -67,9 +67,9 @@ start http://localhost:8009
 This will call the Dashboard.
 
 ## Update auf 1.4.0 / Upgrade to 1.4.0
-**Deutsch:** Die Bestätigungsmail bei Einzahlungen hat drei Stufen (nie / pro Einzahlung wählbar / immer). Vorher eine Sicherung erstellen, dann `docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> essenskasse < code/MySqlScripts/update_v1-3-0_zu_1-4-0.sql` ausführen (ändert nur den Spaltentyp, vorhandene Werte bleiben: Ja → „wählbar“, Nein → „nie“) und neu bauen: `docker-compose up -d --build`.
+**Deutsch:** Die Bestätigungsmail bei Einzahlungen hat drei Stufen (nie / pro Einzahlung wählbar / immer). Vorher eine Sicherung erstellen, dann `docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> essenskasse < code/MySqlScripts/update_v1-3-0_zu_1-4-0.sql` ausführen (ändert den Spaltentyp, vorhandene Werte bleiben: Ja → „wählbar“, Nein → „nie“; ergänzt außerdem fünf Spalten für die Einstellungen: Schnellbeträge, Farbschema, Sprache, Sortierung) und neu bauen: `docker-compose up -d --build`.
 
-**English:** The payment confirmation email now has three levels (never / selectable per payment / always). Create a backup, run `code/MySqlScripts/update_v1-3-0_zu_1-4-0.sql` (it only changes the column type; existing values are kept: yes → selectable, no → never) and rebuild with `docker-compose up -d --build`.
+**English:** The payment confirmation email now has three levels (never / selectable per payment / always). Create a backup, run `code/MySqlScripts/update_v1-3-0_zu_1-4-0.sql` (it changes the column type, existing values are kept: yes → selectable, no → never; it also adds five columns for the settings: quick amounts, theme, language, sorting) and rebuild with `docker-compose up -d --build`.
 
 ## Update auf 1.3.0 / Upgrade to 1.3.0
 **Deutsch**

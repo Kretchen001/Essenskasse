@@ -161,10 +161,12 @@ namespace EssenskasseAPI.Controllers {
                         $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
                                             $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
                                             $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
-                                            $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
+                                            $"adminEmail, noticeableOnRightSide, sendConfirmationMail, " +
+                                            $"quickAmounts, theme, language, personSort, providerSort) " +
                         $"VALUES (@userGuid, @singleList, @loadPayment, @loadOrder, @showProvider, " +
                                             $"@moneyLimit, @showPerson, @accessToken, " +
-                                            $"@adminEmail, @rightSide, @sendMail);";
+                                            $"@adminEmail, @rightSide, @sendMail, " +
+                                            $"@quickAmounts, @theme, @language, @personSort, @providerSort);";
                     tx.Query(queryStringInsert,
                         Db.P("@userGuid", x.Item1),
                         Db.P("@singleList", x.Item2.IsSingleListWishDashboard),
@@ -176,7 +178,12 @@ namespace EssenskasseAPI.Controllers {
                         Db.P("@accessToken", x.Item2.AccessToken?.ToString() ?? "00000000-0000-0000-0000-000000000000"),
                         Db.P("@adminEmail", x.Item2.AdminEmail),
                         Db.P("@rightSide", x.Item2.NoticeableOnRightSide),
-                        Db.P("@sendMail", (int)x.Item2.SendConfirmationMail));
+                        Db.P("@sendMail", (int)x.Item2.SendConfirmationMail),
+                        Db.P("@quickAmounts", SettingsSanitizer.QuickAmountsToText(x.Item2.QuickAmounts)),
+                        Db.P("@theme", x.Item2.Theme ?? ""),
+                        Db.P("@language", x.Item2.Language ?? ""),
+                        Db.P("@personSort", x.Item2.PersonSort ?? ""),
+                        Db.P("@providerSort", x.Item2.ProviderSort ?? ""));
                 }
             }
             tx.Commit();
@@ -305,7 +312,13 @@ namespace EssenskasseAPI.Controllers {
                             row["adminEmail"].ToString()!,
                             bool.Parse(row["noticeableOnRightSide"].ToString()!),
                             ConfirmationMailModes.Parse(row["sendConfirmationMail"].ToString())
-                    )
+                    ) {
+                        QuickAmounts = SettingsSanitizer.QuickAmountsFromText(row["quickAmounts"].ToString()),
+                        Theme = row["theme"].ToString() ?? "",
+                        Language = row["language"].ToString() ?? "",
+                        PersonSort = row["personSort"].ToString() ?? "",
+                        ProviderSort = row["providerSort"].ToString() ?? ""
+                    }
                 ));
             }
             return settings;

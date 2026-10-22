@@ -78,5 +78,10 @@ CREATE TABLE IF NOT EXISTS essenskasse.SettingsUser (
     accessToken CHAR(36) DEFAULT "00000000-0000-0000-0000-000000000000",
     adminEmail VARCHAR(255),
     noticeableOnRightSide BOOLEAN DEFAULT false,
-    sendConfirmationMail TINYINT NOT NULL DEFAULT 1 -- 0 = nie, 1 = pro Einzahlung waehlbar, 2 = immer
+    sendConfirmationMail TINYINT NOT NULL DEFAULT 1, -- 0 = nie, 1 = pro Einzahlung waehlbar, 2 = immer
+    quickAmounts VARCHAR(255) NOT NULL DEFAULT '', -- Schnellbetraege in Cent, kommagetrennt (leer = nichts gespeichert)
+    theme VARCHAR(16) NOT NULL DEFAULT '', -- Light oder Dark (leer = nichts gespeichert)
+    language VARCHAR(16) NOT NULL DEFAULT '', -- z. B. de-DE (leer = nichts gespeichert)
+    personSort VARCHAR(32) NOT NULL DEFAULT '',
+    providerSort VARCHAR(32) NOT NULL DEFAULT ''
 );
