@@ -42,10 +42,13 @@
                         <input type="text" inputmode="decimal" class="ek-input" autocomplete="off" placeholder="10,00"
                                @bind="amountText" @bind:event="oninput" />
                     </label>
-                    <label class="ek-field">
-                        <span>@_loc[nameof(RessourceAppStrings.comment)] *</span>
+                    <label class="ek-field ek-field-required @(AmountValid && !CommentValid ? "is-missing" : "")">
+                        <span class="ek-req-label">
+                            @_loc[nameof(RessourceAppStrings.comment)]
+                            <span class="ek-req-badge">@_loc[nameof(RessourceAppStrings.coffeeRequired)]</span>
+                        </span>
                         <input type="text" class="ek-input" autocomplete="off" maxlength="200" required aria-required="true"
-                               @bind="comment" @bind:event="oninput" />
+                               aria-invalid="@(AmountValid && !CommentValid)" @bind="comment" @bind:event="oninput" />
                     </label>
                     <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@(!CanBook || isBooking)">
                         @_loc[nameof(RessourceAppStrings.coffeeBook)]
@@ -55,7 +58,7 @@
                     <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</p>
                 }
                 else if (AmountValid && !CommentValid) {
-                    <p class="ek-hint is-warn">@_loc[nameof(RessourceAppStrings.coffeeCommentRequired)]</p>
+                    <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.coffeeCommentRequired)]</p>
                 }
                 else if (AmountValid) {
                     <p class="ek-hint @(BalanceAfter.IsPositiv() ? "" : "is-warn")">

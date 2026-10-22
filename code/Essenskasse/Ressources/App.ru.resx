@@ -866,4 +866,7 @@
   <data name="coffeeCommentRequired" xml:space="preserve">
     <value>Укажите комментарий (обязательное поле).</value>
   </data>
+  <data name="coffeeRequired" xml:space="preserve">
+    <value>Обязательно</value>
+  </data>
 </root>

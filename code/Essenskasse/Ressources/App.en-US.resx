@@ -866,4 +866,7 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="coffeeCommentRequired" xml:space="preserve">
     <value>Please enter a comment (required).</value>
   </data>
+  <data name="coffeeRequired" xml:space="preserve">
+    <value>Required</value>
+  </data>
 </root>

@@ -29,9 +29,13 @@
                     @_loc[nameof(RessourceAppStrings.swapColumns)]
                 </button>
             }
-            <button type="button" class="ek-btn" @onclick="RecalculateSaldos">
-                @_loc[nameof(RessourceAppStrings.recalculateSaldo)]
-            </button>
+            <AuthorizeView>
+                <Authorized>
+                    <button type="button" class="ek-btn" @onclick="RecalculateSaldos">
+                        @_loc[nameof(RessourceAppStrings.recalculateSaldo)]
+                    </button>
+                </Authorized>
+            </AuthorizeView>
         </div>
     </header>
 
