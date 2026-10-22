@@ -38,6 +38,11 @@ namespace Essenskasse.Pages {
             }
         }
 
+        /// <summary>Gleiche Einteilung wie auf dem Dashboard: Saldo ueber dem Grenzwert ist unauffaellig.</summary>
+        private bool IsInconspicuous(Person x) {
+            return x.Saldo.IsGreater(AppData.DashboardMoneyLimit);
+        }
+
         private void ClearFilter() {
             Filter = "";
         }

@@ -12,6 +12,10 @@ namespace Essenskasse.Cards {
         [Parameter]
         public Person Person { get; set; } = new Person();
 
+        /// <summary>Saldo liegt ueber dem Dashboard-Grenzwert (gruen), sonst auffaellig (rot).</summary>
+        [Parameter]
+        public bool PositivSaldo { get; set; } = false;
+
         private string Initials => PersonText.Initials(Person.Name);
 
         private async Task CopyGuid() {

@@ -1,7 +1,7 @@
 ﻿@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<App> _loc
 
-<article class="ek-person ek-person-neutral">
+<article class="ek-person @(PositivSaldo ? "ek-person-ok" : "ek-person-bad")">
     <span class="ek-avatar" aria-hidden="true">@Initials</span>
     <div class="ek-person-text">
         <h4 class="ek-person-name">@Person.Name</h4>
@@ -12,6 +12,7 @@
             <p class="ek-person-sub">@Person.Email</p>
         }
     </div>
+    <span class="ek-amount">@Person.Saldo.ToString()</span>
     <button type="button" class="ek-icon-btn" @onclick="CopyGuid"
             title="@_loc[nameof(RessourceAppStrings.copy)] @_loc[nameof(RessourceAppStrings.guid)]"
             aria-label="@_loc[nameof(RessourceAppStrings.copy)] @_loc[nameof(RessourceAppStrings.guid)]">

@@ -88,16 +88,6 @@
         font-style: italic;
     }
 
-/* Kachel ohne Saldo-Farbe */
-.ek-person-neutral {
-    border-left-color: var(--ek-line-strong);
-}
-
-    .ek-person-neutral .ek-avatar {
-        background: var(--ek-line);
-        color: var(--ek-text);
-    }
-
 /* Kleiner Symbol-Knopf (wie der Mail-Knopf auf dem Dashboard) */
 .ek-icon-btn {
     flex: none;
