@@ -44,7 +44,7 @@ namespace Essenskasse.Pages {
             set {
                 if (Enum.TryParse(value, out ProviderSort mode)) {
                     sortMode = mode;
-                    _ = LocalStorage.SetItemAsync<string>("ProviderSort", mode.ToString());
+                    _ = UserSettings.SetAsync("ProviderSort", mode.ToString());
                     ApplyFilterAndSort();
                 }
             }
@@ -55,11 +55,11 @@ namespace Essenskasse.Pages {
         }
 
         private async Task ReadSortModeAsync() {
-            string? stored = await LocalStorage.GetItemAsync<string>("ProviderSort");
+            string? stored = await UserSettings.GetAsync<string?>("ProviderSort", null);
             if (Enum.TryParse(stored, out ProviderSort mode)) {
                 sortMode = mode;
             }
-            else if (await LocalStorage.ContainKeyAsync("ProviderIsASC") && !await LocalStorage.GetItemAsync<bool>("ProviderIsASC")) {
+            else if (!await UserSettings.GetAsync("ProviderIsASC", true)) {
                 sortMode = ProviderSort.NameDesc; // alte Einstellung (absteigend) uebernehmen
             }
         }

@@ -116,7 +116,7 @@ namespace Essenskasse.Pages {
         }
 
         private async void WriteWishListToLocalStorage(bool value) {
-            await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
+            await UserSettings.SetAsync("IsSingleWishListDashboard", value);
         }
 
         private void CurrentCashBalanceCalculate() {
@@ -140,7 +140,7 @@ namespace Essenskasse.Pages {
         }
 
         private async void WriteNoticableSideToLocalStorage(bool value) {
-            await LocalStorage.SetItemAsync<bool>("NoticeableOnRightSide", value);
+            await UserSettings.SetAsync("NoticeableOnRightSide", value);
         }
     }
 }

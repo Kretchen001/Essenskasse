@@ -1,4 +1,5 @@
 ﻿using Essenskasse.Client;
+using Essenskasse.Client.Services;
 using Essenskasse.Ressources;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -110,7 +111,7 @@ namespace Essenskasse.Pages {
 
         private async void SaveQuickAmounts() {
             try {
-                await LocalStorage.SetItemAsync<List<long>>("OrderQuickAmounts", AppData.QuickAmounts);
+                await UserSettings.SetAsync("OrderQuickAmounts", AppData.QuickAmounts);
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.quickAmountsSaved)], ToastLevel.Success);
             }
             catch {
@@ -278,7 +279,7 @@ namespace Essenskasse.Pages {
         /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>
         private async void SaveUserThemePersistentAsync() {
             try {
-                await LocalStorage.SetItemAsStringAsync("UserTheme", CurrentTheme);
+                await UserSettings.SetRawAsync("UserTheme", CurrentTheme);
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastColorThemePre)] + " " + CurrentTheme + " " +
                                             _loc[nameof(RessourceAppStrings.toastColorThemePost)], ToastLevel.Success);
             }
@@ -290,41 +291,41 @@ namespace Essenskasse.Pages {
         /// <summary>Save the Listform to localstorage persistant.</summary>
         /// <param name="value">new listwish bool</param>
         private async void WriteWishListToLocalStorage(bool value) {
-            await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
+            await UserSettings.SetAsync("IsSingleWishListDashboard", value);
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
         private async void WriteNoticableSideToLocalStorage(bool value) {
-            await LocalStorage.SetItemAsync<bool>("NoticeableOnRightSide", value);
+            await UserSettings.SetAsync("NoticeableOnRightSide", value);
         }
         
         /// <summary></summary>
         /// <param name="value"></param>
         private async void WriteSendConfirmationMailToLocalStorage(U.ConfirmationMailMode value) {
-            await LocalStorage.SetItemAsync<int>("ConfirmationMailMode", (int)value);
-            await LocalStorage.RemoveItemAsync("SendConfirmationMail"); // alter Ja/Nein-Schluessel
+            await UserSettings.SetAsync("ConfirmationMailMode", (int)value);
+            await UserSettings.RemoveAsync("SendConfirmationMail"); // alter Ja/Nein-Schluessel
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.confirmationMailSetting)] + ": " + MailModeText(value), ToastLevel.Success);
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
         private async void SaveAmountOfPaymentsPersistentAsync(int value) {
-            await LocalStorage.SetItemAsync<int>("loadAmountOfPayments", value);
+            await UserSettings.SetAsync("loadAmountOfPayments", value);
             ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullPaymentAmount)], ToastLevel.Success);
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
         private async void SaveAmountOfOrderPersistentAsync(int value) {
-            await LocalStorage.SetItemAsync<int>("loadAmountOfOrders", value);
+            await UserSettings.SetAsync("loadAmountOfOrders", value);
             ToastService.ShowToast(value.ToString() + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyOrderAmount)], ToastLevel.Success);
         }
 
         /// <summary></summary>
         /// <param name="value"></param>
         private async void SaveFilterShowProvider(bool value) {
-            await LocalStorage.SetItemAsync<bool>("filterShowProvider", value);
+            await UserSettings.SetAsync("filterShowProvider", value);
             if (AppData.FilterShowProvider) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterProviderOn)], ToastLevel.Success);
             }
@@ -336,7 +337,7 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <param name="value"></param>
         private async void SaveFilterShowPerson(bool value) {
-            await LocalStorage.SetItemAsync<bool>("filterShowPerson", value);
+            await UserSettings.SetAsync("filterShowPerson", value);
             if (AppData.FilterShowPerson) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastFilterPersonOn)], ToastLevel.Success);
             }
@@ -348,7 +349,7 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <param name="limitToSave"></param>
         private async void SaveDashboardMoneyLimit(Money limitToSave) {
-            await LocalStorage.SetItemAsync<Money>("DashboardMoneyLimit", limitToSave);
+            await UserSettings.SetAsync("DashboardMoneyLimit", limitToSave);
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastLimitToValueSet)] + $" {limitToSave}", ToastLevel.Success);
         }
 
@@ -401,7 +402,7 @@ namespace Essenskasse.Pages {
         /// <param name="value"></param>
         private async void SaveAccessToken(Guid value) {
             try {
-                await LocalStorage.SetItemAsync<Guid>("AccessToken", value);
+                await UserSettings.SetAsync("AccessToken", value);
             }
             catch (Exception) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSaveError)], ToastLevel.Error);
@@ -413,7 +414,7 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <param name="value"></param>
         private async void SaveAdminEmail(string value) {
-            await LocalStorage.SetItemAsync<string>("AdminEmail", value);
+            await UserSettings.SetAsync("AdminEmail", value);
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminEmailEntered)] + "\n" + _loc[nameof(RessourceAppStrings.toastEventErrorRememberProcedurePlease)], ToastLevel.Success);
         }
 
@@ -439,81 +440,44 @@ namespace Essenskasse.Pages {
             }
         }
 
-        /// <summary></summary>
-        /// <returns></returns>
+        /// <summary>Holt die gespeicherten Einstellungen vom Server und ersetzt die lokalen (nach Rueckfrage).</summary>
         private async Task RequestOnlineSettingsForThisUser() {
-            if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen VOM Server abfragen und lokale überschreiben?")) {
-                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri(Config["API-Adress"] + "user/loadSettingsForUser"),
-                    Headers = {
-                        { "sessionToken", (await LocalStorage.GetItemAsync<Guid>("SessionToken")).ToString() },
-                        { "name", await LocalStorage.GetItemAsync<string>("NameOfUser") },
-                    }
-                };
-
-                HttpResponseMessage? response = null;
-                try {
-                    response = await HttpClient.SendAsync(httpRequestMessage);
-
-                    U.Settings? backupSettings = JsonConvert.DeserializeObject<U.Settings>(await response.Content.ReadAsStringAsync());
-
-                    if (backupSettings is null) {
-                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.noSettingsAvailable)], ToastLevel.Warning);
-                        return;
-                    }
-                    AppData.SettingsToAppData(backupSettings!);
-
-                    //save to local storage
-                    SaveAmountOfPaymentsPersistentAsync(AppData.LoadAmountPayment);
-                    SaveAmountOfOrderPersistentAsync(AppData.LoadAmountOrder);
-                    SaveFilterShowPerson(AppData.FilterShowPerson);
-                    SaveFilterShowProvider(AppData.FilterShowProvider);
-                    SaveDashboardMoneyLimit(AppData.DashboardMoneyLimit);
-                    if (AppData.AccessToken is not null) {
-                        SaveAccessToken(AppData.AccessToken ?? default);
-                    }
-                    SaveAdminEmail(AppData.AdminEmail);
-                    WriteSendConfirmationMailToLocalStorage(AppData.SendConfirmationMail);
-
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.settingsSuccsessfullyRestored)], ToastLevel.Success);
-                }
-                catch {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                    return;
-                }
+            if (!await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen VOM Server abfragen und lokale überschreiben?")) {
+                return;
             }
+            switch (await UserSettings.LoadFromServerAsync()) {
+                case ServerSettingsResult.Applied:
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.settingsSuccsessfullyRestored)], ToastLevel.Success);
+                    break;
+                case ServerSettingsResult.AppliedReloadNeeded:
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.settingsSuccsessfullyRestored)], ToastLevel.Success);
+                    Navi.NavigateTo(Navi.Uri, true); // andere Sprache: einmal neu laden
+                    break;
+                case ServerSettingsResult.NothingSaved:
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.noSettingsAvailable)], ToastLevel.Warning);
+                    break;
+                default:
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    break;
+            }
+            await InvokeAsync(StateHasChanged);
         }
 
-        /// <summary></summary>
-        /// <returns></returns>
+        /// <summary>Speichert die aktuellen Einstellungen auf dem Server (nach Rueckfrage).</summary>
         private async Task SaveSettingsForThisUserOnline() {
-            if (await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen ZUM Server übertragen und online überschreiben?")) {
-                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(Config["API-Adress"] + "user/saveSettingsForUser"),
-                    Headers = {
-                        { "sessionToken", (await LocalStorage.GetItemAsync<Guid>("SessionToken")).ToString() },
-                        { "name", await LocalStorage.GetItemAsync<string>("NameOfUser") },
-                    },
-                    Content = new StringContent(JsonConvert.SerializeObject(AppData.GetAppDataAsSettingsObject()), Encoding.UTF8, "application/json")
-                };
-
-                HttpResponseMessage? response = null;
-                try {
-                    response = await HttpClient.SendAsync(httpRequestMessage);
-                }
-                catch {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                    return;
-                }
-
-                if (response.IsSuccessStatusCode) {
+            if (!await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen ZUM Server übertragen und online überschreiben?")) {
+                return;
+            }
+            switch (await UserSettings.SaveToServerAsync()) {
+                case ServerCallResult.Success:
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.successfullyTransmitted)], ToastLevel.Success);
-                }
-                else {
+                    break;
+                case ServerCallResult.Rejected:
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
-                }
+                    break;
+                default:
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    break;
             }
         }
         #endregion

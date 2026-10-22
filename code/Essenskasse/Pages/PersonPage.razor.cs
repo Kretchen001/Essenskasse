@@ -26,7 +26,7 @@ namespace Essenskasse.Pages {
             set {
                 if (Enum.TryParse(value, out PersonSortMode mode)) {
                     sortMode = mode;
-                    _ = LocalStorage.SetItemAsync<string>("PersonSort", mode.ToString());
+                    _ = UserSettings.SetAsync("PersonSort", mode.ToString());
                     ApplyFilterAndSort();
                 }
             }
@@ -290,11 +290,11 @@ namespace Essenskasse.Pages {
         }
 
         private async Task ReadSortModeAsync() {
-            string? stored = await LocalStorage.GetItemAsync<string>("PersonSort");
+            string? stored = await UserSettings.GetAsync<string?>("PersonSort", null);
             if (Enum.TryParse(stored, out PersonSortMode mode)) {
                 sortMode = mode;
             }
-            else if (await LocalStorage.ContainKeyAsync("PersonIsASC") && !await LocalStorage.GetItemAsync<bool>("PersonIsASC")) {
+            else if (!await UserSettings.GetAsync("PersonIsASC", true)) {
                 sortMode = PersonSortMode.NameDesc; // alte Einstellung (absteigend) uebernehmen
             }
         }
