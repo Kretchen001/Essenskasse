@@ -66,6 +66,9 @@
                                         }
                                     </span>
                                     <span class="ek-hist-amount">@x.Amount.ToString()</span>
+                                    <button type="button" class="ek-btn ek-chg-edit" @onclick="() => OpenEditPayment(x)">
+                                        @_loc[nameof(RessourceAppStrings.change)]
+                                    </button>
                                 </li>
                             }
                         </ul>
@@ -100,6 +103,9 @@
                                         <span class="ek-chg-sub">@x.Provider.Designation</span>
                                     </span>
                                     <span class="ek-hist-amount">@x.Money.ToString()</span>
+                                    <button type="button" class="ek-btn ek-chg-edit" @onclick="() => OpenEditOrder(x)">
+                                        @_loc[nameof(RessourceAppStrings.change)]
+                                    </button>
                                 </li>
                             }
                         </ul>
@@ -116,6 +122,64 @@
                     </div>
                 }
             }
+
+            <EkDialog Open="EditOpen" Title="@EditTitle" OnClose="CloseEdit">
+                <ChildContent>
+                    <form class="ek-chg-form" @onsubmit="SaveAsync" @onsubmit:preventDefault>
+                        <p class="ek-chg-date">@EditDate.ToString("dddd, dd. MMMM yyyy, HH:mm")</p>
+
+                        @if (TokenMissing) {
+                            <p class="ek-hint is-warn" role="alert">@_loc[nameof(RessourceAppStrings.changeTokenMissing)]</p>
+                        }
+
+                        <label class="ek-field @(PersonChanged ? "is-changed" : "")">
+                            <span>@_loc[nameof(RessourceAppStrings.person)]</span>
+                            <select class="ek-select" disabled="@(PersonList.Count == 0)" @bind="personChoice">
+                                @foreach (Person p in PersonList) {
+                                    <option value="@p.Guid">@p.Name</option>
+                                }
+                            </select>
+                        </label>
+
+                        <label class="ek-field @(AmountChanged ? "is-changed" : "")">
+                            <span>@_loc[nameof(RessourceAppStrings.amount)]</span>
+                            <input type="text" inputmode="decimal" class="ek-input" autocomplete="off" placeholder="10,00"
+                                   @bind="amountText" @bind:event="oninput" />
+                            <small>@string.Format(_loc[nameof(RessourceAppStrings.changeNow)], EditOriginalAmount)</small>
+                        </label>
+                        @if (AmountEntered && !AmountValid) {
+                            <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</p>
+                        }
+
+                        @if (editPayment is not null) {
+                            <label class="ek-field @(CommentChanged ? "is-changed" : "")">
+                                <span>@_loc[nameof(RessourceAppStrings.comment)]</span>
+                                <input type="text" class="ek-input" autocomplete="off" @bind="commentText" @bind:event="oninput" />
+                                <small>@string.Format(_loc[nameof(RessourceAppStrings.changeNow)], string.IsNullOrWhiteSpace(editPayment.Comment) ? "–" : editPayment.Comment)</small>
+                            </label>
+                        }
+                        else {
+                            <label class="ek-field @(ProviderChanged ? "is-changed" : "")">
+                                <span>@_loc[nameof(RessourceAppStrings.provider)]</span>
+                                <select class="ek-select" disabled="@(Providers.Count == 0)" @bind="providerChoice">
+                                    @foreach (Provider z in Providers) {
+                                        <option value="@z.Guid">@z.Designation</option>
+                                    }
+                                </select>
+                                <small>@string.Format(_loc[nameof(RessourceAppStrings.changeNow)], editOrder?.Provider.Designation)</small>
+                            </label>
+                        }
+
+                        @if (!Changed) {
+                            <p class="ek-hint">@_loc[nameof(RessourceAppStrings.changeNotChanged)]</p>
+                        }
+                    </form>
+                </ChildContent>
+                <Footer>
+                    <button type="button" class="ek-btn" disabled="@isSaving" @onclick="CloseEdit">@_loc[nameof(RessourceAppStrings.cancel)]</button>
+                    <button type="button" class="ek-btn ek-btn-primary" disabled="@(!CanSave)" @onclick="SaveAsync">@_loc[nameof(RessourceAppStrings.acceptChanges)]</button>
+                </Footer>
+            </EkDialog>
         </div>
     </Authorized>
 </AuthorizeView>

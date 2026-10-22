@@ -3,6 +3,7 @@ using Essenskasse.Client.Services;
 using Essenskasse.Ressources;
 using Modells;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace Essenskasse.Pages {
 
@@ -39,6 +40,187 @@ namespace Essenskasse.Pages {
 
         private void ShowOrders(bool orders) {
             showOrders = orders;
+        }
+
+        // ---------- Bearbeiten ----------
+
+        private Payment? editPayment;
+        private Order? editOrder;
+        private string amountText = "";
+        private string commentText = "";
+        private Guid personChoice = Guid.Empty;
+        private Guid providerChoice = Guid.Empty;
+        private bool isSaving = false;
+
+        private bool EditOpen => editPayment is not null || editOrder is not null;
+
+        private string EditTitle => _loc[editPayment is not null
+            ? nameof(RessourceAppStrings.changeEditPayment)
+            : nameof(RessourceAppStrings.changeEditOrder)].Value;
+
+        private DateTime EditDate => editPayment?.DateTime ?? editOrder?.DateTime ?? DateTime.MinValue;
+
+        /// <summary>Der bisherige Betrag der geoeffneten Buchung.</summary>
+        private string EditOriginalAmount => (editPayment?.Amount ?? editOrder?.Money)?.ToString() ?? "";
+
+        /// <summary>Ohne Aenderungstoken kann der Server nichts aendern.</summary>
+        private bool TokenMissing => AppData.AccessToken is null || AppData.AccessToken == Guid.Empty;
+
+        private bool AmountEntered => amountText.Trim().Length > 0;
+
+        /// <summary>Gueltig ist ein Betrag ungleich 0; bei Bestellungen zusaetzlich nur positiv.</summary>
+        private bool TryGetAmount(out Money amount) {
+            if (!MoneyParser.TryParse(amountText, out amount)) {
+                return false;
+            }
+            long cents = amount.ToTotalCents();
+            return cents != 0 && (editPayment is not null || cents > 0);
+        }
+
+        private bool AmountValid => TryGetAmount(out _);
+
+        private bool PersonChanged => EditOpen && personChoice != (editPayment?.ReferencedPerson ?? editOrder?.ReferencedPerson);
+
+        private bool AmountChanged =>
+            TryGetAmount(out Money amount) && amount.ToTotalCents() != (editPayment?.Amount ?? editOrder?.Money)?.ToTotalCents();
+
+        private bool CommentChanged =>
+            editPayment is not null && commentText.Trim() != (editPayment.Comment ?? "").Trim();
+
+        private bool ProviderChanged => editOrder is not null && providerChoice != editOrder.Provider.Guid;
+
+        /// <summary>Wurde gegenueber der Buchung etwas geaendert (bei gueltigem Betrag)?</summary>
+        private bool Changed {
+            get {
+                if (!TryGetAmount(out Money amount)) {
+                    return false;
+                }
+                if (editPayment is not null) {
+                    return EntityChanges.PaymentChanged(editPayment, amount, commentText, personChoice);
+                }
+                return editOrder is not null && EntityChanges.OrderChanged(editOrder, amount, providerChoice, personChoice);
+            }
+        }
+
+        private bool CanSave => !isSaving && !TokenMissing && AmountValid && Changed
+            && (editPayment is not null || Providers.Exists(x => x.Guid == providerChoice));
+
+        private void OpenEditPayment(Payment payment) {
+            editOrder = null;
+            editPayment = payment;
+            amountText = EntityChanges.ToInputText(payment.Amount);
+            commentText = payment.Comment ?? "";
+            personChoice = payment.ReferencedPerson;
+            isSaving = false;
+        }
+
+        private void OpenEditOrder(Order order) {
+            editPayment = null;
+            editOrder = order;
+            amountText = EntityChanges.ToInputText(order.Money);
+            personChoice = order.ReferencedPerson;
+            providerChoice = order.Provider.Guid;
+            isSaving = false;
+        }
+
+        private void CloseEdit() {
+            if (isSaving) {
+                return;
+            }
+            editPayment = null;
+            editOrder = null;
+        }
+
+        private async Task SaveAsync() {
+            if (!CanSave || !TryGetAmount(out Money amount)) {
+                return;
+            }
+            isSaving = true;
+            try {
+                if (editPayment is not null) {
+                    await SavePaymentAsync(editPayment, amount);
+                }
+                else if (editOrder is not null) {
+                    await SaveOrderAsync(editOrder, amount);
+                }
+            }
+            finally {
+                isSaving = false;
+            }
+        }
+
+        /// <summary>Schickt die Aenderung an die API. Bei Erfolg true; sonst gibt es einen Hinweis und der Dialog bleibt offen.</summary>
+        private async Task<bool> SendUpdateAsync(HttpRequestMessage request) {
+            HttpResponseMessage response;
+            try {
+                response = await HttpClient.SendAsync(request);
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return false;
+            }
+            if (!response.IsSuccessStatusCode) {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
+                return false;
+            }
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
+            return true;
+        }
+
+        private async Task SavePaymentAsync(Payment original, Money amount) {
+            string comment = commentText.Trim();
+            // Der Betrag wird immer mitgeschickt; Person und Kommentar nur, wenn sie geaendert wurden.
+            HttpRequestMessage request = new() {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(Config["API-Adress"] + "payment/update"),
+                Content = new StringContent(JsonConvert.SerializeObject(amount), Encoding.UTF8, "application/json")
+            };
+            request.Headers.Add("accessToken", AppData.AccessToken!.Value.ToString());
+            request.Headers.Add("dateAsLong", original.DateTime.Ticks.ToString());
+            if (personChoice != original.ReferencedPerson) {
+                request.Headers.Add("referencedPerson", personChoice.ToString());
+            }
+            if (CommentChanged) {
+                // Ein leerer Header gilt am Server als "nicht angegeben"; zum Leeren wird deshalb ein (maskiertes) Leerzeichen geschickt.
+                request.Headers.Add("comment", comment.Length == 0 ? Uri.EscapeDataString(" ") : Uri.EscapeDataString(comment));
+            }
+
+            if (await SendUpdateAsync(request)) {
+                int index = Payments.IndexOf(original);
+                if (index >= 0) {
+                    Payments[index] = new Payment(original.DateTime, amount, personChoice, comment);
+                }
+                editPayment = null;
+            }
+        }
+
+        private async Task SaveOrderAsync(Order original, Money amount) {
+            Provider? provider = providerChoice == original.Provider.Guid
+                ? original.Provider
+                : Providers.FirstOrDefault(x => x.Guid == providerChoice);
+            if (provider is null) {
+                return;
+            }
+            MoneyProviderGuidData data = new() {
+                Money = amount,
+                Provider = provider,
+                ReferencedPerson = personChoice
+            };
+            HttpRequestMessage request = new() {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(Config["API-Adress"] + "order/update"),
+                Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json")
+            };
+            request.Headers.Add("accessToken", AppData.AccessToken!.Value.ToString());
+            request.Headers.Add("dateAsLong", original.DateTime.Ticks.ToString());
+
+            if (await SendUpdateAsync(request)) {
+                int index = Orders.IndexOf(original);
+                if (index >= 0) {
+                    Orders[index] = new Order(original.DateTime, amount, provider, personChoice);
+                }
+                editOrder = null;
+            }
         }
 
         private string PersonName(Guid guid) {

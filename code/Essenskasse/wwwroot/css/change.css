@@ -26,6 +26,27 @@
     overflow-wrap: anywhere;
 }
 
+.ek-dash .ek-chg-edit {
+    flex: none;
+    padding: 0.3rem 0.8rem;
+}
+
+.ek-chg-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding-top: 0.5rem;
+}
+
+.ek-chg-date {
+    margin: 0;
+    color: var(--ek-muted);
+}
+
+.ek-chg-form .ek-hint {
+    margin: 0;
+}
+
 @media (max-width: 575.98px) {
     .ek-chg .ek-hist li .ek-chg-main {
         flex-basis: 100%;
