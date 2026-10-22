@@ -7,7 +7,7 @@
         public static IReadOnlyList<DateTime> OfWeek(DateTime day) {
             int sinceMonday = ((int)day.DayOfWeek + 6) % 7;
             DateTime monday = day.Date.AddDays(-sinceMonday);
-            return Enumerable.Range(0, 7).Select(monday.AddDays).ToList();
+            return Enumerable.Range(0, 7).Select(offset => monday.AddDays(offset)).ToList();
         }
     }
 }
