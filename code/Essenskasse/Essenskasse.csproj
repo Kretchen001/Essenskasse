@@ -5,7 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+    <!-- Statt aller ICU-Daten nur den Satz ohne Chinesisch/Japanisch/Koreanisch laden: deckt de, en, es und ru ab und spart Download. -->
+    <BlazorIcuDataFileName>icudt_no_CJK.dat</BlazorIcuDataFileName>
     <Authors>Kretchen001</Authors>
   </PropertyGroup>
 
