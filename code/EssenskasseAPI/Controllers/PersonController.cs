@@ -149,56 +149,34 @@ namespace EssenskasseAPI.Controllers {
         public IActionResult UpdatePersonSaldoInDatabase() {
             using (Operation.Time("UpdatePersonSaldoInDatabase")) {
                 Log.Information("UpdatePersonSaldoInDatabase called");
-                // get all Persons
-                string queryString = $"" +
-                    $"SELECT * " +
-                    $"FROM essenskasse.Person;";
-
-                DataTable dataTablePerson = _db.Query(queryString);
+                // Alles in einer Transaktion: erst alle Personen sperren (so kann waehrenddessen keine Buchung
+                // dazwischenkommen), dann die Summen in der Datenbank bilden und die Salden setzen.
+                using DbScope tx = _db.BeginTransaction();
+                DataTable dataTablePerson = tx.Query("SELECT * FROM essenskasse.Person FOR UPDATE;");
                 List<Person> persons = DataTableToListOfPerson(dataTablePerson);
 
+                Dictionary<string, long> paymentCents = SumCentsPerPerson(tx, "essenskasse.Payment");
+                Dictionary<string, long> orderCents = SumCentsPerPerson(tx, "essenskasse.Order");
+
                 foreach (Person person in persons) {
-                    // get all Payments of Person
-                    string queryStringPayments = $"" +
-                        $"SELECT * " +
-                        $"FROM essenskasse.Payment " +
-                        $"WHERE ReferencedPerson=@person;";
-
-                    DataTable dataTablePayments = _db.Query(queryStringPayments, Db.P("@person", person.Guid));
-                    List<Payment> payments = DataTableToListOfPayments(dataTablePayments);
-
-                    Money paymentsAmount = new Money(0, 0);
-                    foreach (Payment x in payments) {
-                        paymentsAmount = new Money().CalculateMoney(CalculationOperation.Addition, paymentsAmount, x.Amount)!;
-                    }
-
-                    // get all Orders of Person
-                    string queryStringOrders = $"" +
-                        $"SELECT * " +
-                        $"FROM essenskasse.Order " +
-                        $"WHERE ReferencedPerson=@person;";
-
-                    DataTable dataTableOrders= _db.Query(queryStringOrders, Db.P("@person", person.Guid));
-                    List<Order> orders = DataTableToListOfOrders(dataTableOrders);
-
-                    Money ordersAmount = new Money(0, 0);
-                    foreach (Order x in orders) {
-                        ordersAmount = new Money().CalculateMoney(CalculationOperation.Addition, ordersAmount, x.Money)!;
-                    }
+                    string key = person.Guid.ToString();
+                    long paid = paymentCents.GetValueOrDefault(key, 0);
+                    long ordered = orderCents.GetValueOrDefault(key, 0);
 
                     // recalculate saldo and update Person
-                    Money newSaldo = new Money().CalculateMoney(CalculationOperation.Substraction, paymentsAmount, ordersAmount)!;
+                    Money newSaldo = Money.FromTotalCents(paid - ordered);
                     string queryStringPersonUpdate = $"" +
                         $"UPDATE essenskasse.Person " +
                         $"SET SaldoEuro=@euro, SaldoCent=@cent " +
                         $"WHERE Guid=@guid;";
-                    _db.Query(queryStringPersonUpdate,
+                    tx.Query(queryStringPersonUpdate,
                         Db.P("@euro", newSaldo.Euro),
                         Db.P("@cent", newSaldo.Cent),
                         Db.P("@guid", person.Guid));
 
                     Log.Information($"{person.Guid} saldo old {person.Saldo} to new {newSaldo}");
                 }
+                tx.Commit();
                 Log.Information("Successfully recalculate Saldo");
                 return Ok("Keine Fehler.");
             }
@@ -248,6 +226,18 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region InternalFunctions
+        /// <summary>Summe aller Betraege (in Cent) je Person aus Payment oder Order, gebildet in der Datenbank.</summary>
+        /// <param name="tx">Laufende Transaktion.</param>
+        /// <param name="table">Nur 'essenskasse.Payment' oder 'essenskasse.Order' (fester Wert, keine Eingabe).</param>
+        private static Dictionary<string, long> SumCentsPerPerson(DbScope tx, string table) {
+            DataTable sums = tx.Query($"SELECT ReferencedPerson, SUM(AmountEuro * 100 + AmountCent) AS TotalCents FROM {table} GROUP BY ReferencedPerson;");
+            Dictionary<string, long> result = new(StringComparer.OrdinalIgnoreCase);
+            foreach (DataRow row in sums.Rows) {
+                result[row["ReferencedPerson"].ToString()!] = Convert.ToInt64(row["TotalCents"]);
+            }
+            return result;
+        }
+
         private static List<Person> DataTableToListOfPerson(DataTable dataTable) {
             List<Person> personList = [];
             foreach (DataRow row in dataTable.Rows) {
