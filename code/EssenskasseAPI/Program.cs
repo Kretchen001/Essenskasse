@@ -16,13 +16,28 @@ namespace EssenskasseAPI {
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(x => {
                 x.SwaggerDoc("v1", new OpenApiInfo { Title = "EssenskasseAPI", Version = "v1" });
+                // "Authorize"-Knopf: Token aus POST api/user/newTokenForUser eintragen (ohne Anfuehrungszeichen),
+                // dann senden alle "Try it out"-Aufrufe es als "Authorization: Bearer ..." mit.
+                x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+                    Description = "Sitzungs-Token (nur das Token, ohne \"Bearer \" davor)",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer"
+                });
+                x.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                    {
+                        new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
+                        Array.Empty<string>()
+                    }
+                });
             });
 
             WebApplication app = builder.Build();
 
-            // Swagger nur in Development oder wenn "Swagger:Enabled" gesetzt ist
-            // (z. B. Umgebungsvariable Swagger__Enabled=true im Container).
-            if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled")) {
+            // Swagger ist standardmaessig an (auch im Container). Abschalten mit "Swagger:Enabled": false
+            // (z. B. Umgebungsvariable Swagger__Enabled=false).
+            if (app.Configuration.GetValue<bool>("Swagger:Enabled", true)) {
                 app.UseSwagger();
                 app.UseSwaggerUI(x => {
                     x.SwaggerEndpoint("/swagger/v1/swagger.json", "EssenskasseAPI");

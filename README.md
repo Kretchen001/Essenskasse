@@ -88,7 +88,7 @@ Was sich ändert:
   |---|---|
   | `Security__AdminMaxRole` | Benutzer mit `Role` bis zu diesem Wert sind Administratoren (Backup, Benutzerverwaltung). Standard 100 = jeder angemeldete Benutzer. |
   | `Cors__AllowedOrigins__0` | Erlaubte Adresse der PWA, z. B. `http://meinserver:8009`. Ohne Angabe sind alle Origins erlaubt. |
-  | `Swagger__Enabled` | `true` schaltet Swagger im Container ein (Standard: nur in Development). |
+  | `Swagger__Enabled` | `false` schaltet Swagger ab (Standard: an, erreichbar unter `/swagger`; über „Authorize“ das Token eintragen). |
 
 **English**
 1. Create a backup. 2. Run `code/MySqlScripts/update_v1-2-0_zu_1-3-0.sql` against the database (additive: it never deletes or changes data and can be run repeatedly). 3. Rebuild with `docker-compose up -d --build`.
