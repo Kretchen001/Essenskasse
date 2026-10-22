@@ -25,5 +25,19 @@
             </svg>
         </button>
     </div>
+    @if (Last is not null || Quick.Count > 0) {
+        <div class="ek-ord-chips" role="group" aria-label="@_loc[nameof(RessourceAppStrings.orderChipsLabel)]: @Person.Name">
+            @if (Last is not null) {
+                <button type="button" class="ek-chip ek-chip-last" title="@_loc[nameof(RessourceAppStrings.orderLastAmount)]"
+                        @onclick="() => OnApplyLast.InvokeAsync()">
+                    <span aria-hidden="true">↺</span> @Last.ToString()
+                </button>
+            }
+            @foreach (long cents in Quick) {
+                long add = cents;
+                <button type="button" class="ek-chip" @onclick="() => OnAddAmount.InvokeAsync(add)">+ @QuickAmounts.Label(add)</button>
+            }
+        </div>
+    }
     @ChildContent
 </li>

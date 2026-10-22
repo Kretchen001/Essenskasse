@@ -86,6 +86,8 @@
                                         Text="@TextOf(current.Guid)" TextChanged="@((string v) => SetText(current.Guid, v))"
                                         Invalid="IsInvalid(current.Guid)" InputId="@InputIdOf(current)"
                                         OnEnter="() => FocusNext(current.Guid)"
+                                        Quick="AppData.QuickAmounts" Last="LastOf(current.Guid)"
+                                        OnAddAmount="@((long c) => AddQuick(current.Guid, c))" OnApplyLast="() => ApplyLast(current.Guid)"
                                         HistoryOpen="openHistory.Contains(current.Guid)" OnToggleHistory="() => ToggleHistory(current)">
                             @if (openHistory.Contains(current.Guid)) {
                                 <div class="ek-ord-history">

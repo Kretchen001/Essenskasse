@@ -905,4 +905,10 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="orderOnlyFilled" xml:space="preserve">
     <value>Nur mit Betrag</value>
   </data>
+  <data name="orderChipsLabel" xml:space="preserve">
+    <value>Schnellbeträge</value>
+  </data>
+  <data name="orderLastAmount" xml:space="preserve">
+    <value>Wie zuletzt</value>
+  </data>
 </root>

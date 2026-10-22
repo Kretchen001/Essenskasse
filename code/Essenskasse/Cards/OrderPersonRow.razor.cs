@@ -40,6 +40,20 @@ namespace Essenskasse.Cards {
         [Parameter]
         public EventCallback OnToggleHistory { get; set; }
 
+        /// <summary>Die Schnellbetraege (Cent), je ein Chip "+ Betrag".</summary>
+        [Parameter]
+        public IReadOnlyList<long> Quick { get; set; } = [];
+
+        /// <summary>Der Betrag der letzten Bestellung dieser Person, falls bekannt (Chip "wie zuletzt").</summary>
+        [Parameter]
+        public Money? Last { get; set; }
+
+        [Parameter]
+        public EventCallback<long> OnAddAmount { get; set; }
+
+        [Parameter]
+        public EventCallback OnApplyLast { get; set; }
+
         /// <summary>Weitere Inhalte unter der Zeile (Chips, Verlauf).</summary>
         [Parameter]
         public RenderFragment? ChildContent { get; set; }

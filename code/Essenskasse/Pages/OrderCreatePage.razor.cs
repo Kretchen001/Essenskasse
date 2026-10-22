@@ -28,6 +28,9 @@ namespace Essenskasse.Pages {
 
         private bool isSubmitting = false;
 
+        /// <summary>Zuletzt bestellter Betrag je Person (Vorschlag "wie zuletzt").</summary>
+        private Dictionary<Guid, Money> lastAmounts = [];
+
         private string personFilter = "";
         private bool onlyFilled = false;
 
@@ -108,6 +111,7 @@ namespace Essenskasse.Pages {
             if (AuthStateService.IsAuthenticated) {
                 await RequestAllProvider();
                 await RequestAllPerson();
+                await LoadLastAmounts();
             }
             base.StateHasChanged();
         }
@@ -162,6 +166,34 @@ namespace Essenskasse.Pages {
         }
 
         private List<Order> HistoryOf(Guid guid) => histories.TryGetValue(guid, out List<Order>? list) ? list : [];
+
+        /// <summary>Laedt je Person den Betrag der letzten Bestellung; schlaegt das fehl, fehlt nur der Vorschlag.</summary>
+        private async Task LoadLastAmounts() {
+            try {
+                HttpResponseMessage response = await HttpClient.GetAsync(Config["API-Adress"] + "order/lastAmounts");
+                if (response.IsSuccessStatusCode) {
+                    List<LastOrderAmount> list = JsonConvert.DeserializeObject<List<LastOrderAmount>>(await response.Content.ReadAsStringAsync()) ?? [];
+                    lastAmounts = list.Where(x => x.Money.ToTotalCents() > 0).ToDictionary(x => x.ReferencedPerson, x => x.Money);
+                }
+            }
+            catch {
+                lastAmounts = [];
+            }
+        }
+
+        private Money? LastOf(Guid guid) => lastAmounts.TryGetValue(guid, out Money? money) ? money : null;
+
+        /// <summary>Addiert einen Schnellbetrag zum eingetippten Betrag (ungueltige Eingaben werden dabei ersetzt).</summary>
+        private void AddQuick(Guid guid, long cents) {
+            TryAmountCents(guid, out long current);
+            SetText(guid, QuickAmounts.ToInputText(current + cents));
+        }
+
+        private void ApplyLast(Guid guid) {
+            if (lastAmounts.TryGetValue(guid, out Money? money)) {
+                SetText(guid, QuickAmounts.ToInputText(money.ToTotalCents()));
+            }
+        }
 
         private string TextOf(Guid guid) => amountTexts.TryGetValue(guid, out string? text) ? text : "";
 
@@ -284,6 +316,7 @@ namespace Essenskasse.Pages {
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
                 ClearAllAmounts();
+                await LoadLastAmounts();
             }
         }
 

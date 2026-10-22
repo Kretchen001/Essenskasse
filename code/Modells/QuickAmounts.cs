@@ -57,6 +57,12 @@
             return result;
         }
 
+        /// <summary>Betrag als Text fuer ein Eingabefeld, z. B. "2,50" (ohne Waehrungszeichen, immer zwei Nachkommastellen).</summary>
+        public static string ToInputText(long cents) {
+            long abs = Math.Abs(cents);
+            return (cents < 0 ? "-" : "") + (abs / 100) + "," + (abs % 100).ToString("00");
+        }
+
         /// <summary>Kurze Beschriftung: "5 €" bei ganzen Euro, sonst "2,50 €".</summary>
         public static string Label(long cents) {
             if (cents % 100 == 0) {

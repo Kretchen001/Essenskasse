@@ -62,6 +62,18 @@
         }
 
         [Theory]
+        [InlineData(250, "2,50")]
+        [InlineData(500, "5,00")]
+        [InlineData(5, "0,05")]
+        [InlineData(0, "0,00")]
+        [InlineData(-150, "-1,50")]
+        public void ToInputText_IsParsableAgain(long cents, string expected) {
+            Assert.Equal(expected, QuickAmounts.ToInputText(cents));
+            Assert.True(MoneyParser.TryParse(expected, out Money money));
+            Assert.Equal(cents, money.ToTotalCents());
+        }
+
+        [Theory]
         [InlineData(500, "5 €")]
         [InlineData(100, "1 €")]
         [InlineData(250, "2,50 €")]

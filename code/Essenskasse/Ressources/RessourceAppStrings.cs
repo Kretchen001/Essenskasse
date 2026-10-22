@@ -265,5 +265,7 @@
         orderTabOrder,
         orderSearchPerson,
         orderOnlyFilled,
+        orderChipsLabel,
+        orderLastAmount,
     }
 }

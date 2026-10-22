@@ -45,7 +45,33 @@
 
     .ek-ord-filter .ek-search {
         flex: 1 1 14rem;
+        margin-top: 0;
     }
+
+/* Schnellbetrags-Chips */
+.ek-ord-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding-left: 2.9rem;
+}
+
+.ek-dash .ek-ord-chips .ek-chip-last {
+    border-style: dashed;
+    border-color: var(--ek-focus);
+}
+
+.ek-dash .ek-ord-chips .ek-chip:hover {
+    border-color: var(--ek-focus);
+    background-color: rgba(128, 128, 128, 0.16);
+}
+
+@media (max-width: 575.98px) {
+    .ek-ord-chips {
+        padding-left: 0;
+    }
+}
 
 /* Personenzeilen */
 .ek-ord-list {
