@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EssenskasseAPI.Data;
+using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -12,10 +13,10 @@ namespace EssenskasseAPI.Controllers {
     public class TransactionProceduresController : ControllerBase {
 
         #region Config
-        private readonly IConfiguration Configuration;
+        private readonly Db _db;
 
         public TransactionProceduresController(IConfiguration configuration) {
-            Configuration = configuration;
+            _db = new Db(configuration);
         }
         #endregion
 
@@ -28,7 +29,7 @@ namespace EssenskasseAPI.Controllers {
                     $"FROM essenskasse.TransactionProcedure " +
                     $"ORDER BY DateTime DESC;";
 
-                DataTable dataTableTransaction = QueryExecuterAtMySql(queryString);
+                DataTable dataTableTransaction = _db.Query(queryString);
                 List<TransactionProcedure> transactions = DataTableToListOfTransactionProcedure(dataTableTransaction);
 
                 return Ok(JsonConvert.SerializeObject(transactions));
@@ -40,14 +41,14 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("NewOne at Procedures")) {
                 string queryString = $"" +
                     $"INSERT INTO essenskasse.TransactionProcedure (DateTime, AmountEuro, AmountCent, Comment) " +
-                    $"VALUES (" +
-                    $"{newOne.DateTime.Ticks}, " +
-                    $"{newOne.Amount.Euro}, " +
-                    $"{newOne.Amount.Cent}, " +
-                    $"'{newOne.Comment}');";
+                    $"VALUES (@dateTime, @euro, @cent, @comment);";
 
                 try {
-                    QueryExecuterAtMySql(queryString);
+                    _db.Query(queryString,
+                        Db.P("@dateTime", newOne.DateTime.Ticks),
+                        Db.P("@euro", newOne.Amount.Euro),
+                        Db.P("@cent", newOne.Amount.Cent),
+                        Db.P("@comment", newOne.Comment));
                     Log.Information($"New Transaction inserted - {newOne.DateTime.Ticks} - {newOne.Amount.Euro} - {newOne.Amount.Cent} - {newOne.Comment}");
                     return Ok();
                 }
@@ -61,22 +62,6 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region InternalFunctions
-        private DataTable QueryExecuterAtMySql(string Query) {
-            // MySql Connection
-            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
-
-            MySqlCommand cmd = new MySqlCommand(Query, connection);
-
-            DataTable dataTable = new DataTable();
-            // read the result
-            connection.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            dataTable.Load(reader);
-            connection.Close();
-
-            return dataTable;
-        }
-
         private static List<TransactionProcedure> DataTableToListOfTransactionProcedure(DataTable dataTable) {
             List<TransactionProcedure> providerController = [];
             foreach (DataRow row in dataTable.Rows) {
