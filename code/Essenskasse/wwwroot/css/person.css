@@ -418,6 +418,20 @@
     }
 }
 
+.ek-add-single {
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+@media (max-width: 719.98px) {
+    .ek-add-single {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.ek-remove-old {
+    margin-top: 2rem;
+}
+
 .ek-hint {
     margin: 0.6rem 0 0;
     font-size: 0.9rem;

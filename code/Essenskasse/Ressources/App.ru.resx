@@ -666,4 +666,13 @@
   <data name="retry" xml:space="preserve">
     <value>Повторить</value>
   </data>
+  <data name="duplicateProvider" xml:space="preserve">
+    <value>Поставщик с таким названием уже есть.</value>
+  </data>
+  <data name="editProvider" xml:space="preserve">
+    <value>Редактировать поставщика</value>
+  </data>
+  <data name="providerRegistered" xml:space="preserve">
+    <value>Имеющиеся поставщики</value>
+  </data>
 </root>

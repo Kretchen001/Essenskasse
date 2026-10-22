@@ -186,5 +186,8 @@
         resetFilter,
         loadFailed,
         retry,
+        duplicateProvider,
+        editProvider,
+        providerRegistered,
     }
 }

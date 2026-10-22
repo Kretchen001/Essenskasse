@@ -1,5 +1,6 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
@@ -9,7 +10,8 @@ namespace Essenskasse.Pages {
     public partial class ProviderPage {
 
         private string dashboardLink = "/";
-        private bool accessToAdd = false;
+        private bool isAdding = false;
+        private ElementReference newNameInput;
         private bool accessToDelete = false;
         private bool IsASC = true;
 
@@ -17,6 +19,19 @@ namespace Essenskasse.Pages {
         private string providerToDeleteGuid = "";
 
         private string filter = "";
+
+        /// <summary>Suchtext; jede Aenderung baut die Liste sofort neu auf.</summary>
+        private string Filter {
+            get => filter;
+            set {
+                filter = value ?? "";
+                ApplyFilterAndSort();
+            }
+        }
+
+        private void ClearFilter() {
+            Filter = "";
+        }
 
         private List<Provider> providers = new List<Provider>();
         private List<Provider> shownProviderList = new List<Provider>();
@@ -52,48 +67,61 @@ namespace Essenskasse.Pages {
                                                 // deserialize the result-JSON with Newtownsoft to the List
                 providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
                 providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
-                providers = providers.OrderBy(x => x.Designation).ToList();
-                shownProviderList.AddRange(providers);
-                SortProviderList();
+                ApplyFilterAndSort();
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
             }
         }
 
-        private async void AddNewAnbieter() {
-            if (newProviderDesignation.Equals("")) {
+        private bool NewNameEntered => newProviderDesignation.Trim().Length > 0;
+        private bool NewNameDuplicate => NewNameEntered
+            && providers.Any(x => string.Equals(x.Designation, newProviderDesignation.Trim(), StringComparison.CurrentCultureIgnoreCase));
+        private bool CanAdd => NewNameEntered && !isAdding;
+
+        private async Task AddNewProvider() {
+            if (!CanAdd) {
                 return;
             }
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(Config["API-Adress"] + "provider/new"),
-                Headers = {
-                        {"name", Uri.EscapeDataString(newProviderDesignation)}
-                    }
-            };
-
-            HttpResponseMessage? response = null;
+            string name = newProviderDesignation.Trim();
+            isAdding = true;
             try {
-                response = await HttpClient.SendAsync(httpRequestMessage);
-            }
-            catch {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
-            }
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "provider/new"),
+                    Headers = {
+                        {"name", Uri.EscapeDataString(name)}
+                    }
+                };
 
-            if (response.IsSuccessStatusCode) {
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+                    return;
+                }
                 string temp = await response.Content.ReadAsStringAsync();
-                providers.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
-                providers = providers.OrderBy(x => x.Designation).ToList();
-                shownProviderList.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
-                SortProviderList();
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.provider)] + " " + newProviderDesignation + " " + _loc[nameof(RessourceAppStrings.toastAdd)], ToastLevel.Success);
+                providers.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), name));
+                ApplyFilterAndSort();
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.provider)] + " " + name + " " + _loc[nameof(RessourceAppStrings.toastAdd)], ToastLevel.Success);
+                newProviderDesignation = "";
             }
+            finally {
+                isAdding = false;
+            }
+            await newNameInput.FocusAsync(); // direkt den naechsten Anbieter eingeben
+        }
 
-            newProviderDesignation = "";
-            accessToAdd = false;
-            base.StateHasChanged();
+        /// <summary>Eine Kachel hat die Bezeichnung gespeichert: Liste (Filter, Sortierung) neu aufbauen.</summary>
+        private void OnProviderUpdated(Provider updated) {
+            ApplyFilterAndSort();
         }
 
         private async Task DeleteAnbieter() {
@@ -130,6 +158,7 @@ namespace Essenskasse.Pages {
                         Provider temp = JsonConvert.DeserializeObject<Provider>(await response.Content.ReadAsStringAsync())!;
                         ToastService.ShowToast(_loc[nameof(RessourceAppStrings.person)] + " " + temp.Designation + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyRemoved)], ToastLevel.Success);
                         providers.Remove(tempAnbieter);
+                        ApplyFilterAndSort();
                         accessToDelete = false;
                         providerToDeleteGuid = "";
                         base.StateHasChanged();
@@ -147,39 +176,22 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async Task CopyToClipboard(string text) {
-            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
-        }
-
-        private void ChangeProviderShownList() {
-            Console.WriteLine(filter);
-            shownProviderList.Clear();
-            if (filter.Equals("")) {
-                shownProviderList.AddRange(providers);
-            }
-            else {
-                foreach (Provider x in providers) {
-                    if (x.Designation.Contains(filter)) {
-                        shownProviderList.Add(x);
-                    }
-                }
-            }
-        }
-
         private void ToggleAscDesc() {
             IsASC = !IsASC;
             _ = SaveAscStatus();
-            SortProviderList();
-            base.StateHasChanged();
+            ApplyFilterAndSort();
         }
 
-        private void SortProviderList() {
-            if (IsASC) {
-                shownProviderList = shownProviderList.OrderBy(x => x.Designation).ToList();
+        /// <summary>Baut die angezeigte Liste aus allen Anbietern: Suchtext (ohne Beachtung der Schreibweise), dann Sortierung.</summary>
+        private void ApplyFilterAndSort() {
+            string text = filter.Trim();
+            IEnumerable<Provider> result = providers;
+            if (text.Length > 0) {
+                result = result.Where(x => x.Designation.Contains(text, StringComparison.CurrentCultureIgnoreCase));
             }
-            else {
-                shownProviderList = shownProviderList.OrderByDescending(x => x.Designation).ToList();
-            }
+            shownProviderList = IsASC
+                ? result.OrderBy(x => x.Designation, StringComparer.CurrentCultureIgnoreCase).ToList()
+                : result.OrderByDescending(x => x.Designation, StringComparer.CurrentCultureIgnoreCase).ToList();
         }
 
         public async Task SaveAscStatus() {
