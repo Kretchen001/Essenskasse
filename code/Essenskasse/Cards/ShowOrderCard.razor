@@ -19,18 +19,3 @@
         </button>
     </div>
 </div>
-
-@code {
-    [Parameter]
-    public Order Order{ get; set; } = new Order();
-    [Parameter]
-    public string DesignationOfPerson { get; set; } = "";
-    [Parameter]
-    public int OrderNumberInList { get; set; }
-    [Parameter]
-    public EventCallback<int> ButtonChangeClickCallback { get; set; }
-
-    private void ClickOnChange() {
-        ButtonChangeClickCallback.InvokeAsync(OrderNumberInList);
-    }
-}
