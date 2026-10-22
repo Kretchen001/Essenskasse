@@ -899,4 +899,10 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="orderTabOrder" xml:space="preserve">
     <value>Bestellen</value>
   </data>
+  <data name="orderSearchPerson" xml:space="preserve">
+    <value>Person suchen</value>
+  </data>
+  <data name="orderOnlyFilled" xml:space="preserve">
+    <value>Nur mit Betrag</value>
+  </data>
 </root>

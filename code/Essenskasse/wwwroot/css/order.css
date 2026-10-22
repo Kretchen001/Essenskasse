@@ -34,6 +34,19 @@
     }
 }
 
+/* Suche und Filter */
+.ek-ord-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1rem;
+}
+
+    .ek-ord-filter .ek-search {
+        flex: 1 1 14rem;
+    }
+
 /* Personenzeilen */
 .ek-ord-list {
     margin: 1rem 0 0;

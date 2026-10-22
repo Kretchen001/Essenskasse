@@ -899,4 +899,10 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="orderTabOrder" xml:space="preserve">
     <value>Pedir</value>
   </data>
+  <data name="orderSearchPerson" xml:space="preserve">
+    <value>Buscar persona</value>
+  </data>
+  <data name="orderOnlyFilled" xml:space="preserve">
+    <value>Solo con importe</value>
+  </data>
 </root>

@@ -899,4 +899,10 @@
   <data name="orderTabOrder" xml:space="preserve">
     <value>Заказать</value>
   </data>
+  <data name="orderSearchPerson" xml:space="preserve">
+    <value>Найти человека</value>
+  </data>
+  <data name="orderOnlyFilled" xml:space="preserve">
+    <value>Только с суммой</value>
+  </data>
 </root>

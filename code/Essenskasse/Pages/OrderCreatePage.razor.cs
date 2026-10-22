@@ -28,6 +28,32 @@ namespace Essenskasse.Pages {
 
         private bool isSubmitting = false;
 
+        private string personFilter = "";
+        private bool onlyFilled = false;
+
+        /// <summary>Anzahl der Personen mit eingetragenem Betrag (auch wenn sie gerade ausgeblendet sind).</summary>
+        private int FilledCount => person.Count(x => TextOf(x.Guid).Trim().Length > 0);
+
+        /// <summary>Personen passend zu Suche und Filter (die Eingaben ausgeblendeter Personen bleiben erhalten).</summary>
+        private IEnumerable<Person> ShownPersons {
+            get {
+                string text = personFilter.Trim();
+                IEnumerable<Person> result = person;
+                if (text.Length > 0) {
+                    result = result.Where(x => x.Name.Contains(text, StringComparison.CurrentCultureIgnoreCase));
+                }
+                if (onlyFilled) {
+                    result = result.Where(x => TextOf(x.Guid).Trim().Length > 0);
+                }
+                return result;
+            }
+        }
+
+        private void ClearPersonFilter() {
+            personFilter = "";
+            onlyFilled = false;
+        }
+
         private record DateAndOrder(List<string> Head, DateTime DateTime, List<Order?> Orders);
         private List<DateAndOrder> orderListForOverview = [];
         private DateTime referenceDate = DateTime.Now;
@@ -165,9 +191,10 @@ namespace Essenskasse.Pages {
 
         /// <summary>Springt mit Enter zum Betragsfeld der naechsten Person.</summary>
         private async Task FocusNext(Guid guid) {
-            int index = person.FindIndex(x => x.Guid.Equals(guid));
-            if (index >= 0 && index + 1 < person.Count) {
-                await JSRuntime.InvokeVoidAsync("ekFocus", InputIdOf(person[index + 1]));
+            List<Person> shown = ShownPersons.ToList();
+            int index = shown.FindIndex(x => x.Guid.Equals(guid));
+            if (index >= 0 && index + 1 < shown.Count) {
+                await JSRuntime.InvokeVoidAsync("ekFocus", InputIdOf(shown[index + 1]));
             }
         }
 

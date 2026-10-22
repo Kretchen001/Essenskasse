@@ -59,8 +59,28 @@
                     </label>
                 </div>
 
+                <div class="ek-ord-filter">
+                    <div class="ek-search">
+                        <svg class="ek-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                        </svg>
+                        <input type="text" inputmode="search" class="ek-search-input" autocomplete="off"
+                               placeholder="@_loc[nameof(RessourceAppStrings.orderSearchPerson)]"
+                               aria-label="@_loc[nameof(RessourceAppStrings.orderSearchPerson)]"
+                               @bind="personFilter" @bind:event="oninput" />
+                        @if (personFilter.Length > 0) {
+                            <button type="button" class="ek-icon-btn" @onclick="() => personFilter = string.Empty"
+                                    title="@_loc[nameof(RessourceAppStrings.clearSearch)]"
+                                    aria-label="@_loc[nameof(RessourceAppStrings.clearSearch)]">✕</button>
+                        }
+                    </div>
+                    <button type="button" class="ek-chip @(onlyFilled ? "is-active" : "")" aria-pressed="@onlyFilled" @onclick="() => onlyFilled = !onlyFilled">
+                        @_loc[nameof(RessourceAppStrings.orderOnlyFilled)] <span class="ek-chip-count">@FilledCount</span>
+                    </button>
+                </div>
+
                 <ul class="ek-ord-list">
-                    @foreach (Person x in person) {
+                    @foreach (Person x in ShownPersons) {
                         Person current = x;
                         <OrderPersonRow @key="current.Guid" Person="current" SaldoOk="IsInconspicuous(current)"
                                         Text="@TextOf(current.Guid)" TextChanged="@((string v) => SetText(current.Guid, v))"
@@ -80,6 +100,12 @@
                         </OrderPersonRow>
                     }
                 </ul>
+                @if (person.Count > 0 && !ShownPersons.Any()) {
+                    <div class="ek-empty">
+                        <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noMatches)]</p>
+                        <button type="button" class="ek-btn" @onclick="ClearPersonFilter">@_loc[nameof(RessourceAppStrings.resetFilter)]</button>
+                    </div>
+                }
 
                 <div class="ek-ord-submit">
                     <button type="button" class="ek-btn ek-btn-primary" disabled="@isSubmitting" @onclick="PostOrderForTheDay">

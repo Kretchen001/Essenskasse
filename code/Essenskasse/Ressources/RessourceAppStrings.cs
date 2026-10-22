@@ -263,5 +263,7 @@
         orderDateToday,
         orderDateYesterday,
         orderTabOrder,
+        orderSearchPerson,
+        orderOnlyFilled,
     }
 }

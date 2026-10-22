@@ -899,4 +899,10 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="orderTabOrder" xml:space="preserve">
     <value>Order</value>
   </data>
+  <data name="orderSearchPerson" xml:space="preserve">
+    <value>Find person</value>
+  </data>
+  <data name="orderOnlyFilled" xml:space="preserve">
+    <value>Only with amount</value>
+  </data>
 </root>
