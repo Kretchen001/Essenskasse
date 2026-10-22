@@ -762,4 +762,16 @@
   <data name="bookNow" xml:space="preserve">
     <value>Провести</value>
   </data>
+  <data name="selectPerson" xml:space="preserve">
+    <value>Выберите человека</value>
+  </data>
+  <data name="changePerson" xml:space="preserve">
+    <value>Другой человек</value>
+  </data>
+  <data name="quickAmounts" xml:space="preserve">
+    <value>Быстрые суммы</value>
+  </data>
+  <data name="searchPaymentPerson" xml:space="preserve">
+    <value>Поиск человека (имя или e-mail)</value>
+  </data>
 </root>

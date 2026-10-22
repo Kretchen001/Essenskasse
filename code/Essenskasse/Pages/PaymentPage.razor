@@ -7,6 +7,7 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 @inject NavigationManager Nav
+@inject AuthStateService AuthState
 
 <style>
     th:nth-child(1), td:nth-child(1) {
@@ -26,95 +27,110 @@
 
 <AuthorizeView>
     <NotAuthorized>
-        <div class="row">
-            <div class="col-lg-3">
-                Zugriff verweigert!
-            </div>
-            <div class="col-lg-9">
-                <button @onclick="() => Nav.NavigateTo(dashboardLink)">
-                    Rückkehr zum Dashboard
+        <div class="ek-dash ek-denied" role="alert">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.accessDenied)]</h2>
+            <p class="ek-denied-text">@_loc[nameof(RessourceAppStrings.accessDeniedHint)]</p>
+            <div class="ek-denied-actions">
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="AuthState.RequestLogin">
+                    @_loc[nameof(RessourceAppStrings.signIn)]
+                </button>
+                <button type="button" class="ek-btn" @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    @_loc[nameof(RessourceAppStrings.backToDashboard)]
                 </button>
             </div>
         </div>
     </NotAuthorized>
     <Authorized>
-        <h2>@_loc[nameof(RessourceAppStrings.payment)]</h2>
+        <div class="ek-dash">
+        <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.payment)]</h2>
 
-        <div class="row">
-            <div class="col-lg-3 align-self-center">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.person)]
-                </label>
-            </div>
-            <div class="col-lg-9">
-                <select class="form-select" @bind="@SelectedPerson">
-                    @if (person is not null) {
-                        @foreach (var x in person) {
-                            <option value="@x.Guid">@x.Name</option>
-                        }
-                    }
-                </select>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-lg-3 align-self-center">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.amount)]
-                </label>
-            </div>
-            <div class="col-lg-4 align-self-center" style="width: 25%">
-                <input style="width: 100%" type="text" inputmode="decimal" autocomplete="off"
-                       @bind="amountText" @bind:event="oninput" placeholder="10,00">
-            </div>
-            <div class="col-lg-5 align-self-center">
-                @if (AmountEntered && !AmountValid) {
-                    <small class="text-danger" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</small>
+        @if (SelectedPersonData is null) {
+            <h3 class="ek-group-title ek-list-title">@_loc[nameof(RessourceAppStrings.selectPerson)]</h3>
+            <div class="ek-search">
+                <svg class="ek-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                </svg>
+                <input id="ek-person-search" type="text" inputmode="search" class="ek-search-input" autocomplete="off"
+                       placeholder="@_loc[nameof(RessourceAppStrings.searchPaymentPerson)]"
+                       aria-label="@_loc[nameof(RessourceAppStrings.searchPaymentPerson)]"
+                       @bind="PersonFilter" @bind:event="oninput" @onkeydown="OnPersonSearchKeyDown" />
+                @if (PersonFilter.Length == 0) {
+                    <kbd class="ek-kbd" aria-hidden="true">/</kbd>
                 }
-                else if (AmountValid) {
-                    <label>
-                        @Money.ToString()
-                    </label>
+                else {
+                    <button type="button" class="ek-icon-btn" @onclick="ClearPersonFilter"
+                            title="@_loc[nameof(RessourceAppStrings.clearSearch)]"
+                            aria-label="@_loc[nameof(RessourceAppStrings.clearSearch)]">✕</button>
                 }
             </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-lg-3">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.comment)]
-                </label>
+            <div class="ek-grid ek-people ek-pick-grid">
+                @foreach (Person x in ShownPersons) {
+                    <PersonPickCard Person="x" PositivSaldo="IsInconspicuous(x)" OnPick="SelectPerson" />
+                }
             </div>
-            <div class="col-lg-9" style="width: 75%">
-                <input type="text" style="width: 100%" @bind="comment" />
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            @if (!previewOpen) {
-                <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px"
-                        disabled="@(!AmountValid || SelectedPersonData is null)" @onclick="OpenPreview">
-                    @_loc[nameof(RessourceAppStrings.creditAmount)]
-                </button>
+            @if (person is not null && person.Count > 0 && !ShownPersons.Any()) {
+                <div class="ek-empty">
+                    <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noMatches)]</p>
+                    <button type="button" class="ek-btn" @onclick="ClearPersonFilter">@_loc[nameof(RessourceAppStrings.resetFilter)]</button>
+                </div>
             }
-            else if (SelectedPersonData is not null) {
-                <div class="border rounded p-3" role="group" aria-label="@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]">
-                    <h5>@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]</h5>
-                    <p class="mb-1"><strong>@SelectedPersonData.Name</strong>: @Money.ToString()</p>
-                    <p class="mb-3">
+        }
+        else {
+            <div class="ek-pay-summary @(IsInconspicuous(SelectedPersonData) ? "ek-person-ok" : "ek-person-bad")">
+                <span class="ek-avatar" aria-hidden="true">@PersonText.Initials(SelectedPersonData.Name)</span>
+                <div class="ek-person-text">
+                    <h3 class="ek-person-name">@SelectedPersonData.Name</h3>
+                    <p class="ek-person-sub">@_loc[nameof(RessourceAppStrings.balanceBefore)]</p>
+                </div>
+                <span class="ek-amount">@SelectedPersonData.Saldo.ToString()</span>
+                <button type="button" class="ek-btn" @onclick="ClearSelection">@_loc[nameof(RessourceAppStrings.changePerson)]</button>
+            </div>
+
+            <form class="ek-add ek-pay-form" @onsubmit="OpenPreview" @onsubmit:preventDefault>
+                <h3 class="ek-group-title">@_loc[nameof(RessourceAppStrings.amount)]</h3>
+                <div class="ek-quick" role="group" aria-label="@_loc[nameof(RessourceAppStrings.quickAmounts)]">
+                    @foreach (int euro in quickAmounts) {
+                        <button type="button" class="ek-chip" @onclick="() => SetQuickAmount(euro)">@euro €</button>
+                    }
+                </div>
+                <div class="ek-add-fields ek-pay-fields">
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.amount)]</span>
+                        <input @ref="amountInput" type="text" inputmode="decimal" class="ek-input" autocomplete="off"
+                               placeholder="10,00" @bind="amountText" @bind:event="oninput" />
+                    </label>
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.comment)]</span>
+                        <input type="text" class="ek-input" autocomplete="off" @bind="comment" @bind:event="oninput" />
+                    </label>
+                    <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@(!AmountValid || isBooking)">
+                        @_loc[nameof(RessourceAppStrings.creditAmount)]
+                    </button>
+                </div>
+                @if (AmountEntered && !AmountValid) {
+                    <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</p>
+                }
+            </form>
+
+            @if (previewOpen) {
+                <div class="ek-confirm ek-pay-preview" role="group" aria-label="@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]">
+                    <p class="ek-confirm-title">@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]</p>
+                    <p class="ek-confirm-text">
+                        <strong>@SelectedPersonData.Name</strong>: @Money.ToString()<br />
                         @_loc[nameof(RessourceAppStrings.balanceBefore)]: @SelectedPersonData.Saldo.ToString()
                         &nbsp;→&nbsp;
                         @_loc[nameof(RessourceAppStrings.balanceAfter)]: <strong>@BalanceAfter?.ToString()</strong>
                     </p>
-                    <button type="button" class="btn-success" style="border-radius:8px" disabled="@isBooking" @onclick="() => InsertPayment()">
-                        @_loc[nameof(RessourceAppStrings.bookNow)]
-                    </button>
-                    <button type="button" style="border-radius:8px" disabled="@isBooking" @onclick="ClosePreview">
-                        @_loc[nameof(RessourceAppStrings.cancel)]
-                    </button>
+                    <div class="ek-edit-actions">
+                        <button type="button" class="ek-btn ek-btn-primary" disabled="@isBooking" @onclick="() => InsertPayment()">
+                            @_loc[nameof(RessourceAppStrings.bookNow)]
+                        </button>
+                        <button type="button" class="ek-btn" disabled="@isBooking" @onclick="ClosePreview">
+                            @_loc[nameof(RessourceAppStrings.cancel)]
+                        </button>
+                    </div>
                 </div>
             }
-        </div>
         <br />
         <hr />
         <br />
@@ -153,6 +169,8 @@
                     @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
                 </button>
             </div>
+        </div>
+        }
         </div>
     </Authorized>
 </AuthorizeView>

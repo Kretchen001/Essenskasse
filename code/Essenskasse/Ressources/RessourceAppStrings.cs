@@ -218,5 +218,9 @@
         balanceBefore,
         balanceAfter,
         bookNow,
+        selectPerson,
+        changePerson,
+        quickAmounts,
+        searchPaymentPerson,
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
@@ -19,7 +21,12 @@ namespace Essenskasse.Pages {
             set {
                 _selectedPerson = value;
                 previewOpen = false;
-                _ = RequestPaymentsOfPerson();
+                if (value == Guid.Empty) {
+                    paymentsOfSelectedPerson = new List<Payment>();
+                }
+                else {
+                    _ = RequestPaymentsOfPerson();
+                }
             }
         }
 
@@ -75,9 +82,6 @@ namespace Essenskasse.Pages {
                 person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
                 person = person.OrderBy(x => x.Name).ToList();
 
-                if (person.Count > 0) {
-                    SelectedPerson = person[0].Guid;
-                }
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
@@ -118,6 +122,79 @@ namespace Essenskasse.Pages {
             }
 
             base.StateHasChanged();
+        }
+
+        private string personFilter = "";
+        private string PersonFilter {
+            get => personFilter;
+            set => personFilter = value ?? "";
+        }
+        private ElementReference amountInput;
+        private bool focusAmount = false;
+        private static readonly int[] quickAmounts = { 5, 10, 20, 50 };
+
+        /// <summary>Gleiche Einteilung wie auf dem Dashboard: Saldo ueber dem Grenzwert ist unauffaellig.</summary>
+        private bool IsInconspicuous(Person x) => x.Saldo.IsGreater(AppData.DashboardMoneyLimit);
+
+        /// <summary>Personen passend zum Suchtext (Name oder E-Mail, ohne Beachtung der Schreibweise), nach Name sortiert.</summary>
+        private IEnumerable<Person> ShownPersons {
+            get {
+                string text = personFilter.Trim();
+                IEnumerable<Person> result = person ?? new List<Person>();
+                if (text.Length > 0) {
+                    result = result.Where(x => x.Name.Contains(text, StringComparison.CurrentCultureIgnoreCase)
+                                            || x.Email.Contains(text, StringComparison.CurrentCultureIgnoreCase));
+                }
+                return result.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase);
+            }
+        }
+
+        private void OnPersonSearchKeyDown(KeyboardEventArgs e) {
+            if (e.Key == "Escape") {
+                ClearPersonFilter();
+            }
+            else if (e.Key == "Enter") {
+                // Genau ein Treffer: Enter waehlt ihn.
+                List<Person> matches = ShownPersons.Take(2).ToList();
+                if (matches.Count == 1) {
+                    SelectPerson(matches[0]);
+                }
+            }
+        }
+
+        private void ClearPersonFilter() {
+            personFilter = "";
+        }
+
+        private void SelectPerson(Person selected) {
+            amountText = "";
+            comment = "";
+            SelectedPerson = selected.Guid;
+            focusAmount = true; // Cursor direkt ins Betragsfeld
+        }
+
+        private void ClearSelection() {
+            amountText = "";
+            comment = "";
+            personFilter = "";
+            SelectedPerson = Guid.Empty;
+        }
+
+        private void SetQuickAmount(int euro) {
+            amountText = euro.ToString() + ",00";
+            focusAmount = true;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender) {
+            if (focusAmount) {
+                focusAmount = false;
+                try {
+                    await amountInput.FocusAsync();
+                }
+                catch {
+                    // Feld nicht (mehr) sichtbar, kein Problem.
+                }
+            }
         }
 
         private bool isBooking = false;
