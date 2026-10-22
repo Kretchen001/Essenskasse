@@ -203,5 +203,8 @@
         providerNeverOrdered,
         sortLastOrdered,
         sortMostOrders,
+        signOut,
+        signedInAs,
+        authorizing,
     }
 }

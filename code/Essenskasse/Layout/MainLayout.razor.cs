@@ -12,6 +12,7 @@ namespace Essenskasse.Layout {
         private NavMenu navMenu;
 
         private LoginModal? LoginModel { get; set; }
+        private string currentUserName = string.Empty;
         private string nameToLogin = string.Empty;
         private string passwordToLogin = string.Empty;
         private int roleToLogin = 10;
@@ -54,6 +55,7 @@ namespace Essenskasse.Layout {
                     response = await HttpClient.SendAsync(httpRequestMessage);
                     if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                         AuthStateService.IsAuthenticated = true;
+                        currentUserName = currentNameOfUser;
                         string newToken = await response.Content.ReadAsStringAsync();
                         if (newToken.Length > 0) {
                             // Die API antwortet mit einem JSON-String, also in Anfuehrungszeichen.
@@ -107,6 +109,7 @@ namespace Essenskasse.Layout {
         private async Task LogoutUser() {
             await LocalStorage.RemoveItemAsync("NameOfUser");
             await LocalStorage.RemoveItemAsync("SessionToken");
+            currentUserName = string.Empty;
             AuthStateService.IsAuthenticating = false;
             AuthStateService.IsAuthenticated = false;
             AuthState.NotifyAuthenticationStateChanged();
@@ -142,6 +145,7 @@ namespace Essenskasse.Layout {
                 response = await HttpClient.SendAsync(httpRequestMessage);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                     AuthStateService.IsAuthenticated = true;
+                    currentUserName = nameToLogin;
                     string newToken = await response.Content.ReadAsStringAsync();
                     await LocalStorage.SetItemAsync<string>("NameOfUser", nameToLogin);
                     await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken[1..(newToken.Length - 1)]));

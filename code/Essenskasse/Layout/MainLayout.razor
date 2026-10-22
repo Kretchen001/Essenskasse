@@ -19,11 +19,11 @@
     </div>
 
     <main>
-        <div class="top-row px-4 auth">
+        <div class="top-row ek-topbar px-4 auth">
             <AuthorizeView>
                 <NotAuthorized>
-                    <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px;" @onclick="() => ShowLoginModal()">
-                        Anmelden
+                    <button type="button" class="ek-btn ek-btn-primary" @onclick="() => ShowLoginModal()">
+                        @_loc[nameof(RessourceAppStrings.signIn)]
                     </button>
                     <LoginModal @ref="LoginModel">
                         <div class="row">
@@ -59,16 +59,18 @@
                     </LoginModal>
                 </NotAuthorized>
                 <Authorizing>
-                    <div class="d-flex align-items-center">
-                        Authorizing
-                    </div>
+                    <span class="ek-topbar-busy" role="status">@_loc[nameof(RessourceAppStrings.authorizing)]</span>
                 </Authorizing>
                 <Authorized>
-                    <div class="d-flex align-items-center">
-                        <button type="button" class="btn-danger" data-dismiss="modal" style="border-radius:8px;" @onclick="() => LogoutUser()">
-                            Abmelden
-                        </button>
-                    </div>
+                    @if (currentUserName.Length > 0) {
+                        <div class="ek-user" title="@_loc[nameof(RessourceAppStrings.signedInAs), currentUserName]">
+                            <span class="ek-user-avatar" aria-hidden="true">@PersonText.Initials(currentUserName)</span>
+                            <span class="ek-user-name">@currentUserName</span>
+                        </div>
+                    }
+                    <button type="button" class="ek-btn" @onclick="() => LogoutUser()">
+                        @_loc[nameof(RessourceAppStrings.signOut)]
+                    </button>
                 </Authorized>
             </AuthorizeView>
         </div>

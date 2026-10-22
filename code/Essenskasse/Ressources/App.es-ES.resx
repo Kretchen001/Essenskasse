@@ -717,4 +717,13 @@
   <data name="sortMostOrders" xml:space="preserve">
     <value>Más pedidos</value>
   </data>
+  <data name="signOut" xml:space="preserve">
+    <value>Cerrar sesión</value>
+  </data>
+  <data name="signedInAs" xml:space="preserve">
+    <value>Sesión iniciada como {0}</value>
+  </data>
+  <data name="authorizing" xml:space="preserve">
+    <value>Comprobando inicio de sesión …</value>
+  </data>
 </root>

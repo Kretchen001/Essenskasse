@@ -717,4 +717,13 @@
   <data name="sortMostOrders" xml:space="preserve">
     <value>Most orders</value>
   </data>
+  <data name="signOut" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="signedInAs" xml:space="preserve">
+    <value>Signed in as {0}</value>
+  </data>
+  <data name="authorizing" xml:space="preserve">
+    <value>Checking sign-in …</value>
+  </data>
 </root>

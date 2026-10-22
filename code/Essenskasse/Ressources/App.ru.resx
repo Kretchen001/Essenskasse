@@ -717,4 +717,13 @@
   <data name="sortMostOrders" xml:space="preserve">
     <value>Больше всего заказов</value>
   </data>
+  <data name="signOut" xml:space="preserve">
+    <value>Выйти</value>
+  </data>
+  <data name="signedInAs" xml:space="preserve">
+    <value>Вы вошли как {0}</value>
+  </data>
+  <data name="authorizing" xml:space="preserve">
+    <value>Проверка входа …</value>
+  </data>
 </root>
