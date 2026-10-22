@@ -107,6 +107,12 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("UpdatePerson")) {
                 Log.Information("UpdatePerson called");
 
+                // Ein leerer Header (E-Mail soll geleert werden) wird vom Model Binding zu null; deshalb
+                // wird hier direkt geprueft, ob der Header mitgeschickt wurde.
+                if (Request.Headers.TryGetValue("email", out Microsoft.Extensions.Primitives.StringValues sentEmail)) {
+                    email = sentEmail.ToString();
+                }
+
                 string queryStringRequestPerson = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.Person " +
