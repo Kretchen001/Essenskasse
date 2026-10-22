@@ -47,6 +47,26 @@ namespace Modells.User {
         [JsonInclude, JsonPropertyName("SendConfirmationMail"), JsonProperty(nameof(SendConfirmationMail))]
         public ConfirmationMailMode SendConfirmationMail { get; set; } = ConfirmationMailMode.Optional;
 
+        /// <summary>Die Schnellbetraege (Cent) im Bestellfenster. Leer = nichts gespeichert, der Client behaelt seine Werte.</summary>
+        [JsonInclude, JsonPropertyName("QuickAmounts"), JsonProperty(nameof(QuickAmounts))]
+        public List<long> QuickAmounts { get; set; } = [];
+
+        /// <summary>Farbschema ("Light" oder "Dark"). Leer = nichts gespeichert.</summary>
+        [JsonInclude, JsonPropertyName("Theme"), JsonProperty(nameof(Theme))]
+        public string Theme { get; set; } = "";
+
+        /// <summary>Sprache (z. B. "de-DE"). Leer = nichts gespeichert.</summary>
+        [JsonInclude, JsonPropertyName("Language"), JsonProperty(nameof(Language))]
+        public string Language { get; set; } = "";
+
+        /// <summary>Sortierung der Personenliste (Name des Auswahlwerts). Leer = nichts gespeichert.</summary>
+        [JsonInclude, JsonPropertyName("PersonSort"), JsonProperty(nameof(PersonSort))]
+        public string PersonSort { get; set; } = "";
+
+        /// <summary>Sortierung der Anbieterliste (Name des Auswahlwerts). Leer = nichts gespeichert.</summary>
+        [JsonInclude, JsonPropertyName("ProviderSort"), JsonProperty(nameof(ProviderSort))]
+        public string ProviderSort { get; set; } = "";
+
         /// <summary></summary>
         public Settings() { }
 
