@@ -1,6 +1,7 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
@@ -139,6 +140,19 @@ namespace Essenskasse.Cards {
         private async Task CopyEmail() {
             await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Person.Email);
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.copied)], ToastLevel.Success);
+        }
+
+        /// <summary>Enter speichert, Esc verwirft die Bearbeitung.</summary>
+        private async Task OnEditKeyDown(KeyboardEventArgs e) {
+            if (isSaving) {
+                return;
+            }
+            if (e.Key == "Enter" && IsDirty) {
+                await SaveEdit();
+            }
+            else if (e.Key == "Escape") {
+                CancelEdit();
+            }
         }
 
         private void StartEdit() {

@@ -3,6 +3,7 @@ using Essenskasse.Ressources;
 using Microsoft.JSInterop;
 using Modells;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
@@ -48,6 +49,13 @@ namespace Essenskasse.Pages {
         /// <summary>Gleiche Einteilung wie auf dem Dashboard: Saldo ueber dem Grenzwert ist unauffaellig.</summary>
         private bool IsInconspicuous(Person x) {
             return x.Saldo.IsGreater(AppData.DashboardMoneyLimit);
+        }
+
+        /// <summary>Esc leert die Suche.</summary>
+        private void OnSearchKeyDown(KeyboardEventArgs e) {
+            if (e.Key == "Escape" && Filter.Length > 0) {
+                ClearFilter();
+            }
         }
 
         private void ClearFilter() {

@@ -64,7 +64,10 @@
                 <input id="ek-person-search" type="text" inputmode="search" class="ek-search-input" autocomplete="off"
                        placeholder="@_loc[nameof(RessourceAppStrings.searchPersons)]"
                        aria-label="@_loc[nameof(RessourceAppStrings.searchPersons)]"
-                       @bind="Filter" @bind:event="oninput" />
+                       @bind="Filter" @bind:event="oninput" @onkeydown="OnSearchKeyDown" />
+                @if (Filter.Length == 0) {
+                    <kbd class="ek-kbd" aria-hidden="true">/</kbd>
+                }
                 @if (IsFiltered) {
                     <span class="ek-search-count">@_loc[nameof(RessourceAppStrings.shownOfTotal), shownPersonList.Count, person.Count]</span>
                 }

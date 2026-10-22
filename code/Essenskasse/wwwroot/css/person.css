@@ -279,6 +279,27 @@
     }
 }
 
+.ek-kbd {
+    flex: none;
+    padding: 0 0.45rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 5px;
+    color: var(--ek-muted);
+    font: inherit;
+    font-size: 0.8rem;
+}
+
+/* sichtbarer Fokus fuer alle bedienbaren Teile der Personenseite */
+.ek-people .ek-btn:focus-visible,
+.ek-people .ek-icon-btn:focus-visible,
+.ek-chip:focus-visible,
+.ek-select:focus-visible,
+.ek-hidden-toggle:focus-visible,
+.ek-add .ek-btn:focus-visible {
+    outline: 2px solid var(--ek-focus);
+    outline-offset: 2px;
+}
+
 .ek-icon-warn:hover {
     border-color: var(--ek-bad);
     color: var(--ek-bad);
