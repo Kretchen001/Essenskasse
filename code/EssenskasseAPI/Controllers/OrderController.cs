@@ -305,13 +305,19 @@ namespace EssenskasseAPI.Controllers {
                                 $"UPDATE essenskasse.Order " +
                                 $"SET AmountEuro=@euro, AmountCent=@cent, ProviderGuid=@providerGuid, ProviderDesignation=@providerDesignation, ReferencedPerson=@person " +
                                 $"WHERE DateTime=@dateAsLong;";
-                            tx.Query(queryStringUpdate,
-                                Db.P("@euro", orders[0].Money.Euro),
-                                Db.P("@cent", orders[0].Money.Cent),
-                                Db.P("@providerGuid", orders[0].Provider.Guid),
-                                Db.P("@providerDesignation", orders[0].Provider.Designation),
-                                Db.P("@person", orders[0].ReferencedPerson),
-                                Db.P("@dateAsLong", dateAsLong));
+                            try {
+                                tx.Query(queryStringUpdate,
+                                    Db.P("@euro", orders[0].Money.Euro),
+                                    Db.P("@cent", orders[0].Money.Cent),
+                                    Db.P("@providerGuid", orders[0].Provider.Guid),
+                                    Db.P("@providerDesignation", orders[0].Provider.Designation),
+                                    Db.P("@person", orders[0].ReferencedPerson),
+                                    Db.P("@dateAsLong", dateAsLong));
+                            }
+                            catch (MySqlException ex) when (ex.Number == 1452) { // Fremdschluessel: Anbieter unbekannt
+                                Log.Warning($"Order update rejected: {ex.Message}");
+                                return NotFound("Anbieter oder Person existiert nicht!");
+                            }
                             tx.Commit();
                             Log.Information("Order successfully updated");
                             return Ok();

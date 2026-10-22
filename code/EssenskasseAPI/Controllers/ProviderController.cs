@@ -196,7 +196,13 @@ namespace EssenskasseAPI.Controllers {
                                 $"DELETE " +
                                 $"FROM essenskasse.Provider " +
                                 $"WHERE Guid=@guid;";
-                            _db.Query(queryStringDelete, Db.P("@guid", guid));
+                            try {
+                                _db.Query(queryStringDelete, Db.P("@guid", guid));
+                            }
+                            catch (MySqlException ex) when (ex.Number == 1451) { // Fremdschluessel: es gibt noch Bestellungen
+                                Log.Warning($"{provider[0].Guid} has Orders and can not be removed permanently");
+                                return Conflict("Der Anbieter hat Bestellungen und kann nicht endgültig gelöscht werden. Bitte stattdessen ausblenden (per=false).");
+                            }
                             Log.Information($"{provider[0].Designation} with {provider[0].Guid} successfully removed");
                             return Ok(JsonConvert.SerializeObject(provider[0]));
                         }
