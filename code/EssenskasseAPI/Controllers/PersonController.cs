@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EssenskasseAPI.Data;
+using EssenskasseAPI.Security;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -9,18 +12,20 @@ using System.Data;
 namespace EssenskasseAPI.Controllers {
 
     [ApiController, Route("api/person")]
+    [RequireSession]
     public class PersonController : ControllerBase {
 
         #region Config
-        private readonly IConfiguration Configuration;
+        private readonly Db _db;
 
         public PersonController(IConfiguration configuration) {
-            Configuration = configuration;
+            _db = new Db(configuration);
         }
         #endregion
 
         #region Controller
-        [HttpGet, Route("requestAll")]
+        // Das Dashboard der PWA zeigt die Personen mit Saldo ohne Anmeldung an.
+        [AllowAnonymous, HttpGet, Route("requestAll")]
         public IActionResult GetAllPerson() {
             using (Operation.Time("Request all Persons")) {
                 string queryString = $"" +
@@ -28,7 +33,7 @@ namespace EssenskasseAPI.Controllers {
                     $"FROM essenskasse.Person " +
                     $"WHERE Sichtbar=true;";
 
-                DataTable dataTablePerson = QueryExecuterAtMySql(queryString);
+                DataTable dataTablePerson = _db.Query(queryString);
                 List<Person> persons = DataTableToListOfPerson(dataTablePerson);
 
                 if (persons is not null) {
@@ -49,9 +54,9 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.Person " +
-                    $"WHERE Guid='{guid}';";
+                    $"WHERE Guid=@guid;";
 
-                DataTable dataTablePerson = QueryExecuterAtMySql(queryString);
+                DataTable dataTablePerson = _db.Query(queryString, Db.P("@guid", guid));
                 List<Person> persons = DataTableToListOfPerson(dataTablePerson);
 
                 if (persons.Count == 1) {
@@ -84,13 +89,13 @@ namespace EssenskasseAPI.Controllers {
                     );
                 string queryStringInsert = $"" +
                     $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
-                    $"VALUES (" +
-                    $"'{newPerson.Guid}'," +
-                    $"'{newPerson.Name}', " +
-                    $"'{newPerson.Email}', " +
-                    $"{newPerson.Saldo.Euro}, " +
-                    $"{newPerson.Saldo.Cent});";
-                QueryExecuterAtMySql(queryStringInsert);
+                    $"VALUES (@guid, @name, @email, @saldoEuro, @saldoCent);";
+                _db.Query(queryStringInsert,
+                    Db.P("@guid", newPerson.Guid),
+                    Db.P("@name", newPerson.Name),
+                    Db.P("@email", newPerson.Email),
+                    Db.P("@saldoEuro", newPerson.Saldo.Euro),
+                    Db.P("@saldoCent", newPerson.Saldo.Cent));
                 return Ok(JsonConvert.SerializeObject(newPerson.Guid));
             }
         }
@@ -105,8 +110,8 @@ namespace EssenskasseAPI.Controllers {
                 string queryStringRequestPerson = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.Person " +
-                    $"WHERE Guid='{guid}';";
-                DataTable dataTablePersonToUpdate = QueryExecuterAtMySql(queryStringRequestPerson);
+                    $"WHERE Guid=@guid;";
+                DataTable dataTablePersonToUpdate = _db.Query(queryStringRequestPerson, Db.P("@guid", guid));
 
                 if (dataTablePersonToUpdate.Rows.Count == 1) {
                     Person personToUpdate = DataTableToListOfPerson(dataTablePersonToUpdate)[0];
@@ -119,11 +124,16 @@ namespace EssenskasseAPI.Controllers {
                         personToUpdate.Email = Uri.UnescapeDataString(email);
                     }
 
+                    // DataTableToListOfPerson liefert Name/Email URL-kodiert zurueck. Wurde ein Feld
+                    // nicht geaendert, muss es vor dem Speichern wieder dekodiert werden.
                     string queryStringPersonUpdate = $"" +
                         $"UPDATE essenskasse.Person " +
-                        $"SET Name='{personToUpdate.Name}', Email='{personToUpdate.Email}' " +
-                        $"WHERE Guid='{personToUpdate.Guid}';";
-                    QueryExecuterAtMySql(queryStringPersonUpdate);
+                        $"SET Name=@name, Email=@email " +
+                        $"WHERE Guid=@guid;";
+                    _db.Query(queryStringPersonUpdate,
+                        Db.P("@name", name is not null ? personToUpdate.Name : Uri.UnescapeDataString(personToUpdate.Name)),
+                        Db.P("@email", email is not null ? personToUpdate.Email : Uri.UnescapeDataString(personToUpdate.Email)),
+                        Db.P("@guid", personToUpdate.Guid));
 
                     Log.Information("Person successfully updated");
                     return Ok();
@@ -139,53 +149,34 @@ namespace EssenskasseAPI.Controllers {
         public IActionResult UpdatePersonSaldoInDatabase() {
             using (Operation.Time("UpdatePersonSaldoInDatabase")) {
                 Log.Information("UpdatePersonSaldoInDatabase called");
-                // get all Persons
-                string queryString = $"" +
-                    $"SELECT * " +
-                    $"FROM essenskasse.Person;";
-
-                DataTable dataTablePerson = QueryExecuterAtMySql(queryString);
+                // Alles in einer Transaktion: erst alle Personen sperren (so kann waehrenddessen keine Buchung
+                // dazwischenkommen), dann die Summen in der Datenbank bilden und die Salden setzen.
+                using DbScope tx = _db.BeginTransaction();
+                DataTable dataTablePerson = tx.Query("SELECT * FROM essenskasse.Person FOR UPDATE;");
                 List<Person> persons = DataTableToListOfPerson(dataTablePerson);
 
+                Dictionary<string, long> paymentCents = SumCentsPerPerson(tx, "essenskasse.Payment");
+                Dictionary<string, long> orderCents = SumCentsPerPerson(tx, "essenskasse.Order");
+
                 foreach (Person person in persons) {
-                    // get all Payments of Person
-                    string queryStringPayments = $"" +
-                        $"SELECT * " +
-                        $"FROM essenskasse.Payment " +
-                        $"WHERE ReferencedPerson='{person.Guid}';";
-
-                    DataTable dataTablePayments = QueryExecuterAtMySql(queryStringPayments);
-                    List<Payment> payments = DataTableToListOfPayments(dataTablePayments);
-
-                    Money paymentsAmount = new Money(0, 0);
-                    foreach (Payment x in payments) {
-                        paymentsAmount = new Money().CalculateMoney(CalculationOperation.Addition, paymentsAmount, x.Amount)!;
-                    }
-
-                    // get all Orders of Person
-                    string queryStringOrders = $"" +
-                        $"SELECT * " +
-                        $"FROM essenskasse.Order " +
-                        $"WHERE ReferencedPerson='{person.Guid}';";
-
-                    DataTable dataTableOrders= QueryExecuterAtMySql(queryStringOrders);
-                    List<Order> orders = DataTableToListOfOrders(dataTableOrders);
-
-                    Money ordersAmount = new Money(0, 0);
-                    foreach (Order x in orders) {
-                        ordersAmount = new Money().CalculateMoney(CalculationOperation.Addition, ordersAmount, x.Money)!;
-                    }
+                    string key = person.Guid.ToString();
+                    long paid = paymentCents.GetValueOrDefault(key, 0);
+                    long ordered = orderCents.GetValueOrDefault(key, 0);
 
                     // recalculate saldo and update Person
-                    Money newSaldo = new Money().CalculateMoney(CalculationOperation.Substraction, paymentsAmount, ordersAmount)!;
+                    Money newSaldo = Money.FromTotalCents(paid - ordered);
                     string queryStringPersonUpdate = $"" +
                         $"UPDATE essenskasse.Person " +
-                        $"SET SaldoEuro={newSaldo.Euro}, SaldoCent={newSaldo.Cent} " +
-                        $"WHERE Guid='{person.Guid}';";
-                    QueryExecuterAtMySql(queryStringPersonUpdate);
+                        $"SET SaldoEuro=@euro, SaldoCent=@cent " +
+                        $"WHERE Guid=@guid;";
+                    tx.Query(queryStringPersonUpdate,
+                        Db.P("@euro", newSaldo.Euro),
+                        Db.P("@cent", newSaldo.Cent),
+                        Db.P("@guid", person.Guid));
 
                     Log.Information($"{person.Guid} saldo old {person.Saldo} to new {newSaldo}");
                 }
+                tx.Commit();
                 Log.Information("Successfully recalculate Saldo");
                 return Ok("Keine Fehler.");
             }
@@ -199,26 +190,32 @@ namespace EssenskasseAPI.Controllers {
                     string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Person " +
-                        $"WHERE Guid={guid}";
-                    DataTable dataTable = QueryExecuterAtMySql(queryString);
+                        $"WHERE Guid=@guid;";
+                    DataTable dataTable = _db.Query(queryString, Db.P("@guid", guid));
                     List<Person> persons = DataTableToListOfPerson(dataTable);
 
                     if (persons.Count == 1) {
                         if (per == false) {
                             string queryStringInvisible = $"" +
                                 $"UPDATE essenskasse.Person " +
-                                $"SET Sichtbarkeit=false " +
-                                $"WHERE Guid='{guid}';";
-                            QueryExecuterAtMySql(queryStringInvisible);
+                                $"SET Sichtbar=false " +
+                                $"WHERE Guid=@guid;";
+                            _db.Query(queryStringInvisible, Db.P("@guid", guid));
                             Log.Information($"{persons[0].Name} with {persons[0].Guid} successfully invisible set");
                             return Ok(JsonConvert.SerializeObject(persons[0]));
                         }
                         else {
                             string queryStringDelete = $"" +
                                 $"DELETE " +
-                                $"FROM essenskasse.Person" +
-                                $"WHERE Guid={guid};";
-                            QueryExecuterAtMySql(queryStringDelete);
+                                $"FROM essenskasse.Person " +
+                                $"WHERE Guid=@guid;";
+                            try {
+                                _db.Query(queryStringDelete, Db.P("@guid", guid));
+                            }
+                            catch (MySqlException ex) when (ex.Number == 1451) { // Fremdschluessel: es gibt noch Buchungen
+                                Log.Warning($"{persons[0].Guid} has Payments/Orders and can not be removed permanently");
+                                return Conflict("Die Person hat Einzahlungen oder Bestellungen und kann nicht endgültig gelöscht werden. Bitte stattdessen ausblenden (per=false).");
+                            }
                             Log.Information($"{persons[0].Name} with {persons[0].Guid} successfully removed");
                             return Ok(JsonConvert.SerializeObject(persons[0]));
                         }
@@ -235,20 +232,16 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region InternalFunctions
-        private DataTable QueryExecuterAtMySql(string Query) {
-            // MySql Connection
-            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
-
-            MySqlCommand cmd = new MySqlCommand(Query, connection);
-
-            DataTable dataTable = new DataTable();
-            // read the result
-            connection.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            dataTable.Load(reader);
-            connection.Close();
-
-            return dataTable;
+        /// <summary>Summe aller Betraege (in Cent) je Person aus Payment oder Order, gebildet in der Datenbank.</summary>
+        /// <param name="tx">Laufende Transaktion.</param>
+        /// <param name="table">Nur 'essenskasse.Payment' oder 'essenskasse.Order' (fester Wert, keine Eingabe).</param>
+        private static Dictionary<string, long> SumCentsPerPerson(DbScope tx, string table) {
+            DataTable sums = tx.Query($"SELECT ReferencedPerson, SUM(AmountEuro * 100 + AmountCent) AS TotalCents FROM {table} GROUP BY ReferencedPerson;");
+            Dictionary<string, long> result = new(StringComparer.OrdinalIgnoreCase);
+            foreach (DataRow row in sums.Rows) {
+                result[row["ReferencedPerson"].ToString()!] = Convert.ToInt64(row["TotalCents"]);
+            }
+            return result;
         }
 
         private static List<Person> DataTableToListOfPerson(DataTable dataTable) {

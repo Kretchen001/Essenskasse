@@ -7,10 +7,13 @@ self.addEventListener('activate', event => event.waitUntil(onActivate(event)));
 self.addEventListener('fetch', event => event.respondWith(onFetch(event)));
 
 const cacheNamePrefix = 'offline-cache-';
-let Cache_Version;
-let cacheName = `${cacheNamePrefix}${Cache_Version}`;
+// Die Version kommt aus dem Asset-Manifest und aendert sich mit jedem Publish. So wird nach einem Update
+// ein neuer Cache angelegt und der alte beim Aktivieren geloescht. (Frueher blieb der Name wegen eines
+// asynchron gesetzten Wertes immer "offline-cache-undefined", also wurde nie etwas ersetzt.)
+const cacheName = `${cacheNamePrefix}${self.assetsManifest.version}`;
 const offlineAssetsInclude = [ /\.dll$/, /\.pdb$/, /\.wasm/, /\.html/, /\.js$/, /\.json$/, /\.css$/, /\.woff$/, /\.png$/, /\.jpe?g$/, /\.gif$/, /\.ico$/, /\.blat$/, /\.dat$/ ];
-const offlineAssetsExclude = [ /^service-worker\.js$/ ];
+// appsettings.json (API-Adresse, Version) wird nie gecacht, damit Konfigurationsaenderungen sofort greifen.
+const offlineAssetsExclude = [ /^service-worker\.js$/, /^appsettings\.json$/ ];
 
 // Replace with your base path if you are hosting on a subfolder. Ensure there is a trailing '/'.
 const base = "/";
@@ -19,19 +22,6 @@ const manifestUrlList = self.assetsManifest.assets.map(asset => new URL(asset.ur
 
 async function onInstall(event) {
     console.info('Service worker: Install');
-    (async () => {
-        try {
-            const response = await fetch('/appsettings.json');
-            if (!response.ok) {
-                throw new Error('Netzwerkantwort war nicht ok');
-            }
-            const data = await response.json();
-            Cache_Version = data.Version;
-            console.log('Version:', Cache_Version);
-        } catch (error) {
-            console.error('Fehler beim Abrufen der Version:', error);
-        }
-    })()
     // Fetch and cache all matching items from the assets manifest
     const assetsRequests = self.assetsManifest.assets
         .filter(asset => offlineAssetsInclude.some(pattern => pattern.test(asset.url)))

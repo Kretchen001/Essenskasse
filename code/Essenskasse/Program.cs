@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using Essenskasse.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Configuration;
 
 namespace Essenskasse {
     public class Program {
@@ -20,7 +21,14 @@ namespace Essenskasse {
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            // HttpClient, der an jede API-Anfrage das Sitzungs-Token des angemeldeten Benutzers haengt
+            builder.Services.AddScoped(sp => new HttpClient(new SessionTokenHandler(
+                    sp.GetRequiredService<ILocalStorageService>(),
+                    sp.GetRequiredService<IConfiguration>()) {
+                InnerHandler = new HttpClientHandler()
+            }) {
+                BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+            });
 
             // access to LocalStorage
             builder.Services.AddBlazoredLocalStorage(config => {

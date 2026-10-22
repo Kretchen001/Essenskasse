@@ -16,11 +16,16 @@ services:
       # - ./MySqlScripts/demoData.sql:/docker-entrypoint-initdb.d/2.sql:ro
     restart: always
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
+      # Im Image mysql:8.0.2 gibt es kein mysqladmin; geprueft wird daher, ob der Server den TCP-Port annimmt
+      # (waehrend der Initialisierung laeuft nur ein Server ohne Netzwerk, der Port ist dann noch zu).
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/3306'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
     ports:
-      - 8008:3306
+      # nur lokal erreichbar (z. B. fuer einen SQL-Client oder die lokal gestartete API); die API im Container nutzt "database:3306"
+      - 127.0.0.1:8008:3306
     command: --default-authentication-plugin=mysql_native_password
 
   pwa:
@@ -44,8 +49,12 @@ services:
       dockerfile: EssenskasseAPI/Dockerfile
     ports:
       - 8010:8080
+    environment:
+      # ueberschreibt den Connection String aus der appsettings.json, damit der Container unabhaengig von der lokalen Entwicklungs-Konfiguration ist
+      ConnectionStrings__essenskasse: "Server=database;Port=3306;Uid=${DB_USERNAME};Pwd=${DB_PASSWORD};Database=${DB_DATABASE};SslMode=None;"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
 
 volumes:
   dbdata:

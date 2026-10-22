@@ -21,3 +21,6 @@ localhost_*.html
 /code/EssenskasseAPI/Log
 
 Backups/
+
+# Code-Coverage-Report (wird mit analyze.bat erzeugt)
+code/CoverageReport/

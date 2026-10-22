@@ -50,7 +50,8 @@ namespace Essenskasse.Layout {
                         AuthStateService.IsAuthenticated = true;
                         string newToken = await response.Content.ReadAsStringAsync();
                         if (newToken.Length > 0) {
-                            await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken));
+                            // Die API antwortet mit einem JSON-String, also in Anfuehrungszeichen.
+                            await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken.Trim('"')));
                         }
                     }
                     else {

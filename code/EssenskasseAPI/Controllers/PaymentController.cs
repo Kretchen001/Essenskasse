@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EssenskasseAPI.Data;
+using EssenskasseAPI.Security;
+using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -9,13 +11,14 @@ using System.Data;
 namespace EssenskasseAPI.Controllers {
 
     [ApiController, Route("api/payment")]
+    [RequireSession]
     public class PaymentController : ControllerBase {
 
         #region Config
-        private readonly IConfiguration Configuration;
+        private readonly Db _db;
 
         public PaymentController(IConfiguration configuration) {
-            Configuration = configuration;
+            _db = new Db(configuration);
         }
         #endregion
 
@@ -26,7 +29,7 @@ namespace EssenskasseAPI.Controllers {
                     $"SELECT * " +
                     $"FROM essenskasse.Payment;";
 
-                DataTable dataTablePayments = QueryExecuterAtMySql(queryString);
+                DataTable dataTablePayments = _db.Query(queryString);
                 List<Payment> paymentList = DataTableToListOfPayments(dataTablePayments);
 
                 if (paymentList is not null) {
@@ -51,9 +54,9 @@ namespace EssenskasseAPI.Controllers {
                     $"SELECT * " +
                     $"FROM essenskasse.Payment " +
                     $"ORDER BY DateTime DESC " +
-                    $"LIMIT {amount};";
+                    $"LIMIT @amount;";
 
-                DataTable dataTablePayments = QueryExecuterAtMySql(queryString);
+                DataTable dataTablePayments = _db.Query(queryString, Db.P("@amount", amount));
                 List<Payment> payments = DataTableToListOfPayments(dataTablePayments);
 
                 if (payments.Count != 0) {
@@ -84,9 +87,11 @@ namespace EssenskasseAPI.Controllers {
                     $"SELECT * " +
                     $"FROM essenskasse.Payment " +
                     $"ORDER BY DateTime DESC " +
-                    $"LIMIT {amount} OFFSET {alreadyLoaded};";
+                    $"LIMIT @amount OFFSET @alreadyLoaded;";
 
-                DataTable dataTablePayments = QueryExecuterAtMySql(queryString);
+                DataTable dataTablePayments = _db.Query(queryString,
+                    Db.P("@amount", amount),
+                    Db.P("@alreadyLoaded", alreadyLoaded));
                 List<Payment> payments = DataTableToListOfPayments(dataTablePayments);
 
                 if (payments.Count != 0) {
@@ -112,17 +117,19 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Payment " +
-                        $"WHERE ReferencedPerson='{guid}' " +
+                        $"WHERE ReferencedPerson=@guid " +
                         $"ORDER BY DateTime DESC;";
                 if (amount is not null) { // request amount
                     queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Payment " +
-                        $"WHERE ReferencedPerson='{guid}' " +
+                        $"WHERE ReferencedPerson=@guid " +
                         $"ORDER BY DateTime DESC " +
-                        $"LIMIT {amount};";
+                        $"LIMIT @amount;";
                 }
-                DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
+                DataTable dataTableOrders = _db.Query(queryString,
+                    Db.P("@guid", guid),
+                    Db.P("@amount", amount));
                 List<Payment> payments = DataTableToListOfPayments(dataTableOrders);
                 if (payments.Count != 0) {
                     Log.Information(guid.ToString() + " requested and " + payments.Count + " found.");
@@ -156,11 +163,14 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.Payment " +
-                    $"WHERE ReferencedPerson='{guid}' " +
+                    $"WHERE ReferencedPerson=@guid " +
                     $"ORDER BY DateTime DESC " +
-                    $"LIMIT {amount} OFFSET {alreadyLoaded};";
+                    $"LIMIT @amount OFFSET @alreadyLoaded;";
 
-                DataTable dataTablePayments = QueryExecuterAtMySql(queryString);
+                DataTable dataTablePayments = _db.Query(queryString,
+                    Db.P("@guid", guid),
+                    Db.P("@amount", amount),
+                    Db.P("@alreadyLoaded", alreadyLoaded));
                 List<Payment> payments = DataTableToListOfPayments(dataTablePayments);
 
                 if (payments.Count != 0) {
@@ -180,19 +190,16 @@ namespace EssenskasseAPI.Controllers {
                 Log.Information("GetCountOfOrdersFromDay called");
                 if (dateString is not null) {
                     DateTime date = DateTime.Parse(dateString);
+                    // Die Datenbank speichert Ticks: alle Einzahlungen des Tages liegen in [Tagesbeginn, Tagesbeginn + 1 Tag).
                     string queryString = $"" +
                         $"SELECT * " +
-                        $"FROM essenskasse.Payment;";
+                        $"FROM essenskasse.Payment " +
+                        $"WHERE DateTime >= @dayStart AND DateTime < @dayEnd;";
 
-                    DataTable dataTablePayments = QueryExecuterAtMySql(queryString);
+                    DataTable dataTablePayments = _db.Query(queryString,
+                        Db.P("@dayStart", date.Date.Ticks),
+                        Db.P("@dayEnd", date.Date.AddDays(1).Ticks));
                     List<Payment> payments = DataTableToListOfPayments(dataTablePayments);
-                    List<Payment> removeCandidates = [];
-                    foreach (Payment payment in payments) {
-                        if (date.Date != payment.DateTime.Date) {
-                            removeCandidates.Add(payment);
-                        }
-                    }
-                    payments.RemoveAll(x => removeCandidates.Contains(x));
                     string temp = date.ToString("yyyy-MM-ddTHH:mm:ss");
                     Log.Information($"{payments.Count} Payments at {temp} found and responsed");
                     if (payments.Count == 1) {
@@ -217,14 +224,17 @@ namespace EssenskasseAPI.Controllers {
                 Log.Information("AddNewPayment called");
                 if ((amount is not null) && (referencedPerson is not null)) {
                     Payment newPayment = new Payment(amount, referencedPerson ?? new Guid(), comment ?? "");
-                    switch (FullInsertProcessForOnePayment(newPayment)) {
+                    // Einzahlung und Saldo-Aenderung gehoeren zusammen: entweder beides oder nichts.
+                    using DbScope tx = _db.BeginTransaction();
+                    int result = FullInsertProcessForOnePayment(newPayment, tx);
+                    if (result == 0) {
+                        tx.Commit();
+                    }
+                    switch (result) {
                         case 0: {
                                 return Ok(JsonConvert.SerializeObject(newPayment));
                             }
                         case 1: {
-                                return NotFound("Provider existiert nicht!");
-                            }
-                        case 2: {
                                 return NotFound("Person existiert nicht!");
                             }
                         default: {
@@ -249,19 +259,24 @@ namespace EssenskasseAPI.Controllers {
                     string queryStringToken = $"" +
                             $"SELECT COUNT(*) " +
                             $"FROM essenskasse.User " +
-                            $"WHERE TokenForChange='{accessToken}';";
-                    DataTable dataTableTokenCount = QueryExecuterAtMySql(queryStringToken);
-                    if (dataTableTokenCount.Rows.Count == 1) {
+                            $"WHERE TokenForChange=@accessToken;";
+                    DataTable dataTableTokenCount = _db.Query(queryStringToken, Db.P("@accessToken", accessToken));
+                    // COUNT(*) liefert immer genau eine Zeile; entscheidend ist der Zaehlerwert.
+                    // Die Null-Guid ist der Standardwert "kein Token" und darf nie gueltig sein.
+                    if (accessToken != Guid.Empty && Convert.ToInt64(dataTableTokenCount.Rows[0][0]) > 0) {
                         Log.Information($"{accessToken} called UpdatePayment.");
                         if (dateAsLong is null) {
                             Log.Warning("No dateString in Header");
                             return BadRequest("Kein Datum angegeben!");
                         }
+                        // Einzahlung und beide Salden in einer Transaktion
+                        using DbScope tx = _db.BeginTransaction();
                         string queryString = $"" +
                             $"SELECT * " +
                             $"FROM essenskasse.Payment " +
-                            $"WHERE DateTime={dateAsLong};";
-                        DataTable dataTable = QueryExecuterAtMySql(queryString);
+                            $"WHERE DateTime=@dateAsLong " +
+                            $"FOR UPDATE;";
+                        DataTable dataTable = tx.Query(queryString, Db.P("@dateAsLong", dateAsLong));
                         List<Payment> payments = DataTableToListOfPayments(dataTable);
 
                         if (payments.Count == 0) {
@@ -270,12 +285,13 @@ namespace EssenskasseAPI.Controllers {
                         }
 
                         bool hasChanges = false;
+                        Money oldAmount = payments[0].Amount;
+                        Guid oldPerson = payments[0].ReferencedPerson;
                         if (referencedPerson is not null) {
                             Log.Information($"Payment updated from {payments[0].ReferencedPerson} to {referencedPerson}");
                             payments[0].ReferencedPerson = referencedPerson ?? new Guid();
                             hasChanges = true;
                         }
-                        Money temp = payments[0].Amount;
                         if (money is not null) {
                             Log.Information($"Payment updated from {payments[0].Amount} to {money}");
                             payments[0].Amount = money;
@@ -288,32 +304,32 @@ namespace EssenskasseAPI.Controllers {
                         }
 
                         if (hasChanges) {
-                            // update person saldo
-                            string queryStringUpdateSaldo = $"" +
-                                $"SELECT * " +
-                                $"FROM essenskasse.Person " +
-                                $"WHERE Guid='{payments[0].ReferencedPerson}';";
-                            DataTable dataTablePersonToUpdate = QueryExecuterAtMySql(queryStringUpdateSaldo);
-
-                            if (dataTablePersonToUpdate.Rows.Count == 1) {
-                                Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
-                                Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} old Saldo = {personToUpdate.Saldo}");
-                                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Substraction, personToUpdate.Saldo, temp)!;
-                                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, personToUpdate.Saldo, payments[0].Amount)!;
-                                Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} new Saldo = {personToUpdate.Saldo}");
-
-                                string queryStringPersonUpdate = $"" +
-                                    $"UPDATE essenskasse.Person " +
-                                    $"SET SaldoEuro={personToUpdate.Saldo.Euro}, SaldoCent={personToUpdate.Saldo.Cent} " +
-                                    $"WHERE Guid='{personToUpdate.Guid}';";
-                                QueryExecuterAtMySql(queryStringPersonUpdate);
+                            // Salden: der alte Betrag wird der bisherigen Person wieder abgezogen, der neue der
+                            // (ggf. anderen) Person gutgeschrieben. Die Personen werden immer in gleicher
+                            // Reihenfolge gesperrt, damit sich zwei gleichzeitige Aenderungen nicht blockieren.
+                            Guid newPerson = payments[0].ReferencedPerson;
+                            foreach (Guid personGuid in new[] { oldPerson, newPerson }.Distinct().Order()) {
+                                tx.Query("SELECT Guid FROM essenskasse.Person WHERE Guid=@guid FOR UPDATE;", Db.P("@guid", personGuid));
                             }
+                            if (newPerson != oldPerson && !PersonExists(tx, newPerson)) {
+                                Log.Warning($"Person {newPerson} not found");
+                                return NotFound("Person existiert nicht!");
+                            }
+                            AddToSaldo(tx, oldPerson, new Money(-oldAmount.Euro, (short)-oldAmount.Cent));
+                            AddToSaldo(tx, newPerson, payments[0].Amount);
 
+                            // payments[0].Comment ist der geaenderte Kommentar oder (ohne Aenderung) der bisherige.
                             string queryStringUpdate = $"" +
                                 $"UPDATE essenskasse.Payment " +
-                                $"SET AmountEuro={payments[0].Amount.Euro}, AmountCent={payments[0].Amount.Cent}, ReferencedPerson='{payments[0].ReferencedPerson}', Comment='{comment}' " +
-                                $"WHERE DateTime='{dateAsLong}';";
-                            QueryExecuterAtMySql(queryStringUpdate);
+                                $"SET AmountEuro=@euro, AmountCent=@cent, ReferencedPerson=@person, Comment=@comment " +
+                                $"WHERE DateTime=@dateAsLong;";
+                            tx.Query(queryStringUpdate,
+                                Db.P("@euro", payments[0].Amount.Euro),
+                                Db.P("@cent", payments[0].Amount.Cent),
+                                Db.P("@person", payments[0].ReferencedPerson),
+                                Db.P("@comment", payments[0].Comment),
+                                Db.P("@dateAsLong", dateAsLong));
+                            tx.Commit();
                             Log.Information("Payment successfully updated");
                             return Ok();
                         }
@@ -331,11 +347,14 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("TaskDuration")) {
                 Log.Information("DeleteOrder called");
                 if (dateAsLong is not null) {
+                    // Loeschen und Korrektur des Saldos der Person gehoeren zusammen.
+                    using DbScope tx = _db.BeginTransaction();
                     string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Payment " +
-                        $"WHERE DateTime={dateAsLong}";
-                    DataTable dataTable = QueryExecuterAtMySql(queryString);
+                        $"WHERE DateTime=@dateAsLong " +
+                        $"FOR UPDATE;";
+                    DataTable dataTable = tx.Query(queryString, Db.P("@dateAsLong", dateAsLong));
                     List<Payment> payments = DataTableToListOfPayments(dataTable);
                     if (payments.Count == 0) {
                         Log.Warning($"At {dateAsLong} no Payment found");
@@ -344,8 +363,10 @@ namespace EssenskasseAPI.Controllers {
                     string queryStringDelete = $"" +
                         $"DELETE " +
                         $"FROM essenskasse.Payment " +
-                        $"WHERE DateTime={dateAsLong};";
-                    QueryExecuterAtMySql(queryStringDelete);
+                        $"WHERE DateTime=@dateAsLong;";
+                    tx.Query(queryStringDelete, Db.P("@dateAsLong", dateAsLong));
+                    AddToSaldo(tx, payments[0].ReferencedPerson, new Money(-payments[0].Amount.Euro, (short)-payments[0].Amount.Cent));
+                    tx.Commit();
                     Log.Information($"Payment at {payments[0].DateTime.Ticks} successfully removed");
                     return Ok(JsonConvert.SerializeObject(payments[0]));
                 }
@@ -357,22 +378,6 @@ namespace EssenskasseAPI.Controllers {
         }
 
         #region InternalFunctions
-        private DataTable QueryExecuterAtMySql(string Query) {
-            // MySql Connection
-            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
-
-            MySqlCommand cmd = new MySqlCommand(Query, connection);
-
-            DataTable dataTable = new DataTable();
-            // read the result
-            connection.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            dataTable.Load(reader);
-            connection.Close();
-
-            return dataTable;
-        }
-
         private static List<Payment> DataTableToListOfPayments(DataTable dataTable) {
             List<Payment> paymentList = [];
             foreach (DataRow row in dataTable.Rows) {
@@ -401,53 +406,53 @@ namespace EssenskasseAPI.Controllers {
                 );
         }
 
-        private int FullInsertProcessForOnePayment(Payment payment) {
-            // provider exist?
-            string queryString = $"" +
-                $"SELECT * " +
-                $"FROM essenskasse.Person " +
-                $"WHERE Guid='{payment.ReferencedPerson}';";
-
-            DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
-            if (dataTableProvider.Rows.Count != 1) {
+        /// <summary>Speichert die Einzahlung und schreibt sie dem Saldo der Person gut (innerhalb der Transaktion).</summary>
+        /// <returns>0 = ok, 1 = Person existiert nicht.</returns>
+        private int FullInsertProcessForOnePayment(Payment payment, DbScope tx) {
+            // person exist? (die Zeile wird dabei bis zum Ende der Transaktion gesperrt)
+            if (!PersonExists(tx, payment.ReferencedPerson)) {
                 Log.Warning($"{payment.ReferencedPerson} not available...");
                 return 1;
             }
 
-            // create and insert new order
+            // create and insert new payment
             string queryStringInsert = $"" +
                 $"INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment) " +
-                $"VALUES (" +
-                $"{payment.DateTime.Ticks}, " +
-                $"{payment.Amount.Euro}, " +
-                $"{payment.Amount.Cent}, " +
-                $"'{payment.ReferencedPerson}', " +
-                $"'{payment.Comment}');";
-            QueryExecuterAtMySql(queryStringInsert);
+                $"VALUES (@dateTime, @euro, @cent, @person, @comment);";
+            tx.Query(queryStringInsert,
+                Db.P("@dateTime", payment.DateTime.Ticks),
+                Db.P("@euro", payment.Amount.Euro),
+                Db.P("@cent", payment.Amount.Cent),
+                Db.P("@person", payment.ReferencedPerson),
+                Db.P("@comment", payment.Comment));
 
             // update person saldo
-            string queryStringUpdateSaldo = $"" +
-                $"SELECT * " +
-                $"FROM essenskasse.Person " +
-                $"WHERE Guid='{payment.ReferencedPerson}';";
-            DataTable dataTablePersonToUpdate = QueryExecuterAtMySql(queryStringUpdateSaldo);
+            AddToSaldo(tx, payment.ReferencedPerson, payment.Amount);
+            Log.Information($"New Payment {payment.Amount} for Person added.");
+            return 0;
+        }
 
-            if (dataTablePersonToUpdate.Rows.Count == 1) {
-                Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
-                Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} old Saldo = {personToUpdate.Saldo}");
-                personToUpdate.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, personToUpdate.Saldo, payment.Amount)!;
-                Log.Information($"Person {personToUpdate.Guid} {personToUpdate.Name} new Saldo = {personToUpdate.Saldo}");
+        /// <summary>Gibt es die Person? Die Zeile wird dabei bis zum Ende der Transaktion gesperrt.</summary>
+        private static bool PersonExists(DbScope tx, Guid personGuid) {
+            return tx.Query("SELECT Guid FROM essenskasse.Person WHERE Guid=@guid FOR UPDATE;", Db.P("@guid", personGuid)).Rows.Count == 1;
+        }
 
-                string queryStringPersonUpdate = $"" +
-                    $"UPDATE essenskasse.Person " +
-                    $"SET SaldoEuro = {personToUpdate.Saldo.Euro}, SaldoCent = {personToUpdate.Saldo.Cent} " +
-                    $"WHERE Guid='{personToUpdate.Guid}';";
-                QueryExecuterAtMySql(queryStringPersonUpdate);
-
-                Log.Information($"New Payment {payment.Amount} for Person added.");
-                return 0;
+        /// <summary>Addiert einen Betrag auf den Saldo der Person (negativ = abziehen). Die Person wird gesperrt,
+        /// gelesen, neu berechnet und gespeichert, ohne dass eine andere Buchung dazwischenkommt.</summary>
+        private static void AddToSaldo(DbScope tx, Guid personGuid, Money delta) {
+            DataTable dataTablePerson = tx.Query("SELECT * FROM essenskasse.Person WHERE Guid=@guid FOR UPDATE;", Db.P("@guid", personGuid));
+            if (dataTablePerson.Rows.Count != 1) {
+                Log.Warning($"Saldo of {personGuid} not changed, Person not found");
+                return;
             }
-            return 2;
+            Person person = DataTableToPerson(dataTablePerson);
+            Log.Information($"Person {person.Guid} {person.Name} old Saldo = {person.Saldo}");
+            person.Saldo = new Money().CalculateMoney(CalculationOperation.Addition, person.Saldo, delta)!;
+            Log.Information($"Person {person.Guid} {person.Name} new Saldo = {person.Saldo}");
+            tx.Query("UPDATE essenskasse.Person SET SaldoEuro=@euro, SaldoCent=@cent WHERE Guid=@guid;",
+                Db.P("@euro", person.Saldo.Euro),
+                Db.P("@cent", person.Saldo.Cent),
+                Db.P("@guid", person.Guid));
         }
         #endregion
     }

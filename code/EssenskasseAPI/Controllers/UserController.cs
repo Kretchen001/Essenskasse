@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EssenskasseAPI.Data;
+using EssenskasseAPI.Security;
+using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using Mysqlx.Crud;
 using Newtonsoft.Json;
@@ -14,39 +16,52 @@ namespace EssenskasseAPI.Controllers {
     public class UserController : ControllerBase {
 
         #region Config
-        private readonly IConfiguration Configuration;
+        private static readonly string DummyHash = PasswordHasher.Hash("dummy");
+        private readonly Db _db;
 
         public UserController(IConfiguration configuration) {
-            Configuration = configuration;
+            _db = new Db(configuration);
         }
         #endregion
 
         #region Controller
-        [HttpPost, Route("new")]
+        // Ohne Sitzung darf nur der allererste Benutzer angelegt werden (Ersteinrichtung).
+        // Danach duerfen nur Administratoren neue Benutzer anlegen.
+        [Microsoft.AspNetCore.Authorization.AllowAnonymous, HttpPost, Route("new")]
         public IActionResult CreateNewUser([FromHeader] string name = "", [FromHeader] string userName = "",
                                                 [FromHeader] string pwd = "", [FromHeader] string email = "",
                                                 [FromHeader] int role = short.MaxValue) {
             if (name.Equals("") || userName.Equals("") || pwd.Equals("") || email.Equals("") || role.Equals(short.MaxValue)) {
                 return BadRequest("Notwendiger Parameter fehlt!");
             }
-            using (Operation.Time($"CreateNewUser {name}, {userName}, {pwd}, {email}, {role}")) {
+            long existingUsers = Convert.ToInt64(_db.Query("SELECT COUNT(*) FROM essenskasse.User;").Rows[0][0]);
+            if (existingUsers > 0) {
+                SessionInfo? caller = SessionAuth.Authenticate(HttpContext);
+                if (caller is null) {
+                    return Unauthorized();
+                }
+                if (!SessionAuth.IsAdmin(HttpContext, caller)) {
+                    return StatusCode(StatusCodes.Status403Forbidden);
+                }
+            }
+            using (Operation.Time($"CreateNewUser {name}, {userName}, {email}, {role}")) {
                 U.User user = new U.User(name, userName, pwd, email, role);
                 string queryStringInsert = $"" +
                     $"INSERT INTO essenskasse.User (Guid, Name, UserName, Pwd, Email, Role) " +
-                    $"VALUES (" +
-                    $"'{user.Guid}'," +
-                    $"'{Uri.UnescapeDataString(user.Name)}', " +
-                    $"'{Uri.UnescapeDataString(user.UserName)}', " +
-                    $"'{Uri.UnescapeDataString(user.Pwd)}', " +
-                    $"'{Uri.UnescapeDataString(user.Email)}', " +
-                    $"{user.Role});";
-                QueryExecuterAtMySql(queryStringInsert);
+                    $"VALUES (@guid, @name, @userName, @pwd, @email, @role);";
+                _db.Query(queryStringInsert,
+                    Db.P("@guid", user.Guid),
+                    Db.P("@name", Uri.UnescapeDataString(user.Name)),
+                    Db.P("@userName", Uri.UnescapeDataString(user.UserName)),
+                    Db.P("@pwd", PasswordHasher.Hash(Uri.UnescapeDataString(user.Pwd))),
+                    Db.P("@email", Uri.UnescapeDataString(user.Email)),
+                    Db.P("@role", user.Role));
 
                 return Ok($"Benutzer {user.Name} angelegt");
             }
         }
 
-        [HttpPut, Route("update")]
+        [RequireSession, HttpPut, Route("update")]
         public IActionResult UpdateUser([FromHeader] Guid guid = new Guid(),
                                                 [FromHeader] string name = "", [FromHeader] string userName = "",
                                                 [FromHeader] string pwd = "", [FromHeader] string email = "",
@@ -54,11 +69,20 @@ namespace EssenskasseAPI.Controllers {
             using (Operation.Time("UpdateUser")) {
                 Log.Information("UpdateUser called");
 
+                // Benutzer duerfen nur sich selbst aendern, Administratoren jeden.
+                // Die Rolle darf nur ein Administrator aendern (sonst koennte sich jeder zum Admin machen).
+                SessionInfo caller = SessionAuth.Authenticate(HttpContext)!;
+                bool callerIsAdmin = SessionAuth.IsAdmin(HttpContext, caller);
+                if (!callerIsAdmin && (caller.UserGuid != guid || role < short.MaxValue)) {
+                    Log.Warning($"UpdateUser by {caller.UserGuid} for {guid} denied");
+                    return StatusCode(StatusCodes.Status403Forbidden);
+                }
+
                 string queryStringRequestUser = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.User " +
-                    $"WHERE Guid='{guid}';";
-                DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestUser);
+                    $"WHERE Guid=@guid;";
+                DataTable dataTableUser = _db.Query(queryStringRequestUser, Db.P("@guid", guid));
 
                 if (dataTableUser.Rows.Count == 1) {
                     U.User userToUpdate = DataTableToListOfUser(dataTableUser)[0];
@@ -71,8 +95,8 @@ namespace EssenskasseAPI.Controllers {
                         userToUpdate.UserName = Uri.UnescapeDataString(userName);
                     }
                     if (pwd != "") {
-                        Log.Information($"{userToUpdate.Pwd} to |{pwd}| change");
-                        userToUpdate.Pwd = Uri.UnescapeDataString(pwd);
+                        Log.Information($"Password of {userToUpdate.Name} changed");
+                        userToUpdate.Pwd = PasswordHasher.Hash(Uri.UnescapeDataString(pwd));
                     }
                     if (email != "") {
                         Log.Information($"{userToUpdate.Email} to |{email}| change");
@@ -85,10 +109,16 @@ namespace EssenskasseAPI.Controllers {
 
                     string queryStringUpdate = $"" +
                         $"UPDATE essenskasse.User " +
-                        $"SET Name='{userToUpdate.Name}', UserName='{userToUpdate.UserName}', " +
-                        $"Pwd='{userToUpdate.Pwd}', Email='{userToUpdate.Email}', Role='{userToUpdate.Role}'" +
-                        $"WHERE Guid='{guid}';";
-                    QueryExecuterAtMySql(queryStringUpdate);
+                        $"SET Name=@name, UserName=@userName, " +
+                        $"Pwd=@pwd, Email=@email, Role=@role " +
+                        $"WHERE Guid=@guid;";
+                    _db.Query(queryStringUpdate,
+                        Db.P("@name", userToUpdate.Name),
+                        Db.P("@userName", userToUpdate.UserName),
+                        Db.P("@pwd", userToUpdate.Pwd),
+                        Db.P("@email", userToUpdate.Email),
+                        Db.P("@role", userToUpdate.Role),
+                        Db.P("@guid", guid));
 
                     Log.Information("User successfully updated");
                     return Ok();
@@ -100,19 +130,23 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpGet, Route("exist")]
+        [RequireSession, HttpGet, Route("exist")]
         public IActionResult CheckIfExist([FromHeader] string name = "", [FromHeader] string userName = "",
                                             [FromHeader] string email = "", [FromHeader] bool withResult = false) {
             using (Operation.Time($"Check if User exist: {name}, {userName}, {email}")) {
                 string queryStringInsert = $"" +
-                    $"SELECT Name, UserName, Email, Role " +
+                    $"SELECT Guid, Name, UserName, Pwd, Email, Role " +
                     $"FROM essenskasse.User " +
-                    $"WHERE Name='{name}' OR " +
-                    $"UserName='{userName}' OR" +
-                    $"Email='{email}';";
-                DataTable dataTableUser = QueryExecuterAtMySql(queryStringInsert);
+                    $"WHERE Name=@name OR " +
+                    $"UserName=@userName OR " +
+                    $"Email=@email;";
+                DataTable dataTableUser = _db.Query(queryStringInsert,
+                    Db.P("@name", name),
+                    Db.P("@userName", userName),
+                    Db.P("@email", email));
                 List<U.User> user = DataTableToListOfUser(dataTableUser);
                 if (withResult) {
+                    user.ForEach(x => x.Pwd = string.Empty); // das Passwort wird nie ausgeliefert
                     return Ok(JsonConvert.SerializeObject(user));
                 }
                 else {
@@ -133,22 +167,32 @@ namespace EssenskasseAPI.Controllers {
                 string queryStringInsert = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.User " +
-                    $"WHERE Name='{name}' AND " +
-                    $"Pwd='{pwd}';";
-                DataTable dataTableUser = QueryExecuterAtMySql(queryStringInsert);
+                    $"WHERE Name=@name;";
+                DataTable dataTableUser = _db.Query(queryStringInsert, Db.P("@name", name));
                 List<U.User> user = DataTableToListOfUser(dataTableUser);
-                if (user.Count == 1) {
+                if (user.Count == 1 && PasswordHasher.Verify(pwd, user[0].Pwd)) {
+                    if (PasswordHasher.NeedsRehash(user[0].Pwd)) {
+                        // Altbestand mit Klartext-Passwort: beim ersten erfolgreichen Login durch einen Hash ersetzen.
+                        _db.Query("UPDATE essenskasse.User SET Pwd=@pwd WHERE Guid=@guid;",
+                            Db.P("@pwd", PasswordHasher.Hash(pwd)),
+                            Db.P("@guid", user[0].Guid));
+                        Log.Information($"Password of {user[0].Name} migrated to hash");
+                    }
                     U.SessionToken token = new U.SessionToken(Guid.NewGuid(), user[0].Guid, DateTime.Now.AddDays(14).Ticks);
                     string queryStringInsertToken = $"" +
                         $"INSERT INTO essenskasse.SessionToken (Guid, UserGuid, ExpaireDate) " +
-                        $"VALUES (" +
-                        $"'{token.Guid}'," +
-                        $"'{token.UserGuid}'," +
-                        $"{token.ExpaireDate});";
-                    QueryExecuterAtMySql(queryStringInsertToken);
+                        $"VALUES (@guid, @userGuid, @expaireDate);";
+                    _db.Query(queryStringInsertToken,
+                        Db.P("@guid", token.Guid),
+                        Db.P("@userGuid", token.UserGuid),
+                        Db.P("@expaireDate", token.ExpaireDate));
                     return Ok(token.Guid);
                 }
                 else {
+                    if (user.Count == 0) {
+                        // gleiche Rechenzeit wie bei einem vorhandenen Benutzer (keine Benutzernamen-Erkennung per Antwortzeit)
+                        PasswordHasher.Verify(pwd, DummyHash);
+                    }
                     return NoContent();
                 }
             }
@@ -160,16 +204,18 @@ namespace EssenskasseAPI.Controllers {
                 string queryStringRequestName = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.User " +
-                    $"WHERE Name='{name}';";
-                DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestName);
+                    $"WHERE Name=@name;";
+                DataTable dataTableUser = _db.Query(queryStringRequestName, Db.P("@name", name));
                 List<U.User> user = DataTableToListOfUser(dataTableUser);
                 if (user.Count == 1) {
                     string queryStringRequestToken = $"" +
                         $"SELECT ExpaireDate " +
                         $"FROM essenskasse.SessionToken " +
-                        $"WHERE Guid='{sessionToken}' AND " +
-                        $"UserGuid='{user[0].Guid}';";
-                    DataTable tempRes = QueryExecuterAtMySql(queryStringRequestToken);
+                        $"WHERE Guid=@sessionToken AND " +
+                        $"UserGuid=@userGuid;";
+                    DataTable tempRes = _db.Query(queryStringRequestToken,
+                        Db.P("@sessionToken", sessionToken),
+                        Db.P("@userGuid", user[0].Guid));
                     if (tempRes.Rows.Count == 1) {
                         long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
                         if (DateTime.Now.Ticks < s) { // is under expaire
@@ -177,11 +223,11 @@ namespace EssenskasseAPI.Controllers {
                                 U.SessionToken newS = new U.SessionToken(Guid.NewGuid(), user[0].Guid, DateTime.Now.AddDays(14).Ticks);
                                 string queryStringInsertToken = $"" +
                                     $"INSERT INTO essenskasse.SessionToken (Guid, UserGuid, ExpaireDate) " +
-                                    $"VALUES (" +
-                                    $"'{newS.Guid}'," +
-                                    $"'{newS.UserGuid}'," +
-                                    $"{newS.ExpaireDate});";
-                                QueryExecuterAtMySql(queryStringInsertToken);
+                                    $"VALUES (@guid, @userGuid, @expaireDate);";
+                                _db.Query(queryStringInsertToken,
+                                    Db.P("@guid", newS.Guid),
+                                    Db.P("@userGuid", newS.UserGuid),
+                                    Db.P("@expaireDate", newS.ExpaireDate));
                                 return Ok(newS.Guid); // return new Token because under 4 day barrier
                             }
                             return Ok(); // return without new Token because it is not time for it
@@ -201,16 +247,18 @@ namespace EssenskasseAPI.Controllers {
                 string queryStringRequestName = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.User " +
-                        $"WHERE Name='{name}';";
-                DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestName);
+                        $"WHERE Name=@name;";
+                DataTable dataTableUser = _db.Query(queryStringRequestName, Db.P("@name", name));
                 List<U.User> user = DataTableToListOfUser(dataTableUser);
                 if (user.Count == 1) {
                     string queryStringRequestToken = $"" +
                         $"SELECT ExpaireDate " +
                         $"FROM essenskasse.SessionToken " +
-                        $"WHERE Guid='{sessionToken}' AND " +
-                        $"UserGuid='{user[0].Guid}';";
-                    DataTable tempRes = QueryExecuterAtMySql(queryStringRequestToken);
+                        $"WHERE Guid=@sessionToken AND " +
+                        $"UserGuid=@userGuid;";
+                    DataTable tempRes = _db.Query(queryStringRequestToken,
+                        Db.P("@sessionToken", sessionToken),
+                        Db.P("@userGuid", user[0].Guid));
                     if (tempRes.Rows.Count == 1) {
                         long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
                         if (DateTime.Now.Ticks < s) { // is under expaire
@@ -218,8 +266,8 @@ namespace EssenskasseAPI.Controllers {
                                 //$"SELECT * " +
                                 $"SELECT isSingleListWishDashboard, loadAmountPayment, loadAmountOrder, filterShowProvider, dashboardMoneyLimit, filterShowPerson, accessToken, adminEmail, noticeableOnRightSide, sendConfirmationMail " +
                                 $"FROM essenskasse.SettingsUser " +
-                                $"WHERE UserGuid='{user[0].Guid}';";
-                            DataTable tempSettings = QueryExecuterAtMySql(queryStringRequestSettings);
+                                $"WHERE UserGuid=@userGuid;";
+                            DataTable tempSettings = _db.Query(queryStringRequestSettings, Db.P("@userGuid", user[0].Guid));
                             return Ok(DataTableToSettings(tempSettings));
                         }
                         Log.Information("User expire token");
@@ -241,61 +289,67 @@ namespace EssenskasseAPI.Controllers {
                 string queryStringRequestName = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.User " +
-                        $"WHERE Name='{name}';";
-                DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestName);
+                        $"WHERE Name=@name;";
+                DataTable dataTableUser = _db.Query(queryStringRequestName, Db.P("@name", name));
                 List<U.User> user = DataTableToListOfUser(dataTableUser);
                 if (user.Count == 1) { // user exist
                     string queryStringRequestToken = $"" +
                         $"SELECT ExpaireDate " +
                         $"FROM essenskasse.SessionToken " +
-                        $"WHERE Guid='{sessionToken}' AND " +
-                        $"UserGuid='{user[0].Guid}';";
-                    DataTable tempRes = QueryExecuterAtMySql(queryStringRequestToken);
+                        $"WHERE Guid=@sessionToken AND " +
+                        $"UserGuid=@userGuid;";
+                    DataTable tempRes = _db.Query(queryStringRequestToken,
+                        Db.P("@sessionToken", sessionToken),
+                        Db.P("@userGuid", user[0].Guid));
                     if (tempRes.Rows.Count == 1) {
                         long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
                         if (DateTime.Now.Ticks < s) { // is under expaire
                             string queryCheckIfSettingsSaved = $"" +
                                 $"SELECT * " +
                                 $"FROM essenskasse.SettingsUser " +
-                                $"WHERE UserGuid='{user[0].Guid}';";
-                            DataTable tempSettings = QueryExecuterAtMySql(queryCheckIfSettingsSaved);
+                                $"WHERE UserGuid=@userGuid;";
+                            DataTable tempSettings = _db.Query(queryCheckIfSettingsSaved, Db.P("@userGuid", user[0].Guid));
                             settings.AccessToken ??= new Guid("00000000-0000-0000-0000-000000000000");
+                            MySqlParameter[] settingsParameters = [
+                                Db.P("@userGuid", user[0].Guid),
+                                Db.P("@singleList", settings.IsSingleListWishDashboard),
+                                Db.P("@loadPayment", settings.LoadAmountPayment),
+                                Db.P("@loadOrder", settings.LoadAmountOrder),
+                                Db.P("@showProvider", settings.FilterShowProvider),
+                                Db.P("@moneyLimit", settings.DashboardMoneyLimit.ToString()),
+                                Db.P("@showPerson", settings.FilterShowPerson),
+                                Db.P("@accessToken", settings.AccessToken),
+                                Db.P("@adminEmail", settings.AdminEmail),
+                                Db.P("@rightSide", settings.NoticeableOnRightSide),
+                                Db.P("@sendMail", settings.SendConfirmationMail)
+                            ];
                             if (tempSettings.Rows.Count == 0) { // no settings there, so insert
                                 string insertQueryString = $"" +
                                     $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
                                                 $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
                                                 $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
                                                 $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
-                                    $"VALUES (" +
-                                    $"'{user[0].Guid}'," +
-                                    $"{settings.IsSingleListWishDashboard}," +
-                                    $"{settings.LoadAmountPayment}," +
-                                    $"{settings.LoadAmountOrder}," +
-                                    $"{settings.FilterShowProvider}," +
-                                    $"'{settings.DashboardMoneyLimit}'," +
-                                    $"{settings.FilterShowPerson}," +
-                                    $"'{settings.AccessToken}'," +
-                                    $"'{settings.AdminEmail}'," +
-                                    $"{settings.NoticeableOnRightSide}," +
-                                    $"{settings.SendConfirmationMail});";
-                                QueryExecuterAtMySql(insertQueryString);
+                                    $"VALUES (@userGuid, @singleList, @loadPayment, @loadOrder, @showProvider, " +
+                                                $"@moneyLimit, @showPerson, @accessToken, " +
+                                                $"@adminEmail, @rightSide, @sendMail);";
+                                _db.Query(insertQueryString, settingsParameters);
                             }
                             else { // settings saved, so update
                                 string queryUpdate = $"" +
                                 $"UPDATE essenskasse.SettingsUser " +
                                     $"SET " +
-                                    $"isSingleListWishDashboard={settings.IsSingleListWishDashboard}, " +
-                                    $"loadAmountPayment={settings.LoadAmountPayment}, " +
-                                    $"loadAmountOrder={settings.LoadAmountOrder}, " +
-                                    $"filterShowProvider={settings.FilterShowProvider}, " +
-                                    $"dashboardMoneyLimit='{settings.DashboardMoneyLimit}', " +
-                                    $"filterShowPerson={settings.FilterShowPerson}, " +
-                                    $"accessToken='{settings.AccessToken}', " +
-                                    $"adminEmail='{settings.AdminEmail}', " +
-                                    $"noticeableOnRightSide={settings.NoticeableOnRightSide}, " +
-                                    $"sendConfirmationMail={settings.SendConfirmationMail} " +
-                                    $"WHERE UserGuid='{user[0].Guid}';";
-                                QueryExecuterAtMySql(queryUpdate);
+                                    $"isSingleListWishDashboard=@singleList, " +
+                                    $"loadAmountPayment=@loadPayment, " +
+                                    $"loadAmountOrder=@loadOrder, " +
+                                    $"filterShowProvider=@showProvider, " +
+                                    $"dashboardMoneyLimit=@moneyLimit, " +
+                                    $"filterShowPerson=@showPerson, " +
+                                    $"accessToken=@accessToken, " +
+                                    $"adminEmail=@adminEmail, " +
+                                    $"noticeableOnRightSide=@rightSide, " +
+                                    $"sendConfirmationMail=@sendMail " +
+                                    $"WHERE UserGuid=@userGuid;";
+                                _db.Query(queryUpdate, settingsParameters);
                             }
                             return Ok();
                         }
@@ -316,16 +370,18 @@ namespace EssenskasseAPI.Controllers {
                 string queryStringRequestName = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.User " +
-                        $"WHERE Name='{name}';";
-                DataTable dataTableUser = QueryExecuterAtMySql(queryStringRequestName);
+                        $"WHERE Name=@name;";
+                DataTable dataTableUser = _db.Query(queryStringRequestName, Db.P("@name", name));
                 List<U.User> user = DataTableToListOfUser(dataTableUser);
                 if (user.Count == 1) {
                     string queryStringRequestToken = $"" +
                         $"SELECT ExpaireDate " +
                         $"FROM essenskasse.SessionToken " +
-                        $"WHERE Guid='{sessionToken}' AND " +
-                        $"UserGuid='{user[0].Guid}';";
-                    DataTable tempRes = QueryExecuterAtMySql(queryStringRequestToken);
+                        $"WHERE Guid=@sessionToken AND " +
+                        $"UserGuid=@userGuid;";
+                    DataTable tempRes = _db.Query(queryStringRequestToken,
+                        Db.P("@sessionToken", sessionToken),
+                        Db.P("@userGuid", user[0].Guid));
                     if (tempRes.Rows.Count == 1) {
                         long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
                         if (DateTime.Now.Ticks < s) { // is under expaire
@@ -334,9 +390,11 @@ namespace EssenskasseAPI.Controllers {
                                 Guid newToken = Guid.NewGuid();
                                 string queryInsertNewToken = $"" +
                                     $"UPDATE essenskasse.User " +
-                                    $"SET TokenForChange='{newToken}' " +
-                                    $"WHERE Guid='{user[0].Guid}';";
-                                QueryExecuterAtMySql(queryInsertNewToken);
+                                    $"SET TokenForChange=@newToken " +
+                                    $"WHERE Guid=@userGuid;";
+                                _db.Query(queryInsertNewToken,
+                                    Db.P("@newToken", newToken),
+                                    Db.P("@userGuid", user[0].Guid));
                                 return Ok(newToken);
                             }
                             else { // send the "old" token
@@ -355,22 +413,6 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region InternalFunctions
-        private DataTable QueryExecuterAtMySql(string Query) {
-            // MySql Connection
-            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
-
-            MySqlCommand cmd = new MySqlCommand(Query, connection);
-
-            DataTable dataTable = new DataTable();
-            // read the result
-            connection.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            dataTable.Load(reader);
-            connection.Close();
-
-            return dataTable;
-        }
-
         private static List<U.User> DataTableToListOfUser(DataTable dataTable) {
             List<U.User> userList = [];
             foreach (DataRow row in dataTable.Rows) {

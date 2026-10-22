@@ -8,6 +8,7 @@
 - [Beschreibung Deutsch](#beschreibung-deutsch)
 - [Description English](#description-english)
 - [Installation and Run](#installation-and-run)
+- [Update auf 1.3.0 / Upgrade to 1.3.0](#update-auf-130--upgrade-to-130)
 - [Contribution](#contribution)
 
 ## Beschreibung Deutsch
@@ -64,6 +65,48 @@ Because of the settings in the `docker-compose.yml` the essentiell port for call
 start http://localhost:8009
 ```
 This will call the Dashboard.
+
+## Update auf 1.3.0 / Upgrade to 1.3.0
+**Deutsch**
+1. **Sicherung erstellen** (z. B. `mysqldump` oder `POST api/backup/newNow`).
+2. **Datenbank migrieren** (additiv, ändert keine Daten, beliebig oft ausführbar):
+   ```bash
+   cd code
+   docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> essenskasse < MySqlScripts/update_v1-2-0_zu_1-3-0.sql
+   ```
+   Die Ausgabe zeigt verwaiste Datensätze und abweichende Salden an. Ein Fremdschlüssel wird nur angelegt, wenn es keine verwaisten Datensätze gibt.
+3. **Neu bauen und starten:** `docker-compose up -d --build`.
+
+Was sich ändert:
+- Die API verlangt für alle Endpunkte ein Sitzungs-Token (`Authorization: Bearer {Token}`). Die PWA sendet es automatisch nach dem Login. Ohne Anmeldung bleibt nur das Dashboard (`GET person/requestAll`) offen. Eigene Clients/Skripte müssen sich anpassen (Login: `POST api/user/newTokenForUser`).
+- Passwörter werden als Hash gespeichert. Bestehende Klartext-Passwörter werden beim ersten erfolgreichen Login automatisch umgestellt.
+- Den allerersten Benutzer legt man ohne Anmeldung an (`POST api/user/new` mit den Headern `name`, `userName`, `pwd`, `email`, `role`); danach dürfen das nur Administratoren.
+- Buchungen (Bestellung/Einzahlung und Saldo) werden atomar gespeichert; Löschen und Ändern korrigiert den Saldo.
+- Optionale Einstellungen der API (z. B. als Umgebungsvariablen im `docker-compose.yml`):
+
+  | Einstellung | Wirkung |
+  |---|---|
+  | `Security__AdminMaxRole` | Benutzer mit `Role` bis zu diesem Wert sind Administratoren (Backup, Benutzerverwaltung). Standard 100 = jeder angemeldete Benutzer. |
+  | `Cors__AllowedOrigins__0` | Erlaubte Adresse der PWA, z. B. `http://meinserver:8009`. Ohne Angabe sind alle Origins erlaubt. |
+  | `Swagger__Enabled` | `false` schaltet Swagger ab (Standard: an, erreichbar unter `/swagger`; über „Authorize“ das Token eintragen). |
+
+**English**
+1. Create a backup. 2. Run `code/MySqlScripts/update_v1-2-0_zu_1-3-0.sql` against the database (additive: it never deletes or changes data and can be run repeatedly). 3. Rebuild with `docker-compose up -d --build`.
+All API endpoints now require a session token (`Authorization: Bearer {token}`) except `GET person/requestAll` (dashboard) and the login; the PWA sends it automatically. Passwords are stored hashed and existing plaintext passwords are converted on the next successful login. The very first user can be created without a login, afterwards only administrators can create users. Settings: `Security__AdminMaxRole`, `Cors__AllowedOrigins__0`, `Swagger__Enabled`.
+
+### Betrieb im Container / Operation in containers
+- Die API im Container bekommt ihren Connection String aus dem `docker-compose.yml` (`ConnectionStrings__essenskasse`, Werte aus `.env`). Die `appsettings.json` darf lokal auf `localhost:8008` zeigen, ohne dass der Container davon beeinflusst wird.
+- Der DB-Port `8008` ist nur noch auf `127.0.0.1` erreichbar (SQL-Client, lokal gestartete API). Die API startet erst, wenn die Datenbank gesund ist.
+- PWA-Updates: Der Service Worker nutzt pro Build einen neuen Cache; `appsettings.json` wird nie gecacht. Nach einem Update wird die neue Version aktiv, sobald alle Tabs der PWA einmal geschlossen waren (kein hartes Neuladen mehr nötig).
+- Tests: `dotnet test` (Authentifizierungs-Tests brauchen keine Datenbank). Den Coverage-Report erzeugt `code/analyze.bat` lokal; er gehört nicht ins Repository.
+
+### MySQL aktualisieren (optional, manuell) / Upgrading MySQL (optional)
+Das Image `mysql:8.0.2` ist eine frühe Vorabversion. Ein einfaches Hochsetzen des Tags auf den vorhandenen Datenordner wird von MySQL für diese Version **nicht unterstützt** und kann die Datenbank unbrauchbar machen. Deshalb wird es nicht automatisch geändert. Sicherer Weg über einen Dump:
+1. Sicherung der Daten: `docker exec EssenskasseDB mysqldump -uroot -p<DB_ROOT_PASSWORD> --databases essenskasse --routines --single-transaction > essenskasse_dump.sql` (Datei prüfen, nicht leer?).
+2. `docker-compose down`, dann das Volume sichern bzw. unter anderem Namen aufheben (`docker volume ls`; **nicht** löschen, bis alles läuft).
+3. Im `docker-compose.yml` das Image auf eine aktuelle 8.0-Version setzen (z. B. `mysql:8.0`) und mit einem neuen, leeren Volume starten: `docker-compose up -d database`.
+4. Dump einspielen: `docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> < essenskasse_dump.sql`, dann `docker-compose up -d --build`.
+5. Funktioniert alles (Anmeldung, Salden, Buchungen), kann das alte Volume später entfernt werden.
 
 ## Contribution
 Source of the icon: [www.flaticon.com/free-icon](https://www.flaticon.com/free-icon/cost_11645186?related_id=11645144&origin=search)
