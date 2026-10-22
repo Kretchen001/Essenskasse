@@ -582,4 +582,10 @@
   <data name="nameRequired" xml:space="preserve">
     <value>Введите имя.</value>
   </data>
+  <data name="unsaved" xml:space="preserve">
+    <value>Не сохранено</value>
+  </data>
+  <data name="discard" xml:space="preserve">
+    <value>Отменить изменения</value>
+  </data>
 </root>

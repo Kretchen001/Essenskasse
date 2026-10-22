@@ -154,6 +154,26 @@
     font-size: 0.85rem;
 }
 
+.ek-field.is-changed {
+    color: var(--ek-text);
+}
+
+    .ek-field.is-changed .ek-input {
+        border-color: var(--ek-ok);
+    }
+
+.ek-edit-state {
+    align-self: center;
+    margin-left: 0.25rem;
+    color: var(--ek-muted);
+    font-size: 0.88rem;
+}
+
+    .ek-edit-state.is-dirty {
+        color: var(--ek-bad);
+        font-weight: 600;
+    }
+
 .ek-input {
     width: 100%;
     padding: 0.4rem 0.6rem;

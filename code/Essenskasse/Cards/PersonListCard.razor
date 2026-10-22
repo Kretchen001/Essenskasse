@@ -8,21 +8,27 @@
     <span class="ek-avatar" aria-hidden="true">@Initials</span>
     @if (isEditing) {
         <div class="ek-person-edit">
-            <label class="ek-field">
-                <span>@_loc[nameof(RessourceAppStrings.name)]</span>
+            <label class="ek-field @(NameChanged ? "is-changed" : "")">
+                <span>@_loc[nameof(RessourceAppStrings.name)] @(NameChanged ? "•" : "")</span>
                 <input type="text" class="ek-input" @bind="editName" @bind:event="oninput" autocomplete="off" />
             </label>
-            <label class="ek-field">
-                <span>@_loc[nameof(RessourceAppStrings.email)]</span>
+            <label class="ek-field @(EmailChanged ? "is-changed" : "")">
+                <span>@_loc[nameof(RessourceAppStrings.email)] @(EmailChanged ? "•" : "")</span>
                 <input type="email" class="ek-input" @bind="editEmail" @bind:event="oninput" autocomplete="off" />
             </label>
             <div class="ek-edit-actions">
-                <button type="button" class="ek-btn ek-btn-primary" disabled="@isSaving" @onclick="SaveEdit">
+                <button type="button" class="ek-btn ek-btn-primary" disabled="@(isSaving || !IsDirty)" @onclick="SaveEdit">
                     @_loc[nameof(RessourceAppStrings.save)]
                 </button>
                 <button type="button" class="ek-btn" disabled="@isSaving" @onclick="CancelEdit">
-                    @_loc[nameof(RessourceAppStrings.cancel)]
+                    @(IsDirty ? _loc[nameof(RessourceAppStrings.discard)] : _loc[nameof(RessourceAppStrings.cancel)])
                 </button>
+                @if (IsDirty) {
+                    <span class="ek-edit-state is-dirty">@_loc[nameof(RessourceAppStrings.unsaved)]</span>
+                }
+                else {
+                    <span class="ek-edit-state">@_loc[nameof(RessourceAppStrings.toastNoChanges)]</span>
+                }
             </div>
         </div>
     }

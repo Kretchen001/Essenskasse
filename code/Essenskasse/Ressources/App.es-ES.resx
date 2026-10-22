@@ -582,4 +582,10 @@
   <data name="nameRequired" xml:space="preserve">
     <value>Introduce un nombre.</value>
   </data>
+  <data name="unsaved" xml:space="preserve">
+    <value>Sin guardar</value>
+  </data>
+  <data name="discard" xml:space="preserve">
+    <value>Descartar</value>
+  </data>
 </root>

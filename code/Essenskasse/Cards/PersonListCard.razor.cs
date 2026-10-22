@@ -25,6 +25,10 @@ namespace Essenskasse.Cards {
         private string editName = "";
         private string editEmail = "";
 
+        private bool NameChanged => editName.Trim() != Person.Name;
+        private bool EmailChanged => editEmail.Trim() != Person.Email;
+        private bool IsDirty => NameChanged || EmailChanged;
+
         private string Initials => PersonText.Initials(Person.Name);
 
         private async Task CopyGuid() {
@@ -48,9 +52,7 @@ namespace Essenskasse.Cards {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.nameRequired)], ToastLevel.Warning);
                 return;
             }
-            if (name == Person.Name && email == Person.Email) {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoChanges)], ToastLevel.Info);
-                isEditing = false;
+            if (!IsDirty) {
                 return;
             }
 

@@ -158,5 +158,7 @@
         save,
         cancel,
         nameRequired,
+        unsaved,
+        discard,
     }
 }
