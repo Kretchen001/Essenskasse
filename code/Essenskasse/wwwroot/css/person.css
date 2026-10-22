@@ -83,6 +83,12 @@
     color: var(--ek-hero-muted);
 }
 
+.ek-icon-warn:hover {
+    border-color: var(--ek-bad);
+    color: var(--ek-bad);
+    background: var(--ek-bad-tint);
+}
+
 .ek-add {
     margin-top: 1.25rem;
     padding: 1rem 1.1rem 1.1rem;

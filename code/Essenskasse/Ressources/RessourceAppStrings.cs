@@ -163,5 +163,8 @@
         addAnyway,
         duplicateName,
         emailInvalid,
+        noEmailEntered,
+        copyEmail,
+        copied,
     }
 }

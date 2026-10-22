@@ -597,4 +597,13 @@
   <data name="emailInvalid" xml:space="preserve">
     <value>The email address looks invalid.</value>
   </data>
+  <data name="noEmailEntered" xml:space="preserve">
+    <value>No email entered!</value>
+  </data>
+  <data name="copyEmail" xml:space="preserve">
+    <value>Copy email</value>
+  </data>
+  <data name="copied" xml:space="preserve">
+    <value>Copied</value>
+  </data>
 </root>

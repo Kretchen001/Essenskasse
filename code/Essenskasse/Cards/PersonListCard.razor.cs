@@ -35,6 +35,13 @@ namespace Essenskasse.Cards {
             await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Person.Guid.ToString());
         }
 
+        private Task SendPaymentMail() => PaymentMail.SendAsync(JSRuntime, _loc, ToastService, Person);
+
+        private async Task CopyEmail() {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Person.Email);
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.copied)], ToastLevel.Success);
+        }
+
         private void StartEdit() {
             editName = Person.Name;
             editEmail = Person.Email;

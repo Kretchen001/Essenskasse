@@ -597,4 +597,13 @@
   <data name="emailInvalid" xml:space="preserve">
     <value>Die E-Mail-Adresse sieht ungültig aus.</value>
   </data>
+  <data name="noEmailEntered" xml:space="preserve">
+    <value>Keine E-Mail eingetragen!</value>
+  </data>
+  <data name="copyEmail" xml:space="preserve">
+    <value>E-Mail kopieren</value>
+  </data>
+  <data name="copied" xml:space="preserve">
+    <value>Kopiert</value>
+  </data>
 </root>

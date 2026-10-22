@@ -18,36 +18,6 @@ namespace Essenskasse.Cards {
 
         private string Initials => PersonText.Initials(Person.Name);
 
-        private async void SendEmailForPayment() {
-            if (Person.Email.Equals("")) {
-                ToastService.ShowToast("Keine E-Mail eingetragen!", ToastLevel.Info);
-            }
-            else {
-                string subject = _loc[nameof(RessourceAppStrings.emailSubject)];
-                string body = _loc[nameof(RessourceAppStrings.emailDearSirMadam)] + " " + Person.Name + ",\n\n" +
-                                _loc[nameof(RessourceAppStrings.emailYouAreCurrently)] + "\n" +
-                                "\xA0\xA0\xA0\xA0" + Person.Saldo.ToString() + "\n";
-                if (Person.Saldo.IsPositiv()) {
-                    subject = _loc[nameof(RessourceAppStrings.emailSubjectPositiv)]; // change the subject to Information when positiv Saldo
-                    body += _loc[nameof(RessourceAppStrings.emailPositivButNotNegativ)] + "\n\n" +
-                                _loc[nameof(RessourceAppStrings.emailRemaining)] + "\n" +
-                                _loc[nameof(RessourceAppStrings.emailCashManagement)];
-                }
-                else {
-                    body += _loc[nameof(RessourceAppStrings.emailPositiv)] + "\n" +
-                                _loc[nameof(RessourceAppStrings.emailRemedy)] + "\n\n" +
-                                _loc[nameof(RessourceAppStrings.emailRemaining)] + "\n" +
-                                _loc[nameof(RessourceAppStrings.emailCashManagement)];
-                }
-                await JSRuntime.InvokeAsync<object>(
-                    "blazorExtensions.SendLocalEmail",
-                    new object[] {
-                        Person.Email,
-                        subject,
-                        body
-                    }
-                );
-            }
-        }
+        private Task SendEmailForPayment() => PaymentMail.SendAsync(JSRuntime, _loc, ToastService, Person);
     }
 }

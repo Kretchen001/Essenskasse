@@ -597,4 +597,13 @@
   <data name="emailInvalid" xml:space="preserve">
     <value>Адрес e-mail выглядит неверным.</value>
   </data>
+  <data name="noEmailEntered" xml:space="preserve">
+    <value>E-mail не указан!</value>
+  </data>
+  <data name="copyEmail" xml:space="preserve">
+    <value>Копировать e-mail</value>
+  </data>
+  <data name="copied" xml:space="preserve">
+    <value>Скопировано</value>
+  </data>
 </root>
