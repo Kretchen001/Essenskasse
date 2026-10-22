@@ -726,4 +726,25 @@
   <data name="authorizing" xml:space="preserve">
     <value>Anmeldung wird geprüft …</value>
   </data>
+  <data name="userName" xml:space="preserve">
+    <value>Benutzername</value>
+  </data>
+  <data name="password" xml:space="preserve">
+    <value>Passwort</value>
+  </data>
+  <data name="permissionLevel" xml:space="preserve">
+    <value>Berechtigungsebene</value>
+  </data>
+  <data name="advanced" xml:space="preserve">
+    <value>Erweitert</value>
+  </data>
+  <data name="showPassword" xml:space="preserve">
+    <value>Passwort anzeigen</value>
+  </data>
+  <data name="hidePassword" xml:space="preserve">
+    <value>Passwort verbergen</value>
+  </data>
+  <data name="signingIn" xml:space="preserve">
+    <value>Anmeldung läuft …</value>
+  </data>
 </root>

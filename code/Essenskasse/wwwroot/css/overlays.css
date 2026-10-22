@@ -1,0 +1,212 @@
+/* Anmeldedialog und Meldungen (Toast). Die Farbvariablen stehen in topbar.css. */
+
+/* ---------- Anmeldedialog ---------- */
+
+.ek-login-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1060;
+    background: rgba(8, 20, 24, 0.55);
+}
+
+.ek-login {
+    position: fixed;
+    z-index: 1061;
+    top: 12vh;
+    left: 50%;
+    width: min(26rem, calc(100% - 2rem));
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    transform: translateX(-50%);
+    border: 1px solid var(--ek-line);
+    border-radius: 14px;
+    background: var(--ek-surface);
+    color: var(--ek-text);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    outline: 0;
+}
+
+.ek-login-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem 0.25rem;
+}
+
+.ek-login-title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 650;
+}
+
+.ek-login-body {
+    padding: 0.5rem 1.25rem 1.25rem;
+}
+
+.ek-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.ek-pw {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .ek-pw .ek-input {
+        flex: 1;
+        min-width: 0;
+    }
+
+.ek-advanced summary {
+    cursor: pointer;
+    color: var(--ek-muted);
+    font-size: 0.9rem;
+}
+
+.ek-advanced[open] summary {
+    margin-bottom: 0.5rem;
+}
+
+.ek-login-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+    .ek-login-actions .ek-btn {
+        flex: 1 1 8rem;
+    }
+
+@media (max-width: 575.98px) {
+    .ek-login {
+        top: 1rem;
+    }
+}
+
+@media (pointer: coarse) {
+    .ek-login .ek-input,
+    .ek-login .ek-btn {
+        min-height: 2.75rem;
+    }
+
+    .ek-login .ek-icon-btn {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+}
+
+/* ---------- Meldungen (Toast) ---------- */
+
+.ek-toast {
+    position: fixed;
+    z-index: 2000;
+    top: 1rem;
+    right: 1rem;
+    display: none;
+    align-items: flex-start;
+    gap: 0.8rem;
+    width: min(24rem, calc(100% - 2rem));
+    padding: 0.85rem 0.6rem 0.85rem 1rem;
+    border: 1px solid var(--ek-line);
+    border-left-width: 5px;
+    border-radius: 12px;
+    background: var(--ek-surface);
+    color: var(--ek-text);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+.ek-toast-visible {
+    display: flex;
+    animation: ek-toast-in 0.25s ease-out;
+}
+
+@keyframes ek-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-0.6rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.ek-toast-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+}
+
+.ek-toast-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.ek-toast-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 650;
+}
+
+.ek-toast-text {
+    margin: 0.1rem 0 0;
+    font-size: 0.95rem;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.ek-toast-info {
+    border-left-color: var(--ek-focus);
+}
+
+    .ek-toast-info .ek-toast-icon {
+        background: var(--ek-line);
+        color: var(--ek-focus);
+    }
+
+.ek-toast-success {
+    border-left-color: var(--ek-ok);
+}
+
+    .ek-toast-success .ek-toast-icon {
+        background: var(--ek-ok-tint);
+        color: var(--ek-ok);
+    }
+
+.ek-toast-warning {
+    border-left-color: #c78a00;
+}
+
+    .ek-toast-warning .ek-toast-icon {
+        background: #fff1cc;
+        color: #8a5d00;
+    }
+
+body.Dark .ek-toast-warning .ek-toast-icon {
+    background: #4d3d12;
+    color: #ffd166;
+}
+
+.ek-toast-error {
+    border-left-color: var(--ek-bad);
+}
+
+    .ek-toast-error .ek-toast-icon {
+        background: var(--ek-bad-tint);
+        color: var(--ek-bad);
+    }
+
+@media (prefers-reduced-motion: reduce) {
+    .ek-toast-visible {
+        animation: none;
+    }
+}

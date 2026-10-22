@@ -15,7 +15,11 @@ namespace Essenskasse.Layout {
         private string currentUserName = string.Empty;
         private string nameToLogin = string.Empty;
         private string passwordToLogin = string.Empty;
-        private int roleToLogin = 10;
+        private const int DefaultRole = 10;
+        private int roleToLogin = DefaultRole;
+        private bool showPassword = false;
+        private bool loginFailed = false;
+        private bool isLoggingIn = false;
 
         [CascadingParameter]
         private Task<AuthenticationState> AuthenticationStateTask { get; set; }
@@ -131,6 +135,11 @@ namespace Essenskasse.Layout {
         #endregion
 
         private async Task LoginUser() {
+            if (isLoggingIn || nameToLogin.Trim().Length == 0 || passwordToLogin.Length == 0) {
+                return;
+            }
+            isLoggingIn = true;
+            loginFailed = false;
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config["API-Adress"] + "user/newTokenForUser"),
@@ -150,19 +159,28 @@ namespace Essenskasse.Layout {
                     await LocalStorage.SetItemAsync<string>("NameOfUser", nameToLogin);
                     await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken[1..(newToken.Length - 1)]));
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.welcome)], ToastLevel.Success);
+                    nameToLogin = "";
+                    passwordToLogin = "";
+                    roleToLogin = DefaultRole;
+                    showPassword = false;
+                    LoginModel?.Close();
                 }
                 else {
+                    // Dialog bleibt offen, das Passwort wird geleert und der Fokus springt zurueck ins Feld.
                     AuthStateService.IsAuthenticated = false;
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.loginFailedRetry)], ToastLevel.Error);
+                    loginFailed = true;
+                    passwordToLogin = "";
+                    if (LoginModel is not null) {
+                        await LoginModel.FocusAsync("ek-login-password");
+                    }
                 }
-                nameToLogin = "";
-                passwordToLogin = "";
-                roleToLogin = short.MaxValue;
                 AuthState.NotifyAuthenticationStateChanged();
             }
             catch {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
+            }
+            finally {
+                isLoggingIn = false;
             }
         }
     }

@@ -206,5 +206,12 @@
         signOut,
         signedInAs,
         authorizing,
+        userName,
+        password,
+        permissionLevel,
+        advanced,
+        showPassword,
+        hidePassword,
+        signingIn,
     }
 }

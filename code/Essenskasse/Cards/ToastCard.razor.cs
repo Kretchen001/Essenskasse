@@ -8,8 +8,8 @@ namespace Essenskasse.Cards {
         private string? _heading;
         private string? _message;
         private bool _isVisible;
-        private string? _backgroundCssClass;
-        private string? _iconCssClass;
+        private ToastLevel _level = ToastLevel.Info;
+        private string _levelCssClass = "ek-toast-info";
 
         protected override void OnInitialized () {
             ToastService.OnShow += ShowToast;
@@ -28,25 +28,22 @@ namespace Essenskasse.Cards {
         }
 
         private void BuildToastSettings (ToastLevel level, string message) {
+            _level = level;
             switch (level) {
                 case ToastLevel.Info:
-                    _backgroundCssClass = $"bg-info";
-                    _iconCssClass = "info";
+                    _levelCssClass = "ek-toast-info";
                     _heading = _loc[nameof(RessourceAppStrings.information)];
                     break;
                 case ToastLevel.Success:
-                    _backgroundCssClass = $"bg-success";
-                    _iconCssClass = "check";
+                    _levelCssClass = "ek-toast-success";
                     _heading = _loc[nameof(RessourceAppStrings.success)];
                     break;
                 case ToastLevel.Warning:
-                    _backgroundCssClass = $"bg-warning";
-                    _iconCssClass = "exclamation";
+                    _levelCssClass = "ek-toast-warning";
                     _heading = _loc[nameof(RessourceAppStrings.warning)];
                     break;
                 case ToastLevel.Error:
-                    _backgroundCssClass = "bg-danger";
-                    _iconCssClass = "times";
+                    _levelCssClass = "ek-toast-error";
                     _heading = _loc[nameof(RessourceAppStrings.error)];
                     break;
                 default:

@@ -1,6 +1,8 @@
 /* Kopfzeile mit Anmelden/Abmelden. Farben als Variablen (wie .ek-dash); body.Dark ueberschreibt sie. */
 
-.ek-topbar {
+.ek-topbar,
+.ek-login,
+.ek-toast {
     --ek-surface: #ffffff;
     --ek-line: #d3dad9;
     --ek-line-strong: #aebcbb;
@@ -15,7 +17,9 @@
     --ek-focus: #1b6ec2;
 }
 
-body.Dark .ek-topbar {
+body.Dark .ek-topbar,
+body.Dark .ek-login,
+body.Dark .ek-toast {
     --ek-surface: #383e41;
     --ek-line: #4d5659;
     --ek-line-strong: #6a777b;
