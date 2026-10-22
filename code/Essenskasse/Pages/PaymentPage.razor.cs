@@ -18,7 +18,7 @@ namespace Essenskasse.Pages {
             }
             set {
                 _selectedPerson = value;
-                RequestPaymentsOfPerson();
+                _ = RequestPaymentsOfPerson();
             }
         }
 
@@ -108,13 +108,14 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async void RequestPaymentsOfPerson() {
+        private async Task RequestPaymentsOfPerson() {
             // Request last payments of a person
+            Guid requestedFor = SelectedPerson;
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/fromPerson"),
                 Headers = {
-                    { "guid", SelectedPerson.ToString() },
+                    { "guid", requestedFor.ToString() },
                     { "amount", Amount.ToString() }
                 }
             };
@@ -129,7 +130,11 @@ namespace Essenskasse.Pages {
             }
 
             if (response.IsSuccessStatusCode) {
-                paymentsOfSelectedPerson = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+                List<Payment> loaded = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+                if (requestedFor != SelectedPerson) {
+                    return; // zwischenzeitlich wurde eine andere Person gewaehlt, deren Liste nicht ueberschreiben
+                }
+                paymentsOfSelectedPerson = loaded;
                 paymentsOfSelectedPerson.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
             }
             else {
@@ -139,8 +144,26 @@ namespace Essenskasse.Pages {
             base.StateHasChanged();
         }
 
-        private async void InsertPayment() {
-            if (!(await JSRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.insertFollowingAmount)] + "\n" + Money.ToString()))) {
+        private bool isBooking = false;
+
+        /// <summary>Bucht die Einzahlung. Solange eine Buchung laeuft, wird jeder weitere Aufruf ignoriert (kein doppeltes Buchen).</summary>
+        private async Task InsertPayment() {
+            if (isBooking) {
+                return;
+            }
+            isBooking = true;
+            try {
+                await InsertPaymentCoreAsync();
+            }
+            finally {
+                isBooking = false;
+            }
+        }
+
+        private async Task InsertPaymentCoreAsync() {
+            Guid bookedFor = SelectedPerson;
+            Money booked = Money;
+            if (!(await JSRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.insertFollowingAmount)] + "\n" + booked.ToString()))) {
                 return;
             }
 
@@ -148,10 +171,10 @@ namespace Essenskasse.Pages {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),
                 Headers = {
-                    {"referencedPerson", SelectedPerson.ToString()},
+                    {"referencedPerson", bookedFor.ToString()},
                     {"comment", Uri.EscapeDataString(comment)}
                 },
-                Content = new StringContent(JsonConvert.SerializeObject(Money), Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonConvert.SerializeObject(booked), Encoding.UTF8, "application/json")
             };
 
             HttpResponseMessage? response = null;
@@ -165,19 +188,22 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessfullyAdded)], ToastLevel.Success);
-                paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!);
-                paymentsOfSelectedPerson.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
-                paymentsOfSelectedPerson = paymentsOfSelectedPerson.OrderByDescending(x => x.DateTime).ToList();
+                Payment newPayment = JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!;
+                newPayment.Comment = Uri.UnescapeDataString(newPayment.Comment);
+                if (bookedFor == SelectedPerson) {
+                    paymentsOfSelectedPerson.Add(newPayment);
+                    paymentsOfSelectedPerson = paymentsOfSelectedPerson.OrderByDescending(x => x.DateTime).ToList();
+                }
                 base.StateHasChanged();
                 if (AppData.SendConfirmationMail) {
-                    if (person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Email.Equals("")) {
+                    if (person![person.FindIndex(x => x.Guid.Equals(bookedFor))].Email.Equals("")) {
                         ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoEmailEntered)], ToastLevel.Info);
                     }
                     else {
                         ToastService.ShowToast("Bestätigungsmail versenden...", ToastLevel.Info);
-                        Payment d = paymentsOfSelectedPerson[0];
+                        Payment d = newPayment;
                         string subject = "Bestätigung einer Einzahlung | \"Essenkasse\"";
-                        string body = $"Sehr geehrte(r) {person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Name}\n" +
+                        string body = $"Sehr geehrte(r) {person![person.FindIndex(x => x.Guid.Equals(bookedFor))].Name}\n" +
                             $"Hiermit wird Ihnen bestätigt, daß am heutigen " +
                             $"Tage {d.DateTime:d} um {d.DateTime:t} " +
                             $"eine Einzahlung in der Höhe {d.Amount} erfolgte!\n" +
@@ -187,7 +213,7 @@ namespace Essenskasse.Pages {
                         await JSRuntime.InvokeAsync<object>(
                             "blazorExtensions.SendLocalEmail",
                             new object[] {
-                                person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Email,
+                                person![person.FindIndex(x => x.Guid.Equals(bookedFor))].Email,
                                 subject,
                                 body
                             }

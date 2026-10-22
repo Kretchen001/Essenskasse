@@ -85,7 +85,7 @@
         </div>
         <br />
         <div class="row">
-            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="() => InsertPayment()">
+            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" disabled="@isBooking" @onclick="() => InsertPayment()">
                 @_loc[nameof(RessourceAppStrings.creditAmount)]
             </button>
         </div>
