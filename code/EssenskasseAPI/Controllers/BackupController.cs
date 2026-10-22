@@ -1,4 +1,5 @@
 ﻿using EssenskasseAPI.Data;
+using EssenskasseAPI.Security;
 using Microsoft.AspNetCore.Mvc;
 using Modells;
 using Modells.User;
@@ -9,6 +10,7 @@ using System.Data;
 namespace EssenskasseAPI.Controllers {
 
     [ApiController, Route("api/backup")]
+    [RequireSession(AdminOnly = true)]
     public class BackupController : ControllerBase {
 
         #region Config

@@ -1,4 +1,5 @@
 ﻿using EssenskasseAPI.Data;
+using EssenskasseAPI.Security;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using Mysqlx.Crud;
@@ -23,12 +24,24 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region Controller
-        [HttpPost, Route("new")]
+        // Ohne Sitzung darf nur der allererste Benutzer angelegt werden (Ersteinrichtung).
+        // Danach duerfen nur Administratoren neue Benutzer anlegen.
+        [Microsoft.AspNetCore.Authorization.AllowAnonymous, HttpPost, Route("new")]
         public IActionResult CreateNewUser([FromHeader] string name = "", [FromHeader] string userName = "",
                                                 [FromHeader] string pwd = "", [FromHeader] string email = "",
                                                 [FromHeader] int role = short.MaxValue) {
             if (name.Equals("") || userName.Equals("") || pwd.Equals("") || email.Equals("") || role.Equals(short.MaxValue)) {
                 return BadRequest("Notwendiger Parameter fehlt!");
+            }
+            long existingUsers = Convert.ToInt64(_db.Query("SELECT COUNT(*) FROM essenskasse.User;").Rows[0][0]);
+            if (existingUsers > 0) {
+                SessionInfo? caller = SessionAuth.Authenticate(HttpContext);
+                if (caller is null) {
+                    return Unauthorized();
+                }
+                if (!SessionAuth.IsAdmin(HttpContext, caller)) {
+                    return StatusCode(StatusCodes.Status403Forbidden);
+                }
             }
             using (Operation.Time($"CreateNewUser {name}, {userName}, {pwd}, {email}, {role}")) {
                 U.User user = new U.User(name, userName, pwd, email, role);
@@ -47,13 +60,22 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpPut, Route("update")]
+        [RequireSession, HttpPut, Route("update")]
         public IActionResult UpdateUser([FromHeader] Guid guid = new Guid(),
                                                 [FromHeader] string name = "", [FromHeader] string userName = "",
                                                 [FromHeader] string pwd = "", [FromHeader] string email = "",
                                                 [FromHeader] int role = short.MaxValue) {
             using (Operation.Time("UpdateUser")) {
                 Log.Information("UpdateUser called");
+
+                // Benutzer duerfen nur sich selbst aendern, Administratoren jeden.
+                // Die Rolle darf nur ein Administrator aendern (sonst koennte sich jeder zum Admin machen).
+                SessionInfo caller = SessionAuth.Authenticate(HttpContext)!;
+                bool callerIsAdmin = SessionAuth.IsAdmin(HttpContext, caller);
+                if (!callerIsAdmin && (caller.UserGuid != guid || role < short.MaxValue)) {
+                    Log.Warning($"UpdateUser by {caller.UserGuid} for {guid} denied");
+                    return StatusCode(StatusCodes.Status403Forbidden);
+                }
 
                 string queryStringRequestUser = $"" +
                     $"SELECT * " +
@@ -107,7 +129,7 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
-        [HttpGet, Route("exist")]
+        [RequireSession, HttpGet, Route("exist")]
         public IActionResult CheckIfExist([FromHeader] string name = "", [FromHeader] string userName = "",
                                             [FromHeader] string email = "", [FromHeader] bool withResult = false) {
             using (Operation.Time($"Check if User exist: {name}, {userName}, {email}")) {
