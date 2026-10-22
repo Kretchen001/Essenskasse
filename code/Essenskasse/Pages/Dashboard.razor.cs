@@ -41,6 +41,12 @@ namespace Essenskasse.Pages {
         private List<Person> person = new List<Person>();
         private List<int> positivSaldo = new List<int>();
 
+        /// <summary>Personen, deren Saldo unter dem Dashboard-Limit liegt.</summary>
+        private List<Person> NoticeablePersons => person.Where((x, i) => !positivSaldo.Contains(i)).ToList();
+
+        /// <summary>Personen, deren Saldo ueber dem Dashboard-Limit liegt.</summary>
+        private List<Person> InconspicuousPersons => person.Where((x, i) => positivSaldo.Contains(i)).ToList();
+
         private Money currentCashBalance = new Money(0, 0);
 
         protected override async Task OnInitializedAsync() {
@@ -67,6 +73,7 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 person.Clear();
+                positivSaldo.Clear(); // sonst bleiben die Indizes nach "Saldo neu berechnen" veraltet bzw. doppelt erhalten
                 person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
                 person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
                 person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
