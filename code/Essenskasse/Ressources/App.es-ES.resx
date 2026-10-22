@@ -959,4 +959,7 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="changeTabsLabel" xml:space="preserve">
     <value>Tipo de asiento</value>
   </data>
+  <data name="changePersonField" xml:space="preserve">
+    <value>Persona</value>
+  </data>
 </root>

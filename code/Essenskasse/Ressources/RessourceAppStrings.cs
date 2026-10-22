@@ -283,5 +283,6 @@
         changeNotChanged,
         changeTokenMissing,
         changeTabsLabel,
+        changePersonField,
     }
 }

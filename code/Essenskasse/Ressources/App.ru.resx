@@ -959,4 +959,7 @@
   <data name="changeTabsLabel" xml:space="preserve">
     <value>Тип записи</value>
   </data>
+  <data name="changePersonField" xml:space="preserve">
+    <value>Человек</value>
+  </data>
 </root>

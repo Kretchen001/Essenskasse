@@ -959,4 +959,7 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="changeTabsLabel" xml:space="preserve">
     <value>Art der Buchung</value>
   </data>
+  <data name="changePersonField" xml:space="preserve">
+    <value>Person</value>
+  </data>
 </root>

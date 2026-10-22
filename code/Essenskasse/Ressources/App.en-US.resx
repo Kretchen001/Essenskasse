@@ -959,4 +959,7 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="changeTabsLabel" xml:space="preserve">
     <value>Type of entry</value>
   </data>
+  <data name="changePersonField" xml:space="preserve">
+    <value>Person</value>
+  </data>
 </root>

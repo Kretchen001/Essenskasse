@@ -56,4 +56,8 @@
     .ek-chg .ek-hist li .ek-hist-amount {
         order: 2;
     }
+
+    .ek-dash .ek-chg-edit {
+        order: 3;
+    }
 }

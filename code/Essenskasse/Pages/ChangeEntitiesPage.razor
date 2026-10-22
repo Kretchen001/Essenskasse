@@ -133,7 +133,7 @@
                         }
 
                         <label class="ek-field @(PersonChanged ? "is-changed" : "")">
-                            <span>@_loc[nameof(RessourceAppStrings.person)]</span>
+                            <span>@_loc[nameof(RessourceAppStrings.changePersonField)]</span>
                             <select class="ek-select" disabled="@(PersonList.Count == 0)" @bind="personChoice">
                                 @foreach (Person p in PersonList) {
                                     <option value="@p.Guid">@p.Name</option>
