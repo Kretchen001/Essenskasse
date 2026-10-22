@@ -71,24 +71,28 @@ namespace EssenskasseAPI.Controllers {
             }
             string dirForBackup = $"{AppDomain.CurrentDomain.BaseDirectory}backup/{identifier}";
 
-            //check if the backup-files exist -> if not then add false and so ignore them
-            List<bool> fileExist = [];
-            fileExist.Add(System.IO.File.Exists(dirForBackup + "/person.json"));
-            fileExist.Add(System.IO.File.Exists(dirForBackup + "/provider.json"));
-            fileExist.Add(System.IO.File.Exists(dirForBackup + "/payment.json"));
-            fileExist.Add(System.IO.File.Exists(dirForBackup + "/order.json"));
-            fileExist.Add(System.IO.File.Exists(dirForBackup + "/transactionProcedure.json"));
-            fileExist.Add(System.IO.File.Exists(dirForBackup + "/settings.json"));
+            // Zuerst alle vorhandenen Dateien lesen und auswerten (fehlende Dateien werden ignoriert).
+            // Ist eine Datei beschaedigt, ist die Datenbank noch unberuehrt.
+            List<Person>? persons = ReadBackupFile<List<Person>>(dirForBackup, "person.json");
+            List<Tuple<Provider, bool>>? providers = ReadBackupFile<List<Tuple<Provider, bool>>>(dirForBackup, "provider.json");
+            List<Payment>? payments = ReadBackupFile<List<Payment>>(dirForBackup, "payment.json");
+            List<Order>? orders = ReadBackupFile<List<Order>>(dirForBackup, "order.json");
+            List<TransactionProcedure>? transactionProcedures = ReadBackupFile<List<TransactionProcedure>>(dirForBackup, "transactionProcedure.json");
+            List<Tuple<Guid, Settings>>? settings = ReadBackupFile<List<Tuple<Guid, Settings>>>(dirForBackup, "settings.json");
 
-            //read json's if there and restore
-            if (fileExist[0]) {
-                List<Person> persons = JsonConvert.DeserializeObject<List<Person>>(System.IO.File.ReadAllText(dirForBackup + "/person.json")) ?? [];
-                _db.Query("TRUNCATE essenskasse.Person;");
+            // Alles in einer Transaktion: bei einem Fehler bleibt die Datenbank im alten Zustand.
+            // (TRUNCATE ging dafuer nicht, es bestaetigt sofort; deshalb DELETE.)
+            // Fremdschluessel-Pruefung aus, weil die Tabellen komplett ersetzt werden; das Backup
+            // selbst ist in sich konsistent.
+            using DbScope tx = _db.BeginTransaction(disableForeignKeyChecks: true);
+
+            if (persons is not null) {
+                tx.Query("DELETE FROM essenskasse.Person;");
                 foreach (Person x in persons) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
                         $"VALUES (@guid, @name, @email, @euro, @cent);";
-                    _db.Query(queryStringInsert,
+                    tx.Query(queryStringInsert,
                         Db.P("@guid", x.Guid),
                         Db.P("@name", Uri.UnescapeDataString(x.Name)),
                         Db.P("@email", Uri.UnescapeDataString(x.Email)),
@@ -96,27 +100,25 @@ namespace EssenskasseAPI.Controllers {
                         Db.P("@cent", x.Saldo.Cent));
                 }
             }
-            if (fileExist[1]) {
-                List<Tuple<Provider, bool>> providers = JsonConvert.DeserializeObject<List<Tuple<Provider, bool>>>(System.IO.File.ReadAllText(dirForBackup + "/provider.json")) ?? [];
-                _db.Query("TRUNCATE essenskasse.Provider;");
+            if (providers is not null) {
+                tx.Query("DELETE FROM essenskasse.Provider;");
                 foreach (Tuple<Provider, bool> x in providers) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.Provider (Guid, Designation, Sichtbar) " +
                         $"VALUES (@guid, @designation, @visible);";
-                    _db.Query(queryStringInsert,
+                    tx.Query(queryStringInsert,
                         Db.P("@guid", x.Item1.Guid),
                         Db.P("@designation", x.Item1.Designation),
                         Db.P("@visible", x.Item2));
                 }
             }
-            if (fileExist[2]) {
-                List<Payment> payments = JsonConvert.DeserializeObject<List<Payment>>(System.IO.File.ReadAllText(dirForBackup + "/payment.json")) ?? [];
-                _db.Query("TRUNCATE essenskasse.Payment;");
+            if (payments is not null) {
+                tx.Query("DELETE FROM essenskasse.Payment;");
                 foreach (Payment x in payments) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment) " +
                         $"VALUES (@dateTime, @euro, @cent, @person, @comment);";
-                    _db.Query(queryStringInsert,
+                    tx.Query(queryStringInsert,
                         Db.P("@dateTime", x.DateTime.Ticks),
                         Db.P("@euro", x.Amount.Euro),
                         Db.P("@cent", x.Amount.Cent),
@@ -124,14 +126,13 @@ namespace EssenskasseAPI.Controllers {
                         Db.P("@comment", x.Comment));
                 }
             }
-            if (fileExist[3]) {
-                List<Order> orders = JsonConvert.DeserializeObject<List<Order>>(System.IO.File.ReadAllText(dirForBackup + "/order.json")) ?? [];
-                _db.Query("TRUNCATE essenskasse.Order;");
+            if (orders is not null) {
+                tx.Query("DELETE FROM essenskasse.Order;");
                 foreach (Order x in orders) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson) " +
                         $"VALUES (@dateTime, @euro, @cent, @providerGuid, @providerDesignation, @person);";
-                    _db.Query(queryStringInsert,
+                    tx.Query(queryStringInsert,
                         Db.P("@dateTime", x.DateTime.Ticks),
                         Db.P("@euro", x.Money.Euro),
                         Db.P("@cent", x.Money.Cent),
@@ -140,24 +141,21 @@ namespace EssenskasseAPI.Controllers {
                         Db.P("@person", x.ReferencedPerson));
                 }
             }
-            if (fileExist[4]) {
-                List<TransactionProcedure> transactionProcedures = JsonConvert.DeserializeObject<List<TransactionProcedure>>(System.IO.File.ReadAllText(dirForBackup + "/transactionProcedure.json")) ?? [];
-
-                _db.Query("TRUNCATE essenskasse.TransactionProcedure");
+            if (transactionProcedures is not null) {
+                tx.Query("DELETE FROM essenskasse.TransactionProcedure;");
                 foreach (TransactionProcedure x in transactionProcedures) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.TransactionProcedure (DateTime, AmountEuro, AmountCent, Comment) " +
                         $"VALUES (@dateTime, @euro, @cent, @comment);";
-                    _db.Query(queryStringInsert,
+                    tx.Query(queryStringInsert,
                         Db.P("@dateTime", x.DateTime.Ticks),
                         Db.P("@euro", x.Amount.Euro),
                         Db.P("@cent", x.Amount.Cent),
                         Db.P("@comment", x.Comment));
                 }
             }
-            if (fileExist[5]) {
-                List<Tuple<Guid, Settings>> settings = JsonConvert.DeserializeObject<List<Tuple<Guid, Settings>>>(System.IO.File.ReadAllText(dirForBackup + "/settings.json")) ?? [];
-                _db.Query("TRUNCATE essenskasse.SettingsUser;");
+            if (settings is not null) {
+                tx.Query("DELETE FROM essenskasse.SettingsUser;");
                 foreach (Tuple<Guid, Settings> x in settings) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
@@ -167,7 +165,7 @@ namespace EssenskasseAPI.Controllers {
                         $"VALUES (@userGuid, @singleList, @loadPayment, @loadOrder, @showProvider, " +
                                             $"@moneyLimit, @showPerson, @accessToken, " +
                                             $"@adminEmail, @rightSide, @sendMail);";
-                    _db.Query(queryStringInsert,
+                    tx.Query(queryStringInsert,
                         Db.P("@userGuid", x.Item1),
                         Db.P("@singleList", x.Item2.IsSingleListWishDashboard),
                         Db.P("@loadPayment", x.Item2.LoadAmountPayment),
@@ -181,11 +179,21 @@ namespace EssenskasseAPI.Controllers {
                         Db.P("@sendMail", x.Item2.SendConfirmationMail));
                 }
             }
+            tx.Commit();
             return Ok();
         }
         #endregion
 
         #region InternalFunctions
+        /// <summary>Liest eine Backup-Datei als JSON. <c>null</c>, wenn die Datei fehlt.</summary>
+        private static T? ReadBackupFile<T>(string directory, string fileName) where T : class, new() {
+            string path = directory + "/" + fileName;
+            if (!System.IO.File.Exists(path)) {
+                return null;
+            }
+            return JsonConvert.DeserializeObject<T>(System.IO.File.ReadAllText(path)) ?? new T();
+        }
+
         private static List<Person> DataTableToListOfPerson(DataTable dataTable) {
             List<Person> personList = [];
             foreach (DataRow row in dataTable.Rows) {

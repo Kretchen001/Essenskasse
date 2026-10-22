@@ -12,11 +12,19 @@ namespace EssenskasseAPI.Data {
 
         private readonly MySqlConnection _connection;
         private readonly MySqlTransaction _transaction;
+        private readonly bool _foreignKeyChecksDisabled;
 
-        internal DbScope(string connectionString) {
+        internal DbScope(string connectionString, bool disableForeignKeyChecks = false) {
             _connection = new MySqlConnection(connectionString);
             try {
                 _connection.Open();
+                if (disableForeignKeyChecks) {
+                    // Sitzungsvariable, gilt nur fuer diese Verbindung; wird in Dispose zurueckgesetzt
+                    // (Verbindungen kommen in einen Pool und wuerden die Einstellung sonst behalten).
+                    using MySqlCommand cmd = new MySqlCommand("SET FOREIGN_KEY_CHECKS=0;", _connection);
+                    cmd.ExecuteNonQuery();
+                    _foreignKeyChecksDisabled = true;
+                }
                 _transaction = _connection.BeginTransaction();
             }
             catch {
@@ -45,6 +53,16 @@ namespace EssenskasseAPI.Data {
         /// <summary>Beendet die Transaktion; nicht bestaetigte Aenderungen werden zurueckgerollt.</summary>
         public void Dispose() {
             _transaction.Dispose();
+            if (_foreignKeyChecksDisabled) {
+                try {
+                    using MySqlCommand cmd = new MySqlCommand("SET FOREIGN_KEY_CHECKS=1;", _connection);
+                    cmd.ExecuteNonQuery();
+                }
+                catch {
+                    // Ist die Verbindung kaputt, wird sie nicht in den Pool zurueckgegeben.
+                    MySqlConnection.ClearPool(_connection);
+                }
+            }
             _connection.Dispose();
         }
     }

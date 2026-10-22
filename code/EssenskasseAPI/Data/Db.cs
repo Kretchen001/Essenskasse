@@ -37,8 +37,11 @@ namespace EssenskasseAPI.Data {
 
         /// <summary>Startet eine Transaktion. Verwendung:
         /// <code>using DbScope tx = db.BeginTransaction(); ... tx.Query(...); tx.Commit();</code></summary>
-        public DbScope BeginTransaction() {
-            return new DbScope(_connectionString);
+        /// <param name="disableForeignKeyChecks">Schaltet die Fremdschluessel-Pruefung fuer diese Verbindung aus
+        /// (nur fuer das Wiederherstellen eines kompletten Backups gedacht, bei dem Tabellen leer geraeumt und
+        /// neu gefuellt werden). Sie wird am Ende wieder eingeschaltet.</param>
+        public DbScope BeginTransaction(bool disableForeignKeyChecks = false) {
+            return new DbScope(_connectionString, disableForeignKeyChecks);
         }
 
         /// <summary>Erzeugt einen SQL-Parameter. Guid wird als Text (Format D) uebergeben,
