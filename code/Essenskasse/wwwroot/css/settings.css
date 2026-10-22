@@ -1,9 +1,5 @@
 /* Einstellungsseite: Abschnitte mit farbigem Verlaufsbalken (Farben der frueheren Zeilen als Anregung). */
 
-.ek-set-page {
-    max-width: 52rem;
-}
-
 .ek-set {
     --ek-accent: linear-gradient(90deg, #e0dede 0%, #d4d4d4 35%, #999999 70%, #6a6a6a 100%);
     margin: 0 0 1.25rem;
@@ -118,6 +114,23 @@
 
 .ek-dash .ek-set .ek-select {
     background-color: var(--ek-surface);
+}
+
+/* Hover und Tastaturfokus gut sichtbar (gewinnt gegen die Theme-Farben) */
+.ek-dash .ek-set .ek-btn,
+.ek-dash .ek-set .ek-select {
+    transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.ek-dash .ek-set .ek-btn:hover,
+.ek-dash .ek-set .ek-select:hover {
+    border-color: var(--ek-focus);
+    background-color: var(--ek-surface-2, rgba(128, 128, 128, 0.16));
+    box-shadow: 0 0 0 2px var(--ek-focus);
+}
+
+.ek-dash .ek-set .ek-btn:active {
+    transform: translateY(1px);
 }
 
 @media (max-width: 575.98px) {

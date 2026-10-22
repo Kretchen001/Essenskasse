@@ -3,7 +3,7 @@
 @inject IStringLocalizer<App> _loc
 
 <span>
-    <select @onchange="NewCultureSelectedAsync">
+    <select class="ek-select" aria-label="@_loc[nameof(RessourceAppStrings.language)]" @onchange="NewCultureSelectedAsync">
         @foreach (var culture in LocalizerSettings.SupportedCultures) {
             @if (SelectedCulture != null && culture == SelectedCulture) {
                 <option selected value="@culture.Culture">@culture.Name</option>

@@ -327,16 +327,22 @@ namespace Essenskasse.Pages {
                     }
                 };
 
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-            if (response.IsSuccessStatusCode) {
-                AppData.AccessToken = new Guid((await response.Content.ReadAsStringAsync())[1..^1]); // ()[1..^1] remove first and last character of String
-                SaveAccessToken(AppData.AccessToken ?? new Guid("00000000-0000-0000-0000-000000000000"));
-                base.StateHasChanged();
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
+                string text = (await response.Content.ReadAsStringAsync()).Trim().Trim('"');
+                if (response.IsSuccessStatusCode && Guid.TryParse(text, out Guid token)) {
+                    // Nur das Token wird gesetzt; alle anderen Einstellungen bleiben unveraendert.
+                    AppData.AccessToken = token;
+                    SaveAccessToken(token);
+                }
+                else {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+                }
             }
-            else {
+            catch (Exception) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
             }
+            await InvokeAsync(StateHasChanged);
         }
 
         /// <summary></summary>
@@ -350,7 +356,13 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <param name="value"></param>
         private async void SaveAccessToken(Guid value) {
-            await LocalStorage.SetItemAsync<Guid>("AccessToken", value);
+            try {
+                await LocalStorage.SetItemAsync<Guid>("AccessToken", value);
+            }
+            catch (Exception) {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSaveError)], ToastLevel.Error);
+                return;
+            }
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessRequestedAndSaved)], ToastLevel.Success);
         }
 
