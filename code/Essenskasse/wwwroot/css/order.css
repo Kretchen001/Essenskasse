@@ -177,8 +177,68 @@
     border-top: 1px dashed var(--ek-line);
 }
 
-.ek-ord-submit {
+/* Feste Leiste mit Summe und Absenden */
+.ek-ord-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
     margin-top: 1rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 12px;
+    background: var(--ek-surface);
+    box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.ek-ord-bar-text {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Bestaetigung */
+.ek-ord-prev-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0 0 0.6rem;
+    color: var(--ek-muted);
+}
+
+.ek-ord-prev-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--ek-line);
+    border-radius: 10px;
+}
+
+    .ek-ord-prev-list li {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.45rem 0.8rem;
+        border-top: 1px solid var(--ek-line);
+    }
+
+        .ek-ord-prev-list li:first-child {
+            border-top: 0;
+        }
+
+.ek-ord-prev-sum {
+    margin: 0.7rem 0 0;
+    text-align: right;
+}
+
+/* Die Theme-Dateien faerben jeden button: Chips und Knoepfe behalten ihre Farben */
+.ek-dash .ek-ord-page .ek-chip:not(.is-active) {
+    background-color: transparent;
+    color: var(--ek-text);
+    border-color: var(--ek-line-strong);
 }
 
 @media (pointer: coarse) {

@@ -109,11 +109,44 @@
                     </div>
                 }
 
-                <div class="ek-ord-submit">
-                    <button type="button" class="ek-btn ek-btn-primary" disabled="@isSubmitting" @onclick="PostOrderForTheDay">
-                        @_loc[nameof(RessourceAppStrings.submit)] @_loc[nameof(RessourceAppStrings.order)]
+                <div class="ek-ord-bar" role="region" aria-label="@_loc[nameof(RessourceAppStrings.order)]">
+                    <p class="ek-ord-bar-text">
+                        <strong>@Entries.Count</strong> @_loc[nameof(RessourceAppStrings.orderPersonsLabel)]
+                        <span aria-hidden="true">·</span>
+                        @_loc[nameof(RessourceAppStrings.orderSumLabel)] <strong>@Modells.Money.FromTotalCents(TotalCents).ToString()</strong>
+                    </p>
+                    <button type="button" class="ek-btn ek-btn-primary" disabled="@(isSubmitting || Entries.Count == 0)" @onclick="OpenPreview">
+                        @_loc[nameof(RessourceAppStrings.orderReview)]
                     </button>
                 </div>
+
+                <EkDialog Open="previewOpen" Title="@_loc[nameof(RessourceAppStrings.orderPreviewTitle)]" OnClose="ClosePreview">
+                    <ChildContent>
+                        <p class="ek-ord-prev-meta">
+                            <span>@selectedDate.ToString("dddd, dd.MM.yyyy")</span>
+                            <span aria-hidden="true">·</span>
+                            <span>@SelectedProviderData?.Designation</span>
+                        </p>
+                        @if (existingOrdersOnDay > 0) {
+                            <p class="ek-hint is-warn" role="alert">@string.Format(_loc[nameof(RessourceAppStrings.orderExistingWarn)], existingOrdersOnDay)</p>
+                        }
+                        <ul class="ek-ord-prev-list">
+                            @foreach ((Person x, long cents) in Entries) {
+                                <li>
+                                    <span>@x.Name</span>
+                                    <span class="ek-hist-amount">@Modells.Money.FromTotalCents(cents).ToString()</span>
+                                </li>
+                            }
+                        </ul>
+                        <p class="ek-ord-prev-sum">
+                            @_loc[nameof(RessourceAppStrings.orderSumLabel)]: <strong>@Modells.Money.FromTotalCents(TotalCents).ToString()</strong>
+                        </p>
+                    </ChildContent>
+                    <Footer>
+                        <button type="button" class="ek-btn" disabled="@isSubmitting" @onclick="ClosePreview">@_loc[nameof(RessourceAppStrings.cancel)]</button>
+                        <button type="button" class="ek-btn ek-btn-primary" disabled="@isSubmitting" @onclick="ConfirmOrder">@_loc[nameof(RessourceAppStrings.orderConfirmNow)]</button>
+                    </Footer>
+                </EkDialog>
 
                 @*<button class="btn btn-primary" @onclick="() => ModalDialog.Open()">Click me!</button>*@
                 <HistoryModalCard @ref="@ModalDialog" Title="@ModalTitle">

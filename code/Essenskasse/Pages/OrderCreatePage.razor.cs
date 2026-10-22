@@ -234,89 +234,112 @@ namespace Essenskasse.Pages {
             amountTexts.Clear();
         }
 
-        /// <summary></summary>
-        private async Task PostOrderForTheDay() {
+        private bool previewOpen = false;
+        private int existingOrdersOnDay = 0;
+
+        /// <summary>Alle Personen mit eingetragenem Betrag groesser 0 samt Betrag in Cent.</summary>
+        private List<(Person Person, long Cents)> Entries {
+            get {
+                List<(Person, long)> result = [];
+                foreach (Person x in person) {
+                    TryAmountCents(x.Guid, out long cents);
+                    if (cents > 0) {
+                        result.Add((x, cents));
+                    }
+                }
+                return result;
+            }
+        }
+
+        private long TotalCents => Entries.Sum(x => x.Cents);
+
+        private Provider? SelectedProviderData => providers.Find(x => x.Guid.Equals(selectedProvider));
+
+        private void ClosePreview() {
+            previewOpen = false;
+        }
+
+        /// <summary>Prueft die Eingaben, fragt die vorhandenen Bestellungen des Tages ab und oeffnet die Bestaetigung.</summary>
+        private async Task OpenPreview() {
             if (isSubmitting) {
+                return;
+            }
+            if (SelectedProviderData is null) {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.orderNoProvider)], ToastLevel.Info);
                 return;
             }
             if (person.Any(x => IsInvalid(x.Guid))) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastMoneyFormatInvalid)], ToastLevel.Warning);
                 return;
             }
+            if (Entries.Count == 0) {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNobodyHasChanges)], ToastLevel.Info);
+                return;
+            }
             isSubmitting = true;
             try {
-                await PostOrderForTheDayCore();
+                HttpResponseMessage response = await HttpClient.SendAsync(new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "order/requestDate"),
+                    Headers = { { "dateString", selectedDate.Date.ToString("yyyy-MM-ddTHH:mm:ss.fffK") } }
+                });
+                if (!response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+                existingOrdersOnDay = int.Parse(await response.Content.ReadAsStringAsync());
+                previewOpen = true;
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
             }
             finally {
                 isSubmitting = false;
             }
         }
 
-        /// <summary></summary>
-        private async Task PostOrderForTheDayCore() {
-            // request Date
-            HttpRequestMessage httpRequestMessageDate = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "order/requestDate"),
-                Headers = {
-                    { "dateString", selectedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffK") }
-                }
-            };
-
-            HttpResponseMessage responseDate = await HttpClient.SendAsync(httpRequestMessageDate);
-
-            int res = 0;
-            if (!responseDate.IsSuccessStatusCode) {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-            }
-            else {
-                res = Int32.Parse(await responseDate.Content.ReadAsStringAsync());
-                if (res != 0) {
-                    if (!(await JSRuntime.InvokeAsync<bool>("confirm",
-                                                            String.Format(
-                                                                format: "An diesem Tag wurde(n) bereits {0} Bestellung(en) vorgefunden.\n" +
-                                                                        "Dennoch eintragen? (Ja)",
-                                                                arg0: res)))) {
-                        return;
-                    }
-                }
-            }
-
-            // collect orders
-            List<Order> orders = new List<Order>();
-            Provider p = providers.Find(x => x.Guid.Equals(selectedProvider))!;
-            foreach (Person x in person) {
-                TryAmountCents(x.Guid, out long cents);
-                if (cents > 0) {
-                    orders.Add(new Order(
-                        dateTime: selectedDate.Date.AddMilliseconds(orders.Count + res),
-                        money: Money.FromTotalCents(cents),
-                        provider: p,
-                        referencedPerson: x.Guid
-                    ));
-                }
-            }
-
-            if (orders.Count == 0) {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNobodyHasChanges)], ToastLevel.Info);
+        /// <summary>Sendet die Bestellungen der Bestaetigung ab (alles oder nichts, das erledigt die API).</summary>
+        private async Task ConfirmOrder() {
+            if (isSubmitting) {
                 return;
             }
-
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(Config["API-Adress"] + "order/insertNewList"),
-                Content = new StringContent(JsonConvert.SerializeObject(orders), Encoding.UTF8, "application/json")
-            };
-
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-            if (!response.IsSuccessStatusCode) {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Error);
+            Provider? provider = SelectedProviderData;
+            List<(Person Person, long Cents)> entries = Entries;
+            if (provider is null || entries.Count == 0) {
+                previewOpen = false;
+                return;
             }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
-                ClearAllAmounts();
-                await LoadLastAmounts();
+            isSubmitting = true;
+            try {
+                List<Order> orders = [];
+                foreach ((Person x, long cents) in entries) {
+                    orders.Add(new Order(
+                        dateTime: selectedDate.Date.AddMilliseconds(orders.Count + existingOrdersOnDay),
+                        money: Money.FromTotalCents(cents),
+                        provider: provider,
+                        referencedPerson: x.Guid));
+                }
+                HttpResponseMessage response = await HttpClient.SendAsync(new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "order/insertNewList"),
+                    Content = new StringContent(JsonConvert.SerializeObject(orders), Encoding.UTF8, "application/json")
+                });
+                if (response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
+                    previewOpen = false;
+                    ClearAllAmounts();
+                    await LoadLastAmounts();
+                    await RequestAllPerson(); // neue Salden anzeigen
+                }
+                else {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Error);
+                }
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+            }
+            finally {
+                isSubmitting = false;
             }
         }
 
