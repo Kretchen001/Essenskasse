@@ -42,8 +42,13 @@
                     <div class="ek-field ek-ord-date">
                         <span>@_loc[nameof(RessourceAppStrings.date)]</span>
                         <div class="ek-ord-date-row">
-                            <button type="button" class="ek-chip @(IsDate(0) ? "is-active" : "")" @onclick="() => SetDateOffset(0)">@_loc[nameof(RessourceAppStrings.orderDateToday)]</button>
-                            <button type="button" class="ek-chip @(IsDate(-1) ? "is-active" : "")" @onclick="() => SetDateOffset(-1)">@_loc[nameof(RessourceAppStrings.orderDateYesterday)]</button>
+                            @foreach (DateTime day in ThisWeek) {
+                                <button type="button" class="ek-chip ek-day @(selectedDate.Date == day ? "is-active" : "") @(day == DateTime.Today ? "is-today" : "")"
+                                        aria-pressed="@((selectedDate.Date == day).ToString().ToLowerInvariant())"
+                                        title="@day.ToString("dddd, dd.MM.yyyy")" @onclick="() => SetDate(day)">
+                                    @day.ToString("ddd dd.")
+                                </button>
+                            }
                             <input type="date" class="ek-input" aria-label="@_loc[nameof(RessourceAppStrings.date)]" @bind="SelectedDateValue" />
                         </div>
                     </div>

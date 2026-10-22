@@ -28,6 +28,12 @@
     gap: 0.5rem;
 }
 
+/* Tage der aktuellen Woche: heute ist unterstrichen, auch wenn ein anderer Tag gewaehlt ist */
+.ek-dash .ek-ord-page .ek-day.is-today {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 @media (max-width: 719.98px) {
     .ek-ord-head {
         grid-template-columns: minmax(0, 1fr);

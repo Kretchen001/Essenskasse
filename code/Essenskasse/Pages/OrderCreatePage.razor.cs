@@ -84,10 +84,11 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private bool IsDate(int dayOffset) => selectedDate.Date == DateTime.Today.AddDays(dayOffset);
+        /// <summary>Montag bis Sonntag der aktuellen Woche (es wird woechentlich abgerechnet).</summary>
+        private IReadOnlyList<DateTime> ThisWeek => WeekDays.OfWeek(DateTime.Today);
 
-        private void SetDateOffset(int dayOffset) {
-            selectedDate = DateTime.Today.AddDays(dayOffset);
+        private void SetDate(DateTime day) {
+            selectedDate = day.Date;
         }
 
         private async Task ShowView(OrderView target) {
