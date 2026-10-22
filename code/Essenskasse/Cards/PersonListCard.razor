@@ -8,6 +8,7 @@
     <span class="ek-avatar" aria-hidden="true">@Initials</span>
     @if (isEditing) {
         <div class="ek-person-edit">
+            <h3 class="ek-edit-title">@_loc[nameof(RessourceAppStrings.editPerson)]</h3>
             <label class="ek-field @(NameChanged ? "is-changed" : "")">
                 <span>@_loc[nameof(RessourceAppStrings.name)] @(NameChanged ? "•" : "")</span>
                 <input type="text" class="ek-input" @bind="editName" @bind:event="oninput" @onkeydown="OnEditKeyDown" autocomplete="off" />
