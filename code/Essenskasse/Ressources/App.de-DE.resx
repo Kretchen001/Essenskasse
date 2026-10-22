@@ -525,4 +525,16 @@
   <data name="yes" xml:space="preserve">
     <value>Ja</value>
   </data>
+  <data name="accessDenied" xml:space="preserve">
+    <value>Zugriff verweigert</value>
+  </data>
+  <data name="accessDeniedHint" xml:space="preserve">
+    <value>Die Personenverwaltung ist nur nach der Anmeldung verfügbar.</value>
+  </data>
+  <data name="signIn" xml:space="preserve">
+    <value>Anmelden</value>
+  </data>
+  <data name="backToDashboard" xml:space="preserve">
+    <value>Zum Dashboard</value>
+  </data>
 </root>

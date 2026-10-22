@@ -139,5 +139,9 @@
         settingsSuccsessfullyRestored,
         requestSavedSettings,
         saveSettings,
+        accessDenied,
+        accessDeniedHint,
+        signIn,
+        backToDashboard,
     }
 }

@@ -28,6 +28,13 @@ namespace Essenskasse.Client {
             return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(identity)));
         }
 
+        /// <summary>Wird ausgeloest, wenn eine Seite den Anmeldedialog oeffnen moechte (z. B. "Zugriff verweigert").</summary>
+        public event Action? LoginRequested;
+
+        public void RequestLogin() {
+            LoginRequested?.Invoke();
+        }
+
         public void NotifyAuthenticationStateChanged() {
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }

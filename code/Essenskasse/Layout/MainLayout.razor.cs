@@ -20,6 +20,12 @@ namespace Essenskasse.Layout {
         private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
         protected override async Task OnInitializedAsync() {
+            AuthState.LoginRequested += () => {
+                if (LoginModel is not null) {
+                    ShowLoginModal();
+                    StateHasChanged();
+                }
+            };
             await CheckLogin();
             await CollectUserThemeAsync();
             await ReadLocalStorage();

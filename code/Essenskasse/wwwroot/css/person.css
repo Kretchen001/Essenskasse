@@ -1,0 +1,32 @@
+﻿/* Personenseite. Farben und Grundschrift kommen von .ek-dash (siehe dashboard.css). */
+
+/* ---------- Kein Zugriff ---------- */
+
+.ek-denied {
+    max-width: 34rem;
+    padding: 1.5rem 0;
+}
+
+.ek-denied-text {
+    margin: 0.5rem 0 1.25rem;
+    color: var(--ek-muted);
+    font-size: 1.05rem;
+}
+
+.ek-denied-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+/* Haupt-Knopf (die Standard-Knoepfe .ek-btn stehen in dashboard.css) */
+.ek-btn-primary {
+    border-color: transparent;
+    background: var(--ek-hero-bg);
+    color: var(--ek-hero-text);
+}
+
+    .ek-btn-primary:hover {
+        background: var(--ek-hero-bg);
+        border-color: var(--ek-line-strong);
+    }

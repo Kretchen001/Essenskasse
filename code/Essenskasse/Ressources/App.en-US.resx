@@ -525,4 +525,16 @@
   <data name="yes" xml:space="preserve">
     <value>Yes</value>
   </data>
+  <data name="accessDenied" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
+  <data name="accessDeniedHint" xml:space="preserve">
+    <value>Managing people is only available after you sign in.</value>
+  </data>
+  <data name="signIn" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="backToDashboard" xml:space="preserve">
+    <value>Back to dashboard</value>
+  </data>
 </root>

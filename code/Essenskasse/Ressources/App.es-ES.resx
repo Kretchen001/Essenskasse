@@ -525,4 +525,16 @@
   <data name="yes" xml:space="preserve">
     <value>Sí</value>
   </data>
+  <data name="accessDenied" xml:space="preserve">
+    <value>Acceso denegado</value>
+  </data>
+  <data name="accessDeniedHint" xml:space="preserve">
+    <value>La gestión de personas solo está disponible tras iniciar sesión.</value>
+  </data>
+  <data name="signIn" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="backToDashboard" xml:space="preserve">
+    <value>Volver al panel</value>
+  </data>
 </root>

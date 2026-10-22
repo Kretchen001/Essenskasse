@@ -525,4 +525,16 @@
   <data name="yes" xml:space="preserve">
     <value>Да</value>
   </data>
+  <data name="accessDenied" xml:space="preserve">
+    <value>Доступ запрещён</value>
+  </data>
+  <data name="accessDeniedHint" xml:space="preserve">
+    <value>Управление людьми доступно только после входа.</value>
+  </data>
+  <data name="signIn" xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="backToDashboard" xml:space="preserve">
+    <value>К панели</value>
+  </data>
 </root>
