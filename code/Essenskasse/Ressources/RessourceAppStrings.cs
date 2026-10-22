@@ -180,5 +180,11 @@
         restore,
         toastPersonRestored,
         noHiddenPersons,
+        noPersonsYet,
+        noPersonsYetHint,
+        noMatches,
+        resetFilter,
+        loadFailed,
+        retry,
     }
 }

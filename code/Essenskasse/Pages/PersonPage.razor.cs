@@ -12,6 +12,8 @@ namespace Essenskasse.Pages {
 
         private string dashboardLink = "/";
         private bool isAdding = false;
+        private bool isLoading = true;
+        private bool loadFailed = false;
         private bool showHidden = false;
         private List<Person> hiddenPersons = new List<Person>();
         private ElementReference newNameInput;
@@ -98,31 +100,51 @@ namespace Essenskasse.Pages {
         }
 
         private async Task RequestAllPersonFromApiAsync() {
-            // Request all Person, that are saved in the database
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
-            };
-
-            HttpResponseMessage? response = null;
+            isLoading = true;
+            loadFailed = false;
             try {
-                response = await HttpClient.SendAsync(httpRequestMessage);
-            }
-            catch {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
-            }
+                // Request all Person, that are saved in the database
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "person/requestAll")
+                };
 
-            if (response.IsSuccessStatusCode) {
-                person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
-                person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
-                person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
-                person = person.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
-                ApplyFilterAndSort();
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+                }
+                catch {
+                    loadFailed = true;
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+
+                if (response.IsSuccessStatusCode) {
+                    person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
+                    person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
+                    person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+                    person = person.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+                    ApplyFilterAndSort();
+                }
+                else {
+                    loadFailed = true;
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+                }
             }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+            finally {
+                isLoading = false;
             }
+        }
+
+        private async Task RetryLoadAsync() {
+            await RequestAllPersonFromApiAsync();
+        }
+
+        /// <summary>Setzt Suchtext und Schnellfilter zurueck.</summary>
+        private void ResetFilters() {
+            filter = "";
+            statusFilter = PersonStatusFilter.All;
+            ApplyFilterAndSort();
         }
 
         private static readonly Regex EmailPattern = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);

@@ -226,6 +226,59 @@
     opacity: 0.85;
 }
 
+/* Lade- und Leerzustand */
+.ek-empty {
+    padding: 2rem 1rem;
+    border: 1px dashed var(--ek-line-strong);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.ek-empty-title {
+    margin: 0 0 0.35rem;
+    font-size: 1.1rem;
+    font-weight: 650;
+}
+
+.ek-empty-text {
+    margin: 0;
+    color: var(--ek-muted);
+}
+
+.ek-empty .ek-btn {
+    margin-top: 0.6rem;
+}
+
+.ek-skeleton .ek-avatar,
+.ek-skeleton-line {
+    background: var(--ek-line);
+    animation: ek-pulse 1.2s ease-in-out infinite;
+}
+
+.ek-skeleton-line {
+    display: block;
+    height: 0.8rem;
+    margin: 0.35rem 0;
+    border-radius: 4px;
+}
+
+    .ek-skeleton-line.is-short {
+        width: 55%;
+    }
+
+@keyframes ek-pulse {
+    50% {
+        opacity: 0.45;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ek-skeleton .ek-avatar,
+    .ek-skeleton-line {
+        animation: none;
+    }
+}
+
 .ek-icon-warn:hover {
     border-color: var(--ek-bad);
     color: var(--ek-bad);

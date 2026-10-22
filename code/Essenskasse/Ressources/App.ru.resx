@@ -648,4 +648,22 @@
   <data name="noHiddenPersons" xml:space="preserve">
     <value>Скрытых людей нет</value>
   </data>
+  <data name="noPersonsYet" xml:space="preserve">
+    <value>Людей пока нет</value>
+  </data>
+  <data name="noPersonsYetHint" xml:space="preserve">
+    <value>Введите выше имя и e-mail и подтвердите клавишей Enter.</value>
+  </data>
+  <data name="noMatches" xml:space="preserve">
+    <value>Ничего не найдено</value>
+  </data>
+  <data name="resetFilter" xml:space="preserve">
+    <value>Сбросить фильтр</value>
+  </data>
+  <data name="loadFailed" xml:space="preserve">
+    <value>Не удалось загрузить людей.</value>
+  </data>
+  <data name="retry" xml:space="preserve">
+    <value>Повторить</value>
+  </data>
 </root>

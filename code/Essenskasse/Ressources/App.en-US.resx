@@ -648,4 +648,22 @@
   <data name="noHiddenPersons" xml:space="preserve">
     <value>No hidden people</value>
   </data>
+  <data name="noPersonsYet" xml:space="preserve">
+    <value>No people yet</value>
+  </data>
+  <data name="noPersonsYetHint" xml:space="preserve">
+    <value>Enter a name and email above and confirm with Enter.</value>
+  </data>
+  <data name="noMatches" xml:space="preserve">
+    <value>No matches</value>
+  </data>
+  <data name="resetFilter" xml:space="preserve">
+    <value>Reset filter</value>
+  </data>
+  <data name="loadFailed" xml:space="preserve">
+    <value>The people could not be loaded.</value>
+  </data>
+  <data name="retry" xml:space="preserve">
+    <value>Try again</value>
+  </data>
 </root>

@@ -96,11 +96,44 @@
                 </select>
             </label>
         </div>
-        <div class="ek-grid ek-people">
-            @foreach (Person x in shownPersonList) {
-                <PersonListCard Person="x" PositivSaldo="IsInconspicuous(x)" OnUpdated="OnPersonUpdated" OnHidden="OnPersonHidden" />
-            }
-        </div>
+        @if (isLoading) {
+            <div class="ek-grid ek-people" aria-busy="true" aria-live="polite">
+                @for (int i = 0; i < 6; i++) {
+                    <div class="ek-person ek-skeleton" aria-hidden="true">
+                        <span class="ek-avatar"></span>
+                        <div class="ek-person-text">
+                            <span class="ek-skeleton-line"></span>
+                            <span class="ek-skeleton-line is-short"></span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else if (loadFailed) {
+            <div class="ek-empty" role="alert">
+                <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.loadFailed)]</p>
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="RetryLoadAsync">@_loc[nameof(RessourceAppStrings.retry)]</button>
+            </div>
+        }
+        else if (person.Count == 0) {
+            <div class="ek-empty">
+                <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noPersonsYet)]</p>
+                <p class="ek-empty-text">@_loc[nameof(RessourceAppStrings.noPersonsYetHint)]</p>
+            </div>
+        }
+        else if (shownPersonList.Count == 0) {
+            <div class="ek-empty">
+                <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noMatches)]</p>
+                <button type="button" class="ek-btn" @onclick="ResetFilters">@_loc[nameof(RessourceAppStrings.resetFilter)]</button>
+            </div>
+        }
+        else {
+            <div class="ek-grid ek-people">
+                @foreach (Person x in shownPersonList) {
+                    <PersonListCard Person="x" PositivSaldo="IsInconspicuous(x)" OnUpdated="OnPersonUpdated" OnHidden="OnPersonHidden" />
+                }
+            </div>
+        }
 
         <button type="button" class="ek-btn ek-hidden-toggle" aria-expanded="@showHidden" @onclick="ToggleHiddenAsync">
             @(showHidden ? _loc[nameof(RessourceAppStrings.hideHiddenPersons)] : _loc[nameof(RessourceAppStrings.showHiddenPersons)])
