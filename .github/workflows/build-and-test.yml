@@ -7,7 +7,7 @@ on:
     branches: master
 
 env:
-  DOTNET_VERSION: '8.0.101' # The .NET SDK version to use
+  DOTNET_VERSION: '10.0.x' # The .NET SDK version to use
   SLN_NAME: Essenskasse.sln
 
 jobs:
