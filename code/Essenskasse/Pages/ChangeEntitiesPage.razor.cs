@@ -10,6 +10,7 @@ namespace Essenskasse.Pages {
 
     public partial class ChangeEntitiesPage {
 
+        private string dashboardLink = "/";
         private bool Loaded = false;
         private bool noMorePaymentsToLoad = false;
         private bool noMoreOrderToLoad = false;

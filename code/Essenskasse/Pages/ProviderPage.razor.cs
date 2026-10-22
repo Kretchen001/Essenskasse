@@ -8,6 +8,7 @@ namespace Essenskasse.Pages {
 
     public partial class ProviderPage {
 
+        private string dashboardLink = "/";
         private bool accessToAdd = false;
         private bool accessToDelete = false;
         private bool IsASC = true;

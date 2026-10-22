@@ -8,6 +8,7 @@ namespace Essenskasse.Pages {
     
     public partial class PersonPage {
 
+        private string dashboardLink = "/";
         private bool accessToAdd = false;
         private bool IsASC = true;
 

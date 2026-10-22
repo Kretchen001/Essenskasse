@@ -9,6 +9,7 @@ namespace Essenskasse.Pages {
 
     public partial class PaymentPage {
 
+        private string dashboardLink = "/";
         private List<Person>? person = new List<Person>();
         private Guid _selectedPerson;
         private Guid SelectedPerson {

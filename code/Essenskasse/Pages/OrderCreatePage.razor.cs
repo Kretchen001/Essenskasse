@@ -10,6 +10,7 @@ namespace Essenskasse.Pages {
 
     public partial class OrderCreatePage {
 
+        private string dashboardLink = "/";
         private HistoryModalCard? ModalDialog { get; set; }
 
         private List<Provider> providers = [];
