@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EssenskasseAPI.Data;
+using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -12,10 +13,10 @@ namespace EssenskasseAPI.Controllers {
     public class PersonController : ControllerBase {
 
         #region Config
-        private readonly IConfiguration Configuration;
+        private readonly Db _db;
 
         public PersonController(IConfiguration configuration) {
-            Configuration = configuration;
+            _db = new Db(configuration);
         }
         #endregion
 
@@ -28,7 +29,7 @@ namespace EssenskasseAPI.Controllers {
                     $"FROM essenskasse.Person " +
                     $"WHERE Sichtbar=true;";
 
-                DataTable dataTablePerson = QueryExecuterAtMySql(queryString);
+                DataTable dataTablePerson = _db.Query(queryString);
                 List<Person> persons = DataTableToListOfPerson(dataTablePerson);
 
                 if (persons is not null) {
@@ -49,9 +50,9 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.Person " +
-                    $"WHERE Guid='{guid}';";
+                    $"WHERE Guid=@guid;";
 
-                DataTable dataTablePerson = QueryExecuterAtMySql(queryString);
+                DataTable dataTablePerson = _db.Query(queryString, Db.P("@guid", guid));
                 List<Person> persons = DataTableToListOfPerson(dataTablePerson);
 
                 if (persons.Count == 1) {
@@ -84,13 +85,13 @@ namespace EssenskasseAPI.Controllers {
                     );
                 string queryStringInsert = $"" +
                     $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
-                    $"VALUES (" +
-                    $"'{newPerson.Guid}'," +
-                    $"'{newPerson.Name}', " +
-                    $"'{newPerson.Email}', " +
-                    $"{newPerson.Saldo.Euro}, " +
-                    $"{newPerson.Saldo.Cent});";
-                QueryExecuterAtMySql(queryStringInsert);
+                    $"VALUES (@guid, @name, @email, @saldoEuro, @saldoCent);";
+                _db.Query(queryStringInsert,
+                    Db.P("@guid", newPerson.Guid),
+                    Db.P("@name", newPerson.Name),
+                    Db.P("@email", newPerson.Email),
+                    Db.P("@saldoEuro", newPerson.Saldo.Euro),
+                    Db.P("@saldoCent", newPerson.Saldo.Cent));
                 return Ok(JsonConvert.SerializeObject(newPerson.Guid));
             }
         }
@@ -105,8 +106,8 @@ namespace EssenskasseAPI.Controllers {
                 string queryStringRequestPerson = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.Person " +
-                    $"WHERE Guid='{guid}';";
-                DataTable dataTablePersonToUpdate = QueryExecuterAtMySql(queryStringRequestPerson);
+                    $"WHERE Guid=@guid;";
+                DataTable dataTablePersonToUpdate = _db.Query(queryStringRequestPerson, Db.P("@guid", guid));
 
                 if (dataTablePersonToUpdate.Rows.Count == 1) {
                     Person personToUpdate = DataTableToListOfPerson(dataTablePersonToUpdate)[0];
@@ -119,11 +120,16 @@ namespace EssenskasseAPI.Controllers {
                         personToUpdate.Email = Uri.UnescapeDataString(email);
                     }
 
+                    // DataTableToListOfPerson liefert Name/Email URL-kodiert zurueck. Wurde ein Feld
+                    // nicht geaendert, muss es vor dem Speichern wieder dekodiert werden.
                     string queryStringPersonUpdate = $"" +
                         $"UPDATE essenskasse.Person " +
-                        $"SET Name='{personToUpdate.Name}', Email='{personToUpdate.Email}' " +
-                        $"WHERE Guid='{personToUpdate.Guid}';";
-                    QueryExecuterAtMySql(queryStringPersonUpdate);
+                        $"SET Name=@name, Email=@email " +
+                        $"WHERE Guid=@guid;";
+                    _db.Query(queryStringPersonUpdate,
+                        Db.P("@name", name is not null ? personToUpdate.Name : Uri.UnescapeDataString(personToUpdate.Name)),
+                        Db.P("@email", email is not null ? personToUpdate.Email : Uri.UnescapeDataString(personToUpdate.Email)),
+                        Db.P("@guid", personToUpdate.Guid));
 
                     Log.Information("Person successfully updated");
                     return Ok();
@@ -144,7 +150,7 @@ namespace EssenskasseAPI.Controllers {
                     $"SELECT * " +
                     $"FROM essenskasse.Person;";
 
-                DataTable dataTablePerson = QueryExecuterAtMySql(queryString);
+                DataTable dataTablePerson = _db.Query(queryString);
                 List<Person> persons = DataTableToListOfPerson(dataTablePerson);
 
                 foreach (Person person in persons) {
@@ -152,9 +158,9 @@ namespace EssenskasseAPI.Controllers {
                     string queryStringPayments = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Payment " +
-                        $"WHERE ReferencedPerson='{person.Guid}';";
+                        $"WHERE ReferencedPerson=@person;";
 
-                    DataTable dataTablePayments = QueryExecuterAtMySql(queryStringPayments);
+                    DataTable dataTablePayments = _db.Query(queryStringPayments, Db.P("@person", person.Guid));
                     List<Payment> payments = DataTableToListOfPayments(dataTablePayments);
 
                     Money paymentsAmount = new Money(0, 0);
@@ -166,9 +172,9 @@ namespace EssenskasseAPI.Controllers {
                     string queryStringOrders = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Order " +
-                        $"WHERE ReferencedPerson='{person.Guid}';";
+                        $"WHERE ReferencedPerson=@person;";
 
-                    DataTable dataTableOrders= QueryExecuterAtMySql(queryStringOrders);
+                    DataTable dataTableOrders= _db.Query(queryStringOrders, Db.P("@person", person.Guid));
                     List<Order> orders = DataTableToListOfOrders(dataTableOrders);
 
                     Money ordersAmount = new Money(0, 0);
@@ -180,9 +186,12 @@ namespace EssenskasseAPI.Controllers {
                     Money newSaldo = new Money().CalculateMoney(CalculationOperation.Substraction, paymentsAmount, ordersAmount)!;
                     string queryStringPersonUpdate = $"" +
                         $"UPDATE essenskasse.Person " +
-                        $"SET SaldoEuro={newSaldo.Euro}, SaldoCent={newSaldo.Cent} " +
-                        $"WHERE Guid='{person.Guid}';";
-                    QueryExecuterAtMySql(queryStringPersonUpdate);
+                        $"SET SaldoEuro=@euro, SaldoCent=@cent " +
+                        $"WHERE Guid=@guid;";
+                    _db.Query(queryStringPersonUpdate,
+                        Db.P("@euro", newSaldo.Euro),
+                        Db.P("@cent", newSaldo.Cent),
+                        Db.P("@guid", person.Guid));
 
                     Log.Information($"{person.Guid} saldo old {person.Saldo} to new {newSaldo}");
                 }
@@ -199,26 +208,26 @@ namespace EssenskasseAPI.Controllers {
                     string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Person " +
-                        $"WHERE Guid={guid}";
-                    DataTable dataTable = QueryExecuterAtMySql(queryString);
+                        $"WHERE Guid=@guid;";
+                    DataTable dataTable = _db.Query(queryString, Db.P("@guid", guid));
                     List<Person> persons = DataTableToListOfPerson(dataTable);
 
                     if (persons.Count == 1) {
                         if (per == false) {
                             string queryStringInvisible = $"" +
                                 $"UPDATE essenskasse.Person " +
-                                $"SET Sichtbarkeit=false " +
-                                $"WHERE Guid='{guid}';";
-                            QueryExecuterAtMySql(queryStringInvisible);
+                                $"SET Sichtbar=false " +
+                                $"WHERE Guid=@guid;";
+                            _db.Query(queryStringInvisible, Db.P("@guid", guid));
                             Log.Information($"{persons[0].Name} with {persons[0].Guid} successfully invisible set");
                             return Ok(JsonConvert.SerializeObject(persons[0]));
                         }
                         else {
                             string queryStringDelete = $"" +
                                 $"DELETE " +
-                                $"FROM essenskasse.Person" +
-                                $"WHERE Guid={guid};";
-                            QueryExecuterAtMySql(queryStringDelete);
+                                $"FROM essenskasse.Person " +
+                                $"WHERE Guid=@guid;";
+                            _db.Query(queryStringDelete, Db.P("@guid", guid));
                             Log.Information($"{persons[0].Name} with {persons[0].Guid} successfully removed");
                             return Ok(JsonConvert.SerializeObject(persons[0]));
                         }
@@ -235,22 +244,6 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region InternalFunctions
-        private DataTable QueryExecuterAtMySql(string Query) {
-            // MySql Connection
-            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
-
-            MySqlCommand cmd = new MySqlCommand(Query, connection);
-
-            DataTable dataTable = new DataTable();
-            // read the result
-            connection.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            dataTable.Load(reader);
-            connection.Close();
-
-            return dataTable;
-        }
-
         private static List<Person> DataTableToListOfPerson(DataTable dataTable) {
             List<Person> personList = [];
             foreach (DataRow row in dataTable.Rows) {
