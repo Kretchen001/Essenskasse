@@ -67,7 +67,7 @@ namespace EssenskasseAPI.Controllers {
                         new Guid(row["ProviderGuid"].ToString()!),
                         Convert.ToInt32(row["OrderCount"]),
                         Convert.ToInt64(row["TotalCents"]),
-                        row["LastOrder"] is DBNull ? null : Convert.ToDateTime(row["LastOrder"])));
+                        row["LastOrder"] is DBNull ? null : new DateTime(Convert.ToInt64(row["LastOrder"])))); // DateTime ist als Ticks (BIGINT) gespeichert
                 }
                 return Ok(JsonConvert.SerializeObject(statistics));
             }
