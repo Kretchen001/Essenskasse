@@ -225,5 +225,11 @@
         paymentHistory,
         noPaymentsYet,
         endOfList,
+        emailConfirmSubject,
+        emailConfirmBody,
+        emailConfirmComment,
+        emailConfirmClosing,
+        sendConfirmation,
+        confirmationMailPreparing,
     }
 }

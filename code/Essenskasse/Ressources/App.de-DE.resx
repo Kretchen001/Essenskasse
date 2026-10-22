@@ -783,4 +783,24 @@
   <data name="endOfList" xml:space="preserve">
     <value>Alle Einträge geladen</value>
   </data>
+  <data name="emailConfirmSubject" xml:space="preserve">
+    <value>Bestätigung einer Einzahlung | "Essenskasse"</value>
+  </data>
+  <data name="emailConfirmBody" xml:space="preserve">
+    <value>Sehr geehrte(r) {0},
+
+hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {3} erfolgte.</value>
+  </data>
+  <data name="emailConfirmComment" xml:space="preserve">
+    <value>Anmerkung des Eintrags: {0}</value>
+  </data>
+  <data name="emailConfirmClosing" xml:space="preserve">
+    <value>Ihre Kassenverwaltung</value>
+  </data>
+  <data name="sendConfirmation" xml:space="preserve">
+    <value>Bestätigung per E-Mail senden</value>
+  </data>
+  <data name="confirmationMailPreparing" xml:space="preserve">
+    <value>Bestätigungsmail wird vorbereitet …</value>
+  </data>
 </root>

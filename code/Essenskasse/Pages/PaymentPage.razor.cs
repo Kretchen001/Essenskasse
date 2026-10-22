@@ -195,6 +195,7 @@ namespace Essenskasse.Pages {
             amountText = "";
             comment = "";
             SelectedPerson = selected.Guid;
+            sendConfirmation = AppData.SendConfirmationMail && !selected.Email.Equals("");
             focusAmount = true; // Cursor direkt ins Betragsfeld
         }
 
@@ -221,6 +222,10 @@ namespace Essenskasse.Pages {
                 }
             }
         }
+
+        /// <summary>Soll fuer die naechste Buchung eine Bestaetigungsmail vorbereitet werden? Voreinstellung aus den Einstellungen.</summary>
+        private bool sendConfirmation = false;
+        private bool HasEmail => !(SelectedPersonData?.Email ?? "").Equals("");
 
         private bool isBooking = false;
         private bool previewOpen = false;
@@ -285,6 +290,7 @@ namespace Essenskasse.Pages {
             }
             Guid bookedFor = SelectedPerson;
             Money booked = Money;
+            bool sendForThisBooking = sendConfirmation; // Wahl zum Zeitpunkt der Buchung festhalten
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),
@@ -316,29 +322,22 @@ namespace Essenskasse.Pages {
                     paymentsOfSelectedPerson = paymentsOfSelectedPerson.OrderByDescending(x => x.DateTime).ToList();
                 }
                 base.StateHasChanged();
-                if (AppData.SendConfirmationMail) {
-                    if (person![person.FindIndex(x => x.Guid.Equals(bookedFor))].Email.Equals("")) {
+                if (sendForThisBooking) {
+                    Person? bookedPerson = person?.Find(x => x.Guid.Equals(bookedFor));
+                    if (bookedPerson is null || bookedPerson.Email.Equals("")) {
                         ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoEmailEntered)], ToastLevel.Info);
                     }
                     else {
-                        ToastService.ShowToast("Bestätigungsmail versenden...", ToastLevel.Info);
-                        Payment d = newPayment;
-                        string subject = "Bestätigung einer Einzahlung | \"Essenkasse\"";
-                        string body = $"Sehr geehrte(r) {person![person.FindIndex(x => x.Guid.Equals(bookedFor))].Name}\n" +
-                            $"Hiermit wird Ihnen bestätigt, daß am heutigen " +
-                            $"Tage {d.DateTime:d} um {d.DateTime:t} " +
-                            $"eine Einzahlung in der Höhe {d.Amount} erfolgte!\n" +
-                            $"Anmerkung des Eintrages: {d.Comment}" +
-                            $"\n\n" +
-                            $"Ihre Kassenverwaltung";
+                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.confirmationMailPreparing)], ToastLevel.Info);
+                        (string subject, string body) = PaymentConfirmation.Compose(
+                            _loc[nameof(RessourceAppStrings.emailConfirmSubject)],
+                            _loc[nameof(RessourceAppStrings.emailConfirmBody)],
+                            _loc[nameof(RessourceAppStrings.emailConfirmComment)],
+                            _loc[nameof(RessourceAppStrings.emailConfirmClosing)],
+                            bookedPerson.Name, newPayment.DateTime, newPayment.Amount, newPayment.Comment);
                         await JSRuntime.InvokeAsync<object>(
                             "blazorExtensions.SendLocalEmail",
-                            new object[] {
-                                person![person.FindIndex(x => x.Guid.Equals(bookedFor))].Email,
-                                subject,
-                                body
-                            }
-                        );
+                            new object[] { bookedPerson.Email, subject, body });
                     }
                 }
                 return;

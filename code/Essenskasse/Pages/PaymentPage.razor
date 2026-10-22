@@ -96,6 +96,14 @@
                 @if (AmountEntered && !AmountValid) {
                     <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</p>
                 }
+                <label class="ek-switch ek-pay-mail">
+                    <input type="checkbox" @bind="sendConfirmation" disabled="@(!HasEmail)" />
+                    <span class="ek-switch-track"></span>
+                    <span>@_loc[nameof(RessourceAppStrings.sendConfirmation)]</span>
+                </label>
+                @if (!HasEmail) {
+                    <p class="ek-hint is-warn">@_loc[nameof(RessourceAppStrings.toastNoEmailEntered)]</p>
+                }
             </form>
 
             @if (previewOpen) {

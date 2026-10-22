@@ -783,4 +783,24 @@
   <data name="endOfList" xml:space="preserve">
     <value>All entries loaded</value>
   </data>
+  <data name="emailConfirmSubject" xml:space="preserve">
+    <value>Confirmation of a payment | "Essenskasse"</value>
+  </data>
+  <data name="emailConfirmBody" xml:space="preserve">
+    <value>Dear {0},
+
+this confirms that on {1} at {2} a payment of {3} was received.</value>
+  </data>
+  <data name="emailConfirmComment" xml:space="preserve">
+    <value>Note on the entry: {0}</value>
+  </data>
+  <data name="emailConfirmClosing" xml:space="preserve">
+    <value>Your cash management</value>
+  </data>
+  <data name="sendConfirmation" xml:space="preserve">
+    <value>Send confirmation by email</value>
+  </data>
+  <data name="confirmationMailPreparing" xml:space="preserve">
+    <value>Preparing confirmation email …</value>
+  </data>
 </root>

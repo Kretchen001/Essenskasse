@@ -783,4 +783,24 @@
   <data name="endOfList" xml:space="preserve">
     <value>Все записи загружены</value>
   </data>
+  <data name="emailConfirmSubject" xml:space="preserve">
+    <value>Подтверждение платежа | "Essenskasse"</value>
+  </data>
+  <data name="emailConfirmBody" xml:space="preserve">
+    <value>Уважаемый(ая) {0}!
+
+Подтверждаем, что {1} в {2} поступил платёж на сумму {3}.</value>
+  </data>
+  <data name="emailConfirmComment" xml:space="preserve">
+    <value>Примечание к записи: {0}</value>
+  </data>
+  <data name="emailConfirmClosing" xml:space="preserve">
+    <value>Ваше управление кассой</value>
+  </data>
+  <data name="sendConfirmation" xml:space="preserve">
+    <value>Отправить подтверждение по e-mail</value>
+  </data>
+  <data name="confirmationMailPreparing" xml:space="preserve">
+    <value>Подготовка письма с подтверждением …</value>
+  </data>
 </root>
