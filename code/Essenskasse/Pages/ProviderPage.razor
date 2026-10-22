@@ -54,11 +54,15 @@
                     <svg class="ek-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                         <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
                     </svg>
-                    <input type="text" inputmode="search" class="ek-search-input" autocomplete="off"
-                           placeholder="@_loc[nameof(RessourceAppStrings.filter)]"
-                           aria-label="@_loc[nameof(RessourceAppStrings.filter)]"
-                           @bind="Filter" @bind:event="oninput" />
-                    @if (Filter.Length > 0) {
+                    <input id="ek-person-search" type="text" inputmode="search" class="ek-search-input" autocomplete="off"
+                           placeholder="@_loc[nameof(RessourceAppStrings.searchProviders)]"
+                           aria-label="@_loc[nameof(RessourceAppStrings.searchProviders)]"
+                           @bind="Filter" @bind:event="oninput" @onkeydown="OnSearchKeyDown" />
+                    @if (Filter.Length == 0) {
+                        <kbd class="ek-kbd" aria-hidden="true">/</kbd>
+                    }
+                    else {
+                        <span class="ek-search-count">@_loc[nameof(RessourceAppStrings.shownOfTotal), shownProviderList.Count, providers.Count]</span>
                         <button type="button" class="ek-icon-btn" @onclick="ClearFilter"
                                 title="@_loc[nameof(RessourceAppStrings.clearSearch)]"
                                 aria-label="@_loc[nameof(RessourceAppStrings.clearSearch)]">✕</button>
@@ -66,38 +70,51 @@
                 </div>
             }
             <div class="ek-people-tools">
-                <button type="button" class="ek-btn" @onclick="ToggleAscDesc">
-                    @_loc[nameof(RessourceAppStrings.designator)] @(IsASC ? "A→Z" : "Z→A")
-                </button>
+                <label class="ek-select-wrap">
+                    <span>@_loc[nameof(RessourceAppStrings.sortBy)]</span>
+                    <select class="ek-select" @bind="SortKey">
+                        <option value="Asc">@_loc[nameof(RessourceAppStrings.sortNameAsc)]</option>
+                        <option value="Desc">@_loc[nameof(RessourceAppStrings.sortNameDesc)]</option>
+                    </select>
+                </label>
             </div>
-            <div class="ek-grid ek-people">
-                @foreach (Provider x in shownProviderList) {
-                    <ProviderListCard Provider="x" OnUpdated="OnProviderUpdated" />
-                }
-            </div>
-
-            <div class="ek-remove-old">
-                <h4 class="ek-group-title">@_loc[nameof(RessourceAppStrings.removeAnEntry)]</h4>
-                @if (!accessToDelete) {
-                    <button type="button" class="ek-btn ek-btn-danger" @onclick="() => {accessToDelete = true;}">
-                        @_loc[nameof(RessourceAppStrings.provider)] @_loc[nameof(RessourceAppStrings.remove)]?
-                    </button>
-                }
-                else {
-                    <label class="ek-field">
-                        <span>@_loc[nameof(RessourceAppStrings.GuidofTheProviderToBeRemoved)]</span>
-                        <input type="text" class="ek-input" @bind-value="providerToDeleteGuid" list="suggestions">
-                        <datalist id="suggestions">
-                            @foreach (Provider x in providers) {
-                                <option value="@x.Guid" />
-                            }
-                        </datalist>
-                    </label>
-                    <button type="button" class="ek-btn ek-btn-danger" @onclick="() => DeleteAnbieter()">
-                        @_loc[nameof(RessourceAppStrings.remove)]!
-                    </button>
-                }
-            </div>
+            @if (isLoading) {
+                <div class="ek-grid ek-people" aria-busy="true" aria-live="polite">
+                    @for (int i = 0; i < 6; i++) {
+                        <div class="ek-person ek-skeleton" aria-hidden="true">
+                            <span class="ek-avatar"></span>
+                            <div class="ek-person-text">
+                                <span class="ek-skeleton-line"></span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (loadFailed) {
+                <div class="ek-empty" role="alert">
+                    <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.providerLoadFailed)]</p>
+                    <button type="button" class="ek-btn ek-btn-primary" @onclick="RequestAllProviderFromApiAsync">@_loc[nameof(RessourceAppStrings.retry)]</button>
+                </div>
+            }
+            else if (providers.Count == 0) {
+                <div class="ek-empty">
+                    <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noProvidersYet)]</p>
+                    <p class="ek-empty-text">@_loc[nameof(RessourceAppStrings.noProvidersYetHint)]</p>
+                </div>
+            }
+            else if (shownProviderList.Count == 0) {
+                <div class="ek-empty">
+                    <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noMatches)]</p>
+                    <button type="button" class="ek-btn" @onclick="ClearFilter">@_loc[nameof(RessourceAppStrings.resetFilter)]</button>
+                </div>
+            }
+            else {
+                <div class="ek-grid ek-people">
+                    @foreach (Provider x in shownProviderList) {
+                        <ProviderListCard Provider="x" OnUpdated="OnProviderUpdated" OnRemoved="OnProviderRemoved" />
+                    }
+                </div>
+            }
         </div>
     </Authorized>
 </AuthorizeView>

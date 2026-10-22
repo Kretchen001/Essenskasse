@@ -675,4 +675,28 @@
   <data name="providerRegistered" xml:space="preserve">
     <value>Vorhandene Anbieter</value>
   </data>
+  <data name="searchProviders" xml:space="preserve">
+    <value>Anbieter suchen</value>
+  </data>
+  <data name="removeProvider" xml:space="preserve">
+    <value>Anbieter entfernen</value>
+  </data>
+  <data name="confirmRemoveProvider" xml:space="preserve">
+    <value>{0} entfernen?</value>
+  </data>
+  <data name="confirmRemoveProviderHint" xml:space="preserve">
+    <value>Der Anbieter steht bei neuen Bestellungen nicht mehr zur Auswahl. Bisherige Bestellungen und Auswertungen bleiben unverändert.</value>
+  </data>
+  <data name="toastProviderRemoved" xml:space="preserve">
+    <value>entfernt</value>
+  </data>
+  <data name="noProvidersYet" xml:space="preserve">
+    <value>Noch keine Anbieter</value>
+  </data>
+  <data name="noProvidersYetHint" xml:space="preserve">
+    <value>Trage oben eine Bezeichnung ein und bestätige mit Enter.</value>
+  </data>
+  <data name="providerLoadFailed" xml:space="preserve">
+    <value>Die Anbieter konnten nicht geladen werden.</value>
+  </data>
 </root>

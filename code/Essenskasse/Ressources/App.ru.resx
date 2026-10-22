@@ -675,4 +675,28 @@
   <data name="providerRegistered" xml:space="preserve">
     <value>Имеющиеся поставщики</value>
   </data>
+  <data name="searchProviders" xml:space="preserve">
+    <value>Поиск поставщиков</value>
+  </data>
+  <data name="removeProvider" xml:space="preserve">
+    <value>Удалить поставщика</value>
+  </data>
+  <data name="confirmRemoveProvider" xml:space="preserve">
+    <value>Удалить: {0}?</value>
+  </data>
+  <data name="confirmRemoveProviderHint" xml:space="preserve">
+    <value>Поставщик больше не будет доступен для новых заказов. Прежние заказы и отчёты не изменятся.</value>
+  </data>
+  <data name="toastProviderRemoved" xml:space="preserve">
+    <value>удалён</value>
+  </data>
+  <data name="noProvidersYet" xml:space="preserve">
+    <value>Поставщиков пока нет</value>
+  </data>
+  <data name="noProvidersYetHint" xml:space="preserve">
+    <value>Введите выше название и подтвердите клавишей Enter.</value>
+  </data>
+  <data name="providerLoadFailed" xml:space="preserve">
+    <value>Не удалось загрузить поставщиков.</value>
+  </data>
 </root>

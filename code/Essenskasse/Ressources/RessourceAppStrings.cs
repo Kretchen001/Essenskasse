@@ -189,5 +189,13 @@
         duplicateProvider,
         editProvider,
         providerRegistered,
+        searchProviders,
+        removeProvider,
+        confirmRemoveProvider,
+        confirmRemoveProviderHint,
+        toastProviderRemoved,
+        noProvidersYet,
+        noProvidersYetHint,
+        providerLoadFailed,
     }
 }

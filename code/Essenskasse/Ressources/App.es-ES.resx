@@ -675,4 +675,28 @@
   <data name="providerRegistered" xml:space="preserve">
     <value>Proveedores existentes</value>
   </data>
+  <data name="searchProviders" xml:space="preserve">
+    <value>Buscar proveedores</value>
+  </data>
+  <data name="removeProvider" xml:space="preserve">
+    <value>Quitar proveedor</value>
+  </data>
+  <data name="confirmRemoveProvider" xml:space="preserve">
+    <value>¿Quitar a {0}?</value>
+  </data>
+  <data name="confirmRemoveProviderHint" xml:space="preserve">
+    <value>El proveedor ya no estará disponible para nuevos pedidos. Los pedidos y análisis existentes no cambian.</value>
+  </data>
+  <data name="toastProviderRemoved" xml:space="preserve">
+    <value>quitado</value>
+  </data>
+  <data name="noProvidersYet" xml:space="preserve">
+    <value>Aún no hay proveedores</value>
+  </data>
+  <data name="noProvidersYetHint" xml:space="preserve">
+    <value>Introduce arriba un nombre y confirma con Enter.</value>
+  </data>
+  <data name="providerLoadFailed" xml:space="preserve">
+    <value>No se pudieron cargar los proveedores.</value>
+  </data>
 </root>

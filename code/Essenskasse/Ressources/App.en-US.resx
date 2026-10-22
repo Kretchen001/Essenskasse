@@ -675,4 +675,28 @@
   <data name="providerRegistered" xml:space="preserve">
     <value>Existing providers</value>
   </data>
+  <data name="searchProviders" xml:space="preserve">
+    <value>Search providers</value>
+  </data>
+  <data name="removeProvider" xml:space="preserve">
+    <value>Remove provider</value>
+  </data>
+  <data name="confirmRemoveProvider" xml:space="preserve">
+    <value>Remove {0}?</value>
+  </data>
+  <data name="confirmRemoveProviderHint" xml:space="preserve">
+    <value>The provider is no longer available for new orders. Existing orders and reports stay unchanged.</value>
+  </data>
+  <data name="toastProviderRemoved" xml:space="preserve">
+    <value>removed</value>
+  </data>
+  <data name="noProvidersYet" xml:space="preserve">
+    <value>No providers yet</value>
+  </data>
+  <data name="noProvidersYetHint" xml:space="preserve">
+    <value>Enter a name above and confirm with Enter.</value>
+  </data>
+  <data name="providerLoadFailed" xml:space="preserve">
+    <value>The providers could not be loaded.</value>
+  </data>
 </root>
