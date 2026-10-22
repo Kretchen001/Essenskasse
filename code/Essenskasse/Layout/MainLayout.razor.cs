@@ -32,8 +32,9 @@ namespace Essenskasse.Layout {
                 }
             };
             await CheckLogin();
+            await UserSettings.MigrateLegacyAsync();
             await CollectUserThemeAsync();
-            await ReadLocalStorage();
+            await UserSettings.LoadAppDataAsync();
             await navMenu.ReloadNavMenu();
         }
 
@@ -60,6 +61,7 @@ namespace Essenskasse.Layout {
                     if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                         AuthStateService.IsAuthenticated = true;
                         currentUserName = currentNameOfUser;
+                        UserSettings.UseUser(currentNameOfUser); // ab jetzt gelten die Einstellungen dieses Benutzers
                         string newToken = await response.Content.ReadAsStringAsync();
                         if (newToken.Length > 0) {
                             // Die API antwortet mit einem JSON-String, also in Anfuehrungszeichen.
@@ -79,62 +81,19 @@ namespace Essenskasse.Layout {
             }
         }
 
-        /// <summary> Request the LocalStorage for a saved theme. If no one is found is the light-theme selected. </summary>
+        /// <summary> Request the LocalStorage for the saved theme of the current user. If no one is found is the light-theme selected. </summary>
         private async Task CollectUserThemeAsync() {
-            switch (await LocalStorage.GetItemAsStringAsync("UserTheme")) {
-                case "Dark": {
-                        themeService.ThemeCode = ColorCode.Dark;
-                        break;
-                    }
-                default: { // ^= light-theme
-                        themeService.ThemeCode = ColorCode.Light;
-                        break;
-                    }
-            }
-        }
-
-        /// <summary>Read all Key-Value Pairs from the LocalStorage and bring it to its necessary place.</summary>
-        private async Task ReadLocalStorage() {
-            AppData.IsSingleListWishDashboard = await LocalStorage.GetItemAsync<bool>("IsSingleWishListDashboard");
-            AppData.NoticeableOnRightSide = await LocalStorage.GetItemAsync<bool>("NoticeableOnRightSide");
-            AppData.LoadAmountPayment = await LocalStorage.GetItemAsync<int>("loadAmountOfPayments") == 0 ? 10 : await LocalStorage.GetItemAsync<int>("loadAmountOfPayments");
-            AppData.LoadAmountOrder = await LocalStorage.GetItemAsync<int>("loadAmountOfOrders") == 0 ? 25 : await LocalStorage.GetItemAsync<int>("loadAmountOfOrders");
-            AppData.FilterShowProvider = await LocalStorage.GetItemAsync<bool>("filterShowProvider");
-            AppData.FilterShowPerson = await LocalStorage.GetItemAsync<bool>("filterShowPerson");
-            AppData.AccessToken = await LocalStorage.GetItemAsync<Guid>("AccessToken");
-            AppData.DashboardMoneyLimit = await LocalStorage.GetItemAsync<Money>("DashboardMoneyLimit") ?? new Money(0, 0);
-            if (AppData.AccessToken.Equals(new Guid("00000000-0000-0000-0000-000000000000"))) {
-                AppData.AccessToken = null;
-            }
-            AppData.AdminEmail = await LocalStorage.GetItemAsync<string>("AdminEmail") ?? "";
-            AppData.SendConfirmationMail = await ReadConfirmationMailModeAsync();
-            try {
-                if (await LocalStorage.ContainKeyAsync("OrderQuickAmounts")) {
-                    AppData.QuickAmounts = QuickAmounts.Normalize(await LocalStorage.GetItemAsync<List<long>>("OrderQuickAmounts"));
-                }
-            }
-            catch {
-                AppData.QuickAmounts = [.. QuickAmounts.Default]; // beschaedigter Eintrag -> Voreinstellung
-            }
-        }
-
-        /// <summary>Liest die Einstellung neu (Schluessel "ConfirmationMailMode") oder uebernimmt den frueheren Ja/Nein-Wert.</summary>
-        private async Task<Modells.User.ConfirmationMailMode> ReadConfirmationMailModeAsync() {
-            if (await LocalStorage.ContainKeyAsync("ConfirmationMailMode")) {
-                return Modells.User.ConfirmationMailModes.Parse((await LocalStorage.GetItemAsync<int>("ConfirmationMailMode")).ToString());
-            }
-            if (await LocalStorage.ContainKeyAsync("SendConfirmationMail")) {
-                return await LocalStorage.GetItemAsync<bool>("SendConfirmationMail")
-                    ? Modells.User.ConfirmationMailMode.Optional
-                    : Modells.User.ConfirmationMailMode.Never;
-            }
-            return Modells.User.ConfirmationMailMode.Optional;
+            themeService.ThemeCode = await UserSettings.ReadThemeAsync();
         }
 
         private async Task LogoutUser() {
             await LocalStorage.RemoveItemAsync("NameOfUser");
             await LocalStorage.RemoveItemAsync("SessionToken");
             currentUserName = string.Empty;
+            // Danach gelten wieder die geraeteweiten Einstellungen; der Aenderungstoken des Benutzers verschwindet aus dem Programm.
+            UserSettings.UseUser("");
+            await UserSettings.LoadAppDataAsync();
+            await CollectUserThemeAsync();
             AuthStateService.IsAuthenticating = false;
             AuthStateService.IsAuthenticated = false;
             AuthState.NotifyAuthenticationStateChanged();
@@ -154,6 +113,22 @@ namespace Essenskasse.Layout {
             AuthState.NotifyAuthenticationStateChanged();
         }
         #endregion
+
+        /// <summary>Nach der Anmeldung: eigene lokale Einstellungen laden und einmal beim Server nachfragen.
+        /// Kommt dort nichts (noch nie gespeichert oder nicht erreichbar), wird mit den lokalen bzw. Standardwerten weitergearbeitet.</summary>
+        private async Task LoadUserSettingsAfterLoginAsync(string userName) {
+            UserSettings.UseUser(userName);
+            await UserSettings.MigrateLegacyAsync();
+            await UserSettings.LoadAppDataAsync();
+            await CollectUserThemeAsync();
+            ServerSettingsResult result = await UserSettings.LoadFromServerAsync();
+            if (result == ServerSettingsResult.AppliedReloadNeeded) {
+                NavManager.NavigateTo(NavManager.Uri, true); // andere Sprache: einmal neu laden
+            }
+            else if (result == ServerSettingsResult.Applied) {
+                await navMenu.ReloadNavMenu();
+            }
+        }
 
         private async Task LoginUser() {
             if (isLoggingIn || nameToLogin.Trim().Length == 0 || passwordToLogin.Length == 0) {
@@ -179,12 +154,14 @@ namespace Essenskasse.Layout {
                     string newToken = await response.Content.ReadAsStringAsync();
                     await LocalStorage.SetItemAsync<string>("NameOfUser", nameToLogin);
                     await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken[1..(newToken.Length - 1)]));
+                    string loggedInName = nameToLogin;
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.welcome)], ToastLevel.Success);
                     nameToLogin = "";
                     passwordToLogin = "";
                     roleToLogin = DefaultRole;
                     showPassword = false;
                     LoginModel?.Close();
+                    await LoadUserSettingsAfterLoginAsync(loggedInName);
                 }
                 else {
                     // Dialog bleibt offen, das Passwort wird geleert und der Fokus springt zurueck ins Feld.

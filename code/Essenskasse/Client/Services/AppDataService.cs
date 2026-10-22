@@ -48,11 +48,13 @@ namespace Essenskasse.Client.Services {
                 filterShowProvider: FilterShowProvider,
                 dashboardMoneyLimit: DashboardMoneyLimit,
                 filterShowPerson: FilterShowPerson,
-                accessToken: AccessToken,
+                accessToken: null, // der Aenderungstoken gehoert zum Benutzer und wird nicht mit den Einstellungen gespeichert
                 adminEmail: AdminEmail,
                 noticeableOnRightSide: NoticeableOnRightSide,
                 sendConfirmationMail: SendConfirmationMail
-                );
+                ) {
+                QuickAmounts = [.. QuickAmounts]
+            };
         }
 
         public void SettingsToAppData(U.Settings settings) {
@@ -62,7 +64,7 @@ namespace Essenskasse.Client.Services {
             FilterShowProvider = settings.FilterShowProvider;
             DashboardMoneyLimit = settings.DashboardMoneyLimit;
             FilterShowPerson = settings.FilterShowPerson;
-            AccessToken = settings.AccessToken;
+            // Der Aenderungstoken wird bewusst nicht uebernommen (siehe GetAppDataAsSettingsObject).
             AdminEmail = settings.AdminEmail;
             NoticeableOnRightSide = settings.NoticeableOnRightSide;
             SendConfirmationMail = settings.SendConfirmationMail;

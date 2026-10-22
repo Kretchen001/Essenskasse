@@ -46,6 +46,9 @@ namespace Essenskasse {
 
             // add the ThemeService as a Simgleton to access it by injection
             builder.Services.AddSingleton<ThemeService>();
+
+            // Einstellungen im Browser, getrennt pro angemeldetem Benutzer (plus Abgleich mit dem Server)
+            builder.Services.AddScoped<UserSettingsStore>();
             
             // add access to the toast's
             builder.Services.AddScoped<ToastService>();
