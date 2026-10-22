@@ -863,4 +863,7 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="coffeeBook" xml:space="preserve">
     <value>Buchen</value>
   </data>
+  <data name="coffeeCommentRequired" xml:space="preserve">
+    <value>Bitte einen Kommentar angeben (Pflichtfeld).</value>
+  </data>
 </root>

@@ -251,5 +251,6 @@
         coffeeNoEntries,
         coffeeLoadFailed,
         coffeeBook,
+        coffeeCommentRequired,
     }
 }

@@ -24,6 +24,7 @@ namespace Essenskasse.Pages {
         private bool loading = true;
         private bool loadFailed = false;
         private bool isBooking = false;
+        private bool previewOpen = false;
 
         /// <summary>false = Einzahlung in die Kasse, true = Auszahlung aus der Kasse.</summary>
         private bool isPayout = false;
@@ -34,6 +35,27 @@ namespace Essenskasse.Pages {
 
         /// <summary>Gueltig ist ein Betrag groesser als 0; die Richtung bestimmt der Umschalter, kein Minuszeichen.</summary>
         private bool AmountValid => TryGetAmountCents(out _);
+
+        /// <summary>Der Kommentar ist ein Pflichtfeld.</summary>
+        private bool CommentValid => comment.Trim().Length > 0;
+
+        private bool CanBook => AmountValid && CommentValid;
+
+        /// <summary>Der Betrag mit Vorzeichen: Einzahlung positiv, Auszahlung negativ.</summary>
+        private Money SignedAmount {
+            get {
+                TryGetAmountCents(out long cents);
+                return Money.FromTotalCents(isPayout ? -cents : cents);
+            }
+        }
+
+        private void OpenPreview() {
+            previewOpen = CanBook;
+        }
+
+        private void ClosePreview() {
+            previewOpen = false;
+        }
 
         /// <summary>Der Kassenstand nach der eingegebenen Buchung.</summary>
         private Money BalanceAfter {
@@ -62,6 +84,7 @@ namespace Essenskasse.Pages {
 
         private void SetDirection(bool payout) {
             isPayout = payout;
+            previewOpen = false;
         }
 
         private void ShowMore() {
@@ -90,7 +113,7 @@ namespace Essenskasse.Pages {
         }
 
         private async Task InsertNewTransaction() {
-            if (isBooking || !TryGetAmountCents(out long cents)) {
+            if (isBooking || !CanBook || !TryGetAmountCents(out long cents)) {
                 return;
             }
             isBooking = true;
@@ -111,6 +134,7 @@ namespace Essenskasse.Pages {
                     summary = CoffeeFundSummary.Summarize(transactions);
                     amountText = "";
                     comment = "";
+                    previewOpen = false;
                 }
                 else {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);

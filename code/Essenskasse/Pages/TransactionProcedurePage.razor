@@ -27,7 +27,7 @@
 
     <AuthorizeView>
         <Authorized>
-            <form class="ek-add ek-cash-form" @onsubmit="InsertNewTransaction" @onsubmit:preventDefault>
+            <form class="ek-add ek-cash-form" @onsubmit="OpenPreview" @onsubmit:preventDefault>
                 <div class="ek-seg" role="group" aria-label="@_loc[nameof(RessourceAppStrings.coffeeFund)]">
                     <button type="button" class="is-in @(isPayout ? "" : "is-active")" aria-pressed="@(!isPayout)" @onclick="() => SetDirection(false)">
                         <span aria-hidden="true">↓</span> @_loc[nameof(RessourceAppStrings.coffeeDeposit)]
@@ -43,15 +43,19 @@
                                @bind="amountText" @bind:event="oninput" />
                     </label>
                     <label class="ek-field">
-                        <span>@_loc[nameof(RessourceAppStrings.comment)]</span>
-                        <input type="text" class="ek-input" autocomplete="off" maxlength="200" @bind="comment" @bind:event="oninput" />
+                        <span>@_loc[nameof(RessourceAppStrings.comment)] *</span>
+                        <input type="text" class="ek-input" autocomplete="off" maxlength="200" required aria-required="true"
+                               @bind="comment" @bind:event="oninput" />
                     </label>
-                    <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@(!AmountValid || isBooking)">
+                    <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@(!CanBook || isBooking)">
                         @_loc[nameof(RessourceAppStrings.coffeeBook)]
                     </button>
                 </div>
                 @if (AmountEntered && !AmountValid) {
                     <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</p>
+                }
+                else if (AmountValid && !CommentValid) {
+                    <p class="ek-hint is-warn">@_loc[nameof(RessourceAppStrings.coffeeCommentRequired)]</p>
                 }
                 else if (AmountValid) {
                     <p class="ek-hint @(BalanceAfter.IsPositiv() ? "" : "is-warn")">
@@ -62,6 +66,27 @@
                     </p>
                 }
             </form>
+
+            @if (previewOpen && CanBook) {
+                <div class="ek-confirm ek-pay-preview" role="group" aria-label="@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]">
+                    <p class="ek-confirm-title">@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]</p>
+                    <p class="ek-confirm-text">
+                        <strong>@(isPayout ? _loc[nameof(RessourceAppStrings.coffeePayout)] : _loc[nameof(RessourceAppStrings.coffeeDeposit)])</strong>:
+                        @SignedAmount.ToString() – @comment.Trim()<br />
+                        @_loc[nameof(RessourceAppStrings.balanceBefore)]: @summary.Balance.ToString()
+                        &nbsp;→&nbsp;
+                        @_loc[nameof(RessourceAppStrings.balanceAfter)]: <strong>@BalanceAfter.ToString()</strong>
+                    </p>
+                    <div class="ek-edit-actions">
+                        <button type="button" class="ek-btn ek-btn-primary" disabled="@isBooking" @onclick="InsertNewTransaction">
+                            @_loc[nameof(RessourceAppStrings.bookNow)]
+                        </button>
+                        <button type="button" class="ek-btn" disabled="@isBooking" @onclick="ClosePreview">
+                            @_loc[nameof(RessourceAppStrings.cancel)]
+                        </button>
+                    </div>
+                </div>
+            }
         </Authorized>
         <NotAuthorized>
             <div class="ek-cash-note">

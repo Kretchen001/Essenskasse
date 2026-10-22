@@ -863,4 +863,7 @@
   <data name="coffeeBook" xml:space="preserve">
     <value>Записать</value>
   </data>
+  <data name="coffeeCommentRequired" xml:space="preserve">
+    <value>Укажите комментарий (обязательное поле).</value>
+  </data>
 </root>

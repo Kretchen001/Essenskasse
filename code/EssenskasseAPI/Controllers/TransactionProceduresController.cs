@@ -43,7 +43,7 @@ namespace EssenskasseAPI.Controllers {
         [HttpPost, Route("new")]
         public IActionResult NewOne([FromBody] TransactionProcedure newOne) {
             using (Operation.Time("NewOne at Procedures")) {
-                if (newOne is null || newOne.Amount is null || newOne.Amount.ToTotalCents() == 0) {
+                if (newOne is null || newOne.Amount is null || newOne.Amount.ToTotalCents() == 0 || string.IsNullOrWhiteSpace(newOne.Comment)) {
                     return BadRequest();
                 }
                 string queryString = $"" +
