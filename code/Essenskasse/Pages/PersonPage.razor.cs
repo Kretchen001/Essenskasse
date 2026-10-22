@@ -51,9 +51,8 @@ namespace Essenskasse.Pages {
                 person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
                 person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
                 person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
-                person = person.OrderBy(x => x.Name).ToList();
-                shownPersonList.AddRange(person);
-                SortPersonList();
+                person = person.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+                ApplyFilterAndSort();
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
@@ -99,12 +98,10 @@ namespace Essenskasse.Pages {
                     temp.Name = Uri.UnescapeDataString(temp.Name);
                     temp.Email = Uri.UnescapeDataString(temp.Email);
                     person.Add(temp);
-                    shownPersonList.Add(temp);
                     ToastService.ShowToast(newPersonName + " " + _loc[nameof(RessourceAppStrings.toastAddedAndAvailable)], ToastLevel.Success);
                     accessToAdd = false;
                     newPersonName = newPersonEmail = ""; 
-                    person = person.OrderBy(x => x.Name).ToList();
-                    SortPersonList();
+                    ApplyFilterAndSort();
                     base.StateHasChanged();
                 }
                 else {
@@ -132,34 +129,27 @@ namespace Essenskasse.Pages {
         }
 
         private void ChangePersonShownList() {
-            Console.WriteLine(filter);
-            shownPersonList.Clear();
-            if (filter.Equals("")) {
-                shownPersonList.AddRange(person);
-            }
-            else {
-                foreach (Person x in person) {
-                    if (x.Name.Contains(filter)) {
-                        shownPersonList.Add(x);
-                    }
-                }
-            }
+            ApplyFilterAndSort();
         }
 
         private void ToggleAscDesc() {
             IsASC = !IsASC;
             _ = SaveAscStatus();
-            SortPersonList();
+            ApplyFilterAndSort();
             base.StateHasChanged();
         }
 
-        private void SortPersonList() {
-            if (IsASC) {
-                shownPersonList = shownPersonList.OrderBy(x => x.Name).ToList();
+        /// <summary>Baut die angezeigte Liste immer aus allen Personen, dem aktuellen Filter (ohne Beachtung der
+        /// Schreibweise) und der Sortierung neu auf. Alle Stellen, die die Liste aendern, rufen das auf.</summary>
+        private void ApplyFilterAndSort() {
+            IEnumerable<Person> result = person;
+            string text = filter.Trim();
+            if (text.Length > 0) {
+                result = result.Where(x => x.Name.Contains(text, StringComparison.CurrentCultureIgnoreCase));
             }
-            else {
-                shownPersonList = shownPersonList.OrderByDescending(x => x.Name).ToList();
-            }
+            shownPersonList = (IsASC
+                ? result.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase)
+                : result.OrderByDescending(x => x.Name, StringComparer.CurrentCultureIgnoreCase)).ToList();
         }
 
         public async Task SaveAscStatus() {
