@@ -222,5 +222,8 @@
         changePerson,
         quickAmounts,
         searchPaymentPerson,
+        paymentHistory,
+        noPaymentsYet,
+        endOfList,
     }
 }

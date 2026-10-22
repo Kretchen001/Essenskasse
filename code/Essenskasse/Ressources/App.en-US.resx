@@ -774,4 +774,13 @@
   <data name="searchPaymentPerson" xml:space="preserve">
     <value>Search person (name or email)</value>
   </data>
+  <data name="paymentHistory" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="noPaymentsYet" xml:space="preserve">
+    <value>No payments yet</value>
+  </data>
+  <data name="endOfList" xml:space="preserve">
+    <value>All entries loaded</value>
+  </data>
 </root>

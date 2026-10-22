@@ -88,7 +88,31 @@ namespace Essenskasse.Pages {
             }
         }
 
+        private bool historyLoading = false;
+        private bool loadingMore = false;
+        private bool allLoaded = false;
+
+        /// <summary>Einzahlungen gruppiert nach Monat (neueste zuerst).</summary>
+        private IEnumerable<IGrouping<DateTime, Payment>> PaymentsByMonth => paymentsOfSelectedPerson
+            .OrderByDescending(x => x.DateTime)
+            .GroupBy(x => new DateTime(x.DateTime.Year, x.DateTime.Month, 1));
+
         private async Task RequestPaymentsOfPerson() {
+            Guid requestedFor = SelectedPerson;
+            historyLoading = true;
+            allLoaded = false;
+            try {
+                await RequestPaymentsCoreAsync();
+            }
+            finally {
+                if (requestedFor == SelectedPerson) {
+                    historyLoading = false;
+                }
+                StateHasChanged();
+            }
+        }
+
+        private async Task RequestPaymentsCoreAsync() {
             // Request last payments of a person
             Guid requestedFor = SelectedPerson;
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
@@ -116,6 +140,7 @@ namespace Essenskasse.Pages {
                 }
                 paymentsOfSelectedPerson = loaded;
                 paymentsOfSelectedPerson.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
+                allLoaded = loaded.Count < Amount;
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
@@ -324,12 +349,25 @@ namespace Essenskasse.Pages {
         }
 
         private async Task LoadNextAmountOfPayments() {
-            // Request last payments of a person
+            if (loadingMore) {
+                return;
+            }
+            loadingMore = true;
+            try {
+                await LoadNextCoreAsync();
+            }
+            finally {
+                loadingMore = false;
+            }
+        }
+
+        private async Task LoadNextCoreAsync() {
+            Guid requestedFor = SelectedPerson;
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/requestNextAmountFromPerson"),
                 Headers = {
-                    { "guid", SelectedPerson.ToString() },
+                    { "guid", requestedFor.ToString() },
                     { "amount", Amount.ToString() },
                     { "alreadyLoaded", paymentsOfSelectedPerson.Count.ToString()}
                 }
@@ -346,12 +384,15 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 List<Payment> getted = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
-                if (getted.Count == 0) {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNothingToLoad)], ToastLevel.Info);
+                if (requestedFor != SelectedPerson) {
+                    return; // zwischenzeitlich andere Person gewaehlt
                 }
-                else {
+                if (getted.Count > 0) {
                     getted.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
                     paymentsOfSelectedPerson.AddRange(getted);
+                }
+                if (getted.Count < Amount) {
+                    allLoaded = true;
                 }
             }
             else {
