@@ -235,7 +235,9 @@ namespace EssenskasseAPI.Controllers {
                             $"FROM essenskasse.User " +
                             $"WHERE TokenForChange=@accessToken;";
                     DataTable dataTableTokenCount = _db.Query(queryStringToken, Db.P("@accessToken", accessToken));
-                    if (dataTableTokenCount.Rows.Count == 1) {
+                    // COUNT(*) liefert immer genau eine Zeile; entscheidend ist der Zaehlerwert.
+                    // Die Null-Guid ist der Standardwert "kein Token" und darf nie gueltig sein.
+                    if (accessToken != Guid.Empty && Convert.ToInt64(dataTableTokenCount.Rows[0][0]) > 0) {
                         Log.Information($"{accessToken} called UpdateOrder.");
                         if (dateAsLong is null) {
                             Log.Warning("Empty dateAsLong Header");
