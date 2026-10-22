@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EssenskasseAPI.Data;
+using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -12,10 +13,10 @@ namespace EssenskasseAPI.Controllers {
     public class ProviderController : ControllerBase {
 
         #region Config
-        private readonly IConfiguration Configuration;
+        private readonly Db _db;
 
         public ProviderController(IConfiguration configuration) {
-            Configuration = configuration;
+            _db = new Db(configuration);
         }
         #endregion
 
@@ -30,7 +31,7 @@ namespace EssenskasseAPI.Controllers {
                     $"FROM essenskasse.Provider " +
                     $"WHERE Sichtbar=true;";
 
-                DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
+                DataTable dataTableProvider = _db.Query(queryString);
                 List<Provider> provider = DataTableToListOfProvider(dataTableProvider);
 
                 if (provider.Count != 0) {
@@ -54,20 +55,22 @@ namespace EssenskasseAPI.Controllers {
                     queryString = $"" +
                        $"SELECT * " +
                        $"FROM essenskasse.Provider " +
-                       $"WHERE Guid='';";
+                       $"WHERE Guid=@guid;";
                 }
                 if (designator is not null) {
                     queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Provider " +
-                        $"WHERE Guid='' OR Designation='';";
+                        $"WHERE Guid=@guid OR Designation=@designator;";
                 }
                 if (guid is null && designator is null) {
                     Log.Warning("Both Headers null!");
                     return BadRequest("Beide Header null!");
                 }
 
-                DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
+                DataTable dataTableProvider = _db.Query(queryString,
+                    Db.P("@guid", guid),
+                    Db.P("@designator", designator));
                 List<Provider> provider = DataTableToListOfProvider(dataTableProvider);
 
                 if (provider.Count == 1) {
@@ -94,12 +97,14 @@ namespace EssenskasseAPI.Controllers {
                     Provider newProvider = new Provider(name);
 
                     string queryString = $"" +
-                        $"INSERT INTO essenskasse.Provider (Guid, Designation)" +
-                        $"VALUES ('{newProvider.Guid}', '{newProvider.Designation}')";
+                        $"INSERT INTO essenskasse.Provider (Guid, Designation) " +
+                        $"VALUES (@guid, @designation);";
 
                     try {
-                        QueryExecuterAtMySql(queryString);
-                    
+                        _db.Query(queryString,
+                            Db.P("@guid", newProvider.Guid),
+                            Db.P("@designation", newProvider.Designation));
+
                         Log.Information($"New provider {newProvider.Designation} and {newProvider.Guid}");
                         return Ok(JsonConvert.SerializeObject(newProvider.Guid));
                     }
@@ -123,16 +128,24 @@ namespace EssenskasseAPI.Controllers {
                     string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Provider " +
-                        $"WHERE Guid='{guid}'";
+                        $"WHERE Guid=@guid;";
 
-                    DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
+                    DataTable dataTableProvider = _db.Query(queryString, Db.P("@guid", guid));
                     List<Provider> provider = DataTableToListOfProvider(dataTableProvider);
 
                     if (provider.Count == 1) {
                         string oldDesignation = provider[0].Designation;
 
                         try {
-                            string queryUpdateString = $"";
+                            if (designation is not null) {
+                                string queryUpdateString = $"" +
+                                    $"UPDATE essenskasse.Provider " +
+                                    $"SET Designation=@designation " +
+                                    $"WHERE Guid=@guid;";
+                                _db.Query(queryUpdateString,
+                                    Db.P("@designation", Uri.UnescapeDataString(designation)),
+                                    Db.P("@guid", guid));
+                            }
                             Log.Information($"Provider successfully updated from {oldDesignation} to {designation}");
                             return Ok();
                         }
@@ -162,8 +175,8 @@ namespace EssenskasseAPI.Controllers {
                     string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Provider " +
-                        $"WHERE Guid='{guid}'";
-                    DataTable dataTable = QueryExecuterAtMySql(queryString);
+                        $"WHERE Guid=@guid;";
+                    DataTable dataTable = _db.Query(queryString, Db.P("@guid", guid));
                     List<Provider> provider = DataTableToListOfProvider(dataTable);
 
                     if (provider.Count == 1) {
@@ -171,17 +184,17 @@ namespace EssenskasseAPI.Controllers {
                             string queryStringInvisible = $"" +
                                 $"UPDATE essenskasse.Provider " +
                                 $"SET Sichtbar=false " +
-                                $"WHERE Guid='{guid}';";
-                            QueryExecuterAtMySql(queryStringInvisible);
+                                $"WHERE Guid=@guid;";
+                            _db.Query(queryStringInvisible, Db.P("@guid", guid));
                             Log.Information($"{provider[0].Designation} with {provider[0].Guid} successfully invisible set");
                             return Ok(JsonConvert.SerializeObject(provider[0]));
                         }
                         else {
                             string queryStringDelete = $"" +
                                 $"DELETE " +
-                                $"FROM essenskasse.Provider" +
-                                $"WHERE Guid='{guid}';";
-                            QueryExecuterAtMySql(queryStringDelete);
+                                $"FROM essenskasse.Provider " +
+                                $"WHERE Guid=@guid;";
+                            _db.Query(queryStringDelete, Db.P("@guid", guid));
                             Log.Information($"{provider[0].Designation} with {provider[0].Guid} successfully removed");
                             return Ok(JsonConvert.SerializeObject(provider[0]));
                         }
@@ -198,22 +211,6 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region InternalFunctions
-        private DataTable QueryExecuterAtMySql(string Query) {
-            // MySql Connection
-            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
-
-            MySqlCommand cmd = new MySqlCommand(Query, connection);
-
-            DataTable dataTable = new DataTable();
-            // read the result
-            connection.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            dataTable.Load(reader);
-            connection.Close();
-
-            return dataTable;
-        }
-
         private static List<Provider> DataTableToListOfProvider(DataTable dataTable) {
             List<Provider> providerController = [];
             foreach (DataRow row in dataTable.Rows) {
