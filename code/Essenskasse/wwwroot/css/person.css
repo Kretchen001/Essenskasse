@@ -88,6 +88,15 @@
     flex-wrap: wrap;
 }
 
+/* Knoepfe in einer eigenen Zeile unter Name und Saldo, damit sie den Namen nicht verdecken */
+.ek-person-actions {
+    flex: 1 0 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.4rem;
+}
+
 .ek-person-details {
     flex: 1 0 100%;
     margin-top: 0.1rem;
