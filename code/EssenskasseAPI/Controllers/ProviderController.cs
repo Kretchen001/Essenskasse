@@ -1,4 +1,5 @@
 ﻿using EssenskasseAPI.Data;
+using EssenskasseAPI.Security;
 using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
@@ -10,6 +11,7 @@ using System.Data;
 namespace EssenskasseAPI.Controllers {
 
     [ApiController, Route("api/provider")]
+    [RequireSession]
     public class ProviderController : ControllerBase {
 
         #region Config

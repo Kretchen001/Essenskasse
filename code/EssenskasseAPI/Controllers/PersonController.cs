@@ -1,4 +1,6 @@
 ﻿using EssenskasseAPI.Data;
+using EssenskasseAPI.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
@@ -10,6 +12,7 @@ using System.Data;
 namespace EssenskasseAPI.Controllers {
 
     [ApiController, Route("api/person")]
+    [RequireSession]
     public class PersonController : ControllerBase {
 
         #region Config
@@ -21,7 +24,8 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region Controller
-        [HttpGet, Route("requestAll")]
+        // Das Dashboard der PWA zeigt die Personen mit Saldo ohne Anmeldung an.
+        [AllowAnonymous, HttpGet, Route("requestAll")]
         public IActionResult GetAllPerson() {
             using (Operation.Time("Request all Persons")) {
                 string queryString = $"" +
