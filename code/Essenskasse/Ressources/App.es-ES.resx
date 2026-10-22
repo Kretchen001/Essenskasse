@@ -747,4 +747,7 @@
   <data name="signingIn" xml:space="preserve">
     <value>Iniciando sesión …</value>
   </data>
+  <data name="amountInvalid" xml:space="preserve">
+    <value>Introduce un importe como 10,50 (como máximo dos decimales).</value>
+  </data>
 </root>

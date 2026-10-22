@@ -213,5 +213,6 @@
         showPassword,
         hidePassword,
         signingIn,
+        amountInvalid,
     }
 }

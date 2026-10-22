@@ -747,4 +747,7 @@
   <data name="signingIn" xml:space="preserve">
     <value>Выполняется вход …</value>
   </data>
+  <data name="amountInvalid" xml:space="preserve">
+    <value>Введите сумму, например 10,50 (не более двух знаков после запятой).</value>
+  </data>
 </root>

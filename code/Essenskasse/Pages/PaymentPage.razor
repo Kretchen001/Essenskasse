@@ -64,12 +64,18 @@
                 </label>
             </div>
             <div class="col-lg-4 align-self-center" style="width: 25%">
-                <input style="width: 100%" type="number" @bind="Payment" placeholder="Euro,Cent -> 10,00€">
+                <input style="width: 100%" type="text" inputmode="decimal" autocomplete="off"
+                       @bind="amountText" @bind:event="oninput" placeholder="10,00">
             </div>
             <div class="col-lg-5 align-self-center">
-                <label>
-                    @Money.ToString()
-                </label>
+                @if (AmountEntered && !AmountValid) {
+                    <small class="text-danger" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</small>
+                }
+                else if (AmountValid) {
+                    <label>
+                        @Money.ToString()
+                    </label>
+                }
             </div>
         </div>
         <br />
@@ -85,7 +91,7 @@
         </div>
         <br />
         <div class="row">
-            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" disabled="@isBooking" @onclick="() => InsertPayment()">
+            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" disabled="@(isBooking || !AmountValid)" @onclick="() => InsertPayment()">
                 @_loc[nameof(RessourceAppStrings.creditAmount)]
             </button>
         </div>

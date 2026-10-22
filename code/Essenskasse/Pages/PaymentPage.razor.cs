@@ -22,28 +22,11 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private decimal _Payment = 0;
-        private decimal Payment {
-            get {
-                return _Payment;
-            }
-            set {
-                if (value != 0) {
-                    Money temp = ConvertToMoney(value);
-                    if (temp.Cent < 100) {
-                        _Payment = value;
-                    }
-                    else {
-                        // nothing
-                    }
-                }
-            }
-        }
-        private Money Money {
-            get {
-                return ConvertToMoney(_Payment);
-            }
-        }
+        /// <summary>Eingetippter Betrag, z. B. "12,50". Wird erst beim Buchen in einen Geldbetrag umgewandelt.</summary>
+        private string amountText = "";
+        private bool AmountEntered => amountText.Trim().Length > 0;
+        private bool AmountValid => MoneyParser.TryParse(amountText, out Money parsed) && parsed.ToTotalCents() != 0;
+        private Money Money => MoneyParser.TryParse(amountText, out Money parsed) ? parsed : new Money(0, 0);
 
         private string comment = "";
 
@@ -60,21 +43,6 @@ namespace Essenskasse.Pages {
                 await RefreshPersonList();
             }
             base.StateHasChanged();
-        }
-
-        /// <summary></summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private Money ConvertToMoney(decimal value) {
-            try {
-                long euro = (long)value;
-                short cent = (short)((value - euro) * 100);
-                return new Money(euro, cent);
-            }
-            catch {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastMoneyFormatInvalid)], ToastLevel.Warning);
-                return new Money(0, 0);
-            }
         }
 
         private async Task RefreshPersonList() {
@@ -161,6 +129,9 @@ namespace Essenskasse.Pages {
         }
 
         private async Task InsertPaymentCoreAsync() {
+            if (!AmountValid) {
+                return;
+            }
             Guid bookedFor = SelectedPerson;
             Money booked = Money;
             if (!(await JSRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.insertFollowingAmount)] + "\n" + booked.ToString()))) {
@@ -188,6 +159,8 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessfullyAdded)], ToastLevel.Success);
+                amountText = "";
+                comment = "";
                 Payment newPayment = JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!;
                 newPayment.Comment = Uri.UnescapeDataString(newPayment.Comment);
                 if (bookedFor == SelectedPerson) {

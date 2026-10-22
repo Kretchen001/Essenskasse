@@ -747,4 +747,7 @@
   <data name="signingIn" xml:space="preserve">
     <value>Anmeldung läuft …</value>
   </data>
+  <data name="amountInvalid" xml:space="preserve">
+    <value>Bitte einen Betrag wie 10,50 eingeben (höchstens zwei Nachkommastellen).</value>
+  </data>
 </root>
