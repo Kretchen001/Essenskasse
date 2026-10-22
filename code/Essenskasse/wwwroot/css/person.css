@@ -493,7 +493,18 @@
 
 .ek-people {
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    align-items: start; /* aufgeklappte Kachel streckt ihre Nachbarn nicht in die Hoehe */
 }
+
+/* Anbieter haben keinen Saldo, daher eine neutrale Farbe fuer Rand und Kuerzel */
+.ek-provider {
+    border-left-color: var(--ek-focus);
+}
+
+    .ek-provider .ek-avatar {
+        background: var(--ek-line);
+        color: var(--ek-text);
+    }
 
 .ek-person-text {
     flex: 1;
