@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EssenskasseAPI.Data;
+using Microsoft.AspNetCore.Mvc;
 using Modells;
 using Modells.User;
 using MySql.Data.MySqlClient;
@@ -11,10 +12,10 @@ namespace EssenskasseAPI.Controllers {
     public class BackupController : ControllerBase {
 
         #region Config
-        private readonly IConfiguration Configuration;
+        private readonly Db _db;
 
         public BackupController(IConfiguration configuration) {
-            Configuration = configuration;
+            _db = new Db(configuration);
         }
         #endregion
 
@@ -35,12 +36,12 @@ namespace EssenskasseAPI.Controllers {
             Directory.CreateDirectory(dirForBackup);
 
             //request everything
-            List<Person> persons = DataTableToListOfPerson(QueryExecuterAtMySql("SELECT * FROM essenskasse.Person"));
-            List<Tuple<Provider, bool>> providers = DataTableToListOfProvider(QueryExecuterAtMySql("SELECT * FROM essenskasse.Provider"));
-            List<Payment> payments = DataTableToListOfPayments(QueryExecuterAtMySql("SELECT * FROM essenskasse.Payment"));
-            List<Order> orders = DataTableToListOfOrders(QueryExecuterAtMySql("SELECT * FROM essenskasse.Order"));
-            List<TransactionProcedure> transactionProcedures = DataTableToListOfTransactionProcedure(QueryExecuterAtMySql("SELECT * FROM essenskasse.TransactionProcedure"));
-            List<Tuple<Guid, Settings>> settings = DataTableToListOfSettings(QueryExecuterAtMySql("SELECT * FROM essenskasse.SettingsUser"));
+            List<Person> persons = DataTableToListOfPerson(_db.Query("SELECT * FROM essenskasse.Person"));
+            List<Tuple<Provider, bool>> providers = DataTableToListOfProvider(_db.Query("SELECT * FROM essenskasse.Provider"));
+            List<Payment> payments = DataTableToListOfPayments(_db.Query("SELECT * FROM essenskasse.Payment"));
+            List<Order> orders = DataTableToListOfOrders(_db.Query("SELECT * FROM essenskasse.Order"));
+            List<TransactionProcedure> transactionProcedures = DataTableToListOfTransactionProcedure(_db.Query("SELECT * FROM essenskasse.TransactionProcedure"));
+            List<Tuple<Guid, Settings>> settings = DataTableToListOfSettings(_db.Query("SELECT * FROM essenskasse.SettingsUser"));
 
             //save all as json
             System.IO.File.WriteAllText(dirForBackup + "/person.json", JsonConvert.SerializeObject(persons));
@@ -75,104 +76,102 @@ namespace EssenskasseAPI.Controllers {
             //read json's if there and restore
             if (fileExist[0]) {
                 List<Person> persons = JsonConvert.DeserializeObject<List<Person>>(System.IO.File.ReadAllText(dirForBackup + "/person.json")) ?? [];
-                QueryExecuterAtMySql("TRUNCATE essenskasse.Person;");
+                _db.Query("TRUNCATE essenskasse.Person;");
                 foreach (Person x in persons) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
-                        $"VALUES (" +
-                        $"'{x.Guid}'," +
-                        $"'{Uri.UnescapeDataString(x.Name)}', " +
-                        $"'{Uri.UnescapeDataString(x.Email)}', " +
-                        $"{x.Saldo.Euro}, " +
-                        $"{x.Saldo.Cent});";
-                    QueryExecuterAtMySql(queryStringInsert);
+                        $"VALUES (@guid, @name, @email, @euro, @cent);";
+                    _db.Query(queryStringInsert,
+                        Db.P("@guid", x.Guid),
+                        Db.P("@name", Uri.UnescapeDataString(x.Name)),
+                        Db.P("@email", Uri.UnescapeDataString(x.Email)),
+                        Db.P("@euro", x.Saldo.Euro),
+                        Db.P("@cent", x.Saldo.Cent));
                 }
             }
             if (fileExist[1]) {
                 List<Tuple<Provider, bool>> providers = JsonConvert.DeserializeObject<List<Tuple<Provider, bool>>>(System.IO.File.ReadAllText(dirForBackup + "/provider.json")) ?? [];
-                QueryExecuterAtMySql("TRUNCATE essenskasse.Provider;");
+                _db.Query("TRUNCATE essenskasse.Provider;");
                 foreach (Tuple<Provider, bool> x in providers) {
-                    string v = "false";
-                    if (x.Item2) {
-                        v = "true";
-                    }
                     string queryStringInsert = $"" +
-                        $"INSERT INTO essenskasse.Provider (Guid, Designation, Sichtbar)" +
-                        $"VALUES (" +
-                        $"'{x.Item1.Guid}', " +
-                        $"'{x.Item1.Designation}', " +
-                        $"{v})";
-                    QueryExecuterAtMySql(queryStringInsert);
+                        $"INSERT INTO essenskasse.Provider (Guid, Designation, Sichtbar) " +
+                        $"VALUES (@guid, @designation, @visible);";
+                    _db.Query(queryStringInsert,
+                        Db.P("@guid", x.Item1.Guid),
+                        Db.P("@designation", x.Item1.Designation),
+                        Db.P("@visible", x.Item2));
                 }
             }
             if (fileExist[2]) {
                 List<Payment> payments = JsonConvert.DeserializeObject<List<Payment>>(System.IO.File.ReadAllText(dirForBackup + "/payment.json")) ?? [];
-                QueryExecuterAtMySql("TRUNCATE essenskasse.Payment;");
+                _db.Query("TRUNCATE essenskasse.Payment;");
                 foreach (Payment x in payments) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment) " +
-                        $"VALUES (" +
-                        $"{x.DateTime.Ticks}, " +
-                        $"{x.Amount.Euro}, " +
-                        $"{x.Amount.Cent}, " +
-                        $"'{x.ReferencedPerson}', " +
-                        $"'{x.Comment}');";
-                    QueryExecuterAtMySql(queryStringInsert);
+                        $"VALUES (@dateTime, @euro, @cent, @person, @comment);";
+                    _db.Query(queryStringInsert,
+                        Db.P("@dateTime", x.DateTime.Ticks),
+                        Db.P("@euro", x.Amount.Euro),
+                        Db.P("@cent", x.Amount.Cent),
+                        Db.P("@person", x.ReferencedPerson),
+                        Db.P("@comment", x.Comment));
                 }
             }
             if (fileExist[3]) {
                 List<Order> orders = JsonConvert.DeserializeObject<List<Order>>(System.IO.File.ReadAllText(dirForBackup + "/order.json")) ?? [];
-                QueryExecuterAtMySql("TRUNCATE essenskasse.Order;");
+                _db.Query("TRUNCATE essenskasse.Order;");
                 foreach (Order x in orders) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson) " +
-                        $"VALUES (" +
-                        $"{x.DateTime.Ticks}, " +
-                        $"{x.Money.Euro}, " +
-                        $"{x.Money.Cent}, " +
-                        $"'{x.Provider.Guid}', " +
-                        $"'{x.Provider.Designation}', " +
-                        $"'{x.ReferencedPerson}');";
-                    QueryExecuterAtMySql(queryStringInsert);
+                        $"VALUES (@dateTime, @euro, @cent, @providerGuid, @providerDesignation, @person);";
+                    _db.Query(queryStringInsert,
+                        Db.P("@dateTime", x.DateTime.Ticks),
+                        Db.P("@euro", x.Money.Euro),
+                        Db.P("@cent", x.Money.Cent),
+                        Db.P("@providerGuid", x.Provider.Guid),
+                        Db.P("@providerDesignation", x.Provider.Designation),
+                        Db.P("@person", x.ReferencedPerson));
                 }
             }
             if (fileExist[4]) {
                 List<TransactionProcedure> transactionProcedures = JsonConvert.DeserializeObject<List<TransactionProcedure>>(System.IO.File.ReadAllText(dirForBackup + "/transactionProcedure.json")) ?? [];
 
-                QueryExecuterAtMySql("TRUNCATE essenskasse.TransactionProcedure");
+                _db.Query("TRUNCATE essenskasse.TransactionProcedure");
                 foreach (TransactionProcedure x in transactionProcedures) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.TransactionProcedure (DateTime, AmountEuro, AmountCent, Comment) " +
-                        $"VALUES (" +
-                        $"{x.DateTime.Ticks}, " +
-                        $"{x.Amount.Euro}, " +
-                        $"{x.Amount.Cent}, " +
-                        $"'{x.Comment}');";
-                    QueryExecuterAtMySql(queryStringInsert);
+                        $"VALUES (@dateTime, @euro, @cent, @comment);";
+                    _db.Query(queryStringInsert,
+                        Db.P("@dateTime", x.DateTime.Ticks),
+                        Db.P("@euro", x.Amount.Euro),
+                        Db.P("@cent", x.Amount.Cent),
+                        Db.P("@comment", x.Comment));
                 }
             }
             if (fileExist[5]) {
                 List<Tuple<Guid, Settings>> settings = JsonConvert.DeserializeObject<List<Tuple<Guid, Settings>>>(System.IO.File.ReadAllText(dirForBackup + "/settings.json")) ?? [];
-                QueryExecuterAtMySql("TRUNCATE essenskasse.SettingsUser;");
+                _db.Query("TRUNCATE essenskasse.SettingsUser;");
                 foreach (Tuple<Guid, Settings> x in settings) {
                     string queryStringInsert = $"" +
                         $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
                                             $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
                                             $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
                                             $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
-                        $"VALUES (" +
-                        $"'{x.Item1}', " +
-                        $"{x.Item2.IsSingleListWishDashboard}, " +
-                        $"{x.Item2.LoadAmountPayment}, " +
-                        $"{x.Item2.LoadAmountOrder}, " +
-                        $"{x.Item2.FilterShowProvider}, " +
-                        $"'{x.Item2.DashboardMoneyLimit}', " +
-                        $"{x.Item2.FilterShowPerson}, " +
-                        $"'{x.Item2.AccessToken}', " +
-                        $"'{x.Item2.AdminEmail}', " +
-                        $"{x.Item2.NoticeableOnRightSide}, " +
-                        $"{x.Item2.SendConfirmationMail});";
-                    QueryExecuterAtMySql(queryStringInsert);
+                        $"VALUES (@userGuid, @singleList, @loadPayment, @loadOrder, @showProvider, " +
+                                            $"@moneyLimit, @showPerson, @accessToken, " +
+                                            $"@adminEmail, @rightSide, @sendMail);";
+                    _db.Query(queryStringInsert,
+                        Db.P("@userGuid", x.Item1),
+                        Db.P("@singleList", x.Item2.IsSingleListWishDashboard),
+                        Db.P("@loadPayment", x.Item2.LoadAmountPayment),
+                        Db.P("@loadOrder", x.Item2.LoadAmountOrder),
+                        Db.P("@showProvider", x.Item2.FilterShowProvider),
+                        Db.P("@moneyLimit", x.Item2.DashboardMoneyLimit.ToString()),
+                        Db.P("@showPerson", x.Item2.FilterShowPerson),
+                        Db.P("@accessToken", x.Item2.AccessToken?.ToString() ?? "00000000-0000-0000-0000-000000000000"),
+                        Db.P("@adminEmail", x.Item2.AdminEmail),
+                        Db.P("@rightSide", x.Item2.NoticeableOnRightSide),
+                        Db.P("@sendMail", x.Item2.SendConfirmationMail));
                 }
             }
             return Ok();
@@ -180,22 +179,6 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region InternalFunctions
-        private DataTable QueryExecuterAtMySql(string Query) {
-            // MySql Connection
-            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
-
-            MySqlCommand cmd = new MySqlCommand(Query, connection);
-
-            DataTable dataTable = new DataTable();
-            // read the result
-            connection.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            dataTable.Load(reader);
-            connection.Close();
-
-            return dataTable;
-        }
-
         private static List<Person> DataTableToListOfPerson(DataTable dataTable) {
             List<Person> personList = [];
             foreach (DataRow row in dataTable.Rows) {
