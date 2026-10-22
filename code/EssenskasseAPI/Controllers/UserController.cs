@@ -16,6 +16,7 @@ namespace EssenskasseAPI.Controllers {
     public class UserController : ControllerBase {
 
         #region Config
+        private static readonly string DummyHash = PasswordHasher.Hash("dummy");
         private readonly Db _db;
 
         public UserController(IConfiguration configuration) {
@@ -43,7 +44,7 @@ namespace EssenskasseAPI.Controllers {
                     return StatusCode(StatusCodes.Status403Forbidden);
                 }
             }
-            using (Operation.Time($"CreateNewUser {name}, {userName}, {pwd}, {email}, {role}")) {
+            using (Operation.Time($"CreateNewUser {name}, {userName}, {email}, {role}")) {
                 U.User user = new U.User(name, userName, pwd, email, role);
                 string queryStringInsert = $"" +
                     $"INSERT INTO essenskasse.User (Guid, Name, UserName, Pwd, Email, Role) " +
@@ -52,7 +53,7 @@ namespace EssenskasseAPI.Controllers {
                     Db.P("@guid", user.Guid),
                     Db.P("@name", Uri.UnescapeDataString(user.Name)),
                     Db.P("@userName", Uri.UnescapeDataString(user.UserName)),
-                    Db.P("@pwd", Uri.UnescapeDataString(user.Pwd)),
+                    Db.P("@pwd", PasswordHasher.Hash(Uri.UnescapeDataString(user.Pwd))),
                     Db.P("@email", Uri.UnescapeDataString(user.Email)),
                     Db.P("@role", user.Role));
 
@@ -94,8 +95,8 @@ namespace EssenskasseAPI.Controllers {
                         userToUpdate.UserName = Uri.UnescapeDataString(userName);
                     }
                     if (pwd != "") {
-                        Log.Information($"{userToUpdate.Pwd} to |{pwd}| change");
-                        userToUpdate.Pwd = Uri.UnescapeDataString(pwd);
+                        Log.Information($"Password of {userToUpdate.Name} changed");
+                        userToUpdate.Pwd = PasswordHasher.Hash(Uri.UnescapeDataString(pwd));
                     }
                     if (email != "") {
                         Log.Information($"{userToUpdate.Email} to |{email}| change");
@@ -166,13 +167,17 @@ namespace EssenskasseAPI.Controllers {
                 string queryStringInsert = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.User " +
-                    $"WHERE Name=@name AND " +
-                    $"Pwd=@pwd;";
-                DataTable dataTableUser = _db.Query(queryStringInsert,
-                    Db.P("@name", name),
-                    Db.P("@pwd", pwd));
+                    $"WHERE Name=@name;";
+                DataTable dataTableUser = _db.Query(queryStringInsert, Db.P("@name", name));
                 List<U.User> user = DataTableToListOfUser(dataTableUser);
-                if (user.Count == 1) {
+                if (user.Count == 1 && PasswordHasher.Verify(pwd, user[0].Pwd)) {
+                    if (PasswordHasher.NeedsRehash(user[0].Pwd)) {
+                        // Altbestand mit Klartext-Passwort: beim ersten erfolgreichen Login durch einen Hash ersetzen.
+                        _db.Query("UPDATE essenskasse.User SET Pwd=@pwd WHERE Guid=@guid;",
+                            Db.P("@pwd", PasswordHasher.Hash(pwd)),
+                            Db.P("@guid", user[0].Guid));
+                        Log.Information($"Password of {user[0].Name} migrated to hash");
+                    }
                     U.SessionToken token = new U.SessionToken(Guid.NewGuid(), user[0].Guid, DateTime.Now.AddDays(14).Ticks);
                     string queryStringInsertToken = $"" +
                         $"INSERT INTO essenskasse.SessionToken (Guid, UserGuid, ExpaireDate) " +
@@ -184,6 +189,10 @@ namespace EssenskasseAPI.Controllers {
                     return Ok(token.Guid);
                 }
                 else {
+                    if (user.Count == 0) {
+                        // gleiche Rechenzeit wie bei einem vorhandenen Benutzer (keine Benutzernamen-Erkennung per Antwortzeit)
+                        PasswordHasher.Verify(pwd, DummyHash);
+                    }
                     return NoContent();
                 }
             }
