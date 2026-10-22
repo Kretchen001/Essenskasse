@@ -911,4 +911,25 @@
   <data name="orderLastAmount" xml:space="preserve">
     <value>Как в прошлый раз</value>
   </data>
+  <data name="orderPersonsLabel" xml:space="preserve">
+    <value>чел.</value>
+  </data>
+  <data name="orderSumLabel" xml:space="preserve">
+    <value>Итого</value>
+  </data>
+  <data name="orderReview" xml:space="preserve">
+    <value>Проверить заказ</value>
+  </data>
+  <data name="orderPreviewTitle" xml:space="preserve">
+    <value>Подтвердить заказ</value>
+  </data>
+  <data name="orderExistingWarn" xml:space="preserve">
+    <value>В этот день уже есть заказы: {0}. Всё равно добавить?</value>
+  </data>
+  <data name="orderConfirmNow" xml:space="preserve">
+    <value>Заказать сейчас</value>
+  </data>
+  <data name="orderNoProvider" xml:space="preserve">
+    <value>Сначала создайте поставщика.</value>
+  </data>
 </root>

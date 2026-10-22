@@ -911,4 +911,25 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="orderLastAmount" xml:space="preserve">
     <value>Wie zuletzt</value>
   </data>
+  <data name="orderPersonsLabel" xml:space="preserve">
+    <value>Personen</value>
+  </data>
+  <data name="orderSumLabel" xml:space="preserve">
+    <value>Summe</value>
+  </data>
+  <data name="orderReview" xml:space="preserve">
+    <value>Bestellung prüfen</value>
+  </data>
+  <data name="orderPreviewTitle" xml:space="preserve">
+    <value>Bestellung bestätigen</value>
+  </data>
+  <data name="orderExistingWarn" xml:space="preserve">
+    <value>An diesem Tag gibt es bereits {0} Bestellung(en). Trotzdem eintragen?</value>
+  </data>
+  <data name="orderConfirmNow" xml:space="preserve">
+    <value>Jetzt bestellen</value>
+  </data>
+  <data name="orderNoProvider" xml:space="preserve">
+    <value>Bitte zuerst einen Anbieter anlegen.</value>
+  </data>
 </root>

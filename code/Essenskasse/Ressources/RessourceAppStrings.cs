@@ -267,5 +267,12 @@
         orderOnlyFilled,
         orderChipsLabel,
         orderLastAmount,
+        orderPersonsLabel,
+        orderSumLabel,
+        orderReview,
+        orderPreviewTitle,
+        orderExistingWarn,
+        orderConfirmNow,
+        orderNoProvider,
     }
 }

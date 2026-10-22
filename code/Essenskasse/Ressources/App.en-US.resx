@@ -911,4 +911,25 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="orderLastAmount" xml:space="preserve">
     <value>Same as last time</value>
   </data>
+  <data name="orderPersonsLabel" xml:space="preserve">
+    <value>people</value>
+  </data>
+  <data name="orderSumLabel" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="orderReview" xml:space="preserve">
+    <value>Review order</value>
+  </data>
+  <data name="orderPreviewTitle" xml:space="preserve">
+    <value>Confirm order</value>
+  </data>
+  <data name="orderExistingWarn" xml:space="preserve">
+    <value>There are already {0} order(s) on this day. Add anyway?</value>
+  </data>
+  <data name="orderConfirmNow" xml:space="preserve">
+    <value>Order now</value>
+  </data>
+  <data name="orderNoProvider" xml:space="preserve">
+    <value>Please create a provider first.</value>
+  </data>
 </root>

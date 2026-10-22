@@ -1,0 +1,20 @@
+﻿@inject IStringLocalizer<App> _loc
+
+@if (Open) {
+    <div class="ek-login-backdrop" @onclick="CloseAsync"></div>
+    <div id="@dialogId" class="ek-dialog @(Wide ? "is-wide" : "")" role="dialog" aria-modal="true" aria-labelledby="@titleId" tabindex="-1" @onkeydown="OnKeyDown">
+        <div class="ek-login-head">
+            <h2 id="@titleId" class="ek-login-title">@Title</h2>
+            <button type="button" class="ek-icon-btn" aria-label="@_loc[nameof(RessourceAppStrings.close)]"
+                    title="@_loc[nameof(RessourceAppStrings.close)]" @onclick="CloseAsync">✕</button>
+        </div>
+        <div class="ek-dialog-body">
+            @ChildContent
+        </div>
+        @if (Footer is not null) {
+            <div class="ek-dialog-foot">
+                @Footer
+            </div>
+        }
+    </div>
+}

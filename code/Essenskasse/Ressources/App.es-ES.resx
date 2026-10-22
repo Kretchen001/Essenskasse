@@ -911,4 +911,25 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="orderLastAmount" xml:space="preserve">
     <value>Como la última vez</value>
   </data>
+  <data name="orderPersonsLabel" xml:space="preserve">
+    <value>personas</value>
+  </data>
+  <data name="orderSumLabel" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="orderReview" xml:space="preserve">
+    <value>Revisar pedido</value>
+  </data>
+  <data name="orderPreviewTitle" xml:space="preserve">
+    <value>Confirmar pedido</value>
+  </data>
+  <data name="orderExistingWarn" xml:space="preserve">
+    <value>Ya hay {0} pedido(s) ese día. ¿Añadir de todos modos?</value>
+  </data>
+  <data name="orderConfirmNow" xml:space="preserve">
+    <value>Pedir ahora</value>
+  </data>
+  <data name="orderNoProvider" xml:space="preserve">
+    <value>Cree primero un proveedor.</value>
+  </data>
 </root>

@@ -2,6 +2,7 @@
 
 .ek-topbar,
 .ek-login,
+.ek-dialog,
 .ek-toast {
     --ek-surface: #ffffff;
     --ek-line: #d3dad9;
@@ -19,6 +20,7 @@
 
 body.Dark .ek-topbar,
 body.Dark .ek-login,
+body.Dark .ek-dialog,
 body.Dark .ek-toast {
     --ek-surface: #383e41;
     --ek-line: #4d5659;
