@@ -21,6 +21,7 @@ namespace Essenskasse.Cards {
         public EventCallback<Person> OnUpdated { get; set; }
 
         private bool isEditing = false;
+        private bool showDetails = false;
         private bool isSaving = false;
         private string editName = "";
         private string editEmail = "";
@@ -31,8 +32,13 @@ namespace Essenskasse.Cards {
 
         private string Initials => PersonText.Initials(Person.Name);
 
+        private void ToggleDetails() {
+            showDetails = !showDetails;
+        }
+
         private async Task CopyGuid() {
             await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Person.Guid.ToString());
+            ToastService.ShowToast(_loc[nameof(RessourceAppStrings.copied)], ToastLevel.Success);
         }
 
         private Task SendPaymentMail() => PaymentMail.SendAsync(JSRuntime, _loc, ToastService, Person);

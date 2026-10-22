@@ -606,4 +606,10 @@
   <data name="copied" xml:space="preserve">
     <value>Copiado</value>
   </data>
+  <data name="details" xml:space="preserve">
+    <value>Detalles</value>
+  </data>
+  <data name="hideDetails" xml:space="preserve">
+    <value>Ocultar detalles</value>
+  </data>
 </root>

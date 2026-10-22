@@ -606,4 +606,10 @@
   <data name="copied" xml:space="preserve">
     <value>Скопировано</value>
   </data>
+  <data name="details" xml:space="preserve">
+    <value>Подробности</value>
+  </data>
+  <data name="hideDetails" xml:space="preserve">
+    <value>Скрыть подробности</value>
+  </data>
 </root>

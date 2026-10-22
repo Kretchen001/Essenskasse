@@ -166,5 +166,7 @@
         noEmailEntered,
         copyEmail,
         copied,
+        details,
+        hideDetails,
     }
 }

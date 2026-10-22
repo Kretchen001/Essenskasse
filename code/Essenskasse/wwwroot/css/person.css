@@ -83,6 +83,54 @@
     color: var(--ek-hero-muted);
 }
 
+/* Details: eigene Zeile unter der Kachel */
+.ek-people .ek-person {
+    flex-wrap: wrap;
+}
+
+.ek-person-details {
+    flex: 1 0 100%;
+    margin-top: 0.1rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--ek-line);
+}
+
+.ek-detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+}
+
+.ek-detail-label {
+    flex: none;
+    color: var(--ek-muted);
+    font-size: 0.85rem;
+}
+
+.ek-guid {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 0.85rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ek-chevron {
+    transition: transform 0.15s;
+}
+
+    .ek-chevron.is-open {
+        transform: rotate(180deg);
+    }
+
+@media (prefers-reduced-motion: reduce) {
+    .ek-chevron {
+        transition: none;
+    }
+}
+
 .ek-icon-warn:hover {
     border-color: var(--ek-bad);
     color: var(--ek-bad);
