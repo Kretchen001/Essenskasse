@@ -124,10 +124,6 @@ namespace Essenskasse.Pages {
             base.StateHasChanged();
         }
 
-        public async Task CopyToClipboard(string text) {
-            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
-        }
-
         private void ChangePersonShownList() {
             ApplyFilterAndSort();
         }

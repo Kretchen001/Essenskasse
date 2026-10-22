@@ -1,5 +1,72 @@
 ﻿/* Personenseite. Farben und Grundschrift kommen von .ek-dash (siehe dashboard.css). */
 
+/* ---------- Personenliste ---------- */
+
+.ek-people-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1rem 0 0.75rem;
+}
+
+.ek-people {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+}
+
+.ek-person-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.ek-person-sub {
+    margin: 0;
+    overflow: hidden;
+    color: var(--ek-muted);
+    font-size: 0.88rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+    .ek-person-sub.ek-muted {
+        font-style: italic;
+    }
+
+/* Kachel ohne Saldo-Farbe */
+.ek-person-neutral {
+    border-left-color: var(--ek-line-strong);
+}
+
+    .ek-person-neutral .ek-avatar {
+        background: var(--ek-line);
+        color: var(--ek-text);
+    }
+
+/* Kleiner Symbol-Knopf (wie der Mail-Knopf auf dem Dashboard) */
+.ek-icon-btn {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid var(--ek-line);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ek-muted);
+    font: inherit;
+    cursor: pointer;
+}
+
+    .ek-icon-btn:hover {
+        border-color: var(--ek-line-strong);
+        color: var(--ek-text);
+    }
+
+    .ek-icon-btn:focus-visible {
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 2px;
+    }
+
 /* ---------- Kein Zugriff ---------- */
 
 .ek-denied {

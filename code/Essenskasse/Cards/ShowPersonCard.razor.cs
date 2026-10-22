@@ -16,19 +16,7 @@ namespace Essenskasse.Cards {
         [Parameter]
         public bool PositivSaldo { get; set; } = false;
 
-        /// <summary>Anfangsbuchstaben fuer den Kreis neben dem Namen (Vor- und Nachname, sonst nur der erste).</summary>
-        private string Initials {
-            get {
-                string[] parts = (Person.Name ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length == 0) {
-                    return "?";
-                }
-                if (parts.Length == 1) {
-                    return char.ToUpper(parts[0][0]).ToString();
-                }
-                return $"{char.ToUpper(parts[0][0])}{char.ToUpper(parts[^1][0])}";
-            }
-        }
+        private string Initials => PersonText.Initials(Person.Name);
 
         private async void SendEmailForPayment() {
             if (Person.Email.Equals("")) {
