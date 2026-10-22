@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EssenskasseAPI.Data;
+using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -12,10 +13,10 @@ namespace EssenskasseAPI.Controllers {
     public class OrderController : ControllerBase {
 
         #region Config
-        private readonly IConfiguration Configuration;
+        private readonly Db _db;
 
         public OrderController(IConfiguration configuration) {
-            Configuration = configuration;
+            _db = new Db(configuration);
         }
         #endregion
 
@@ -27,7 +28,7 @@ namespace EssenskasseAPI.Controllers {
                     $"SELECT * " +
                     $"FROM essenskasse.Order;";
 
-                DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
+                DataTable dataTableOrders = _db.Query(queryString);
                 List<Order> ordersList = DataTableToListOfOrders(dataTableOrders);
 
                 if (ordersList is not null) {
@@ -52,9 +53,9 @@ namespace EssenskasseAPI.Controllers {
                     $"SELECT * " +
                     $"FROM essenskasse.Order " +
                     $"ORDER BY DateTime DESC " +
-                    $"LIMIT {amount};";
+                    $"LIMIT @amount;";
 
-                DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
+                DataTable dataTableOrders = _db.Query(queryString, Db.P("@amount", amount));
                 List<Order> orders = DataTableToListOfOrders(dataTableOrders);
                 if (orders.Count != 0) {
                     Log.Information(orders.Count + " Orders requested");
@@ -84,9 +85,11 @@ namespace EssenskasseAPI.Controllers {
                     $"SELECT * " +
                     $"FROM essenskasse.Order " +
                     $"ORDER BY DateTime DESC " +
-                    $"LIMIT {amount} OFFSET {alreadyLoaded};";
+                    $"LIMIT @amount OFFSET @alreadyLoaded;";
 
-                DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
+                DataTable dataTableOrders = _db.Query(queryString,
+                    Db.P("@amount", amount),
+                    Db.P("@alreadyLoaded", alreadyLoaded));
                 List<Order> oders = DataTableToListOfOrders(dataTableOrders);
 
                 if (oders.Count != 0) {
@@ -112,17 +115,19 @@ namespace EssenskasseAPI.Controllers {
                 string queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Order " +
-                        $"WHERE ReferencedPerson='{guid}' " +
+                        $"WHERE ReferencedPerson=@guid " +
                         $"ORDER BY DateTime DESC;";
                 if (amount is not null) { // request amount
                     queryString = $"" +
                         $"SELECT * " +
                         $"FROM essenskasse.Order " +
-                        $"WHERE ReferencedPerson='{guid}' " +
+                        $"WHERE ReferencedPerson=@guid " +
                         $"ORDER BY DateTime DESC " +
-                        $"LIMIT {amount};";
+                        $"LIMIT @amount;";
                 }
-                DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
+                DataTable dataTableOrders = _db.Query(queryString,
+                    Db.P("@guid", guid),
+                    Db.P("@amount", amount));
                 List<Order> orders = DataTableToListOfOrders(dataTableOrders);
                 if (orders.Count != 0) {
                     Log.Information(guid.ToString() + " requested and " + orders.Count + " found.");
@@ -141,20 +146,16 @@ namespace EssenskasseAPI.Controllers {
                 Log.Information("GetCountOfOrdersFromDay called");
                 if (dateString is not null) {
                     DateTime date = DateTime.Parse(dateString);
+                    // Die Datenbank speichert Ticks: alle Bestellungen des Tages liegen in [Tagesbeginn, Tagesbeginn + 1 Tag).
                     string queryString = $"" +
                         $"SELECT * " +
-                        $"FROM essenskasse.Order;";
+                        $"FROM essenskasse.Order " +
+                        $"WHERE DateTime >= @dayStart AND DateTime < @dayEnd;";
 
-                    DataTable dataTableOrders = QueryExecuterAtMySql(queryString);
+                    DataTable dataTableOrders = _db.Query(queryString,
+                        Db.P("@dayStart", date.Date.Ticks),
+                        Db.P("@dayEnd", date.Date.AddDays(1).Ticks));
                     List<Order> orders = DataTableToListOfOrders(dataTableOrders);
-                    List<Order> removeCandidates = [];
-                    foreach (Order order in orders) {
-                        if (date.Date != order.DateTime.Date) {
-                            removeCandidates.Add(order);
-                        }
-                    }
-                    orders.RemoveAll(x => removeCandidates.Contains(x));
-                    //List<Order> orders = _orderDbController.OrdersAtDay(date);
                     string temp = date.ToString("yyyy-MM-ddTHH:mm:ss");
                     Log.Information($"{orders.Count} Orders at {temp} found and responsed");
                     return Ok(JsonConvert.SerializeObject(orders.Count));
@@ -230,8 +231,8 @@ namespace EssenskasseAPI.Controllers {
                     string queryStringToken = $"" +
                             $"SELECT COUNT(*) " +
                             $"FROM essenskasse.User " +
-                            $"WHERE TokenForChange='{accessToken}';";
-                    DataTable dataTableTokenCount = QueryExecuterAtMySql(queryStringToken);
+                            $"WHERE TokenForChange=@accessToken;";
+                    DataTable dataTableTokenCount = _db.Query(queryStringToken, Db.P("@accessToken", accessToken));
                     if (dataTableTokenCount.Rows.Count == 1) {
                         Log.Information($"{accessToken} called UpdateOrder.");
                         if (dateAsLong is null) {
@@ -241,8 +242,8 @@ namespace EssenskasseAPI.Controllers {
                         string queryString = $"" +
                             $"SELECT * " +
                             $"FROM essenskasse.Order " +
-                            $"WHERE DateTime={dateAsLong};";
-                        DataTable dataTable = QueryExecuterAtMySql(queryString);
+                            $"WHERE DateTime=@dateAsLong;";
+                        DataTable dataTable = _db.Query(queryString, Db.P("@dateAsLong", dateAsLong));
                         List<Order> orders = DataTableToListOfOrders(dataTable);
 
                         if (orders.Count == 0) {
@@ -272,8 +273,8 @@ namespace EssenskasseAPI.Controllers {
                             string queryStringUpdateSaldo = $"" +
                                 $"SELECT * " +
                                 $"FROM essenskasse.Person " +
-                                $"WHERE Guid='{orders[0].ReferencedPerson}';";
-                            DataTable dataTablePersonToUpdate = QueryExecuterAtMySql(queryStringUpdateSaldo);
+                                $"WHERE Guid=@guid;";
+                            DataTable dataTablePersonToUpdate = _db.Query(queryStringUpdateSaldo, Db.P("@guid", orders[0].ReferencedPerson));
 
                             if (dataTablePersonToUpdate.Rows.Count == 1) {
                                 Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
@@ -284,16 +285,25 @@ namespace EssenskasseAPI.Controllers {
 
                                 string queryStringPersonUpdate = $"" +
                                     $"UPDATE essenskasse.Person " +
-                                    $"SET SaldoEuro={personToUpdate.Saldo.Euro}, SaldoCent={personToUpdate.Saldo.Cent} " +
-                                    $"WHERE Guid='{personToUpdate.Guid}';";
-                                QueryExecuterAtMySql(queryStringPersonUpdate);
+                                    $"SET SaldoEuro=@euro, SaldoCent=@cent " +
+                                    $"WHERE Guid=@guid;";
+                                _db.Query(queryStringPersonUpdate,
+                                    Db.P("@euro", personToUpdate.Saldo.Euro),
+                                    Db.P("@cent", personToUpdate.Saldo.Cent),
+                                    Db.P("@guid", personToUpdate.Guid));
                             }
 
                             string queryStringUpdate = $"" +
                                 $"UPDATE essenskasse.Order " +
-                                $"SET AmountEuro={orders[0].Money.Euro}, AmountCent={orders[0].Money.Cent}, ProviderGuid='{orders[0].Provider.Guid}', ProviderDesignation='{orders[0].Provider.Designation}', ReferencedPerson='{orders[0].ReferencedPerson}' " +
-                                $"WHERE DateTime='{dateAsLong}';";
-                            QueryExecuterAtMySql(queryStringUpdate);
+                                $"SET AmountEuro=@euro, AmountCent=@cent, ProviderGuid=@providerGuid, ProviderDesignation=@providerDesignation, ReferencedPerson=@person " +
+                                $"WHERE DateTime=@dateAsLong;";
+                            _db.Query(queryStringUpdate,
+                                Db.P("@euro", orders[0].Money.Euro),
+                                Db.P("@cent", orders[0].Money.Cent),
+                                Db.P("@providerGuid", orders[0].Provider.Guid),
+                                Db.P("@providerDesignation", orders[0].Provider.Designation),
+                                Db.P("@person", orders[0].ReferencedPerson),
+                                Db.P("@dateAsLong", dateAsLong));
                             Log.Information("Order successfully updated");
                             return Ok();
                         }
@@ -316,8 +326,8 @@ namespace EssenskasseAPI.Controllers {
                     string queryString = $"" +
                     $"SELECT * " +
                     $"FROM essenskasse.Order " +
-                    $"WHERE DateTime={dateAsLong}";
-                    DataTable dataTable = QueryExecuterAtMySql(queryString);
+                    $"WHERE DateTime=@dateAsLong;";
+                    DataTable dataTable = _db.Query(queryString, Db.P("@dateAsLong", dateAsLong));
                     List<Order> orders = DataTableToListOfOrders(dataTable);
                     if (orders.Count == 0) {
                         Log.Warning($"At {dateAsLong} no Order found");
@@ -326,8 +336,8 @@ namespace EssenskasseAPI.Controllers {
                     string queryStringDelete = $"" +
                         $"DELETE " +
                         $"FROM essenskasse.Order " +
-                        $"WHERE DateTime={dateAsLong};";
-                    QueryExecuterAtMySql(queryStringDelete);
+                        $"WHERE DateTime=@dateAsLong;";
+                    _db.Query(queryStringDelete, Db.P("@dateAsLong", dateAsLong));
                     Log.Information($"Order at {orders[0].DateTime.Ticks} successfully removed");
                     return Ok(JsonConvert.SerializeObject(orders[0]));
                 }
@@ -340,22 +350,6 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region InternalFunctions
-        private DataTable QueryExecuterAtMySql(string Query) {
-            // MySql Connection
-            MySqlConnection connection = new MySqlConnection(Configuration["ConnectionStrings:essenskasse"]);
-
-            MySqlCommand cmd = new MySqlCommand(Query, connection);
-
-            DataTable dataTable = new DataTable();
-            // read the result
-            connection.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            dataTable.Load(reader);
-            connection.Close();
-
-            return dataTable;
-        }
-
         private static List<Order> DataTableToListOfOrders(DataTable dataTableOrders) {
             List<Order> ordersList = [];
             foreach (DataRow row in dataTableOrders.Rows) {
@@ -392,9 +386,11 @@ namespace EssenskasseAPI.Controllers {
             string queryString = $"" +
                 $"SELECT * " +
                 $"FROM essenskasse.Provider " +
-                $"WHERE (Guid='{order.Provider.Guid}') AND (Designation='{order.Provider.Designation}');";
+                $"WHERE (Guid=@providerGuid) AND (Designation=@providerDesignation);";
 
-            DataTable dataTableProvider = QueryExecuterAtMySql(queryString);
+            DataTable dataTableProvider = _db.Query(queryString,
+                Db.P("@providerGuid", order.Provider.Guid),
+                Db.P("@providerDesignation", order.Provider.Designation));
             if (dataTableProvider.Rows.Count != 1) {
                 Log.Warning($"{order.Provider.Guid} not available...");
                 return 1;
@@ -403,22 +399,22 @@ namespace EssenskasseAPI.Controllers {
             // create and insert new order
             string queryStringInsert = $"" +
                 $"INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson) " +
-                $"VALUES (" +
-                $"{order.DateTime.Ticks}, " +
-                $"{order.Money.Euro}, " +
-                $"{order.Money.Cent}, " +
-                $"'{order.Provider.Guid}', " +
-                $"'{order.Provider.Designation}', " +
-                $"'{order.ReferencedPerson}');";
-            QueryExecuterAtMySql(queryStringInsert);
-            Log.Information(queryStringInsert + " - inserted");
+                $"VALUES (@dateTime, @euro, @cent, @providerGuid, @providerDesignation, @person);";
+            _db.Query(queryStringInsert,
+                Db.P("@dateTime", order.DateTime.Ticks),
+                Db.P("@euro", order.Money.Euro),
+                Db.P("@cent", order.Money.Cent),
+                Db.P("@providerGuid", order.Provider.Guid),
+                Db.P("@providerDesignation", order.Provider.Designation),
+                Db.P("@person", order.ReferencedPerson));
+            Log.Information($"Order {order.DateTime.Ticks} of {order.Money} for {order.ReferencedPerson} inserted");
 
             // update person saldo
             string queryStringUpdateSaldo = $"" +
                 $"SELECT * " +
                 $"FROM essenskasse.Person " +
-                $"WHERE Guid='{order.ReferencedPerson}';";
-            DataTable dataTablePersonToUpdate = QueryExecuterAtMySql(queryStringUpdateSaldo);
+                $"WHERE Guid=@guid;";
+            DataTable dataTablePersonToUpdate = _db.Query(queryStringUpdateSaldo, Db.P("@guid", order.ReferencedPerson));
 
             if (dataTablePersonToUpdate.Rows.Count == 1) {
                 Person personToUpdate = DataTableToPerson(dataTablePersonToUpdate);
@@ -428,9 +424,12 @@ namespace EssenskasseAPI.Controllers {
 
                 string queryStringPersonUpdate = $"" +
                     $"UPDATE essenskasse.Person " +
-                    $"SET SaldoEuro = {personToUpdate.Saldo.Euro}, SaldoCent = {personToUpdate.Saldo.Cent} " +
-                    $"WHERE Guid='{personToUpdate.Guid}';";
-                QueryExecuterAtMySql(queryStringPersonUpdate);
+                    $"SET SaldoEuro=@euro, SaldoCent=@cent " +
+                    $"WHERE Guid=@guid;";
+                _db.Query(queryStringPersonUpdate,
+                    Db.P("@euro", personToUpdate.Saldo.Euro),
+                    Db.P("@cent", personToUpdate.Saldo.Cent),
+                    Db.P("@guid", personToUpdate.Guid));
 
                 Log.Information($"New Order of {order.Money} for Person added.");
                 return 0;
