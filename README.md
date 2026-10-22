@@ -8,6 +8,7 @@
 - [Beschreibung Deutsch](#beschreibung-deutsch)
 - [Description English](#description-english)
 - [Installation and Run](#installation-and-run)
+- [Update auf 1.3.0 / Upgrade to 1.3.0](#update-auf-130--upgrade-to-130)
 - [Contribution](#contribution)
 
 ## Beschreibung Deutsch
@@ -64,6 +65,34 @@ Because of the settings in the `docker-compose.yml` the essentiell port for call
 start http://localhost:8009
 ```
 This will call the Dashboard.
+
+## Update auf 1.3.0 / Upgrade to 1.3.0
+**Deutsch**
+1. **Sicherung erstellen** (z. B. `mysqldump` oder `POST api/backup/newNow`).
+2. **Datenbank migrieren** (additiv, ändert keine Daten, beliebig oft ausführbar):
+   ```bash
+   cd code
+   docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> essenskasse < MySqlScripts/update_v1-2-0_zu_1-3-0.sql
+   ```
+   Die Ausgabe zeigt verwaiste Datensätze und abweichende Salden an. Ein Fremdschlüssel wird nur angelegt, wenn es keine verwaisten Datensätze gibt.
+3. **Neu bauen und starten:** `docker-compose up -d --build`.
+
+Was sich ändert:
+- Die API verlangt für alle Endpunkte ein Sitzungs-Token (`Authorization: Bearer {Token}`). Die PWA sendet es automatisch nach dem Login. Ohne Anmeldung bleibt nur das Dashboard (`GET person/requestAll`) offen. Eigene Clients/Skripte müssen sich anpassen (Login: `POST api/user/newTokenForUser`).
+- Passwörter werden als Hash gespeichert. Bestehende Klartext-Passwörter werden beim ersten erfolgreichen Login automatisch umgestellt.
+- Den allerersten Benutzer legt man ohne Anmeldung an (`POST api/user/new` mit den Headern `name`, `userName`, `pwd`, `email`, `role`); danach dürfen das nur Administratoren.
+- Buchungen (Bestellung/Einzahlung und Saldo) werden atomar gespeichert; Löschen und Ändern korrigiert den Saldo.
+- Optionale Einstellungen der API (z. B. als Umgebungsvariablen im `docker-compose.yml`):
+
+  | Einstellung | Wirkung |
+  |---|---|
+  | `Security__AdminMaxRole` | Benutzer mit `Role` bis zu diesem Wert sind Administratoren (Backup, Benutzerverwaltung). Standard 100 = jeder angemeldete Benutzer. |
+  | `Cors__AllowedOrigins__0` | Erlaubte Adresse der PWA, z. B. `http://meinserver:8009`. Ohne Angabe sind alle Origins erlaubt. |
+  | `Swagger__Enabled` | `true` schaltet Swagger im Container ein (Standard: nur in Development). |
+
+**English**
+1. Create a backup. 2. Run `code/MySqlScripts/update_v1-2-0_zu_1-3-0.sql` against the database (additive: it never deletes or changes data and can be run repeatedly). 3. Rebuild with `docker-compose up -d --build`.
+All API endpoints now require a session token (`Authorization: Bearer {token}`) except `GET person/requestAll` (dashboard) and the login; the PWA sends it automatically. Passwords are stored hashed and existing plaintext passwords are converted on the next successful login. The very first user can be created without a login, afterwards only administrators can create users. Settings: `Security__AdminMaxRole`, `Cors__AllowedOrigins__0`, `Swagger__Enabled`.
 
 ## Contribution
 Source of the icon: [www.flaticon.com/free-icon](https://www.flaticon.com/free-icon/cost_11645186?related_id=11645144&origin=search)
