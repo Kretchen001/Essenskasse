@@ -935,4 +935,10 @@
   <data name="orderNoOrdersYet" xml:space="preserve">
     <value>Заказов пока нет.</value>
   </data>
+  <data name="overviewNoDayTotal" xml:space="preserve">
+    <value>Итого за день</value>
+  </data>
+  <data name="overviewTableLabel" xml:space="preserve">
+    <value>Заказы по дням и людям</value>
+  </data>
 </root>

@@ -275,5 +275,7 @@
         orderConfirmNow,
         orderNoProvider,
         orderNoOrdersYet,
+        overviewNoDayTotal,
+        overviewTableLabel,
     }
 }

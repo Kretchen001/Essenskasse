@@ -935,4 +935,10 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="orderNoOrdersYet" xml:space="preserve">
     <value>Aún no hay pedidos.</value>
   </data>
+  <data name="overviewNoDayTotal" xml:space="preserve">
+    <value>Total del día</value>
+  </data>
+  <data name="overviewTableLabel" xml:space="preserve">
+    <value>Pedidos por día y persona</value>
+  </data>
 </root>

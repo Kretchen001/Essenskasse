@@ -58,10 +58,14 @@ namespace Essenskasse.Pages {
             onlyFilled = false;
         }
 
-        private record DateAndOrder(List<string> Head, DateTime DateTime, List<Order?> Orders);
-        private List<DateAndOrder> orderListForOverview = [];
-        private DateTime referenceDate = DateTime.Now;
-        private int overviewOrderAlreadyLoadCount = 0;
+        private const int OverviewPageSize = 100;
+
+        /// <summary>Alle bisher fuer die Uebersicht geladenen Bestellungen (neueste zuerst).</summary>
+        private readonly List<Order> overviewOrders = [];
+        private List<OrderOverviewDay> overviewDays = [];
+        private List<Person> overviewPeople = [];
+        private bool overviewLoading = false;
+        private bool noMoreToLoad = false;
 
         private string ModalTitle = "";
 
@@ -88,20 +92,12 @@ namespace Essenskasse.Pages {
 
         private async Task ShowView(OrderView target) {
             view = target;
-            if (target == OrderView.Overview && orderListForOverview.Count == 0 && !noMoreToLoad) {
+            if (target == OrderView.Overview && overviewOrders.Count == 0 && !noMoreToLoad) {
                 await LoadOrdersForOverview();
             }
         }
 
         private Guid selectedProvider = new Guid();
-
-        private bool noMoreToLoad = false;
-
-        private int OpacityOfNoMoreToLoad {
-            get {
-                return noMoreToLoad ? 50 : 100;
-            }
-        }
 
         private int Amount {
             get => AppData.LoadAmountOrder;
@@ -337,6 +333,7 @@ namespace Essenskasse.Pages {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
                     previewOpen = false;
                     ClearAllAmounts();
+                    ResetOverview();
                     await LoadLastAmounts();
                     await RequestAllPerson(); // neue Salden anzeigen
                 }
@@ -411,109 +408,57 @@ namespace Essenskasse.Pages {
             }
         }
 
-        /// <summary></summary>
-        private async Task LoadOrdersForOverview() {
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "order/requestNextAmount"),
-                Headers = {
-                    { "amount", 100.ToString() },
-                    { "alreadyLoaded", overviewOrderAlreadyLoadCount.ToString() }
-                }
-            };
+        /// <summary>Verwirft die geladene Uebersicht (z. B. nach neuen Bestellungen), sie wird beim naechsten Oeffnen neu geladen.</summary>
+        private void ResetOverview() {
+            overviewOrders.Clear();
+            overviewDays = [];
+            overviewPeople = [];
+            noMoreToLoad = false;
+        }
 
-            HttpResponseMessage? response;
+        /// <summary>Laedt die naechsten Bestellungen und baut die Tage der Uebersicht neu auf.</summary>
+        private async Task LoadOrdersForOverview() {
+            if (overviewLoading) {
+                return;
+            }
+            overviewLoading = true;
             try {
-                response = await HttpClient.SendAsync(httpRequestMessage);
+                HttpResponseMessage response = await HttpClient.SendAsync(new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "order/requestNextAmount"),
+                    Headers = {
+                        { "amount", OverviewPageSize.ToString() },
+                        { "alreadyLoaded", overviewOrders.Count.ToString() }
+                    }
+                });
+                if (!response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+                    return;
+                }
+                string json = await response.Content.ReadAsStringAsync();
+                List<Order> loaded = json.Length == 0 ? [] : JsonConvert.DeserializeObject<List<Order>>(json) ?? [];
+                if (loaded.Count == 0) {
+                    noMoreToLoad = true;
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.nothingMoreToLoad)], ToastLevel.Info);
+                }
+                else {
+                    overviewOrders.AddRange(loaded);
+                    noMoreToLoad = loaded.Count < OverviewPageSize;
+                    overviewDays = OrderOverview.Build(overviewOrders);
+                    HashSet<Guid> ordered = OrderOverview.PeopleWithOrders(overviewDays);
+                    overviewPeople = person.Where(x => ordered.Contains(x.Guid)).ToList();
+                }
             }
             catch {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
             }
-
-            if (response.IsSuccessStatusCode) {
-                List<Order> order = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
-                overviewOrderAlreadyLoadCount += order.Count;
-                referenceDate = referenceDate.AddDays(1); // for the next load essential
-
-                if (order.Count == 0) {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.nothingMoreToLoad)], ToastLevel.Info);
-                    noMoreToLoad = true;
-                    base.StateHasChanged();
-                    return;
-                }
-                while (order.Count != 0) {
-                    List<Order?> dayOrders = new List<Order?>();
-                    if (!orderListForOverview.Exists(x => x.DateTime.Date == referenceDate.Date)) {
-                        List<string> head = [_loc[nameof(RessourceAppStrings.date)]];
-                        // initialize day with null && the head
-                        for (int i = 0; i < person.Count; i += 1) {
-                            dayOrders.Add(null);
-                            head.Add(person[i].Name);
-                        }
-                        // if order at day insert it
-                        while (order[0].DateTime.Date == referenceDate.Date) {
-                            // insert the order to person-row
-                            dayOrders[person.FindIndex(x => x.Guid.Equals(order[0].ReferencedPerson))] = order[0];
-                            order.RemoveAt(0);
-                            if (order.Count == 0) {
-                                break;
-                            }
-                        }
-                        // add the day-orders
-                        orderListForOverview.Add(new DateAndOrder(
-                            Head: head,
-                            DateTime: referenceDate,
-                            Orders: dayOrders)
-                        );
-                    }
-                    else { // day already exist -> update cells at last day, other should be irrelevant
-                        while (order[0].DateTime.Date == referenceDate.Date) {
-                            int i = person.FindIndex(x => x.Guid.Equals(order[0].ReferencedPerson));
-                            orderListForOverview[^1].Orders[i] = order[0];
-                            order.RemoveAt(0);
-                            if (order.Count == 0) {
-                                break;
-                            }
-                        }
-                    }
-                    // go to the day before
-                    referenceDate = referenceDate.AddDays(-1);
-                }
-                base.StateHasChanged();
-            }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+            finally {
+                overviewLoading = false;
             }
         }
 
-        /// <summary>
-        /// Check which content should be printed in the cell.
-        /// </summary>
-        /// <param name="x">Order, that contain the Money-Value or is null if not</param>
-        /// <returns>if Money-Value is null => "-" and otherwise the Money.ToString()</returns>
-        private static string OverviewCellFillContent(Order? x) => (x is null) ? "-" : x!.Money.ToString();
+        private static long CentsOf(OrderOverviewDay day, Person x) => day.CentsByPerson.TryGetValue(x.Guid, out long cents) ? cents : 0;
 
-        private static string OverviewCellFill(DateAndOrder x) {
-            bool isWeekend = x.DateTime.DayOfWeek == DayOfWeek.Saturday || x.DateTime.DayOfWeek == DayOfWeek.Sunday;
-            bool hasOrder = x.Orders != null;
-
-            if (isWeekend) {
-                if (hasOrder) {
-                    return "background-color: #FFDDC1;";
-                }
-                else {
-                    return "background-color: #FFE4E1;";
-                }
-            }
-            else {
-                if (hasOrder) {
-                    return "background-color: #DFF0D8;";
-                }
-                else {
-                    return "background-color: #F9F9F9;";
-                }
-            }
-        }
+        private static bool IsWeekend(DateTime date) => date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
     }
 }

@@ -258,14 +258,122 @@
     }
 }
 
-/* Uebersicht (vorlaeufig, wird mit der neuen Uebersicht ersetzt) */
-.overViewGrid {
+/* Uebersicht: Tabelle am PC, Tageskarten auf dem Handy */
+.ek-ovw-table {
     max-height: 70vh;
     overflow: auto;
+    border: 1px solid var(--ek-line);
+    border-radius: 12px;
+    background: var(--ek-surface);
 }
 
-    .overViewGrid thead {
+    .ek-ovw-table table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ek-ovw-table th,
+    .ek-ovw-table td {
+        padding: 0.45rem 0.8rem;
+        border-bottom: 1px solid var(--ek-line);
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .ek-ovw-table thead th {
         position: sticky;
         top: 0;
-        background-color: var(--ek-surface);
+        z-index: 2;
+        background: var(--ek-surface);
+        border-bottom: 2px solid var(--ek-line-strong);
+        font-weight: 650;
     }
+
+    .ek-ovw-table .ek-ovw-date {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background: var(--ek-surface);
+        border-right: 1px solid var(--ek-line);
+        text-align: left;
+        font-weight: 600;
+    }
+
+    .ek-ovw-table thead .ek-ovw-date {
+        z-index: 3;
+    }
+
+    .ek-ovw-table .ek-ovw-person {
+        max-width: 9rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ek-ovw-table .ek-ovw-sum {
+        font-weight: 650;
+        border-left: 1px solid var(--ek-line);
+    }
+
+    .ek-ovw-table td.no-order {
+        color: var(--ek-muted);
+    }
+
+    .ek-ovw-table tr.is-weekend > * {
+        background: rgba(128, 128, 128, 0.12);
+    }
+
+    .ek-ovw-table tbody tr:hover > * {
+        background: rgba(128, 128, 128, 0.2);
+    }
+
+.ek-ovw-cards {
+    display: none;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.ek-ovw-card {
+    border: 1px solid var(--ek-line);
+    border-left-width: 4px;
+    border-left-color: var(--ek-ok);
+    border-radius: 12px;
+    background: var(--ek-surface);
+}
+
+    .ek-ovw-card.is-weekend {
+        border-left-color: var(--ek-line-strong);
+    }
+
+    .ek-ovw-card header {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.6rem 0.9rem;
+    }
+
+    .ek-ovw-card ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .ek-ovw-card li {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.35rem 0.9rem;
+        border-top: 1px solid var(--ek-line);
+        font-variant-numeric: tabular-nums;
+    }
+
+@media (max-width: 719.98px) {
+    .ek-ovw-table {
+        display: none;
+    }
+
+    .ek-ovw-cards {
+        display: flex;
+    }
+}

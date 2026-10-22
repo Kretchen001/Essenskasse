@@ -935,4 +935,10 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="orderNoOrdersYet" xml:space="preserve">
     <value>Noch keine Bestellungen.</value>
   </data>
+  <data name="overviewNoDayTotal" xml:space="preserve">
+    <value>Tagessumme</value>
+  </data>
+  <data name="overviewTableLabel" xml:space="preserve">
+    <value>Bestellungen je Tag und Person</value>
+  </data>
 </root>

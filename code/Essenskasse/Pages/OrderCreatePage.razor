@@ -1,7 +1,5 @@
 ﻿@page "/orderCreate"
 
-@using Microsoft.AspNetCore.Components.QuickGrid;
-
 @inject HttpClient HttpClient
 @inject IJSRuntime JSRuntime
 @inject IConfiguration Config
@@ -193,31 +191,79 @@
             }
             else {
                 <h3 class="ek-group-title">@_loc[nameof(RessourceAppStrings.overview)]</h3>
-                <div class="overViewGrid">
-                    @if (orderListForOverview.Count != 0) {
-                        <QuickGrid Items="@orderListForOverview.AsQueryable()">
-                            <PropertyColumn Property="@(p => p.DateTime.ToString("d"))"
-                                            Title="@(orderListForOverview[0].Head[0])" />
-                            @foreach (int i in Enumerable.Range(0, person.Count)) {
-                                <PropertyColumn Property="@(p => OverviewCellFillContent(p.Orders[i]))"
-                                                Title="@(orderListForOverview[0].Head[i + 1])" Class="text-center" />
-                            }
-                        </QuickGrid>
-                    }
-                </div>
+                @if (overviewLoading && overviewDays.Count == 0) {
+                    <ul class="ek-hist" aria-busy="true" aria-live="polite">
+                        @for (int i = 0; i < 4; i++) {
+                            <li class="ek-skeleton" aria-hidden="true"><span class="ek-skeleton-line"></span></li>
+                        }
+                    </ul>
+                }
+                else if (overviewDays.Count == 0) {
+                    <div class="ek-empty">
+                        <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.orderNoOrdersYet)]</p>
+                    </div>
+                }
+                else {
+                    <div class="ek-ovw-table" tabindex="0" role="region" aria-label="@_loc[nameof(RessourceAppStrings.overviewTableLabel)]">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="ek-ovw-date">@_loc[nameof(RessourceAppStrings.date)]</th>
+                                    @foreach (Person x in overviewPeople) {
+                                        <th scope="col" class="ek-ovw-person" title="@x.Name">@x.Name</th>
+                                    }
+                                    <th scope="col" class="ek-ovw-sum">@_loc[nameof(RessourceAppStrings.orderSumLabel)]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (OrderOverviewDay day in overviewDays) {
+                                    <tr class="@(IsWeekend(day.Date) ? "is-weekend" : "")">
+                                        <th scope="row" class="ek-ovw-date">@day.Date.ToString("ddd dd.MM.yy")</th>
+                                        @foreach (Person x in overviewPeople) {
+                                            long cents = CentsOf(day, x);
+                                            <td class="@(cents > 0 ? "has-order" : "no-order")">@(cents > 0 ? Modells.Money.FromTotalCents(cents).ToString() : "–")</td>
+                                        }
+                                        <td class="ek-ovw-sum">@Modells.Money.FromTotalCents(day.TotalCents).ToString()</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
-                <button type="button" class="btn-primary" data-dismiss="modal"
-                        style="border-radius:8px; margin-top: 1rem; opacity: @OpacityOfNoMoreToLoad%"
-                        disabled="@noMoreToLoad" @onclick="LoadOrdersForOverview">
-                    @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
-                </button>
+                    <div class="ek-ovw-cards">
+                        @foreach (OrderOverviewDay day in overviewDays) {
+                            <section class="ek-ovw-card @(IsWeekend(day.Date) ? "is-weekend" : "")">
+                                <header>
+                                    <strong>@day.Date.ToString("dddd, dd.MM.yyyy")</strong>
+                                    <span class="ek-hist-amount">@Modells.Money.FromTotalCents(day.TotalCents).ToString()</span>
+                                </header>
+                                <ul>
+                                    @foreach (Person x in overviewPeople) {
+                                        long cents = CentsOf(day, x);
+                                        if (cents > 0) {
+                                            <li>
+                                                <span>@x.Name</span>
+                                                <span>@Modells.Money.FromTotalCents(cents).ToString()</span>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            </section>
+                        }
+                    </div>
 
-                <hr />
-
-                <label>
-                    @_loc[nameof(RessourceAppStrings.lastDayMaybyIncomplete)]
-                </label>
-
+                    <div class="ek-hist-more">
+                        @if (noMoreToLoad) {
+                            <span class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.endOfList)]</span>
+                        }
+                        else {
+                            <button type="button" class="ek-btn" disabled="@overviewLoading" @onclick="LoadOrdersForOverview">
+                                @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+                            </button>
+                            <p class="ek-hint">@_loc[nameof(RessourceAppStrings.lastDayMaybyIncomplete)]</p>
+                        }
+                    </div>
+                }
             }
         </div>
     </Authorized>
