@@ -24,6 +24,7 @@ namespace EssenskasseAPI.Test {
             { "GET", "api/order/requestAll" },
             { "POST", "api/order/insertNew" },
             { "PUT", "api/order/update" },
+            { "GET", "api/order/lastAmounts" },
             { "DELETE", "api/order/remove" },
             { "GET", "api/payment/requestAll" },
             { "POST", "api/payment/insertNew" },

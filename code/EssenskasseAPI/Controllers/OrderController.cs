@@ -142,6 +142,30 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        /// <summary>Je Person die zuletzt bestellte Summe (fuer den Vorschlag im Bestellfenster).</summary>
+        [HttpGet, Route("lastAmounts")]
+        public IActionResult GetLastAmountPerPerson() {
+            using (Operation.Time("TaskDuration")) {
+                string queryString = $"" +
+                    $"SELECT o.* " +
+                    $"FROM essenskasse.Order o " +
+                    $"INNER JOIN (" +
+                    $"  SELECT ReferencedPerson, MAX(DateTime) AS LastDate " +
+                    $"  FROM essenskasse.Order GROUP BY ReferencedPerson" +
+                    $") m ON o.ReferencedPerson = m.ReferencedPerson AND o.DateTime = m.LastDate;";
+                DataTable dataTable = _db.Query(queryString);
+                List<LastOrderAmount> result = [];
+                foreach (Order order in DataTableToListOfOrders(dataTable)) {
+                    result.Add(new LastOrderAmount() {
+                        ReferencedPerson = order.ReferencedPerson,
+                        Money = order.Money,
+                        DateTime = order.DateTime
+                    });
+                }
+                return Ok(JsonConvert.SerializeObject(result));
+            }
+        }
+
         [HttpGet, Route("requestDate")]
         public IActionResult GetCountOfOrdersFromDay([FromHeader] string? dateString) {
             using (Operation.Time("TaskDuration")) {
