@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS essenskasse.Payment (
     AmountEuro BIGINT,
     AmountCent SMALLINT,
     ReferencedPerson CHAR(36),
-    Comment TEXT
+    Comment TEXT,
+    INDEX idx_Payment_ReferencedPerson (ReferencedPerson),
+    CONSTRAINT fk_Payment_Person FOREIGN KEY (ReferencedPerson) REFERENCES essenskasse.Person (Guid)
 );
 
 -- Erstelle die Tabelle für Provider
@@ -30,7 +32,11 @@ CREATE TABLE IF NOT EXISTS essenskasse.Order (
     AmountCent SMALLINT,
     ProviderGuid CHAR(36),
     ProviderDesignation VARCHAR(255),
-    ReferencedPerson CHAR(36)
+    ReferencedPerson CHAR(36),
+    INDEX idx_Order_ReferencedPerson (ReferencedPerson),
+    INDEX idx_Order_ProviderGuid (ProviderGuid),
+    CONSTRAINT fk_Order_Person FOREIGN KEY (ReferencedPerson) REFERENCES essenskasse.Person (Guid),
+    CONSTRAINT fk_Order_Provider FOREIGN KEY (ProviderGuid) REFERENCES essenskasse.Provider (Guid)
 );
 
 -- Erstelle die Tabelle für TransactionProcedure
