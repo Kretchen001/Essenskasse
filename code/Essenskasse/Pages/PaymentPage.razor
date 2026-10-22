@@ -91,9 +91,29 @@
         </div>
         <br />
         <div class="row">
-            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" disabled="@(isBooking || !AmountValid)" @onclick="() => InsertPayment()">
-                @_loc[nameof(RessourceAppStrings.creditAmount)]
-            </button>
+            @if (!previewOpen) {
+                <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px"
+                        disabled="@(!AmountValid || SelectedPersonData is null)" @onclick="OpenPreview">
+                    @_loc[nameof(RessourceAppStrings.creditAmount)]
+                </button>
+            }
+            else if (SelectedPersonData is not null) {
+                <div class="border rounded p-3" role="group" aria-label="@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]">
+                    <h5>@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]</h5>
+                    <p class="mb-1"><strong>@SelectedPersonData.Name</strong>: @Money.ToString()</p>
+                    <p class="mb-3">
+                        @_loc[nameof(RessourceAppStrings.balanceBefore)]: @SelectedPersonData.Saldo.ToString()
+                        &nbsp;→&nbsp;
+                        @_loc[nameof(RessourceAppStrings.balanceAfter)]: <strong>@BalanceAfter?.ToString()</strong>
+                    </p>
+                    <button type="button" class="btn-success" style="border-radius:8px" disabled="@isBooking" @onclick="() => InsertPayment()">
+                        @_loc[nameof(RessourceAppStrings.bookNow)]
+                    </button>
+                    <button type="button" style="border-radius:8px" disabled="@isBooking" @onclick="ClosePreview">
+                        @_loc[nameof(RessourceAppStrings.cancel)]
+                    </button>
+                </div>
+            }
         </div>
         <br />
         <hr />

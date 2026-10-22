@@ -750,4 +750,16 @@
   <data name="amountInvalid" xml:space="preserve">
     <value>Introduce un importe como 10,50 (como máximo dos decimales).</value>
   </data>
+  <data name="bookingPreviewTitle" xml:space="preserve">
+    <value>Por favor, revisa</value>
+  </data>
+  <data name="balanceBefore" xml:space="preserve">
+    <value>Saldo actual</value>
+  </data>
+  <data name="balanceAfter" xml:space="preserve">
+    <value>Saldo después</value>
+  </data>
+  <data name="bookNow" xml:space="preserve">
+    <value>Registrar ahora</value>
+  </data>
 </root>

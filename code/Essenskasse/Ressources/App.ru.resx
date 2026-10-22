@@ -750,4 +750,16 @@
   <data name="amountInvalid" xml:space="preserve">
     <value>Введите сумму, например 10,50 (не более двух знаков после запятой).</value>
   </data>
+  <data name="bookingPreviewTitle" xml:space="preserve">
+    <value>Пожалуйста, проверьте</value>
+  </data>
+  <data name="balanceBefore" xml:space="preserve">
+    <value>Сейчас</value>
+  </data>
+  <data name="balanceAfter" xml:space="preserve">
+    <value>После</value>
+  </data>
+  <data name="bookNow" xml:space="preserve">
+    <value>Провести</value>
+  </data>
 </root>

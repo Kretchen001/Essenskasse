@@ -750,4 +750,16 @@
   <data name="amountInvalid" xml:space="preserve">
     <value>Bitte einen Betrag wie 10,50 eingeben (höchstens zwei Nachkommastellen).</value>
   </data>
+  <data name="bookingPreviewTitle" xml:space="preserve">
+    <value>Bitte prüfen</value>
+  </data>
+  <data name="balanceBefore" xml:space="preserve">
+    <value>Stand jetzt</value>
+  </data>
+  <data name="balanceAfter" xml:space="preserve">
+    <value>Stand danach</value>
+  </data>
+  <data name="bookNow" xml:space="preserve">
+    <value>Jetzt buchen</value>
+  </data>
 </root>

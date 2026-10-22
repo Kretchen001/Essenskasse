@@ -214,5 +214,9 @@
         hidePassword,
         signingIn,
         amountInvalid,
+        bookingPreviewTitle,
+        balanceBefore,
+        balanceAfter,
+        bookNow,
     }
 }

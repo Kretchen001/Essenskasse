@@ -18,12 +18,20 @@ namespace Essenskasse.Pages {
             }
             set {
                 _selectedPerson = value;
+                previewOpen = false;
                 _ = RequestPaymentsOfPerson();
             }
         }
 
         /// <summary>Eingetippter Betrag, z. B. "12,50". Wird erst beim Buchen in einen Geldbetrag umgewandelt.</summary>
-        private string amountText = "";
+        private string _amountText = "";
+        private string amountText {
+            get => _amountText;
+            set {
+                _amountText = value ?? "";
+                previewOpen = false; // die Vorschau gilt nur fuer genau diesen Betrag
+            }
+        }
         private bool AmountEntered => amountText.Trim().Length > 0;
         private bool AmountValid => MoneyParser.TryParse(amountText, out Money parsed) && parsed.ToTotalCents() != 0;
         private Money Money => MoneyParser.TryParse(amountText, out Money parsed) ? parsed : new Money(0, 0);
@@ -113,6 +121,46 @@ namespace Essenskasse.Pages {
         }
 
         private bool isBooking = false;
+        private bool previewOpen = false;
+
+        private Person? SelectedPersonData => person?.Find(x => x.Guid.Equals(SelectedPerson));
+
+        /// <summary>Stand der Person nach der Buchung (Stand jetzt plus Betrag).</summary>
+        private Money? BalanceAfter => SelectedPersonData is null
+            ? null
+            : Money.FromTotalCents(SelectedPersonData.Saldo.ToTotalCents() + Money.ToTotalCents());
+
+        private void OpenPreview() {
+            if (AmountValid && SelectedPersonData is not null) {
+                previewOpen = true;
+            }
+        }
+
+        private void ClosePreview() {
+            previewOpen = false;
+        }
+
+        /// <summary>Holt den aktuellen Stand der Person vom Server, damit die naechste Vorschau stimmt.</summary>
+        private async Task RefreshSaldoAsync(Guid guid) {
+            HttpRequestMessage request = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/perGuid"),
+                Headers = { { "guid", guid.ToString() } }
+            };
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode) {
+                    Person? fresh = JsonConvert.DeserializeObject<Person>(await response.Content.ReadAsStringAsync());
+                    Person? local = person?.Find(x => x.Guid.Equals(guid));
+                    if (fresh is not null && local is not null) {
+                        local.Saldo = fresh.Saldo;
+                    }
+                }
+            }
+            catch {
+                // Der Stand ist nur Anzeige; ein Fehler hier darf die Buchung nicht beeintraechtigen.
+            }
+        }
 
         /// <summary>Bucht die Einzahlung. Solange eine Buchung laeuft, wird jeder weitere Aufruf ignoriert (kein doppeltes Buchen).</summary>
         private async Task InsertPayment() {
@@ -125,6 +173,7 @@ namespace Essenskasse.Pages {
             }
             finally {
                 isBooking = false;
+                previewOpen = false;
             }
         }
 
@@ -134,10 +183,6 @@ namespace Essenskasse.Pages {
             }
             Guid bookedFor = SelectedPerson;
             Money booked = Money;
-            if (!(await JSRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.insertFollowingAmount)] + "\n" + booked.ToString()))) {
-                return;
-            }
-
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),
@@ -161,6 +206,7 @@ namespace Essenskasse.Pages {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessfullyAdded)], ToastLevel.Success);
                 amountText = "";
                 comment = "";
+                await RefreshSaldoAsync(bookedFor);
                 Payment newPayment = JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!;
                 newPayment.Comment = Uri.UnescapeDataString(newPayment.Comment);
                 if (bookedFor == SelectedPerson) {
