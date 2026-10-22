@@ -20,13 +20,28 @@ namespace EssenskasseAPI {
 
             WebApplication app = builder.Build();
 
-            app.UseSwagger();
-            app.UseSwaggerUI(x => {
-                x.SwaggerEndpoint("/swagger/v1/swagger.json", "EssenskasseAPI");
-            });
+            // Swagger nur in Development oder wenn "Swagger:Enabled" gesetzt ist
+            // (z. B. Umgebungsvariable Swagger__Enabled=true im Container).
+            if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled")) {
+                app.UseSwagger();
+                app.UseSwaggerUI(x => {
+                    x.SwaggerEndpoint("/swagger/v1/swagger.json", "EssenskasseAPI");
+                });
+            }
 
-            // Allow CORS
-            app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
+            // CORS: Mit "Cors:AllowedOrigins" (Liste, z. B. Cors__AllowedOrigins__0=http://meinserver:8009)
+            // wird auf die PWA eingeschraenkt. Ohne Angabe bleibt es wie bisher offen; das ist vertretbar,
+            // weil die API Anmeldedaten nur per Authorization-Header (kein Cookie) entgegennimmt.
+            string[] allowedOrigins = app.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+            app.UseCors(x => {
+                x.AllowAnyMethod().AllowAnyHeader();
+                if (allowedOrigins.Length > 0) {
+                    x.WithOrigins(allowedOrigins);
+                }
+                else {
+                    x.AllowAnyOrigin();
+                }
+            });
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
