@@ -73,8 +73,10 @@
                 <label class="ek-select-wrap">
                     <span>@_loc[nameof(RessourceAppStrings.sortBy)]</span>
                     <select class="ek-select" @bind="SortKey">
-                        <option value="Asc">@_loc[nameof(RessourceAppStrings.sortNameAsc)]</option>
-                        <option value="Desc">@_loc[nameof(RessourceAppStrings.sortNameDesc)]</option>
+                        <option value="@nameof(ProviderSort.NameAsc)">@_loc[nameof(RessourceAppStrings.sortNameAsc)]</option>
+                        <option value="@nameof(ProviderSort.NameDesc)">@_loc[nameof(RessourceAppStrings.sortNameDesc)]</option>
+                        <option value="@nameof(ProviderSort.LastOrderedFirst)">@_loc[nameof(RessourceAppStrings.sortLastOrdered)]</option>
+                        <option value="@nameof(ProviderSort.MostOrdersFirst)">@_loc[nameof(RessourceAppStrings.sortMostOrders)]</option>
                     </select>
                 </label>
             </div>
@@ -111,7 +113,7 @@
             else {
                 <div class="ek-grid ek-people">
                     @foreach (Provider x in shownProviderList) {
-                        <ProviderListCard Provider="x" OnUpdated="OnProviderUpdated" OnRemoved="OnProviderRemoved" />
+                        <ProviderListCard Provider="x" Statistics="StatisticsOf(x)" OnUpdated="OnProviderUpdated" OnRemoved="OnProviderRemoved" />
                     }
                 </div>
             }

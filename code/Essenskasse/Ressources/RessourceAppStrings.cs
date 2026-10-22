@@ -197,5 +197,11 @@
         noProvidersYet,
         noProvidersYetHint,
         providerLoadFailed,
+        providerOrders,
+        providerOrderTotal,
+        providerLastOrder,
+        providerNeverOrdered,
+        sortLastOrdered,
+        sortMostOrders,
     }
 }

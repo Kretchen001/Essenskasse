@@ -699,4 +699,22 @@
   <data name="providerLoadFailed" xml:space="preserve">
     <value>Не удалось загрузить поставщиков.</value>
   </data>
+  <data name="providerOrders" xml:space="preserve">
+    <value>Заказы</value>
+  </data>
+  <data name="providerOrderTotal" xml:space="preserve">
+    <value>Сумма</value>
+  </data>
+  <data name="providerLastOrder" xml:space="preserve">
+    <value>Последний заказ</value>
+  </data>
+  <data name="providerNeverOrdered" xml:space="preserve">
+    <value>Заказов не было</value>
+  </data>
+  <data name="sortLastOrdered" xml:space="preserve">
+    <value>Недавно заказывали</value>
+  </data>
+  <data name="sortMostOrders" xml:space="preserve">
+    <value>Больше всего заказов</value>
+  </data>
 </root>

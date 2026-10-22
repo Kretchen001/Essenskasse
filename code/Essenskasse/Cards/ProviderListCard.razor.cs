@@ -21,7 +21,12 @@ namespace Essenskasse.Cards {
         [Parameter]
         public EventCallback<Provider> OnRemoved { get; set; }
 
+        /// <summary>Auswertung der Bestellungen; null, solange sie nicht geladen ist oder keine Bestellung existiert.</summary>
+        [Parameter]
+        public ProviderStatistics? Statistics { get; set; }
+
         private bool isEditing = false;
+        private bool showDetails = false;
         private bool confirmingRemove = false;
         private bool isRemoving = false;
         private bool isSaving = false;
@@ -30,6 +35,10 @@ namespace Essenskasse.Cards {
         private bool IsDirty => editName.Trim() != Provider.Designation;
 
         private string Initials => PersonText.Initials(Provider.Designation);
+
+        private void ToggleDetails() {
+            showDetails = !showDetails;
+        }
 
         private async Task CopyGuid() {
             await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Provider.Guid.ToString());

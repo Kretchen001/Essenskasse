@@ -15,7 +15,8 @@ namespace Essenskasse.Pages {
         private ElementReference newNameInput;
         private bool isLoading = true;
         private bool loadFailed = false;
-        private bool IsASC = true;
+        private ProviderSort sortMode = ProviderSort.NameAsc;
+        private Dictionary<Guid, ProviderStatistics> statistics = new Dictionary<Guid, ProviderStatistics>();
 
         private string newProviderDesignation = "";
 
@@ -37,13 +38,29 @@ namespace Essenskasse.Pages {
             }
         }
 
-        /// <summary>Gewaehlte Sortierung ("Asc" oder "Desc") fuer das Auswahlfeld; wird im Browser gemerkt.</summary>
+        /// <summary>Gewaehlte Sortierung als Text fuer das Auswahlfeld; wird im Browser gemerkt.</summary>
         private string SortKey {
-            get => IsASC ? "Asc" : "Desc";
+            get => sortMode.ToString();
             set {
-                IsASC = value != "Desc";
-                _ = SaveAscStatus();
-                ApplyFilterAndSort();
+                if (Enum.TryParse(value, out ProviderSort mode)) {
+                    sortMode = mode;
+                    _ = LocalStorage.SetItemAsync<string>("ProviderSort", mode.ToString());
+                    ApplyFilterAndSort();
+                }
+            }
+        }
+
+        private ProviderStatistics? StatisticsOf(Provider provider) {
+            return statistics.TryGetValue(provider.Guid, out ProviderStatistics? s) ? s : null;
+        }
+
+        private async Task ReadSortModeAsync() {
+            string? stored = await LocalStorage.GetItemAsync<string>("ProviderSort");
+            if (Enum.TryParse(stored, out ProviderSort mode)) {
+                sortMode = mode;
+            }
+            else if (await LocalStorage.ContainKeyAsync("ProviderIsASC") && !await LocalStorage.GetItemAsync<bool>("ProviderIsASC")) {
+                sortMode = ProviderSort.NameDesc; // alte Einstellung (absteigend) uebernehmen
             }
         }
 
@@ -59,9 +76,7 @@ namespace Essenskasse.Pages {
                 Nav.NavigateTo("/");
             }
             else {
-                if (await LocalStorage.ContainKeyAsync("ProviderIsASC")) {
-                    IsASC = await LocalStorage.GetItemAsync<bool>("ProviderIsASC");
-                }
+                await ReadSortModeAsync();
                 await RequestAllProviderFromApiAsync();
             }
             base.StateHasChanged();
@@ -91,6 +106,7 @@ namespace Essenskasse.Pages {
                     providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
                     providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
                     ApplyFilterAndSort();
+                    await RequestStatisticsAsync();
                 }
                 else {
                     loadFailed = true;
@@ -99,6 +115,25 @@ namespace Essenskasse.Pages {
             }
             finally {
                 isLoading = false;
+            }
+        }
+
+        /// <summary>Laedt Anzahl, Summe und letzte Bestellung je Anbieter. Ohne diese Daten funktioniert die Seite weiter.</summary>
+        private async Task RequestStatisticsAsync() {
+            HttpRequestMessage request = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "provider/statistics")
+            };
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode) {
+                    List<ProviderStatistics> loaded = JsonConvert.DeserializeObject<List<ProviderStatistics>>(await response.Content.ReadAsStringAsync()) ?? new List<ProviderStatistics>();
+                    statistics = loaded.ToDictionary(x => x.ProviderGuid);
+                    ApplyFilterAndSort();
+                }
+            }
+            catch {
+                // Auswertung ist optional.
             }
         }
 
@@ -160,18 +195,7 @@ namespace Essenskasse.Pages {
 
         /// <summary>Baut die angezeigte Liste aus allen Anbietern: Suchtext (ohne Beachtung der Schreibweise), dann Sortierung.</summary>
         private void ApplyFilterAndSort() {
-            string text = filter.Trim();
-            IEnumerable<Provider> result = providers;
-            if (text.Length > 0) {
-                result = result.Where(x => x.Designation.Contains(text, StringComparison.CurrentCultureIgnoreCase));
-            }
-            shownProviderList = IsASC
-                ? result.OrderBy(x => x.Designation, StringComparer.CurrentCultureIgnoreCase).ToList()
-                : result.OrderByDescending(x => x.Designation, StringComparer.CurrentCultureIgnoreCase).ToList();
-        }
-
-        public async Task SaveAscStatus() {
-            await LocalStorage.SetItemAsync<bool>("ProviderIsASC", IsASC);
+            shownProviderList = ProviderListing.Apply(providers, filter, sortMode, statistics);
         }
     }
 }

@@ -47,6 +47,32 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        /// <summary>Anzahl, Summe und letzte Bestellung je Anbieter (nur Anbieter mit mindestens einer Bestellung).</summary>
+        [HttpGet, Route("statistics")]
+        public IActionResult GetProviderStatistics() {
+            using (Operation.Time("GetProviderStatistics")) {
+                Log.Information("GetProviderStatistics called");
+                DataTable table = _db.Query($"" +
+                    $"SELECT ProviderGuid, COUNT(*) AS OrderCount, " +
+                    $"SUM(AmountEuro * 100 + AmountCent) AS TotalCents, MAX(`DateTime`) AS LastOrder " +
+                    $"FROM essenskasse.`Order` " +
+                    $"GROUP BY ProviderGuid;");
+
+                List<ProviderStatistics> statistics = [];
+                foreach (DataRow row in table.Rows) {
+                    if (row["ProviderGuid"] is DBNull) {
+                        continue;
+                    }
+                    statistics.Add(new ProviderStatistics(
+                        new Guid(row["ProviderGuid"].ToString()!),
+                        Convert.ToInt32(row["OrderCount"]),
+                        Convert.ToInt64(row["TotalCents"]),
+                        row["LastOrder"] is DBNull ? null : Convert.ToDateTime(row["LastOrder"])));
+                }
+                return Ok(JsonConvert.SerializeObject(statistics));
+            }
+        }
+
         [HttpGet, Route("testExist")]
         public IActionResult CheckExistProvider([FromHeader] Guid? guid, [FromHeader] string? designator) {
             using (Operation.Time("TaskDuration")) {

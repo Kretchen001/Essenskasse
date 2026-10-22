@@ -699,4 +699,22 @@
   <data name="providerLoadFailed" xml:space="preserve">
     <value>No se pudieron cargar los proveedores.</value>
   </data>
+  <data name="providerOrders" xml:space="preserve">
+    <value>Pedidos</value>
+  </data>
+  <data name="providerOrderTotal" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="providerLastOrder" xml:space="preserve">
+    <value>Último pedido</value>
+  </data>
+  <data name="providerNeverOrdered" xml:space="preserve">
+    <value>Nunca pedido</value>
+  </data>
+  <data name="sortLastOrdered" xml:space="preserve">
+    <value>Pedido recientemente</value>
+  </data>
+  <data name="sortMostOrders" xml:space="preserve">
+    <value>Más pedidos</value>
+  </data>
 </root>

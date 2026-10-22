@@ -699,4 +699,22 @@
   <data name="providerLoadFailed" xml:space="preserve">
     <value>The providers could not be loaded.</value>
   </data>
+  <data name="providerOrders" xml:space="preserve">
+    <value>Orders</value>
+  </data>
+  <data name="providerOrderTotal" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="providerLastOrder" xml:space="preserve">
+    <value>Latest order</value>
+  </data>
+  <data name="providerNeverOrdered" xml:space="preserve">
+    <value>Never ordered</value>
+  </data>
+  <data name="sortLastOrdered" xml:space="preserve">
+    <value>Recently ordered</value>
+  </data>
+  <data name="sortMostOrders" xml:space="preserve">
+    <value>Most orders</value>
+  </data>
 </root>
