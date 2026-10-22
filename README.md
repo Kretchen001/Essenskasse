@@ -94,5 +94,19 @@ Was sich ändert:
 1. Create a backup. 2. Run `code/MySqlScripts/update_v1-2-0_zu_1-3-0.sql` against the database (additive: it never deletes or changes data and can be run repeatedly). 3. Rebuild with `docker-compose up -d --build`.
 All API endpoints now require a session token (`Authorization: Bearer {token}`) except `GET person/requestAll` (dashboard) and the login; the PWA sends it automatically. Passwords are stored hashed and existing plaintext passwords are converted on the next successful login. The very first user can be created without a login, afterwards only administrators can create users. Settings: `Security__AdminMaxRole`, `Cors__AllowedOrigins__0`, `Swagger__Enabled`.
 
+### Betrieb im Container / Operation in containers
+- Die API im Container bekommt ihren Connection String aus dem `docker-compose.yml` (`ConnectionStrings__essenskasse`, Werte aus `.env`). Die `appsettings.json` darf lokal auf `localhost:8008` zeigen, ohne dass der Container davon beeinflusst wird.
+- Der DB-Port `8008` ist nur noch auf `127.0.0.1` erreichbar (SQL-Client, lokal gestartete API). Die API startet erst, wenn die Datenbank gesund ist.
+- PWA-Updates: Der Service Worker nutzt pro Build einen neuen Cache; `appsettings.json` wird nie gecacht. Nach einem Update wird die neue Version aktiv, sobald alle Tabs der PWA einmal geschlossen waren (kein hartes Neuladen mehr nötig).
+- Tests: `dotnet test` (Authentifizierungs-Tests brauchen keine Datenbank). Den Coverage-Report erzeugt `code/analyze.bat` lokal; er gehört nicht ins Repository.
+
+### MySQL aktualisieren (optional, manuell) / Upgrading MySQL (optional)
+Das Image `mysql:8.0.2` ist eine frühe Vorabversion. Ein einfaches Hochsetzen des Tags auf den vorhandenen Datenordner wird von MySQL für diese Version **nicht unterstützt** und kann die Datenbank unbrauchbar machen. Deshalb wird es nicht automatisch geändert. Sicherer Weg über einen Dump:
+1. Sicherung der Daten: `docker exec EssenskasseDB mysqldump -uroot -p<DB_ROOT_PASSWORD> --databases essenskasse --routines --single-transaction > essenskasse_dump.sql` (Datei prüfen, nicht leer?).
+2. `docker-compose down`, dann das Volume sichern bzw. unter anderem Namen aufheben (`docker volume ls`; **nicht** löschen, bis alles läuft).
+3. Im `docker-compose.yml` das Image auf eine aktuelle 8.0-Version setzen (z. B. `mysql:8.0`) und mit einem neuen, leeren Volume starten: `docker-compose up -d database`.
+4. Dump einspielen: `docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> < essenskasse_dump.sql`, dann `docker-compose up -d --build`.
+5. Funktioniert alles (Anmeldung, Salden, Buchungen), kann das alte Volume später entfernt werden.
+
 ## Contribution
 Source of the icon: [www.flaticon.com/free-icon](https://www.flaticon.com/free-icon/cost_11645186?related_id=11645144&origin=search)
