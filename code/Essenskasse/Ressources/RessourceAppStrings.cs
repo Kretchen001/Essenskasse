@@ -171,5 +171,14 @@
         lastPayments,
         lastOrders,
         noEntriesYet,
+        hidePerson,
+        confirmHide,
+        confirmHideHint,
+        toastPersonHidden,
+        showHiddenPersons,
+        hideHiddenPersons,
+        restore,
+        toastPersonRestored,
+        noHiddenPersons,
     }
 }

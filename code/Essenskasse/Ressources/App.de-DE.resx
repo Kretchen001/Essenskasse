@@ -621,4 +621,31 @@
   <data name="noEntriesYet" xml:space="preserve">
     <value>Noch keine Einträge</value>
   </data>
+  <data name="hidePerson" xml:space="preserve">
+    <value>Person ausblenden</value>
+  </data>
+  <data name="confirmHide" xml:space="preserve">
+    <value>{0} ausblenden?</value>
+  </data>
+  <data name="confirmHideHint" xml:space="preserve">
+    <value>Die Person verschwindet aus allen Listen. Einzahlungen und Bestellungen bleiben erhalten, ausgeblendete Personen lassen sich wiederherstellen.</value>
+  </data>
+  <data name="toastPersonHidden" xml:space="preserve">
+    <value>ausgeblendet</value>
+  </data>
+  <data name="showHiddenPersons" xml:space="preserve">
+    <value>Ausgeblendete Personen anzeigen</value>
+  </data>
+  <data name="hideHiddenPersons" xml:space="preserve">
+    <value>Ausgeblendete Personen verbergen</value>
+  </data>
+  <data name="restore" xml:space="preserve">
+    <value>Wiederherstellen</value>
+  </data>
+  <data name="toastPersonRestored" xml:space="preserve">
+    <value>wiederhergestellt</value>
+  </data>
+  <data name="noHiddenPersons" xml:space="preserve">
+    <value>Keine ausgeblendeten Personen</value>
+  </data>
 </root>

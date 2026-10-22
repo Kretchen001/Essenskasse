@@ -182,6 +182,50 @@
     }
 }
 
+.ek-btn-danger {
+    border-color: var(--ek-bad);
+    background: var(--ek-bad);
+    color: #ffffff;
+}
+
+    .ek-btn-danger:hover {
+        background: var(--ek-bad);
+        border-color: var(--ek-bad);
+        filter: brightness(0.92);
+    }
+
+.ek-confirm {
+    flex: 1 0 100%;
+    margin-top: 0.1rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--ek-bad);
+    border-radius: 8px;
+    background: var(--ek-bad-tint);
+}
+
+.ek-confirm-title {
+    margin: 0 0 0.2rem;
+    font-weight: 650;
+}
+
+.ek-confirm-text {
+    margin: 0 0 0.6rem;
+    font-size: 0.9rem;
+}
+
+.ek-hidden-toggle {
+    margin-top: 1.5rem;
+}
+
+.ek-people-hidden {
+    margin-top: 0.75rem;
+}
+
+.ek-person-muted {
+    border-left-color: var(--ek-line-strong);
+    opacity: 0.85;
+}
+
 .ek-icon-warn:hover {
     border-color: var(--ek-bad);
     color: var(--ek-bad);

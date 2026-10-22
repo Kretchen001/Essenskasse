@@ -12,6 +12,8 @@ namespace Essenskasse.Pages {
 
         private string dashboardLink = "/";
         private bool isAdding = false;
+        private bool showHidden = false;
+        private List<Person> hiddenPersons = new List<Person>();
         private ElementReference newNameInput;
         private PersonSortMode sortMode = PersonSortMode.NameAsc;
 
@@ -190,6 +192,66 @@ namespace Essenskasse.Pages {
                 isAdding = false;
             }
             await newNameInput.FocusAsync(); // direkt die naechste Person eingeben
+        }
+
+        /// <summary>Eine Kachel hat die Person ausgeblendet: aus der Liste nehmen (und Liste der Ausgeblendeten auffrischen).</summary>
+        private async Task OnPersonHidden(Person hidden) {
+            person.RemoveAll(x => x.Guid == hidden.Guid);
+            ApplyFilterAndSort();
+            if (showHidden) {
+                await LoadHiddenAsync();
+            }
+        }
+
+        private async Task ToggleHiddenAsync() {
+            showHidden = !showHidden;
+            if (showHidden) {
+                await LoadHiddenAsync();
+            }
+        }
+
+        private async Task LoadHiddenAsync() {
+            HttpRequestMessage request = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/requestHidden")
+            };
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+                    return;
+                }
+                List<Person> loaded = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
+                loaded.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
+                loaded.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
+                hiddenPersons = loaded.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+            }
+        }
+
+        private async Task RestorePersonAsync(Person restored) {
+            HttpRequestMessage request = new HttpRequestMessage() {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(Config["API-Adress"] + "person/restore"),
+                Headers = { { "guid", restored.Guid.ToString() } }
+            };
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+                    return;
+                }
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
+            hiddenPersons.RemoveAll(x => x.Guid == restored.Guid);
+            person.Add(restored);
+            ApplyFilterAndSort();
+            ToastService.ShowToast(restored.Name + " " + _loc[nameof(RessourceAppStrings.toastPersonRestored)], ToastLevel.Success);
         }
 
         /// <summary>Eine Kachel hat Name oder E-Mail gespeichert: Liste (Filter, Sortierung, Zaehler) neu aufbauen.</summary>

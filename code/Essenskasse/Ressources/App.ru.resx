@@ -621,4 +621,31 @@
   <data name="noEntriesYet" xml:space="preserve">
     <value>Записей пока нет</value>
   </data>
+  <data name="hidePerson" xml:space="preserve">
+    <value>Скрыть человека</value>
+  </data>
+  <data name="confirmHide" xml:space="preserve">
+    <value>Скрыть: {0}?</value>
+  </data>
+  <data name="confirmHideHint" xml:space="preserve">
+    <value>Человек исчезнет из всех списков. Платежи и заказы сохраняются, скрытых людей можно восстановить.</value>
+  </data>
+  <data name="toastPersonHidden" xml:space="preserve">
+    <value>скрыт</value>
+  </data>
+  <data name="showHiddenPersons" xml:space="preserve">
+    <value>Показать скрытых людей</value>
+  </data>
+  <data name="hideHiddenPersons" xml:space="preserve">
+    <value>Свернуть скрытых людей</value>
+  </data>
+  <data name="restore" xml:space="preserve">
+    <value>Восстановить</value>
+  </data>
+  <data name="toastPersonRestored" xml:space="preserve">
+    <value>восстановлен</value>
+  </data>
+  <data name="noHiddenPersons" xml:space="preserve">
+    <value>Скрытых людей нет</value>
+  </data>
 </root>

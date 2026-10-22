@@ -21,7 +21,13 @@ namespace Essenskasse.Cards {
         [Parameter]
         public EventCallback<Person> OnUpdated { get; set; }
 
+        /// <summary>Wird aufgerufen, nachdem die Person ausgeblendet wurde.</summary>
+        [Parameter]
+        public EventCallback<Person> OnHidden { get; set; }
+
         private bool isEditing = false;
+        private bool confirmingHide = false;
+        private bool isHiding = false;
         private bool showDetails = false;
         private bool historyLoading = false;
         private bool historyLoaded = false;
@@ -38,6 +44,42 @@ namespace Essenskasse.Cards {
         private bool IsDirty => NameChanged || EmailChanged;
 
         private string Initials => PersonText.Initials(Person.Name);
+
+        private void AskHide() {
+            confirmingHide = !confirmingHide;
+        }
+
+        private void CancelHide() {
+            confirmingHide = false;
+        }
+
+        private async Task ConfirmHide() {
+            isHiding = true;
+            HttpRequestMessage request = new HttpRequestMessage() {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri(Config["API-Adress"] + "person/remove"),
+                Headers = { { "guid", Person.Guid.ToString() } }
+            };
+            HttpResponseMessage? response = null;
+            try {
+                response = await HttpClient.SendAsync(request);
+            }
+            catch {
+                isHiding = false;
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                return;
+            }
+            isHiding = false;
+
+            if (response.IsSuccessStatusCode) {
+                confirmingHide = false;
+                ToastService.ShowToast(Person.Name + " " + _loc[nameof(RessourceAppStrings.toastPersonHidden)], ToastLevel.Success);
+                await OnHidden.InvokeAsync(Person);
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
+            }
+        }
 
         private async Task ToggleDetails() {
             showDetails = !showDetails;

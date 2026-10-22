@@ -98,9 +98,34 @@
         </div>
         <div class="ek-grid ek-people">
             @foreach (Person x in shownPersonList) {
-                <PersonListCard Person="x" PositivSaldo="IsInconspicuous(x)" OnUpdated="OnPersonUpdated" />
+                <PersonListCard Person="x" PositivSaldo="IsInconspicuous(x)" OnUpdated="OnPersonUpdated" OnHidden="OnPersonHidden" />
             }
         </div>
+
+        <button type="button" class="ek-btn ek-hidden-toggle" aria-expanded="@showHidden" @onclick="ToggleHiddenAsync">
+            @(showHidden ? _loc[nameof(RessourceAppStrings.hideHiddenPersons)] : _loc[nameof(RessourceAppStrings.showHiddenPersons)])
+        </button>
+        @if (showHidden) {
+            @if (hiddenPersons.Count == 0) {
+                <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.noHiddenPersons)]</p>
+            }
+            else {
+                <div class="ek-grid ek-people ek-people-hidden">
+                    @foreach (Person x in hiddenPersons) {
+                        <article class="ek-person ek-person-muted">
+                            <span class="ek-avatar" aria-hidden="true">@PersonText.Initials(x.Name)</span>
+                            <div class="ek-person-text">
+                                <h4 class="ek-person-name">@x.Name</h4>
+                                <p class="ek-person-sub">@x.Saldo.ToString()</p>
+                            </div>
+                            <button type="button" class="ek-btn" @onclick="() => RestorePersonAsync(x)">
+                                @_loc[nameof(RessourceAppStrings.restore)]
+                            </button>
+                        </article>
+                    }
+                </div>
+            }
+        }
         </div>
     </Authorized>
 </AuthorizeView>

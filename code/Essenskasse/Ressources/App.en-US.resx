@@ -621,4 +621,31 @@
   <data name="noEntriesYet" xml:space="preserve">
     <value>No entries yet</value>
   </data>
+  <data name="hidePerson" xml:space="preserve">
+    <value>Hide person</value>
+  </data>
+  <data name="confirmHide" xml:space="preserve">
+    <value>Hide {0}?</value>
+  </data>
+  <data name="confirmHideHint" xml:space="preserve">
+    <value>The person disappears from all lists. Payments and orders are kept, and hidden people can be restored.</value>
+  </data>
+  <data name="toastPersonHidden" xml:space="preserve">
+    <value>hidden</value>
+  </data>
+  <data name="showHiddenPersons" xml:space="preserve">
+    <value>Show hidden people</value>
+  </data>
+  <data name="hideHiddenPersons" xml:space="preserve">
+    <value>Hide hidden people</value>
+  </data>
+  <data name="restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="toastPersonRestored" xml:space="preserve">
+    <value>restored</value>
+  </data>
+  <data name="noHiddenPersons" xml:space="preserve">
+    <value>No hidden people</value>
+  </data>
 </root>
