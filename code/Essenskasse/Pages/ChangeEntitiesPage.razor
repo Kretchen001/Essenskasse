@@ -7,163 +7,115 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 @inject NavigationManager Nav
+@inject AuthStateService AuthState
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.modifyEntity)]</PageTitle>
 
 <AuthorizeView>
     <NotAuthorized>
-        <div class="row">
-            <div class="col-lg-3">
-                Zugriff verweigert!
-            </div>
-            <div class="col-lg-9">
-                <button @onclick="() => Nav.NavigateTo(dashboardLink)">
-                    Rückkehr zum Dashboard
+        <div class="ek-dash ek-denied" role="alert">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.accessDenied)]</h2>
+            <p class="ek-denied-text">@_loc[nameof(RessourceAppStrings.accessDeniedHint)]</p>
+            <div class="ek-denied-actions">
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="AuthState.RequestLogin">
+                    @_loc[nameof(RessourceAppStrings.signIn)]
+                </button>
+                <button type="button" class="ek-btn" @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    @_loc[nameof(RessourceAppStrings.backToDashboard)]
                 </button>
             </div>
         </div>
     </NotAuthorized>
     <Authorized>
-        <h2>@_loc[nameof(RessourceAppStrings.modifyEntity)]</h2>
-        <BlazorXTabs.XTabs>
-            <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.payment)]">
-                @foreach (int indexP in Enumerable.Range(0, Payments.Count)) {
-                    <div class="row">
-                        <ShowPaymentCard Payment="@Payments[indexP]"
-                                         DesignationOfPerson="@GetTheDesignationOfPerson(Payments[indexP].ReferencedPerson)"
-                                         PaymentNumberInList="indexP"
-                                         ButtonChangeClickCallback="ShowPaymentChangeModal">
-                        </ShowPaymentCard>
+        <div class="ek-dash ek-chg">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.modifyEntity)]</h2>
+
+            <div class="ek-seg ek-seg-neutral ek-chg-tabs" role="group" aria-label="@_loc[nameof(RessourceAppStrings.changeTabsLabel)]">
+                <button type="button" class="@(showOrders ? "" : "is-active")" aria-pressed="@((!showOrders).ToString().ToLowerInvariant())" @onclick="() => ShowOrders(false)">
+                    @_loc[nameof(RessourceAppStrings.payment)]
+                </button>
+                <button type="button" class="@(showOrders ? "is-active" : "")" aria-pressed="@showOrders.ToString().ToLowerInvariant()" @onclick="() => ShowOrders(true)">
+                    @_loc[nameof(RessourceAppStrings.order)]
+                </button>
+            </div>
+
+            @if (loading) {
+                <ul class="ek-hist" aria-busy="true" aria-live="polite">
+                    @for (int i = 0; i < 5; i++) {
+                        <li class="ek-skeleton" aria-hidden="true"><span class="ek-skeleton-line"></span></li>
+                    }
+                </ul>
+            }
+            else if (!showOrders) {
+                @if (Payments.Count == 0) {
+                    <div class="ek-empty">
+                        <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noPaymentsYet)]</p>
                     </div>
                 }
-                <div class="row">
-                    <div class="col-lg-12" align="right">
-                        <button type="button" class="btn-primary" 
-                                data-dismiss="modal"
-                                style="border-radius:8px; margin-top: 1rem; opacity: @OpacityOfNoMorePaymentToLoad%"
-                                disabled="@noMorePaymentsToLoad" 
-                                @onclick="() => LoadNextAmountOfPayments()">
-                            @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
-                        </button>
-                    </div>
-                </div>
-                @if (Loaded) {
-                    <HistoryModalCard @ref="@ModalDialogP" Title="Änderung Einzahlung">
-                        <div class="row">
-                            <div class="col-4"><b>@GetTheDesignationOfPerson(Payments[currentPaymentChangeIndex].ReferencedPerson)</b></div>
-                            <div class="col-4">@Payments[currentPaymentChangeIndex].DateTime.ToString("dddd, dd. MMMM yyyy")</div>
-                            <div class="col-4">@Payments[currentPaymentChangeIndex].Amount.ToString()</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4"></div>
-                            <div class="col-4"></div>
-                            <div class="col-4">
-                                <input style="width: 59%" type="number" @bind="newMoneyAmount" placeholder="Euro,Cent -> 1000 = 10,00€">
-                            </div>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <div class="col-4">
-                                Alter Kommentar
-                            </div>
-                            <div class="col-8">
-                                @Uri.UnescapeDataString(Payments[currentPaymentChangeIndex].Comment)
-                            </div>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <div class="col-4">
-                                Neuer Kommentar
-                            </div>
-                            <div class="col-8">
-                                <input type="text" @bind="@newComment" style="width: 81.15%"/>
-                            </div>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <button class="btn btn-success" @onclick="() => CommitChangesP()">
-                                @_loc[nameof(RessourceAppStrings.acceptChanges)]
+                else {
+                    @foreach (IGrouping<DateTime, Payment> month in PaymentsByMonth) {
+                        <h3 class="ek-hist-month">@month.Key.ToString("MMMM yyyy")</h3>
+                        <ul class="ek-hist">
+                            @foreach (Payment x in month) {
+                                <li class="@(x.Amount.IsPositiv() ? "" : "is-negative")">
+                                    <span class="ek-hist-date">@x.DateTime.ToString("ddd, dd.MM. HH:mm")</span>
+                                    <span class="ek-chg-main">
+                                        <span class="ek-chg-person">@PersonName(x.ReferencedPerson)</span>
+                                        @if (!string.IsNullOrWhiteSpace(x.Comment)) {
+                                            <span class="ek-chg-sub">@x.Comment</span>
+                                        }
+                                    </span>
+                                    <span class="ek-hist-amount">@x.Amount.ToString()</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    <div class="ek-hist-more">
+                        @if (noMorePayments) {
+                            <span class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.endOfList)]</span>
+                        }
+                        else {
+                            <button type="button" class="ek-btn" disabled="@loadingMore" @onclick="LoadNextAmountOfPayments">
+                                @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
                             </button>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <button class="btn btn-primary" @onclick="() => ModalDialogP!.Close()">
-                                @_loc[nameof(RessourceAppStrings.close)]
-                            </button>
-                        </div>
-                    </HistoryModalCard>
-                }
-            </BlazorXTabs.XTab>
-            <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.order)]">
-                @foreach (int indexO in Enumerable.Range(0, Orders.Count)) {
-                    <div class="row">
-                        <ShowOrderCard Order="@Orders[indexO]"
-                                        DesignationOfPerson="@GetTheDesignationOfPerson(Orders[indexO].ReferencedPerson)"
-                                        OrderNumberInList="indexO"
-                                        ButtonChangeClickCallback="ShowOrderChangeModal">
-                        </ShowOrderCard>
+                        }
                     </div>
                 }
-                <div class="row">
-                    <div class="col-lg-12" align="right">
-                        <button type="button" class="btn-primary" 
-                                data-dismiss="modal"
-                                style="border-radius:8px; margin-top: 1rem; opacity: @OpacityOfNoMoreOrderToLoad%"
-                                disabled="@noMoreOrderToLoad"
-                                @onclick="() => LoadNextAmountOfOrders()">
-                            @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
-                        </button>
+            }
+            else {
+                @if (Orders.Count == 0) {
+                    <div class="ek-empty">
+                        <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.orderNoOrdersYet)]</p>
                     </div>
-                </div>
-                @if (Loaded) {
-                    <HistoryModalCard @ref="@ModalDialogO" Title="Änderung Bestellung">
-                        <div class="row">
-                            <div class="col-4">@GetTheDesignationOfPerson(Orders[currentOrderChangeIndex].ReferencedPerson)</div>
-                            <div class="col-4">@Orders[currentOrderChangeIndex].DateTime.ToString("dddd, dd. MMMM yyyy")</div>
-                            <div class="col-4">@Orders[currentOrderChangeIndex].Money.ToString()</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4"></div>
-                            <div class="col-4"></div>
-                            <div class="col-4">
-                                <input style="width: 59%" type="number" @bind="newMoneyAmount" placeholder="Euro,Cent -> 1000 = 10,00€">
-                            </div>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <div class="col-3">
-                                Alter Anbieter
-                            </div>
-                            <div class="col-9">
-                                @Orders[currentOrderChangeIndex].Provider.Designation
-                            </div>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <div class="col-3">
-                                Neuer Anbieter
-                            </div>
-                            <select class="form-select" style="margin: 0.2rem;" value="@Orders[currentOrderChangeIndex].Provider.Guid" @onchange="(e) => {newSelectedProvider = Providers.First(x => x.Guid.Equals(new Guid(e.Value!.ToString()!))).Guid;}">
-                                @foreach (Provider z in Providers) {
-                                    <option value="@z.Guid">@z.Designation</option>
-                                }
-                            </select>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <button class="btn btn-success" @onclick="() => CommitChangesO()">
-                                @_loc[nameof(RessourceAppStrings.acceptChanges)]
-                            </button>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <button class="btn btn-primary" @onclick="() => ModalDialogO!.Close()">
-                                @_loc[nameof(RessourceAppStrings.close)]
-                            </button>
-                        </div>
-                    </HistoryModalCard>
                 }
-            </BlazorXTabs.XTab>
-        </BlazorXTabs.XTabs>
+                else {
+                    @foreach (IGrouping<DateTime, Order> month in OrdersByMonth) {
+                        <h3 class="ek-hist-month">@month.Key.ToString("MMMM yyyy")</h3>
+                        <ul class="ek-hist">
+                            @foreach (Order x in month) {
+                                <li>
+                                    <span class="ek-hist-date">@x.DateTime.ToString("ddd, dd.MM. HH:mm")</span>
+                                    <span class="ek-chg-main">
+                                        <span class="ek-chg-person">@PersonName(x.ReferencedPerson)</span>
+                                        <span class="ek-chg-sub">@x.Provider.Designation</span>
+                                    </span>
+                                    <span class="ek-hist-amount">@x.Money.ToString()</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    <div class="ek-hist-more">
+                        @if (noMoreOrders) {
+                            <span class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.endOfList)]</span>
+                        }
+                        else {
+                            <button type="button" class="ek-btn" disabled="@loadingMore" @onclick="LoadNextAmountOfOrders">
+                                @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+                            </button>
+                        }
+                    </div>
+                }
+            }
+        </div>
     </Authorized>
 </AuthorizeView>

@@ -1,0 +1,38 @@
+﻿/* Aenderungen-Seite: Umschalter und Buchungslisten. Farben aus .ek-dash. */
+
+.ek-chg-tabs {
+    margin-top: 0.25rem;
+}
+
+.ek-chg .ek-hist li {
+    align-items: center;
+}
+
+.ek-chg-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.ek-chg-person {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.ek-chg-sub {
+    color: var(--ek-muted);
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 575.98px) {
+    .ek-chg .ek-hist li .ek-chg-main {
+        flex-basis: 100%;
+        order: 1;
+    }
+
+    .ek-chg .ek-hist li .ek-hist-amount {
+        order: 2;
+    }
+}
