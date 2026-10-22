@@ -84,9 +84,16 @@
             </div>
         }
         <div class="ek-people-tools">
-            <button type="button" class="ek-btn" @onclick="ToggleAscDesc">
-                @_loc[nameof(RessourceAppStrings.name)] @(IsASC ? "↑" : "↓")
-            </button>
+            <label class="ek-select-wrap">
+                <span>@_loc[nameof(RessourceAppStrings.sortBy)]</span>
+                <select class="ek-select" @bind="SortKey">
+                    <option value="@nameof(PersonSortMode.NameAsc)">@_loc[nameof(RessourceAppStrings.sortNameAsc)]</option>
+                    <option value="@nameof(PersonSortMode.NameDesc)">@_loc[nameof(RessourceAppStrings.sortNameDesc)]</option>
+                    <option value="@nameof(PersonSortMode.SaldoAsc)">@_loc[nameof(RessourceAppStrings.sortSaldoAsc)]</option>
+                    <option value="@nameof(PersonSortMode.SaldoDesc)">@_loc[nameof(RessourceAppStrings.sortSaldoDesc)]</option>
+                    <option value="@nameof(PersonSortMode.NoEmailFirst)">@_loc[nameof(RessourceAppStrings.sortNoEmailFirst)]</option>
+                </select>
+            </label>
         </div>
         <div class="ek-grid ek-people">
             @foreach (Person x in shownPersonList) {

@@ -10,7 +10,19 @@ namespace Essenskasse.Pages {
 
         private string dashboardLink = "/";
         private bool accessToAdd = false;
-        private bool IsASC = true;
+        private PersonSortMode sortMode = PersonSortMode.NameAsc;
+
+        /// <summary>Gewaehlte Sortierung als Text fuer das Auswahlfeld; wird im Browser gemerkt.</summary>
+        private string SortKey {
+            get => sortMode.ToString();
+            set {
+                if (Enum.TryParse(value, out PersonSortMode mode)) {
+                    sortMode = mode;
+                    _ = LocalStorage.SetItemAsync<string>("PersonSort", mode.ToString());
+                    ApplyFilterAndSort();
+                }
+            }
+        }
 
         private string newPersonName = "";
         private string newPersonEmail = "";
@@ -38,7 +50,7 @@ namespace Essenskasse.Pages {
                 Nav.NavigateTo("/");
             }
             else {
-                IsASC = await LocalStorage.GetItemAsync<bool>("PersonIsASC");
+                await ReadSortModeAsync();
                 await RequestAllPersonFromApiAsync();
             }
             base.StateHasChanged();
@@ -137,11 +149,14 @@ namespace Essenskasse.Pages {
             base.StateHasChanged();
         }
 
-        private void ToggleAscDesc() {
-            IsASC = !IsASC;
-            _ = SaveAscStatus();
-            ApplyFilterAndSort();
-            base.StateHasChanged();
+        private async Task ReadSortModeAsync() {
+            string? stored = await LocalStorage.GetItemAsync<string>("PersonSort");
+            if (Enum.TryParse(stored, out PersonSortMode mode)) {
+                sortMode = mode;
+            }
+            else if (await LocalStorage.ContainKeyAsync("PersonIsASC") && !await LocalStorage.GetItemAsync<bool>("PersonIsASC")) {
+                sortMode = PersonSortMode.NameDesc; // alte Einstellung (absteigend) uebernehmen
+            }
         }
 
         /// <summary>Baut die angezeigte Liste immer aus allen Personen, dem aktuellen Filter (Name oder E-Mail, ohne Beachtung der
@@ -153,13 +168,15 @@ namespace Essenskasse.Pages {
                 result = result.Where(x => x.Name.Contains(text, StringComparison.CurrentCultureIgnoreCase)
                                         || x.Email.Contains(text, StringComparison.CurrentCultureIgnoreCase));
             }
-            shownPersonList = (IsASC
-                ? result.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase)
-                : result.OrderByDescending(x => x.Name, StringComparer.CurrentCultureIgnoreCase)).ToList();
+            StringComparer byName = StringComparer.CurrentCultureIgnoreCase;
+            shownPersonList = (sortMode switch {
+                PersonSortMode.NameDesc => result.OrderByDescending(x => x.Name, byName),
+                PersonSortMode.SaldoAsc => result.OrderBy(x => x.Saldo.ToTotalCents()).ThenBy(x => x.Name, byName),
+                PersonSortMode.SaldoDesc => result.OrderByDescending(x => x.Saldo.ToTotalCents()).ThenBy(x => x.Name, byName),
+                PersonSortMode.NoEmailFirst => result.OrderBy(x => x.Email.Length > 0).ThenBy(x => x.Name, byName),
+                _ => result.OrderBy(x => x.Name, byName),
+            }).ToList();
         }
 
-        public async Task SaveAscStatus() {
-            await LocalStorage.SetItemAsync<bool>("PersonIsASC", IsASC);
-        }
     }
 }

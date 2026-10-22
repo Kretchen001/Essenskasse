@@ -546,4 +546,22 @@
   <data name="shownOfTotal" xml:space="preserve">
     <value>{0} из {1}</value>
   </data>
+  <data name="sortBy" xml:space="preserve">
+    <value>Сортировка</value>
+  </data>
+  <data name="sortNameAsc" xml:space="preserve">
+    <value>Имя А–Я</value>
+  </data>
+  <data name="sortNameDesc" xml:space="preserve">
+    <value>Имя Я–А</value>
+  </data>
+  <data name="sortSaldoAsc" xml:space="preserve">
+    <value>Баланс: сначала наименьший</value>
+  </data>
+  <data name="sortSaldoDesc" xml:space="preserve">
+    <value>Баланс: сначала наибольший</value>
+  </data>
+  <data name="sortNoEmailFirst" xml:space="preserve">
+    <value>Сначала без e-mail</value>
+  </data>
 </root>

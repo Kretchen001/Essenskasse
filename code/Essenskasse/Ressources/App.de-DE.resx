@@ -546,4 +546,22 @@
   <data name="shownOfTotal" xml:space="preserve">
     <value>{0} von {1}</value>
   </data>
+  <data name="sortBy" xml:space="preserve">
+    <value>Sortieren nach</value>
+  </data>
+  <data name="sortNameAsc" xml:space="preserve">
+    <value>Name A–Z</value>
+  </data>
+  <data name="sortNameDesc" xml:space="preserve">
+    <value>Name Z–A</value>
+  </data>
+  <data name="sortSaldoAsc" xml:space="preserve">
+    <value>Saldo: niedrigster zuerst</value>
+  </data>
+  <data name="sortSaldoDesc" xml:space="preserve">
+    <value>Saldo: höchster zuerst</value>
+  </data>
+  <data name="sortNoEmailFirst" xml:space="preserve">
+    <value>Ohne E-Mail zuerst</value>
+  </data>
 </root>

@@ -38,6 +38,27 @@
     font-variant-numeric: tabular-nums;
 }
 
+.ek-select-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ek-muted);
+}
+
+.ek-select {
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 8px;
+    background: var(--ek-surface);
+    color: var(--ek-text);
+    font: inherit;
+}
+
+    .ek-select:focus-visible {
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 2px;
+    }
+
 .ek-people-tools {
     display: flex;
     flex-wrap: wrap;

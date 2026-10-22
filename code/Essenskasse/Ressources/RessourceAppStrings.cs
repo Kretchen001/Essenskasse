@@ -146,5 +146,11 @@
         searchPersons,
         clearSearch,
         shownOfTotal,
+        sortBy,
+        sortNameAsc,
+        sortNameDesc,
+        sortSaldoAsc,
+        sortSaldoDesc,
+        sortNoEmailFirst,
     }
 }
