@@ -612,4 +612,13 @@
   <data name="hideDetails" xml:space="preserve">
     <value>Details ausblenden</value>
   </data>
+  <data name="lastPayments" xml:space="preserve">
+    <value>Letzte Einzahlungen</value>
+  </data>
+  <data name="lastOrders" xml:space="preserve">
+    <value>Letzte Bestellungen</value>
+  </data>
+  <data name="noEntriesYet" xml:space="preserve">
+    <value>Noch keine Einträge</value>
+  </data>
 </root>

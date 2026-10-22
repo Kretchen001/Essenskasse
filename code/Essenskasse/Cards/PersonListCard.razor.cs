@@ -3,6 +3,7 @@ using Essenskasse.Ressources;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Modells;
+using Newtonsoft.Json;
 
 namespace Essenskasse.Cards {
 
@@ -22,6 +23,12 @@ namespace Essenskasse.Cards {
 
         private bool isEditing = false;
         private bool showDetails = false;
+        private bool historyLoading = false;
+        private bool historyLoaded = false;
+        private List<Payment> payments = new List<Payment>();
+        private List<Order> orders = new List<Order>();
+
+        private const int HistoryAmount = 5;
         private bool isSaving = false;
         private string editName = "";
         private string editEmail = "";
@@ -32,8 +39,52 @@ namespace Essenskasse.Cards {
 
         private string Initials => PersonText.Initials(Person.Name);
 
-        private void ToggleDetails() {
+        private async Task ToggleDetails() {
             showDetails = !showDetails;
+            if (showDetails && !historyLoaded) {
+                await LoadHistory();
+            }
+        }
+
+        /// <summary>Laedt die letzten Einzahlungen und Bestellungen der Person (einmal je Kachel).</summary>
+        private async Task LoadHistory() {
+            historyLoading = true;
+            try {
+                List<Payment>? loadedPayments = await RequestListAsync<Payment>("payment/fromPerson");
+                List<Order>? loadedOrders = await RequestListAsync<Order>("order/fromPerson");
+                if (loadedPayments is null || loadedOrders is null) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Warning);
+                    return; // beim naechsten Aufklappen erneut versuchen
+                }
+                loadedPayments.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment ?? ""));
+                payments = loadedPayments;
+                orders = loadedOrders;
+                historyLoaded = true;
+            }
+            finally {
+                historyLoading = false;
+            }
+        }
+
+        private async Task<List<T>?> RequestListAsync<T>(string endpoint) {
+            HttpRequestMessage request = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + endpoint),
+                Headers = {
+                    { "guid", Person.Guid.ToString() },
+                    { "amount", HistoryAmount.ToString() }
+                }
+            };
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode) {
+                    return null;
+                }
+                return JsonConvert.DeserializeObject<List<T>>(await response.Content.ReadAsStringAsync()) ?? new List<T>();
+            }
+            catch {
+                return null;
+            }
         }
 
         private async Task CopyGuid() {

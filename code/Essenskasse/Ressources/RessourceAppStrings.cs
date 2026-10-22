@@ -168,5 +168,8 @@
         copied,
         details,
         hideDetails,
+        lastPayments,
+        lastOrders,
+        noEntriesYet,
     }
 }

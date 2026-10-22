@@ -117,6 +117,57 @@
     white-space: nowrap;
 }
 
+.ek-history {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.75rem 1.25rem;
+    margin-top: 0.75rem;
+}
+
+.ek-history-title {
+    margin: 0 0 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+.ek-history-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+    .ek-history-list li {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.2rem 0;
+        font-size: 0.88rem;
+    }
+
+.ek-history-date {
+    flex: none;
+    color: var(--ek-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-history-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ek-history-amount {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-detail-empty {
+    margin: 0.2rem 0 0;
+    color: var(--ek-muted);
+    font-size: 0.88rem;
+}
+
 .ek-chevron {
     transition: transform 0.15s;
 }

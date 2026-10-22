@@ -612,4 +612,13 @@
   <data name="hideDetails" xml:space="preserve">
     <value>Скрыть подробности</value>
   </data>
+  <data name="lastPayments" xml:space="preserve">
+    <value>Последние платежи</value>
+  </data>
+  <data name="lastOrders" xml:space="preserve">
+    <value>Последние заказы</value>
+  </data>
+  <data name="noEntriesYet" xml:space="preserve">
+    <value>Записей пока нет</value>
+  </data>
 </root>
