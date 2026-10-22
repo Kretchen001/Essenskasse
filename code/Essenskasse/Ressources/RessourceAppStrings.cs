@@ -277,5 +277,11 @@
         orderNoOrdersYet,
         overviewNoDayTotal,
         overviewTableLabel,
+        changeEditPayment,
+        changeEditOrder,
+        changeNow,
+        changeNotChanged,
+        changeTokenMissing,
+        changeTabsLabel,
     }
 }

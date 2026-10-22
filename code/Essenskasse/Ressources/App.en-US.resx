@@ -941,4 +941,22 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="overviewTableLabel" xml:space="preserve">
     <value>Orders per day and person</value>
   </data>
+  <data name="changeEditPayment" xml:space="preserve">
+    <value>Edit payment</value>
+  </data>
+  <data name="changeEditOrder" xml:space="preserve">
+    <value>Edit order</value>
+  </data>
+  <data name="changeNow" xml:space="preserve">
+    <value>Before: {0}</value>
+  </data>
+  <data name="changeNotChanged" xml:space="preserve">
+    <value>Nothing changed yet.</value>
+  </data>
+  <data name="changeTokenMissing" xml:space="preserve">
+    <value>Changes require a change token. You can request one in the settings.</value>
+  </data>
+  <data name="changeTabsLabel" xml:space="preserve">
+    <value>Type of entry</value>
+  </data>
 </root>

@@ -941,4 +941,22 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="overviewTableLabel" xml:space="preserve">
     <value>Pedidos por día y persona</value>
   </data>
+  <data name="changeEditPayment" xml:space="preserve">
+    <value>Modificar ingreso</value>
+  </data>
+  <data name="changeEditOrder" xml:space="preserve">
+    <value>Modificar pedido</value>
+  </data>
+  <data name="changeNow" xml:space="preserve">
+    <value>Antes: {0}</value>
+  </data>
+  <data name="changeNotChanged" xml:space="preserve">
+    <value>Aún no hay cambios.</value>
+  </data>
+  <data name="changeTokenMissing" xml:space="preserve">
+    <value>Para los cambios se necesita un token de modificación. Puedes solicitarlo en los ajustes.</value>
+  </data>
+  <data name="changeTabsLabel" xml:space="preserve">
+    <value>Tipo de asiento</value>
+  </data>
 </root>

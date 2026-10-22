@@ -941,4 +941,22 @@
   <data name="overviewTableLabel" xml:space="preserve">
     <value>Заказы по дням и людям</value>
   </data>
+  <data name="changeEditPayment" xml:space="preserve">
+    <value>Изменить платёж</value>
+  </data>
+  <data name="changeEditOrder" xml:space="preserve">
+    <value>Изменить заказ</value>
+  </data>
+  <data name="changeNow" xml:space="preserve">
+    <value>Было: {0}</value>
+  </data>
+  <data name="changeNotChanged" xml:space="preserve">
+    <value>Изменений пока нет.</value>
+  </data>
+  <data name="changeTokenMissing" xml:space="preserve">
+    <value>Для изменений нужен токен изменения. Его можно запросить в настройках.</value>
+  </data>
+  <data name="changeTabsLabel" xml:space="preserve">
+    <value>Тип записи</value>
+  </data>
 </root>

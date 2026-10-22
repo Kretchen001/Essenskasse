@@ -941,4 +941,22 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="overviewTableLabel" xml:space="preserve">
     <value>Bestellungen je Tag und Person</value>
   </data>
+  <data name="changeEditPayment" xml:space="preserve">
+    <value>Einzahlung ändern</value>
+  </data>
+  <data name="changeEditOrder" xml:space="preserve">
+    <value>Bestellung ändern</value>
+  </data>
+  <data name="changeNow" xml:space="preserve">
+    <value>Bisher: {0}</value>
+  </data>
+  <data name="changeNotChanged" xml:space="preserve">
+    <value>Noch nichts geändert.</value>
+  </data>
+  <data name="changeTokenMissing" xml:space="preserve">
+    <value>Für Änderungen wird ein Änderungstoken benötigt. Du kannst ihn in den Einstellungen anfordern.</value>
+  </data>
+  <data name="changeTabsLabel" xml:space="preserve">
+    <value>Art der Buchung</value>
+  </data>
 </root>
