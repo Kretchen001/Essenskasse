@@ -35,6 +35,12 @@ namespace EssenskasseAPI.Data {
             return dataTable;
         }
 
+        /// <summary>Startet eine Transaktion. Verwendung:
+        /// <code>using DbScope tx = db.BeginTransaction(); ... tx.Query(...); tx.Commit();</code></summary>
+        public DbScope BeginTransaction() {
+            return new DbScope(_connectionString);
+        }
+
         /// <summary>Erzeugt einen SQL-Parameter. Guid wird als Text (Format D) uebergeben,
         /// weil die Guid-Spalten als CHAR(36) angelegt sind.</summary>
         /// <param name="name">Name mit @, z. B. <c>@guid</c>.</param>
