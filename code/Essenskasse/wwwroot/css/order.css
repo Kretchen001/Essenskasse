@@ -34,6 +34,131 @@
     }
 }
 
+/* Personenzeilen */
+.ek-ord-list {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ek-ord-row {
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--ek-line);
+    border-left-width: 4px;
+    border-radius: 12px;
+    background: var(--ek-surface);
+}
+
+    .ek-ord-row.ek-person-ok {
+        border-left-color: var(--ek-ok);
+    }
+
+    .ek-ord-row.ek-person-bad {
+        border-left-color: var(--ek-bad);
+    }
+
+    .ek-ord-row.is-filled {
+        box-shadow: 0 0 0 1px var(--ek-focus) inset;
+    }
+
+    .ek-ord-row.is-invalid {
+        box-shadow: 0 0 0 2px var(--ek-bad) inset;
+    }
+
+        .ek-ord-row.is-invalid .ek-input {
+            border-color: var(--ek-bad);
+            background: var(--ek-bad-tint);
+        }
+
+.ek-ord-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ek-ord-name {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 8rem;
+    min-width: 0;
+}
+
+    .ek-ord-name .ek-person-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: 600;
+    }
+
+.ek-ord-saldo {
+    color: var(--ek-muted);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-ord-input {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+    .ek-ord-input .ek-input {
+        width: 7.5rem;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+.ek-dash .ek-ord-row .ek-icon-btn {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background-color: transparent;
+    color: var(--ek-muted);
+    cursor: pointer;
+}
+
+    .ek-dash .ek-ord-row .ek-icon-btn:hover,
+    .ek-dash .ek-ord-row .ek-icon-btn.is-open {
+        border-color: var(--ek-focus);
+        color: var(--ek-text);
+        background-color: rgba(128, 128, 128, 0.16);
+    }
+
+.ek-ord-history {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--ek-line);
+}
+
+.ek-ord-submit {
+    margin-top: 1rem;
+}
+
+@media (pointer: coarse) {
+    .ek-dash .ek-ord-row .ek-icon-btn {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .ek-ord-main {
+        flex-wrap: wrap;
+    }
+
+    .ek-ord-input .ek-input {
+        width: 6.5rem;
+    }
+}
+
 /* Uebersicht (vorlaeufig, wird mit der neuen Uebersicht ersetzt) */
 .overViewGrid {
     max-height: 70vh;

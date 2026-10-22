@@ -15,10 +15,18 @@ namespace Essenskasse.Pages {
 
         private List<Provider> providers = [];
         private List<Person> person = [];
-        private List<Money> money = [];
-        private List<List<Order>> shownOrders = new List<List<Order>>();
         private List<Order> completeHistoryFromOne = [];
-        private List<PersonOrderCard> personOrderCards = [];
+
+        /// <summary>Eingetippter Betrag je Person (Text, wie getippt).</summary>
+        private readonly Dictionary<Guid, string> amountTexts = [];
+
+        /// <summary>Geladene Bestellverlaeufe je Person.</summary>
+        private readonly Dictionary<Guid, List<Order>> histories = [];
+
+        /// <summary>Personen, deren Verlauf aufgeklappt ist.</summary>
+        private readonly HashSet<Guid> openHistory = [];
+
+        private bool isSubmitting = false;
 
         private record DateAndOrder(List<string> Head, DateTime DateTime, List<Order?> Orders);
         private List<DateAndOrder> orderListForOverview = [];
@@ -56,8 +64,6 @@ namespace Essenskasse.Pages {
         }
 
         private Guid selectedProvider = new Guid();
-
-        private List<bool> showHistory = new List<bool>();
 
         private bool noMoreToLoad = false;
 
@@ -123,31 +129,72 @@ namespace Essenskasse.Pages {
                 person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
                 person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
                 person = person.OrderBy(x => x.Name).ToList();
-                foreach (Person x in person) {
-                    money.Add(new Money());
-                    showHistory.Add(false);
-                    shownOrders.Add(new List<Order>());
-                    personOrderCards.Add(new PersonOrderCard());
-                }
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
             }
         }
 
-        /// <summary></summary>
-        /// <param name="index"></param>
-        /// <param name="changedValues"></param>
-        private void HandleValuesChanged(int index, Money changedValues) {
-            // Access to the changed Money
-            Money newMoney = changedValues;
+        private List<Order> HistoryOf(Guid guid) => histories.TryGetValue(guid, out List<Order>? list) ? list : [];
 
-            // update List
-            money[index] = newMoney;
+        private string TextOf(Guid guid) => amountTexts.TryGetValue(guid, out string? text) ? text : "";
+
+        private void SetText(Guid guid, string text) {
+            amountTexts[guid] = text;
+        }
+
+        /// <summary>Liest den Betrag einer Person. Leer gilt als 0 (keine Bestellung); gueltig sind 0 und positive Betraege.</summary>
+        private bool TryAmountCents(Guid guid, out long cents) {
+            cents = 0;
+            string text = TextOf(guid).Trim();
+            if (text.Length == 0) {
+                return true;
+            }
+            if (MoneyParser.TryParse(text, out Money parsed) && parsed.ToTotalCents() >= 0) {
+                cents = parsed.ToTotalCents();
+                return true;
+            }
+            return false;
+        }
+
+        private bool IsInvalid(Guid guid) => !TryAmountCents(guid, out _);
+
+        private bool IsInconspicuous(Person x) => x.Saldo.IsGreater(AppData.DashboardMoneyLimit);
+
+        private static string InputIdOf(Person x) => "ek-ord-" + x.Guid.ToString("N");
+
+        /// <summary>Springt mit Enter zum Betragsfeld der naechsten Person.</summary>
+        private async Task FocusNext(Guid guid) {
+            int index = person.FindIndex(x => x.Guid.Equals(guid));
+            if (index >= 0 && index + 1 < person.Count) {
+                await JSRuntime.InvokeVoidAsync("ekFocus", InputIdOf(person[index + 1]));
+            }
+        }
+
+        private void ClearAllAmounts() {
+            amountTexts.Clear();
         }
 
         /// <summary></summary>
         private async Task PostOrderForTheDay() {
+            if (isSubmitting) {
+                return;
+            }
+            if (person.Any(x => IsInvalid(x.Guid))) {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastMoneyFormatInvalid)], ToastLevel.Warning);
+                return;
+            }
+            isSubmitting = true;
+            try {
+                await PostOrderForTheDayCore();
+            }
+            finally {
+                isSubmitting = false;
+            }
+        }
+
+        /// <summary></summary>
+        private async Task PostOrderForTheDayCore() {
             // request Date
             HttpRequestMessage httpRequestMessageDate = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
@@ -171,9 +218,6 @@ namespace Essenskasse.Pages {
                                                                 format: "An diesem Tag wurde(n) bereits {0} Bestellung(en) vorgefunden.\n" +
                                                                         "Dennoch eintragen? (Ja)",
                                                                 arg0: res)))) {
-                        foreach (PersonOrderCard x in personOrderCards) {
-                            x.ResetMoney();
-                        }
                         return;
                     }
                 }
@@ -182,25 +226,20 @@ namespace Essenskasse.Pages {
             // collect orders
             List<Order> orders = new List<Order>();
             Provider p = providers.Find(x => x.Guid.Equals(selectedProvider))!;
-            for (int i = 0; i < person.Count; i += 1) {
-                if (money[i].Equals(new Money(0, 0))) {
-                    // empty -> so do nothing
-                }
-                else {
+            foreach (Person x in person) {
+                TryAmountCents(x.Guid, out long cents);
+                if (cents > 0) {
                     orders.Add(new Order(
                         dateTime: selectedDate.Date.AddMilliseconds(orders.Count + res),
-                        money: money[i],
+                        money: Money.FromTotalCents(cents),
                         provider: p,
-                        referencedPerson: person[i].Guid
+                        referencedPerson: x.Guid
                     ));
                 }
             }
 
             if (orders.Count == 0) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNobodyHasChanges)], ToastLevel.Info);
-                foreach (PersonOrderCard x in personOrderCards) {
-                    x.ResetMoney();
-                }
                 return;
             }
 
@@ -217,70 +256,62 @@ namespace Essenskasse.Pages {
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastOrderSended)], ToastLevel.Success);
-                foreach (PersonOrderCard x in personOrderCards) {
-                    x.ResetMoney();
-                }
+                ClearAllAmounts();
             }
         }
 
-        /// <summary></summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private async Task LoadAndShowHistory(int index) {
-            // toggle preview
-            showHistory[index] = !showHistory[index];
-
-            // load data
-            Guid personGuid = person[index].Guid;
-
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "order/fromPerson"),
-                Headers = {
-                    { "guid", personGuid.ToString() },
-                    { "amount", Amount.ToString() }
-                }
-            };
-
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-            if (response.IsSuccessStatusCode) {
-                shownOrders[index].Clear();
-                shownOrders[index] = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
-                base.StateHasChanged();
+        /// <summary>Klappt den Verlauf einer Person auf oder zu und laedt ihn beim Aufklappen.</summary>
+        private async Task ToggleHistory(Person x) {
+            if (!openHistory.Add(x.Guid)) {
+                openHistory.Remove(x.Guid);
+                return;
             }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "order/fromPerson"),
+                    Headers = {
+                        { "guid", x.Guid.ToString() },
+                        { "amount", Amount.ToString() }
+                    }
+                });
+                if (response.IsSuccessStatusCode) {
+                    string json = await response.Content.ReadAsStringAsync();
+                    histories[x.Guid] = json.Length == 0 ? [] : JsonConvert.DeserializeObject<List<Order>>(json) ?? [];
+                }
+                else {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
+                }
+            }
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
             }
         }
 
-        /// <summary></summary>
-        /// <param name="index"></param>
-        private async void HistoryLoadInModal(int index) {
+        /// <summary>Laedt die komplette Historie einer Person in den Dialog.</summary>
+        private async Task HistoryLoadInModal(Person x) {
             completeHistoryFromOne.Clear();
-
-            // load data
-            Guid personGuid = person[index].Guid;
-            ModalTitle = _loc[nameof(RessourceAppStrings.historyOf)] + ": " + person[index].Name;
-
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "order/fromPerson"),
-                Headers = {
-                    { "guid", personGuid.ToString() }
-                    // empty amount = complete
+            ModalTitle = _loc[nameof(RessourceAppStrings.historyOf)] + ": " + x.Name;
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "order/fromPerson"),
+                    Headers = {
+                        { "guid", x.Guid.ToString() }
+                        // empty amount = complete
+                    }
+                });
+                if (response.IsSuccessStatusCode) {
+                    string json = await response.Content.ReadAsStringAsync();
+                    completeHistoryFromOne = json.Length == 0 ? [] : JsonConvert.DeserializeObject<List<Order>>(json) ?? [];
+                    ModalDialog!.Open();
                 }
-            };
-
-            HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
-
-            if (response.IsSuccessStatusCode) {
-                completeHistoryFromOne = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync()) ?? new List<Order>();
-                ModalDialog!.Open();
-                base.StateHasChanged();
+                else {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
+                }
             }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
+            catch {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
             }
         }
 
