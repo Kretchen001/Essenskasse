@@ -932,4 +932,7 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="orderNoProvider" xml:space="preserve">
     <value>Cree primero un proveedor.</value>
   </data>
+  <data name="orderNoOrdersYet" xml:space="preserve">
+    <value>Aún no hay pedidos.</value>
+  </data>
 </root>

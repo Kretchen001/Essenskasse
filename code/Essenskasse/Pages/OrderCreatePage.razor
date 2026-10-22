@@ -91,12 +91,32 @@
                                         HistoryOpen="openHistory.Contains(current.Guid)" OnToggleHistory="() => ToggleHistory(current)">
                             @if (openHistory.Contains(current.Guid)) {
                                 <div class="ek-ord-history">
-                                    <PersonOrderHistoryCard Orders="@HistoryOf(current.Guid)" />
-                                    <div class="ek-hist-more">
-                                        <button type="button" class="ek-btn" @onclick="() => HistoryLoadInModal(current)">
-                                            @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
-                                        </button>
-                                    </div>
+                                    @if (loadingHistory.Contains(current.Guid)) {
+                                        <ul class="ek-hist" aria-busy="true" aria-live="polite">
+                                            @for (int i = 0; i < 3; i++) {
+                                                <li class="ek-skeleton" aria-hidden="true"><span class="ek-skeleton-line"></span></li>
+                                            }
+                                        </ul>
+                                    }
+                                    else if (HistoryOf(current.Guid).Count == 0) {
+                                        <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.orderNoOrdersYet)]</p>
+                                    }
+                                    else {
+                                        <ul class="ek-hist">
+                                            @foreach (Order o in HistoryOf(current.Guid)) {
+                                                <li>
+                                                    <span class="ek-hist-date">@o.DateTime.ToString("ddd, dd.MM.yyyy")</span>
+                                                    <span class="ek-hist-text">@o.Provider.Designation</span>
+                                                    <span class="ek-hist-amount">@o.Money.ToString()</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                        <div class="ek-hist-more">
+                                            <button type="button" class="ek-btn" @onclick="() => HistoryLoadInModal(current)">
+                                                @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
+                                            </button>
+                                        </div>
+                                    }
                                 </div>
                             }
                         </OrderPersonRow>
@@ -148,28 +168,28 @@
                     </Footer>
                 </EkDialog>
 
-                @*<button class="btn btn-primary" @onclick="() => ModalDialog.Open()">Click me!</button>*@
-                <HistoryModalCard @ref="@ModalDialog" Title="@ModalTitle">
-                    <div class="row">
-                        <div style="height: 70vh; overflow: scroll">
-                            @foreach (Order x in completeHistoryFromOne) {
-                                <div class="row"
-                                     style="margin-left: 1rem; margin-right: 1rem; border-color: black; border-bottom: solid 0.2px">
-                                    <div class="col-lg-5">
-                                        @x.DateTime.ToString("dddd, dd MMMM yyyy")
-                                    </div>
-                                    <div class="col-lg-2">
-                                        @x.Money.ToString()
-                                    </div>
-                                    <div class="col-lg-5">
-                                        @x.Provider.Designation
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                        <button type="button" class="ek-btn" @onclick="() => ModalDialog!.Close()">@_loc[nameof(RessourceAppStrings.close)]</button>
-                    </div>
-                </HistoryModalCard>
+                <EkDialog Open="historyDialogOpen" Wide="true" Title="@ModalTitle" OnClose="CloseHistoryDialog">
+                    <ChildContent>
+                        @if (completeHistoryFromOne.Count == 0) {
+                            <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.orderNoOrdersYet)]</p>
+                        }
+                        @foreach (IGrouping<DateTime, Order> month in CompleteHistoryByMonth) {
+                            <h4 class="ek-hist-month">@month.Key.ToString("MMMM yyyy")</h4>
+                            <ul class="ek-hist">
+                                @foreach (Order o in month) {
+                                    <li>
+                                        <span class="ek-hist-date">@o.DateTime.ToString("ddd, dd.MM.yyyy")</span>
+                                        <span class="ek-hist-text">@o.Provider.Designation</span>
+                                        <span class="ek-hist-amount">@o.Money.ToString()</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </ChildContent>
+                    <Footer>
+                        <button type="button" class="ek-btn" @onclick="CloseHistoryDialog">@_loc[nameof(RessourceAppStrings.close)]</button>
+                    </Footer>
+                </EkDialog>
             }
             else {
                 <h3 class="ek-group-title">@_loc[nameof(RessourceAppStrings.overview)]</h3>

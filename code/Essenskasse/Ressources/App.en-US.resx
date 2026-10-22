@@ -932,4 +932,7 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="orderNoProvider" xml:space="preserve">
     <value>Please create a provider first.</value>
   </data>
+  <data name="orderNoOrdersYet" xml:space="preserve">
+    <value>No orders yet.</value>
+  </data>
 </root>

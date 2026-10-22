@@ -11,7 +11,8 @@ namespace Essenskasse.Pages {
     public partial class OrderCreatePage {
 
         private string dashboardLink = "/";
-        private HistoryModalCard? ModalDialog { get; set; }
+        private bool historyDialogOpen = false;
+        private readonly HashSet<Guid> loadingHistory = [];
 
         private List<Provider> providers = [];
         private List<Person> person = [];
@@ -195,6 +196,14 @@ namespace Essenskasse.Pages {
             }
         }
 
+        private void CloseHistoryDialog() {
+            historyDialogOpen = false;
+        }
+
+        /// <summary>Die Bestellungen des Dialogs, nach Monat gruppiert (neueste zuerst).</summary>
+        private IEnumerable<IGrouping<DateTime, Order>> CompleteHistoryByMonth =>
+            completeHistoryFromOne.OrderByDescending(x => x.DateTime).GroupBy(x => new DateTime(x.DateTime.Year, x.DateTime.Month, 1));
+
         private string TextOf(Guid guid) => amountTexts.TryGetValue(guid, out string? text) ? text : "";
 
         private void SetText(Guid guid, string text) {
@@ -349,6 +358,7 @@ namespace Essenskasse.Pages {
                 openHistory.Remove(x.Guid);
                 return;
             }
+            loadingHistory.Add(x.Guid);
             try {
                 HttpResponseMessage response = await HttpClient.SendAsync(new HttpRequestMessage() {
                     Method = HttpMethod.Get,
@@ -369,6 +379,9 @@ namespace Essenskasse.Pages {
             catch {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
             }
+            finally {
+                loadingHistory.Remove(x.Guid);
+            }
         }
 
         /// <summary>Laedt die komplette Historie einer Person in den Dialog.</summary>
@@ -387,7 +400,7 @@ namespace Essenskasse.Pages {
                 if (response.IsSuccessStatusCode) {
                     string json = await response.Content.ReadAsStringAsync();
                     completeHistoryFromOne = json.Length == 0 ? [] : JsonConvert.DeserializeObject<List<Order>>(json) ?? [];
-                    ModalDialog!.Open();
+                    historyDialogOpen = true;
                 }
                 else {
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
