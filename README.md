@@ -66,8 +66,13 @@ start http://localhost:8009
 ```
 This will call the Dashboard.
 
+## Datenbank-Updates / Database updates
+**Deutsch:** Die Update-Skripte in `code/MySqlScripts/` (`update_vX-Y-Z_zu_A-B-C.sql`) spielt die API beim Start selbst ein: Welche schon gelaufen sind, steht in der Tabelle `essenskasse.SchemaMigration`. Ein Update besteht also aus **Sicherung erstellen** und `docker-compose up -d --build`; manuelles Ausführen ist nicht nötig. Läuft ein Skript nicht durch, startet die API nicht, und `docker logs EssenskasseAPI` nennt das Skript (es gilt dann nicht als angewendet). Abschalten: `Database__AutoMigrate=false`. Der Datenbankbenutzer braucht dafür das Recht, Tabellen zu ändern (mit den Einstellungen in `docker-compose.yml` ist das gegeben). Neue Updates: eine Datei mit dem Namensmuster ergänzen, sie muss mehrfach ausführbar sein.
+
+**English:** The update scripts in `code/MySqlScripts/` (`update_vX-Y-Z_zu_A-B-C.sql`) are applied by the API itself at start-up; the table `essenskasse.SchemaMigration` records which ones have run. An update is therefore: **create a backup** and `docker-compose up -d --build`; running scripts by hand is no longer necessary. If a script fails the API does not start and `docker logs EssenskasseAPI` names it (it is then not marked as applied). Switch off with `Database__AutoMigrate=false`. New updates: add a file following the naming pattern; it must be safe to run more than once.
+
 ## Update auf 1.4.0 / Upgrade to 1.4.0
-**Deutsch:** Die Bestätigungsmail bei Einzahlungen hat drei Stufen (nie / pro Einzahlung wählbar / immer). Vorher eine Sicherung erstellen, dann `docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> essenskasse < code/MySqlScripts/update_v1-3-0_zu_1-4-0.sql` ausführen (ändert den Spaltentyp, vorhandene Werte bleiben: Ja → „wählbar“, Nein → „nie“; ergänzt außerdem fünf Spalten für die Einstellungen: Schnellbeträge, Farbschema, Sprache, Sortierung) und neu bauen: `docker-compose up -d --build`.
+**Deutsch:** (Das passiert jetzt automatisch beim Start der API, siehe oben.) Die Bestätigungsmail bei Einzahlungen hat drei Stufen (nie / pro Einzahlung wählbar / immer). Vorher eine Sicherung erstellen, dann `docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> essenskasse < code/MySqlScripts/update_v1-3-0_zu_1-4-0.sql` ausführen (ändert den Spaltentyp, vorhandene Werte bleiben: Ja → „wählbar“, Nein → „nie“; ergänzt außerdem fünf Spalten für die Einstellungen: Schnellbeträge, Farbschema, Sprache, Sortierung) und neu bauen: `docker-compose up -d --build`.
 
 **English:** The payment confirmation email now has three levels (never / selectable per payment / always). Create a backup, run `code/MySqlScripts/update_v1-3-0_zu_1-4-0.sql` (it changes the column type, existing values are kept: yes → selectable, no → never; it also adds five columns for the settings: quick amounts, theme, language, sorting) and rebuild with `docker-compose up -d --build`.
 

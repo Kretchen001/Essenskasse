@@ -1,3 +1,4 @@
+using EssenskasseAPI.Data;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
@@ -77,10 +78,17 @@ namespace EssenskasseAPI {
 
             try {
                 Log.Information("Starting the application...");
+                // Fehlende Datenbank-Updates einspielen; abschaltbar mit "Database:AutoMigrate": false
+                // (z. B. Umgebungsvariable Database__AutoMigrate=false).
+                string? connectionString = app.Configuration["ConnectionStrings:essenskasse"];
+                if (app.Configuration.GetValue<bool>("Database:AutoMigrate", true) && !string.IsNullOrWhiteSpace(connectionString)) {
+                    new DatabaseMigrator(connectionString).Run();
+                }
                 app.Run();
             }
             catch (Exception ex) {
                 Log.Fatal(ex, "Application terminated unexpectedly");
+                Environment.ExitCode = 1;
             }
             finally {
                 Log.Information("Shutting down the application.");

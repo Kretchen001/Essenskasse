@@ -7,7 +7,8 @@ namespace EssenskasseAPI.Test {
 
         [Fact]
         public async Task PingOk() {
-            await using WebApplicationFactory<Program> application = new WebApplicationFactory<Program>();
+            await using WebApplicationFactory<Program> application = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(builder => builder.UseSetting("Database:AutoMigrate", "false"));
             using (HttpClient client = application.CreateClient()) {
                 HttpResponseMessage httpResponse = await client.GetAsync("api/Ping/ping");
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);

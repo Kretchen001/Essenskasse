@@ -22,4 +22,9 @@
     <ProjectReference Include="..\Modells\Modells.csproj" />
   </ItemGroup>
 
+  <!-- Die Update-Skripte werden in die API eingebettet und beim Start automatisch angewendet (siehe DatabaseMigrator). -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\MySqlScripts\update_v*.sql" LogicalName="Migrations/%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>

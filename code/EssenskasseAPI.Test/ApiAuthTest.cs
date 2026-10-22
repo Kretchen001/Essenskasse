@@ -10,7 +10,8 @@ namespace EssenskasseAPI.Test {
         private readonly WebApplicationFactory<Program> _factory;
 
         public ApiAuthTest(WebApplicationFactory<Program> factory) {
-            _factory = factory;
+            // Diese Tests laufen ohne Datenbank: das automatische Einspielen der Datenbank-Updates beim Start ist aus.
+            _factory = factory.WithWebHostBuilder(builder => builder.UseSetting("Database:AutoMigrate", "false"));
         }
 
         public static TheoryData<string, string> ProtectedEndpoints => new() {
