@@ -178,11 +178,9 @@ namespace Essenskasse.Pages {
             }
         }
 
-        private async void ChangeOfPersonCommit() {
-            person.Clear();
-            shownPersonList.Clear();
-            await RequestAllPersonFromApiAsync();
-            base.StateHasChanged();
+        /// <summary>Eine Kachel hat Name oder E-Mail gespeichert: Liste (Filter, Sortierung, Zaehler) neu aufbauen.</summary>
+        private void OnPersonUpdated(Person updated) {
+            ApplyFilterAndSort();
         }
 
         private async Task ReadSortModeAsync() {

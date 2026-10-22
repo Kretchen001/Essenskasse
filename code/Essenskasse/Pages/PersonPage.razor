@@ -108,14 +108,8 @@
         </div>
         <div class="ek-grid ek-people">
             @foreach (Person x in shownPersonList) {
-                <PersonListCard Person="x" PositivSaldo="IsInconspicuous(x)" />
+                <PersonListCard Person="x" PositivSaldo="IsInconspicuous(x)" OnUpdated="OnPersonUpdated" />
             }
-        </div>
-        <div class="row">
-            <h4 style="margin-top: 1rem;">
-                @_loc[nameof(RessourceAppStrings.editPerson)]
-            </h4>
-            <EditPersonCard OnChangeCommit="ChangeOfPersonCommit" />
         </div>
         </div>
     </Authorized>

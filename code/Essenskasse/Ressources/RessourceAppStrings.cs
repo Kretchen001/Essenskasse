@@ -155,5 +155,8 @@
         filterAll,
         filterNoEmail,
         filterByStatus,
+        save,
+        cancel,
+        nameRequired,
     }
 }

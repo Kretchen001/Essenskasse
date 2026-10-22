@@ -573,4 +573,13 @@
   <data name="filterByStatus" xml:space="preserve">
     <value>Filter by status</value>
   </data>
+  <data name="save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="nameRequired" xml:space="preserve">
+    <value>Please enter a name.</value>
+  </data>
 </root>

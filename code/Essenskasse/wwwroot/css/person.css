@@ -133,6 +133,50 @@
         font-style: italic;
     }
 
+/* Bearbeiten in der Kachel */
+.ek-person.is-editing {
+    align-items: flex-start;
+}
+
+.ek-person-edit {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ek-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    color: var(--ek-muted);
+    font-size: 0.85rem;
+}
+
+.ek-input {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 8px;
+    background: var(--ek-surface);
+    color: var(--ek-text);
+    font: inherit;
+    font-size: 1rem;
+}
+
+    .ek-input:focus-visible {
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 1px;
+    }
+
+.ek-edit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
 /* Kleiner Symbol-Knopf (wie der Mail-Knopf auf dem Dashboard) */
 .ek-icon-btn {
     flex: none;
