@@ -803,4 +803,22 @@
   <data name="confirmationMailPreparing" xml:space="preserve">
     <value>Подготовка письма с подтверждением …</value>
   </data>
+  <data name="settingsGeneral" xml:space="preserve">
+    <value>Общие</value>
+  </data>
+  <data name="settingsDisplay" xml:space="preserve">
+    <value>Отображение</value>
+  </data>
+  <data name="settingsLists" xml:space="preserve">
+    <value>Списки</value>
+  </data>
+  <data name="settingsCash" xml:space="preserve">
+    <value>Касса и администрирование</value>
+  </data>
+  <data name="settingsServer" xml:space="preserve">
+    <value>Синхронизация с сервером</value>
+  </data>
+  <data name="confirmationMailSetting" xml:space="preserve">
+    <value>Отправлять подтверждение по e-mail при платежах?</value>
+  </data>
 </root>

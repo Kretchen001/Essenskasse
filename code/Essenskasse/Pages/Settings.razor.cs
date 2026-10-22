@@ -1,5 +1,6 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Modells;
 using U = Modells.User;
@@ -114,6 +115,9 @@ namespace Essenskasse.Pages {
         private int LoadAmountPayments {
             get => AppData.LoadAmountPayment;
             set {
+                if (value < 1 || value > 500) {
+                    return; // sinnvolle Grenzen, 0 oder negative Werte wuerden die Listen leeren
+                }
                 AppData.LoadAmountPayment = value;
                 SaveAmountOfPaymentsPersistentAsync(value);
             }
@@ -123,6 +127,9 @@ namespace Essenskasse.Pages {
         private int LoadAmountOrders {
             get => AppData.LoadAmountOrder;
             set {
+                if (value < 1 || value > 500) {
+                    return;
+                }
                 AppData.LoadAmountOrder = value;
                 SaveAmountOfOrderPersistentAsync(value);
             }
@@ -170,23 +177,24 @@ namespace Essenskasse.Pages {
             }
         }
 
-        /// <summary></summary>
-        private decimal DashboardMoneyLimitInt {
+        /// <summary>Grenzwert als Text fuer das Eingabefeld, z. B. "10,50" (ohne Waehrungszeichen).</summary>
+        private string LimitDisplay {
             get {
-                decimal temp = AppData.DashboardMoneyLimit.Euro;
-                temp += AppData.DashboardMoneyLimit.Cent * 0.01m;
-                return temp;
+                long cents = AppData.DashboardMoneyLimit.ToTotalCents();
+                string sign = cents < 0 ? "-" : "";
+                cents = Math.Abs(cents);
+                return sign + (cents / 100) + "," + (cents % 100).ToString("00");
             }
-            set {
-                if (value != 0) {
-                    Money temp = ConvertToMoney(value);
-                    if (temp.Cent < 100) {
-                        DashboardMoneyLimit = temp;
-                    }
-                    else {
-                        DashboardMoneyLimit = AppData.DashboardMoneyLimit;
-                    }
-                }
+        }
+
+        /// <summary>Der Grenzwert wird beim Verlassen des Feldes uebernommen; ungueltige Eingaben werden gemeldet und verworfen.</summary>
+        private void OnLimitChanged(ChangeEventArgs e) {
+            string? text = e.Value?.ToString();
+            if (MoneyParser.TryParse(text, out Money parsed)) {
+                DashboardMoneyLimit = parsed;
+            }
+            else {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.amountInvalid)], ToastLevel.Warning);
             }
         }
         /// <summary></summary>
@@ -224,15 +232,6 @@ namespace Essenskasse.Pages {
         protected override void OnInitialized() {
             themeList["Light"] = _loc[nameof(RessourceAppStrings.light)];
             themeList["Dark"] = _loc[nameof(RessourceAppStrings.dark)];
-        }
-
-        /// <summary></summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private static Money ConvertToMoney(decimal value) {
-            long euro = (long)value;
-            short cent = (short)((value - euro) * 100);
-            return new Money(euro, cent);
         }
 
         /// <summary> Save the user-selection in the LocalStorage for remember by restart the PWA. </summary>

@@ -12,294 +12,158 @@
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.settings)]</PageTitle>
 
-<h3>@_loc[nameof(RessourceAppStrings.settings)]</h3>
+<div class="ek-dash ek-set-page">
+    <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.settings)]</h2>
 
-<style>
-    #lilaRow {
-        background: rgb(200,116,217);
-        background: linear-gradient(90deg, rgba(200,116,217,1) 0%, rgba(200,116,217,1) 35%, rgba(197,52,224,1) 45%, rgba(128,7,144,1) 70%, rgba(110,9,121,1) 90%, rgba(62,0,98,1) 100%);
-    }
-
-    #orangeRow {
-        background: rgb(217,194,116);
-        background: linear-gradient(90deg, rgba(217,194,116,1) 0%, rgba(217,189,116,1) 35%, rgba(224,187,52,1) 45%, rgba(144,113,7,1) 70%, rgba(121,97,9,1) 90%, rgba(98,90,0,1) 100%);
-    }
-
-    #greenRow {
-        background: rgb(116,217,196);
-        background: linear-gradient(90deg, rgba(116,217,196,1) 0%, rgba(116,217,192,1) 35%, rgba(52,224,176,1) 45%, rgba(7,144,108,1) 70%, rgba(9,121,88,1) 90%, rgba(0,98,71,1) 100%);
-    }
-
-    #redRow {
-        background: rgb(217,116,116);
-        background: linear-gradient(90deg, rgba(217,116,116,1) 0%, rgba(217,116,116,1) 35%, rgba(224,52,52,1) 45%, rgba(144,7,7,1) 70%, rgba(121,9,9,1) 90%, rgba(98,0,0,1) 100%);
-    }
-
-    #grayRow {
-        background: rgb(224,222,222);
-        background: linear-gradient(90deg, rgba(224,222,222,1) 0%, rgba(224,222,222,1) 35%, rgba(212,212,212,1) 45%, rgba(153,153,153,1) 70%, rgba(107,107,107,1) 90%, rgba(106,106,106,1) 100%);
-    }
-
-    #labelcolor {
-        color: rgb(10,10,10);
-    }
-</style>
-
-<div class="row align-items-center" id="grayRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-    <div class="col-lg-4">
-        <label id="labelcolor">
-            @_loc[nameof(RessourceAppStrings.language)]
-        </label>
-    </div>
-    <div class="col-lg-8" align="center">
-        <div class="row">
-            <div class="col-lg-6" align="right">
-                <CultureSelector />
-            </div>
-            <div class="col-lg-6">
-            </div>
+    <section class="ek-set ek-set-gray">
+        <h3 class="ek-set-title">@_loc[nameof(RessourceAppStrings.settingsGeneral)]</h3>
+        <div class="ek-set-row">
+            <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.language)]</span></span>
+            <span class="ek-set-control"><CultureSelector /></span>
         </div>
-    </div>
-</div>
-
-<div class="row align-items-center" id="grayRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-    <div class="col-lg-4">
-        <label id="labelcolor">
-            @_loc[nameof(RessourceAppStrings.colortheme)]
-        </label>
-    </div>
-    <div class="col-lg-8" align="center">
-        <div class="row">
-            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                <select @bind="@CurrentTheme">
+        <div class="ek-set-row">
+            <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.colortheme)]</span></span>
+            <span class="ek-set-control">
+                <select class="ek-select" @bind="@CurrentTheme" aria-label="@_loc[nameof(RessourceAppStrings.colortheme)]">
                     @foreach (var entity in themeList) {
                         <option value="@entity.Key">@entity.Value</option>
                     }
                 </select>
-            </div>
-            <div class="col-lg-6" align="center">
-                <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="() => SaveUserThemePersistentAsync()">
+                <button type="button" class="ek-btn" @onclick="() => SaveUserThemePersistentAsync()">
                     @_loc[nameof(RessourceAppStrings.savePermanent)]
                 </button>
-            </div>
+            </span>
         </div>
-    </div>
-</div>
+    </section>
 
-<div class="row align-items-center" id="greenRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-    <div class="col-lg-4">
-        <label id="labelcolor">
-            @_loc[nameof(RessourceAppStrings.singleColumn)] (@_loc[nameof(RessourceAppStrings.currentlySelected)])
+    <section class="ek-set ek-set-green">
+        <h3 class="ek-set-title">@_loc[nameof(RessourceAppStrings.settingsDisplay)]</h3>
+        <label class="ek-set-row">
+            <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.singleColumn)]</span></span>
+            <span class="ek-set-control">
+                <span class="ek-switch">
+                    <input type="checkbox" @bind="IsSingleListWish" />
+                    <span class="ek-switch-track"></span>
+                    <span>@ReturnListWish</span>
+                </span>
+            </span>
         </label>
-    </div>
-    <div class="col-lg-8" align="center">
-        <div class="row">
-            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="IsSingleListWish">
-            </div>
-            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                <label class="form-check-label" for="flexSwitchCheckChecked" style="color: white">@ReturnListWish</label>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row align-items-center" id="greenRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-    <div class="col-lg-4">
-        <label id="labelcolor">
-            @_loc[nameof(RessourceAppStrings.showNoticeablePersonRightDashboard)]
+        <label class="ek-set-row">
+            <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.showNoticeablePersonRightDashboard)]</span></span>
+            <span class="ek-set-control">
+                <span class="ek-switch">
+                    <input type="checkbox" @bind="NoticeableOnRightSide" />
+                    <span class="ek-switch-track"></span>
+                    <span>@ReturnNoticeableSide</span>
+                </span>
+            </span>
         </label>
-    </div>
-    <div class="col-lg-8" align="center">
-        <div class="row">
-            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="NoticeableOnRightSide">
-            </div>
-            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                <label class="form-check-label" for="flexSwitchCheckChecked" style="color: white">@ReturnNoticeableSide</label>
-            </div>
-        </div>
-    </div>
-</div>
-
-<AuthorizeView>
-    <Authorized>
-        <div class="row align-items-center" id="greenRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-            <div class="col-lg-4">
-                <label id="labelcolor">
-                    @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.provider)]) @_loc[nameof(RessourceAppStrings.turnOn)]
+        <AuthorizeView>
+            <Authorized>
+                <label class="ek-set-row">
+                    <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.provider)]) @_loc[nameof(RessourceAppStrings.turnOn)]</span></span>
+                    <span class="ek-set-control">
+                        <span class="ek-switch">
+                            <input type="checkbox" @bind="FilterShowProvider" />
+                            <span class="ek-switch-track"></span>
+                            <span>@FilterShowProviderString</span>
+                        </span>
+                    </span>
                 </label>
-            </div>
-            <div class="col-lg-8" align="center">
-                <div class="row">
-                    <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowProvider">
-                    </div>
-                    <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                        <label class="form-check-label" for="flexSwitchCheckChecked" style="color: white">@FilterShowProviderString</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row align-items-center" id="greenRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-            <div class="col-lg-4">
-                <label id="labelcolor">
-                    @_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.person)]) @_loc[nameof(RessourceAppStrings.turnOn)]
+                <label class="ek-set-row">
+                    <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.filter)] (@_loc[nameof(RessourceAppStrings.person)]) @_loc[nameof(RessourceAppStrings.turnOn)]</span></span>
+                    <span class="ek-set-control">
+                        <span class="ek-switch">
+                            <input type="checkbox" @bind="FilterShowPerson" />
+                            <span class="ek-switch-track"></span>
+                            <span>@FilterShowPersonString</span>
+                        </span>
+                    </span>
                 </label>
-            </div>
-            <div class="col-lg-8" align="center">
-                <div class="row">
-                    <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="FilterShowPerson">
-                    </div>
-                    <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                        <label class="form-check-label" for="flexSwitchCheckChecked" style="color: white">@FilterShowPersonString</label>
-                    </div>
-                </div>
-            </div>
-        </div>
+            </Authorized>
+        </AuthorizeView>
+    </section>
 
-        <div class="row align-items-center" id="orangeRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-            <div class="col-lg-4">
-                <label id="labelcolor">
-                    @_loc[nameof(RessourceAppStrings.paymentsToBeLoaded)]
+    <AuthorizeView>
+        <Authorized>
+            <section class="ek-set ek-set-orange">
+                <h3 class="ek-set-title">@_loc[nameof(RessourceAppStrings.settingsLists)]</h3>
+                <label class="ek-set-row">
+                    <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.paymentsToBeLoaded)]</span></span>
+                    <span class="ek-set-control"><input type="number" min="1" max="500" class="ek-input ek-set-num" @bind="LoadAmountPayments" /></span>
                 </label>
-            </div>
-            <div class="col-lg-8" align="center">
-                <div class="row">
-                    <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                        <input type="number" @bind="LoadAmountPayments" />
-                    </div>
-                    <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row align-items-center" id="orangeRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-            <div class="col-lg-4">
-                <label id="labelcolor">
-                    @_loc[nameof(RessourceAppStrings.ordersToBeLoaded)]
+                <label class="ek-set-row">
+                    <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.ordersToBeLoaded)]</span></span>
+                    <span class="ek-set-control"><input type="number" min="1" max="500" class="ek-input ek-set-num" @bind="LoadAmountOrders" /></span>
                 </label>
-            </div>
-            <div class="col-lg-8" align="center">
-                <div class="row">
-                    <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                        <input type="number" @bind="LoadAmountOrders" />
-                    </div>
-                    <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </Authorized>
-</AuthorizeView>
+            </section>
+        </Authorized>
+    </AuthorizeView>
 
-<div class="row align-items-center" id="redRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-    <div class="col-lg-4">
-        <label id="labelcolor">
-            @_loc[nameof(RessourceAppStrings.limitValuePositivBalance)]
+    <section class="ek-set ek-set-red">
+        <h3 class="ek-set-title">@_loc[nameof(RessourceAppStrings.settingsCash)]</h3>
+        <label class="ek-set-row">
+            <span class="ek-set-text">
+                <span class="ek-set-label">@_loc[nameof(RessourceAppStrings.limitValuePositivBalance)]</span>
+                <span class="ek-set-hint">@_loc[nameof(RessourceAppStrings.current)]: @DashboardMoneyLimit.ToString()</span>
+            </span>
+            <span class="ek-set-control">
+                <input type="text" inputmode="decimal" autocomplete="off" class="ek-input ek-set-num"
+                       value="@LimitDisplay" @onchange="OnLimitChanged" />
+            </span>
         </label>
-    </div>
-    <div class="col-lg-8" align="center">
-        <div class="row">
-            <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                <input type="number" @bind="DashboardMoneyLimitInt">
-            </div>
-            <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                <label style="color: white">
-                    @_loc[nameof(RessourceAppStrings.current)]: @DashboardMoneyLimit.ToString()
+        <AuthorizeView>
+            <Authorized>
+                <label class="ek-set-row">
+                    <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.confirmationMailSetting)]</span></span>
+                    <span class="ek-set-control">
+                        <span class="ek-switch">
+                            <input type="checkbox" @bind="SendConfirmationMail" />
+                            <span class="ek-switch-track"></span>
+                            <span>@ReturnSendConfirmationMail</span>
+                        </span>
+                    </span>
                 </label>
-            </div>
-        </div>
-    </div>
-</div>
-
-<AuthorizeView>
-    <Authorized>
-        <div class="row align-items-center" id="redRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-            <div class="col-lg-4">
-                <label id="labelcolor">
-                    Bestätigungsmail bei Einzahlungen absenden?@* @_loc[nameof(RessourceAppStrings.limitValuePositivBalance)] *@
-                </label>
-            </div>
-            <div class="col-lg-8" align="center">
-                <div class="row">
-                    <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" @bind="SendConfirmationMail">
-                    </div>
-                    <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                        <label class="form-check-label" for="flexSwitchCheckChecked" style="color: white">@ReturnSendConfirmationMail</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row align-items-center" id="redRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-            <div class="col-lg-4">
-                <label id="labelcolor">
-                    @_loc[nameof(RessourceAppStrings.tokenForChange)]
-                </label>
-            </div>
-            <div class="col-lg-8" align="center">
-                <div class="row">
-                    <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                        @if (ExistAccessToken) {
-                            <label style="color: white">
-                                @_loc[nameof(RessourceAppStrings.entered)]
-                            </label>
-                        }
-                        else {
-                            <label style="color: white">
-                                @_loc[nameof(RessourceAppStrings.notRequested)]
-                            </label>
-                        }
-                    </div>
-                    <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
+                <div class="ek-set-row">
+                    <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.tokenForChange)]</span></span>
+                    <span class="ek-set-control">
+                        <span class="ek-set-status @(ExistAccessToken ? "is-ok" : "")">
+                            @(ExistAccessToken ? _loc[nameof(RessourceAppStrings.entered)] : _loc[nameof(RessourceAppStrings.notRequested)])
+                        </span>
                         @if (!ExistAccessToken) {
-                            <button type="button" class="btn-warning" data-dismiss="modal" style="border-radius:8px" @onclick="() => RequestAccessTokenForChanges()">
+                            <button type="button" class="ek-btn" @onclick="() => RequestAccessTokenForChanges()">
                                 @_loc[nameof(RessourceAppStrings.request)]
                             </button>
                         }
-                    </div>
+                    </span>
                 </div>
-            </div>
-        </div>
-
-        <div class="row align-items-center" id="redRow" style="border: 2px solid; border-color: lightslategray; margin-bottom: 0.5vh; padding: 0.25vh;">
-            <div class="col-lg-4">
-                <label id="labelcolor">
-                    @_loc[nameof(RessourceAppStrings.emailAdminContact)]
-                </label>
-            </div>
-            <div class="col-lg-8" align="center">
-                <div class="row">
-                    <div class="col-lg-6" align="right" style="margin-top: auto; margin-bottom: auto;">
-                        <input type="text" style="width: 50%;" @bind-value="AdminEmail">
-                    </div>
-                    <div class="col-lg-6" align="center" style="margin-top: auto; margin-bottom: auto;">
-                        <button type="button" class="btn-outline-success" data-dismiss="modal" style="border-radius:8px" @onclick="SendMessageToAdmin">
+                <div class="ek-set-row">
+                    <span class="ek-set-text"><span class="ek-set-label">@_loc[nameof(RessourceAppStrings.emailAdminContact)]</span></span>
+                    <span class="ek-set-control">
+                        <input type="text" class="ek-input ek-set-wide" autocomplete="off" @bind-value="AdminEmail"
+                               aria-label="@_loc[nameof(RessourceAppStrings.emailAdminContact)]" />
+                        <button type="button" class="ek-btn" @onclick="SendMessageToAdmin">
                             @_loc[nameof(RessourceAppStrings.notify)]
                         </button>
-                    </div>
+                    </span>
                 </div>
-            </div>
-        </div>
+            </Authorized>
+        </AuthorizeView>
+    </section>
 
-        <hr />
-
-        <div class="row align-items-center" style="margin-bottom: 0.5vh; padding: 0.25vh;">
-            <div class="col-lg-6" align="center">
-                <button type="button" class="btn-outline-warning" data-dismiss="modal" style="border-radius:8px; width: 80%;" @onclick="() => RequestOnlineSettingsForThisUser()">
-                    @_loc[nameof(RessourceAppStrings.requestSavedSettings)]
-                </button>
-            </div>
-            <div class="col-lg-6" align="center">
-                <button type="button" class="btn-outline-warning" data-dismiss="modal" style="border-radius:8px; width: 80%;" @onclick="() => SaveSettingsForThisUserOnline()">
-                    @_loc[nameof(RessourceAppStrings.saveSettings)]
-                </button>
-            </div>
-        </div>
-    </Authorized>
-</AuthorizeView>
+    <AuthorizeView>
+        <Authorized>
+            <section class="ek-set ek-set-gray">
+                <h3 class="ek-set-title">@_loc[nameof(RessourceAppStrings.settingsServer)]</h3>
+                <div class="ek-set-actions">
+                    <button type="button" class="ek-btn" @onclick="() => RequestOnlineSettingsForThisUser()">
+                        @_loc[nameof(RessourceAppStrings.requestSavedSettings)]
+                    </button>
+                    <button type="button" class="ek-btn" @onclick="() => SaveSettingsForThisUserOnline()">
+                        @_loc[nameof(RessourceAppStrings.saveSettings)]
+                    </button>
+                </div>
+            </section>
+        </Authorized>
+    </AuthorizeView>
+</div>

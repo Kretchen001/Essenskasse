@@ -1,0 +1,143 @@
+/* Einstellungsseite: Abschnitte mit farbigem Verlaufsbalken (Farben der frueheren Zeilen als Anregung). */
+
+.ek-set-page {
+    max-width: 52rem;
+}
+
+.ek-set {
+    --ek-accent: linear-gradient(90deg, #e0dede 0%, #d4d4d4 35%, #999999 70%, #6a6a6a 100%);
+    margin: 0 0 1.25rem;
+    overflow: hidden;
+    border: 1px solid var(--ek-line);
+    border-radius: 14px;
+    background: var(--ek-surface);
+}
+
+    .ek-set::before {
+        content: "";
+        display: block;
+        height: 6px;
+        background: var(--ek-accent);
+    }
+
+.ek-set-gray {
+    --ek-accent: linear-gradient(90deg, #e0dede 0%, #d4d4d4 35%, #999999 70%, #6a6a6a 100%);
+}
+
+.ek-set-green {
+    --ek-accent: linear-gradient(90deg, #74d9c4 0%, #34e0b0 35%, #07906c 70%, #006247 100%);
+}
+
+.ek-set-orange {
+    --ek-accent: linear-gradient(90deg, #d9c274 0%, #e0bb34 35%, #907107 70%, #625a00 100%);
+}
+
+.ek-set-red {
+    --ek-accent: linear-gradient(90deg, #d97474 0%, #e03434 35%, #900707 70%, #620000 100%);
+}
+
+.ek-set-title {
+    margin: 0;
+    padding: 0.9rem 1.1rem 0.4rem;
+    font-size: 1.1rem;
+    font-weight: 650;
+}
+
+.ek-set-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin: 0;
+    padding: 0.7rem 1.1rem;
+    border-top: 1px solid var(--ek-line);
+}
+
+.ek-set-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 14rem;
+    min-width: 0;
+}
+
+.ek-set-label {
+    font-weight: 550;
+}
+
+.ek-set-hint {
+    color: var(--ek-muted);
+    font-size: 0.88rem;
+}
+
+.ek-set-control {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+}
+
+.ek-set-num {
+    width: 8rem;
+    text-align: right;
+}
+
+.ek-set-wide {
+    width: 16rem;
+    max-width: 100%;
+}
+
+.ek-set-status {
+    padding: 0.15rem 0.7rem;
+    border-radius: 999px;
+    background: var(--ek-line);
+    color: var(--ek-muted);
+    font-size: 0.9rem;
+}
+
+    .ek-set-status.is-ok {
+        background: var(--ek-ok-tint);
+        color: var(--ek-ok);
+    }
+
+.ek-set-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 0.7rem 1.1rem 1rem;
+    border-top: 1px solid var(--ek-line);
+}
+
+/* Die Theme-Dateien faerben jeden button und jedes select; hier gewinnen die Farben der Seite. */
+.ek-dash .ek-set .ek-btn,
+.ek-dash .ek-set .ek-select {
+    background-color: transparent;
+    color: var(--ek-text);
+    border-color: var(--ek-line-strong);
+}
+
+.ek-dash .ek-set .ek-select {
+    background-color: var(--ek-surface);
+}
+
+@media (max-width: 575.98px) {
+    .ek-set-control {
+        width: 100%;
+    }
+
+    .ek-set-wide {
+        flex: 1 1 100%;
+        width: auto;
+    }
+}
+
+@media (pointer: coarse) {
+    .ek-set-row {
+        min-height: 3.25rem;
+    }
+
+    .ek-set .ek-input,
+    .ek-set .ek-select {
+        min-height: 2.75rem;
+    }
+}

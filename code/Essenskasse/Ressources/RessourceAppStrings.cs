@@ -231,5 +231,11 @@
         emailConfirmClosing,
         sendConfirmation,
         confirmationMailPreparing,
+        settingsGeneral,
+        settingsDisplay,
+        settingsLists,
+        settingsCash,
+        settingsServer,
+        confirmationMailSetting,
     }
 }

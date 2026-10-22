@@ -803,4 +803,22 @@ this confirms that on {1} at {2} a payment of {3} was received.</value>
   <data name="confirmationMailPreparing" xml:space="preserve">
     <value>Preparing confirmation email …</value>
   </data>
+  <data name="settingsGeneral" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="settingsDisplay" xml:space="preserve">
+    <value>Display</value>
+  </data>
+  <data name="settingsLists" xml:space="preserve">
+    <value>Lists</value>
+  </data>
+  <data name="settingsCash" xml:space="preserve">
+    <value>Cash and administration</value>
+  </data>
+  <data name="settingsServer" xml:space="preserve">
+    <value>Sync with the server</value>
+  </data>
+  <data name="confirmationMailSetting" xml:space="preserve">
+    <value>Send a confirmation email for payments?</value>
+  </data>
 </root>

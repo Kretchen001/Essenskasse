@@ -803,4 +803,22 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   <data name="confirmationMailPreparing" xml:space="preserve">
     <value>Bestätigungsmail wird vorbereitet …</value>
   </data>
+  <data name="settingsGeneral" xml:space="preserve">
+    <value>Allgemein</value>
+  </data>
+  <data name="settingsDisplay" xml:space="preserve">
+    <value>Anzeige</value>
+  </data>
+  <data name="settingsLists" xml:space="preserve">
+    <value>Listen</value>
+  </data>
+  <data name="settingsCash" xml:space="preserve">
+    <value>Kasse und Verwaltung</value>
+  </data>
+  <data name="settingsServer" xml:space="preserve">
+    <value>Abgleich mit dem Server</value>
+  </data>
+  <data name="confirmationMailSetting" xml:space="preserve">
+    <value>Bestätigungsmail bei Einzahlungen absenden?</value>
+  </data>
 </root>

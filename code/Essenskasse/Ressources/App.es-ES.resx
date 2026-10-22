@@ -803,4 +803,22 @@ por la presente se confirma que el {1} a las {2} se recibió un pago de {3}.</va
   <data name="confirmationMailPreparing" xml:space="preserve">
     <value>Preparando correo de confirmación …</value>
   </data>
+  <data name="settingsGeneral" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="settingsDisplay" xml:space="preserve">
+    <value>Pantalla</value>
+  </data>
+  <data name="settingsLists" xml:space="preserve">
+    <value>Listas</value>
+  </data>
+  <data name="settingsCash" xml:space="preserve">
+    <value>Caja y administración</value>
+  </data>
+  <data name="settingsServer" xml:space="preserve">
+    <value>Sincronización con el servidor</value>
+  </data>
+  <data name="confirmationMailSetting" xml:space="preserve">
+    <value>¿Enviar un correo de confirmación en los pagos?</value>
+  </data>
 </root>
