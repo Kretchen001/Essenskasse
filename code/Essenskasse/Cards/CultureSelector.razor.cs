@@ -21,8 +21,7 @@ namespace Essenskasse.Cards {
 
         private async Task NewCultureSelectedAsync(ChangeEventArgs args) {
             string cultureString = args.Value!.ToString() ?? "de-DE";
-            await LocalStorage.SetItemAsync<string>("culture", cultureString);
-            Navi.NavigateTo(Navi.Uri, true);
+            await Language.SetAsync(cultureString); // wechselt sofort, die Seite wird nicht neu geladen
         }
     }
 }

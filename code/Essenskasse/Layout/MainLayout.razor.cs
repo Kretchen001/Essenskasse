@@ -25,6 +25,8 @@ namespace Essenskasse.Layout {
         private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
         protected override async Task OnInitializedAsync() {
+            Language.Changed += OnLanguageChanged;
+            await Language.SyncDocumentLanguageAsync();
             AuthState.LoginRequested += () => {
                 if (LoginModel is not null) {
                     ShowLoginModal();
@@ -36,6 +38,15 @@ namespace Essenskasse.Layout {
             await CollectUserThemeAsync();
             await UserSettings.LoadAppDataAsync();
             await navMenu.ReloadNavMenu();
+        }
+
+        /// <summary>Nach einem Sprachwechsel baut sich die Oberflaeche neu auf (der Schluessel am Seitenrahmen aendert sich).</summary>
+        private void OnLanguageChanged() {
+            _ = InvokeAsync(StateHasChanged);
+        }
+
+        public void Dispose() {
+            Language.Changed -= OnLanguageChanged;
         }
 
         private void ShowLoginModal() {
@@ -122,10 +133,7 @@ namespace Essenskasse.Layout {
             await UserSettings.LoadAppDataAsync();
             await CollectUserThemeAsync();
             ServerSettingsResult result = await UserSettings.LoadFromServerAsync();
-            if (result == ServerSettingsResult.AppliedReloadNeeded) {
-                NavManager.NavigateTo(NavManager.Uri, true); // andere Sprache: einmal neu laden
-            }
-            else if (result == ServerSettingsResult.Applied) {
+            if (result == ServerSettingsResult.Applied) {
                 await navMenu.ReloadNavMenu();
             }
         }

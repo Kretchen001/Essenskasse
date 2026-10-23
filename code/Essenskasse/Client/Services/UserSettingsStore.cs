@@ -11,8 +11,6 @@ namespace Essenskasse.Client.Services {
     public enum ServerSettingsResult {
         /// <summary>Einstellungen gefunden und uebernommen.</summary>
         Applied,
-        /// <summary>Wie <see cref="Applied"/>, aber die Sprache hat sich geaendert: die Seite muss neu geladen werden.</summary>
-        AppliedReloadNeeded,
         /// <summary>Auf dem Server sind noch keine Einstellungen gespeichert; es gelten die lokalen bzw. Standardwerte.</summary>
         NothingSaved,
         /// <summary>Server nicht erreichbar oder Anfrage abgelehnt; es gelten die lokalen bzw. Standardwerte.</summary>
@@ -44,9 +42,11 @@ namespace Essenskasse.Client.Services {
         private readonly ThemeService _theme;
         private readonly HttpClient _http;
         private readonly IConfiguration _config;
+        private readonly LanguageService _language;
 
         public UserSettingsStore(ILocalStorageService storage, AppDataService appData, ThemeService theme,
-                                    HttpClient http, IConfiguration config) {
+                                    HttpClient http, IConfiguration config, LanguageService language) {
+            _language = language;
             _storage = storage;
             _appData = appData;
             _theme = theme;
@@ -240,7 +240,7 @@ namespace Essenskasse.Client.Services {
                 await SetAsync("ProviderSort", settings.ProviderSort);
             }
             if (settings.Language.Length > 0 && settings.Language != await CurrentLanguageAsync()) {
-                await _storage.SetItemAsync(CultureKey, settings.Language);
+                await _language.SetAsync(settings.Language); // wechselt sofort ohne Neuladen
                 return true;
             }
             return false;
@@ -262,9 +262,8 @@ namespace Essenskasse.Client.Services {
                 if (settings is null) {
                     return ServerSettingsResult.NothingSaved;
                 }
-                return await ApplyServerSettingsAsync(settings)
-                    ? ServerSettingsResult.AppliedReloadNeeded
-                    : ServerSettingsResult.Applied;
+                await ApplyServerSettingsAsync(settings);
+                return ServerSettingsResult.Applied;
             }
             catch {
                 return ServerSettingsResult.Failed;

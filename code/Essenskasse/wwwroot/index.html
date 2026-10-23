@@ -49,6 +49,10 @@
         <script src="js/update.js"></script>
 
         <script>
+            window.SetDocumentLanguage = (language) => {
+                window.document.documentElement.lang = language;
+            }
+
             window.ChangeTheme = (colorCode, oldColorCode) => {
                 switch (colorCode) {
                     case "Light": {

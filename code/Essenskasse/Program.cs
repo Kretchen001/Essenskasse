@@ -7,16 +7,20 @@ using System.Text.Json;
 using Essenskasse.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
+using Essenskasse.Client.Localization;
 
 namespace Essenskasse {
     public class Program {
         public static async Task Main(string[] args) {
             WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-            // access to Localization
-            builder.Services.AddLocalization(options => {
-                options.ResourcesPath = "Ressources";
-            });
+            // Texte aller Sprachen liegen als JSON unter wwwroot/i18n und werden beim Start geladen,
+            // damit die Sprache ohne Neuladen gewechselt werden kann (IStringLocalizer<T> liefert immer die aktuelle Sprache)
+            TextService texts = new(new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddSingleton(texts);
+            builder.Services.AddSingleton(typeof(IStringLocalizer<>), typeof(JsonStringLocalizer<>));
+            builder.Services.AddScoped<LanguageService>();
 
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -60,6 +64,7 @@ namespace Essenskasse {
             //await builder.Build().RunAsync(); // <- Old Version
             WebAssemblyHost host = builder.Build();
             await host.SetDefaultCulture();
+            await texts.LoadAllAsync();
             await host.RunAsync();
         }
     }

@@ -11,7 +11,14 @@
         es: ["Hay una nueva versión disponible.", "Actualizar ahora", "Más tarde"],
         ru: ["Доступна новая версия.", "Обновить сейчас", "Позже"]
     };
-    var lang = (navigator.language || "de").slice(0, 2).toLowerCase();
+    // gewaehlte Sprache der App (Blazored.LocalStorage speichert sie als JSON-Text), sonst die des Browsers
+    var stored = "";
+    try {
+        stored = JSON.parse(window.localStorage.getItem("culture") || '""') || "";
+    } catch (e) {
+        stored = "";
+    }
+    var lang = (stored || navigator.language || "de").slice(0, 2).toLowerCase();
     var t = texts[lang] || texts.de;
     var reloading = false;
 

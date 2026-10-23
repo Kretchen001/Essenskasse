@@ -445,10 +445,6 @@ namespace Essenskasse.Pages {
                 case ServerSettingsResult.Applied:
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.settingsSuccsessfullyRestored)], ToastLevel.Success);
                     break;
-                case ServerSettingsResult.AppliedReloadNeeded:
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.settingsSuccsessfullyRestored)], ToastLevel.Success);
-                    Navi.NavigateTo(Navi.Uri, true); // andere Sprache: einmal neu laden
-                    break;
                 case ServerSettingsResult.NothingSaved:
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.noSettingsAvailable)], ToastLevel.Warning);
                     break;

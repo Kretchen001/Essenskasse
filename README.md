@@ -12,6 +12,7 @@
 - [Update auf 1.3.0 / Upgrade to 1.3.0](#update-auf-130--upgrade-to-130)
 - [Betrieb im Container / Operation in containers](#betrieb-im-container--operation-in-containers)
 - [Entwicklung und Tests / Development and tests](#entwicklung-und-tests--development-and-tests)
+- [Texte und Sprachen / Texts and languages](#texte-und-sprachen--texts-and-languages)
 - [MySQL aktualisieren / Upgrading MySQL](#mysql-aktualisieren-optional-manuell--upgrading-mysql-optional)
 - [Contribution](#contribution)
 
@@ -38,7 +39,7 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Kaffeekasse:** getrennte Kasse mit Ein- und Auszahlungen; ohne Anmeldung nur lesbar.
 - **Änderungen:** vorhandene Einzahlungen und Bestellungen nachträglich ändern. Dafür wird ein Änderungstoken benötigt, jede Änderung wird samt Initiator im Log protokolliert.
 - **Personen und Anbieter:** anlegen, bearbeiten, suchen, sortieren, ausblenden und wiederherstellen.
-- **Sprachen und Aussehen:** Deutsch, Englisch, Spanisch, Russisch; helles und dunkles Farbschema.
+- **Sprachen und Aussehen:** Deutsch, Englisch, Spanisch, Russisch (Wechsel sofort, ohne Neuladen); helles und dunkles Farbschema.
 - **Einstellungen je Benutzer:** werden lokal gespeichert und lassen sich mit dem Server abgleichen (Schnellbeträge, Farbschema, Sprache, Sortierung).
 - **PWA:** installierbar, nach dem ersten Laden auch offline startbar; neue Versionen werden per Hinweis angeboten.
 
@@ -49,7 +50,7 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Coffee fund:** separate fund with deposits and payouts; read-only without signing in.
 - **Changes:** edit existing payments and orders afterwards. This requires a change token; every change including who made it is written to the log.
 - **People and providers:** add, edit, search, sort, hide and restore.
-- **Languages and look:** German, English, Spanish, Russian; light and dark theme.
+- **Languages and look:** German, English, Spanish, Russian (switching takes effect immediately, no reload); light and dark theme.
 - **Settings per user:** stored locally and can be synchronised with the server (quick amounts, theme, language, sorting).
 - **PWA:** installable, starts offline after the first load; new versions are offered through a notice.
 
@@ -189,6 +190,11 @@ What changes:
 **Deutsch:** Mit dem .NET-10-SDK im Ordner `code`: `dotnet build` und `dotnet test` (die Tests brauchen keine Datenbank, das automatische Einspielen der Datenbank-Updates ist in ihnen abgeschaltet). Den Coverage-Report erzeugt `code/analyze.bat` lokal; er gehört nicht ins Repository. Die GitHub-Action `build-and-test` baut und testet bei jedem Push und Pull Request auf `master`.
 
 **English:** With the .NET 10 SDK in the `code` folder: `dotnet build` and `dotnet test` (the tests need no database; the automatic database updates are switched off in them). The coverage report is generated locally by `code/analyze.bat` and is not part of the repository. The GitHub action `build-and-test` builds and tests on every push and pull request to `master`.
+
+### Texte und Sprachen / Texts and languages
+**Deutsch:** Alle Texte der Oberfläche stehen in `code/Essenskasse/wwwroot/i18n/{de-DE,en-US,es-ES,ru}.json` und werden beim Start komplett geladen; deshalb wirkt ein Sprachwechsel sofort. Ein neuer Text braucht einen Eintrag in `Ressources/RessourceAppStrings.cs` und in allen vier Dateien (Platzhalter wie `{0}` müssen in jeder Sprache vorkommen). Der Test `TranslationFilesTest` meldet fehlende oder überzählige Einträge.
+
+**English:** All interface texts are in `code/Essenskasse/wwwroot/i18n/{de-DE,en-US,es-ES,ru}.json` and are loaded completely at start-up, so a language change takes effect immediately. A new text needs an entry in `Ressources/RessourceAppStrings.cs` and in all four files (placeholders such as `{0}` must appear in every language). The test `TranslationFilesTest` reports missing or surplus entries.
 
 ## MySQL aktualisieren (optional, manuell) / Upgrading MySQL (optional)
 **Deutsch:** Das Image `mysql:8.0.2` ist eine frühe Vorabversion. Ein einfaches Hochsetzen des Tags auf den vorhandenen Datenordner wird von MySQL für diese Version **nicht unterstützt** und kann die Datenbank unbrauchbar machen. Deshalb wird es nicht automatisch geändert. Sicherer Weg über einen Dump:

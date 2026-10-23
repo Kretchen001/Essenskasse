@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
 
 @inject HttpClient HttpClient
 @inject IJSRuntime JSRuntime
@@ -10,12 +11,13 @@
 @inject ThemeService themeService
 @inject UserSettingsStore UserSettings
 @inject NavigationManager NavManager
+@inject LanguageService Language
 
 @inject AuthStateService AuthState
 
 <ToastCard />
 
-<div class="page">
+<div class="page" @key="Language.Version">
     <div class="sidebar">
         <NavMenu @ref="navMenu" />
     </div>
