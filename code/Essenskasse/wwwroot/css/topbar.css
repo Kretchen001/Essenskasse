@@ -1,39 +1,4 @@
-/* Kopfzeile mit Anmelden/Abmelden. Farben als Variablen (wie .ek-dash); body.Dark ueberschreibt sie. */
-
-.ek-topbar,
-.ek-login,
-.ek-dialog,
-.ek-toast {
-    --ek-surface: #ffffff;
-    --ek-line: #d3dad9;
-    --ek-line-strong: #aebcbb;
-    --ek-text: #13282e;
-    --ek-muted: #566a70;
-    --ek-ok: #17734f;
-    --ek-ok-tint: #dff1e8;
-    --ek-bad: #b3263f;
-    --ek-bad-tint: #fbe4e8;
-    --ek-hero-bg: #0e3a47;
-    --ek-hero-text: #f2f8f7;
-    --ek-focus: #1b6ec2;
-}
-
-body.Dark .ek-topbar,
-body.Dark .ek-login,
-body.Dark .ek-dialog,
-body.Dark .ek-toast {
-    --ek-surface: #383e41;
-    --ek-line: #4d5659;
-    --ek-line-strong: #6a777b;
-    --ek-text: #eaf0f0;
-    --ek-muted: #a6b4b7;
-    --ek-ok: #6fd6ae;
-    --ek-ok-tint: #2c4a40;
-    --ek-bad: #ff8c9e;
-    --ek-bad-tint: #55323a;
-    --ek-hero-bg: #0b2f3a;
-    --ek-focus: #7db8ff;
-}
+/* Kopfzeile mit Anmelden/Abmelden. Farben kommen als Variablen aus theme.css. */
 
 /* ueberschreibt die Farben aus MainLayout.razor.css (isoliertes CSS wird spaeter geladen) */
 main .top-row.ek-topbar {
