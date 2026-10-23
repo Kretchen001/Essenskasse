@@ -51,6 +51,7 @@ namespace Essenskasse.Pages {
         private Guid personChoice = Guid.Empty;
         private Guid providerChoice = Guid.Empty;
         private bool isSaving = false;
+        private bool confirmingReverse = false;
 
         private bool EditOpen => editPayment is not null || editOrder is not null;
 
@@ -105,7 +106,16 @@ namespace Essenskasse.Pages {
         private bool CanSave => !isSaving && !TokenMissing && AmountValid && Changed
             && (editPayment is not null || Providers.Exists(x => x.Guid == providerChoice));
 
+        /// <summary>CSS-Klassen einer Zeile: stornierte Buchungen werden durchgestrichen, Stornobuchungen abgesetzt.</summary>
+        private static string RowClass(string baseClass, long? reversedBy, long? reversalOf) {
+            if (reversedBy is not null) {
+                return (baseClass + " is-reversed").Trim();
+            }
+            return reversalOf is not null ? (baseClass + " is-reversal").Trim() : baseClass;
+        }
+
         private void OpenEditPayment(Payment payment) {
+            confirmingReverse = false;
             editOrder = null;
             editPayment = payment;
             amountText = EntityChanges.ToInputText(payment.Amount);
@@ -115,6 +125,7 @@ namespace Essenskasse.Pages {
         }
 
         private void OpenEditOrder(Order order) {
+            confirmingReverse = false;
             editPayment = null;
             editOrder = order;
             amountText = EntityChanges.ToInputText(order.Money);
@@ -127,8 +138,66 @@ namespace Essenskasse.Pages {
             if (isSaving) {
                 return;
             }
+            confirmingReverse = false;
             editPayment = null;
             editOrder = null;
+        }
+
+        private void AskReverse() {
+            confirmingReverse = true;
+        }
+
+        /// <summary>Storniert die geoeffnete Buchung: Der Server legt eine Gegenbuchung an und korrigiert den Saldo;
+        /// die Buchung selbst bleibt sichtbar und wird als storniert markiert.</summary>
+        private async Task ReverseAsync() {
+            if (isSaving || TokenMissing || (editPayment is null && editOrder is null)) {
+                return;
+            }
+            bool isPayment = editPayment is not null;
+            long ticks = isPayment ? editPayment!.DateTime.Ticks : editOrder!.DateTime.Ticks;
+            isSaving = true;
+            try {
+                HttpRequestMessage request = new() {
+                    Method = HttpMethod.Put,
+                    RequestUri = new Uri(Config["API-Adress"] + (isPayment ? "payment/reverse" : "order/reverse"))
+                };
+                request.Headers.Add("accessToken", AppData.AccessToken!.Value.ToString());
+                request.Headers.Add("dateAsLong", ticks.ToString());
+
+                HttpResponseMessage response;
+                try {
+                    response = await HttpClient.SendAsync(request);
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+                if (!response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
+                    return;
+                }
+                string json = await response.Content.ReadAsStringAsync();
+                if (isPayment) {
+                    Payment reversal = JsonConvert.DeserializeObject<Payment>(json)!;
+                    reversal.Comment = Uri.UnescapeDataString(reversal.Comment ?? "");
+                    editPayment!.ReversedBy = reversal.DateTime.Ticks;
+                    Payments.Add(reversal);
+                    Payments = Payments.OrderByDescending(x => x.DateTime).ToList();
+                    editPayment = null;
+                }
+                else {
+                    Order reversal = JsonConvert.DeserializeObject<Order>(json)!;
+                    editOrder!.ReversedBy = reversal.DateTime.Ticks;
+                    Orders.Add(reversal);
+                    Orders = Orders.OrderByDescending(x => x.DateTime).ToList();
+                    editOrder = null;
+                }
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.reverseDone)], ToastLevel.Success);
+            }
+            finally {
+                isSaving = false;
+                confirmingReverse = false;
+            }
         }
 
         private async Task SaveAsync() {

@@ -117,29 +117,33 @@ namespace EssenskasseAPI.Controllers {
                 tx.Query("DELETE FROM essenskasse.Payment;");
                 foreach (Payment x in payments) {
                     string queryStringInsert = $"" +
-                        $"INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment) " +
-                        $"VALUES (@dateTime, @euro, @cent, @person, @comment);";
+                        $"INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment, ReversalOf, ReversedBy) " +
+                        $"VALUES (@dateTime, @euro, @cent, @person, @comment, @reversalOf, @reversedBy);";
                     tx.Query(queryStringInsert,
                         Db.P("@dateTime", x.DateTime.Ticks),
                         Db.P("@euro", x.Amount.Euro),
                         Db.P("@cent", x.Amount.Cent),
                         Db.P("@person", x.ReferencedPerson),
-                        Db.P("@comment", x.Comment));
+                        Db.P("@comment", x.Comment),
+                        Db.P("@reversalOf", x.ReversalOf),
+                        Db.P("@reversedBy", x.ReversedBy));
                 }
             }
             if (orders is not null) {
                 tx.Query("DELETE FROM essenskasse.Order;");
                 foreach (Order x in orders) {
                     string queryStringInsert = $"" +
-                        $"INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson) " +
-                        $"VALUES (@dateTime, @euro, @cent, @providerGuid, @providerDesignation, @person);";
+                        $"INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson, ReversalOf, ReversedBy) " +
+                        $"VALUES (@dateTime, @euro, @cent, @providerGuid, @providerDesignation, @person, @reversalOf, @reversedBy);";
                     tx.Query(queryStringInsert,
                         Db.P("@dateTime", x.DateTime.Ticks),
                         Db.P("@euro", x.Money.Euro),
                         Db.P("@cent", x.Money.Cent),
                         Db.P("@providerGuid", x.Provider.Guid),
                         Db.P("@providerDesignation", x.Provider.Designation),
-                        Db.P("@person", x.ReferencedPerson));
+                        Db.P("@person", x.ReferencedPerson),
+                        Db.P("@reversalOf", x.ReversalOf),
+                        Db.P("@reversedBy", x.ReversedBy));
                 }
             }
             if (transactionProcedures is not null) {
@@ -219,6 +223,10 @@ namespace EssenskasseAPI.Controllers {
             return personList;
         }
 
+        private static long? ReadTicks(DataRow row, string column) {
+            return row.Table.Columns.Contains(column) && row[column] is not DBNull ? Convert.ToInt64(row[column]) : null;
+        }
+
         private static List<Tuple<Provider, bool>> DataTableToListOfProvider(DataTable dataTable) {
             List<Tuple<Provider, bool>> providerController = [];
             foreach (DataRow row in dataTable.Rows) {
@@ -247,7 +255,7 @@ namespace EssenskasseAPI.Controllers {
                         ),
                     referencedPerson: new Guid(row["ReferencedPerson"].ToString()!),
                     comment: row["Comment"].ToString()!
-                    ));
+                    ) { ReversalOf = ReadTicks(row, "ReversalOf"), ReversedBy = ReadTicks(row, "ReversedBy") });
             }
             return paymentList;
         }
@@ -266,7 +274,7 @@ namespace EssenskasseAPI.Controllers {
                         designation: row["ProviderDesignation"].ToString()!
                         ),
                     referencedPerson: new Guid(row["ReferencedPerson"].ToString()!)
-                    ));
+                    ) { ReversalOf = ReadTicks(row, "ReversalOf"), ReversedBy = ReadTicks(row, "ReversedBy") });
             }
             return ordersList;
         }

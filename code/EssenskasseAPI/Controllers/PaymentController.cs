@@ -283,6 +283,9 @@ namespace EssenskasseAPI.Controllers {
                             Log.Warning($"At {dateAsLong} no Payment found");
                             return NotFound("Keine Einzahlung zum angegebenen Datum gefunden.");
                         }
+                        if (payments[0].ReversedBy is not null || payments[0].ReversalOf is not null) {
+                            return Conflict("Stornierte Einzahlungen und Stornobuchungen koennen nicht geaendert werden.");
+                        }
 
                         bool hasChanges = false;
                         Money oldAmount = payments[0].Amount;
@@ -342,6 +345,59 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        /// <summary>Storniert eine Einzahlung durch eine Gegenbuchung (negativer Betrag, gleiche Person), statt sie zu loeschen.
+        /// Die Gegenbuchung bekommt den Zeitpunkt der Einzahlung plus einen Tick, damit beide in Auswertungen derselben Periode
+        /// zusammen den Wert null ergeben. Die Einzahlung wird als storniert markiert, der Saldo der Person korrigiert.</summary>
+        [HttpPut, Route("reverse")]
+        public IActionResult ReversePayment([FromHeader] Guid? accessToken, [FromHeader] long? dateAsLong) {
+            using (Operation.Time("ReversePayment")) {
+                Log.Information("ReversePayment called");
+                if (!HasValidChangeToken(accessToken)) {
+                    Log.Warning("No valid AccessToken in Request");
+                    return BadRequest("No AccessToken in Request");
+                }
+                if (dateAsLong is null) {
+                    return BadRequest("Kein Datum angegeben!");
+                }
+                using DbScope tx = _db.BeginTransaction();
+                List<Payment> payments = DataTableToListOfPayments(tx.Query(
+                    "SELECT * FROM essenskasse.Payment WHERE DateTime=@dateAsLong FOR UPDATE;", Db.P("@dateAsLong", dateAsLong)));
+                if (payments.Count == 0) {
+                    return NotFound("Keine Einzahlung zum angegebenen Datum gefunden.");
+                }
+                Payment original = payments[0];
+                if (original.ReversedBy is not null || original.ReversalOf is not null) {
+                    return Conflict("Die Einzahlung ist bereits storniert oder selbst eine Stornobuchung.");
+                }
+                if (!PersonExists(tx, original.ReferencedPerson)) {
+                    return NotFound("Person existiert nicht!");
+                }
+                long reversalTicks = original.DateTime.Ticks + 1;
+                while (Convert.ToInt64(tx.Query("SELECT COUNT(*) FROM essenskasse.Payment WHERE DateTime=@ticks;", Db.P("@ticks", reversalTicks)).Rows[0][0]) > 0) {
+                    reversalTicks++;
+                }
+                Money negated = new Money(-original.Amount.Euro, (short)-original.Amount.Cent);
+                Payment reversal = new Payment(new DateTime(reversalTicks), negated, original.ReferencedPerson, original.Comment) {
+                    ReversalOf = original.DateTime.Ticks
+                };
+                tx.Query("INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment, ReversalOf) " +
+                         "VALUES (@dateTime, @euro, @cent, @person, @comment, @reversalOf);",
+                    Db.P("@dateTime", reversalTicks),
+                    Db.P("@euro", negated.Euro),
+                    Db.P("@cent", negated.Cent),
+                    Db.P("@person", original.ReferencedPerson),
+                    Db.P("@comment", original.Comment),
+                    Db.P("@reversalOf", original.DateTime.Ticks));
+                tx.Query("UPDATE essenskasse.Payment SET ReversedBy=@reversedBy WHERE DateTime=@dateAsLong;",
+                    Db.P("@reversedBy", reversalTicks),
+                    Db.P("@dateAsLong", original.DateTime.Ticks));
+                AddToSaldo(tx, original.ReferencedPerson, negated);
+                tx.Commit();
+                Log.Information($"Payment {original.DateTime.Ticks} reversed by {reversalTicks}");
+                return Ok(JsonConvert.SerializeObject(reversal));
+            }
+        }
+
         [HttpDelete, Route("remove")]
         public IActionResult DeletePayment([FromHeader] long? dateAsLong) {
             using (Operation.Time("TaskDuration")) {
@@ -359,6 +415,9 @@ namespace EssenskasseAPI.Controllers {
                     if (payments.Count == 0) {
                         Log.Warning($"At {dateAsLong} no Payment found");
                         return NotFound("Einzahlung konnte nicht gefunden werden!\nFehler in der Eingabe?");
+                    }
+                    if (payments[0].ReversedBy is not null || payments[0].ReversalOf is not null) {
+                        return Conflict("Stornierte Einzahlungen und Stornobuchungen koennen nicht geloescht werden.");
                     }
                     string queryStringDelete = $"" +
                         $"DELETE " +
@@ -378,6 +437,19 @@ namespace EssenskasseAPI.Controllers {
         }
 
         #region InternalFunctions
+        /// <summary>Liest eine optionale Zeitangabe (Ticks) aus der Zeile; fehlt die Spalte oder ist sie leer, kommt null.</summary>
+        private static long? ReadTicks(DataRow row, string column) {
+            return row.Table.Columns.Contains(column) && row[column] is not DBNull ? Convert.ToInt64(row[column]) : null;
+        }
+
+        /// <summary>Gilt der Aenderungstoken (und ist nicht die Null-Guid)?</summary>
+        private bool HasValidChangeToken(Guid? accessToken) {
+            if (accessToken is null || accessToken == Guid.Empty) {
+                return false;
+            }
+            DataTable count = _db.Query("SELECT COUNT(*) FROM essenskasse.User WHERE TokenForChange=@accessToken;", Db.P("@accessToken", accessToken));
+            return Convert.ToInt64(count.Rows[0][0]) > 0;
+        }
         private static List<Payment> DataTableToListOfPayments(DataTable dataTable) {
             List<Payment> paymentList = [];
             foreach (DataRow row in dataTable.Rows) {
@@ -389,7 +461,7 @@ namespace EssenskasseAPI.Controllers {
                         ),
                     referencedPerson: new Guid(row["ReferencedPerson"].ToString()!),
                     comment: row["Comment"].ToString()!
-                    ));
+                    ) { ReversalOf = ReadTicks(row, "ReversalOf"), ReversedBy = ReadTicks(row, "ReversedBy") });
             }
             return paymentList;
         }

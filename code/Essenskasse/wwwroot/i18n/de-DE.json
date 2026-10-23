@@ -313,5 +313,11 @@
   "massMailInfo": "{0} Personen unter dem Grenzwert, {1} davon mit E-Mail-Adresse. Jede Mail wird einzeln im Mailprogramm vorbereitet.",
   "massMailNext": "Zahlungsaufforderung für {0} vorbereiten ({1}/{2})",
   "massMailReset": "Neu beginnen",
-  "massMailDone": "Alle Zahlungsaufforderungen sind vorbereitet."
+  "massMailDone": "Alle Zahlungsaufforderungen sind vorbereitet.",
+  "reverseButton": "Stornieren",
+  "reverseConfirm": "Wirklich stornieren? Es wird eine Gegenbuchung angelegt und der Saldo korrigiert. Die ursprüngliche Buchung bleibt sichtbar.",
+  "reverseConfirmButton": "Ja, stornieren",
+  "reverseDone": "Buchung storniert.",
+  "reversedLabel": "storniert",
+  "reversalLabel": "Storno"
 }

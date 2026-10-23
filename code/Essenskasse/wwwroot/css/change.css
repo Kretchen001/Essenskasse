@@ -20,6 +20,27 @@
     overflow-wrap: anywhere;
 }
 
+.ek-chg .ek-hist li.is-reversed .ek-chg-person,
+.ek-chg .ek-hist li.is-reversed .ek-chg-sub,
+.ek-chg .ek-hist li.is-reversed .ek-hist-amount {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.ek-chg .ek-hist li.is-reversal .ek-chg-person {
+    font-style: italic;
+}
+
+.ek-chg-badge {
+    align-self: flex-start;
+    margin: 0.1rem 0;
+    padding: 0 0.5rem;
+    border: 1px solid var(--ek-muted);
+    border-radius: 999px;
+    color: var(--ek-muted);
+    font-size: 0.75rem;
+}
+
 .ek-chg-sub {
     color: var(--ek-muted);
     font-size: 0.9rem;

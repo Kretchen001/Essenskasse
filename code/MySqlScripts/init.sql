@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS essenskasse.Payment (
     AmountCent SMALLINT,
     ReferencedPerson CHAR(36),
     Comment TEXT,
+    ReversalOf BIGINT NULL, -- Stornobuchung: DateTime der stornierten Einzahlung
+    ReversedBy BIGINT NULL, -- stornierte Einzahlung: DateTime der Stornobuchung
     INDEX idx_Payment_ReferencedPerson (ReferencedPerson),
     CONSTRAINT fk_Payment_Person FOREIGN KEY (ReferencedPerson) REFERENCES essenskasse.Person (Guid)
 );
@@ -34,6 +36,8 @@ CREATE TABLE IF NOT EXISTS essenskasse.Order (
     ProviderGuid CHAR(36),
     ProviderDesignation VARCHAR(255),
     ReferencedPerson CHAR(36),
+    ReversalOf BIGINT NULL, -- Stornobuchung: DateTime der stornierten Bestellung
+    ReversedBy BIGINT NULL, -- stornierte Bestellung: DateTime der Stornobuchung
     INDEX idx_Order_ReferencedPerson (ReferencedPerson),
     INDEX idx_Order_ProviderGuid (ProviderGuid),
     CONSTRAINT fk_Order_Person FOREIGN KEY (ReferencedPerson) REFERENCES essenskasse.Person (Guid),

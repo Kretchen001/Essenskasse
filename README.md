@@ -39,7 +39,7 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Einzahlungen:** mit einstellbaren Schnellbeträgen. Optional wird eine Bestätigungsmail im lokalen Mailprogramm vorbereitet (nie / pro Einzahlung wählbar / immer).
 - **Bestellungen:** pro Tag und Anbieter, mit Auswahl der Tage der aktuellen Woche, Übersicht je Tag und Person und Warnung bei bereits vorhandenen Bestellungen.
 - **Kaffeekasse:** getrennte Kasse mit Ein- und Auszahlungen; ohne Anmeldung nur lesbar.
-- **Änderungen:** vorhandene Einzahlungen und Bestellungen nachträglich ändern. Dafür wird ein Änderungstoken benötigt, jede Änderung wird samt Initiator im Log protokolliert.
+- **Änderungen:** vorhandene Einzahlungen und Bestellungen nachträglich ändern oder stornieren. Dafür wird ein Änderungstoken benötigt, jede Änderung wird samt Initiator im Log protokolliert.
 - **Sammel-Zahlungsaufforderungen:** Auf dem Dashboard bereitet man die Zahlungsaufforderungen für alle auffälligen Personen mit E-Mail-Adresse Person für Person vor (ein Klick, eine Mail).\n- **Export:** Einzahlungen und Bestellungen eines Zeitraums (optional einer Person) als CSV-Datei für Excel.
 - **Personen und Anbieter:** anlegen, bearbeiten, suchen, sortieren, ausblenden und wiederherstellen. Jede Person hat eine Sprache für Mails.
 - **Mails:** Zahlungsaufforderung, Einzahlungsbestätigung und Fehlermeldung an den Admin gehen zweisprachig raus: zuerst in der Sprache der Person (bei der Fehlermeldung Deutsch), danach in der Sprache des angemeldeten Benutzers. Sind beide gleich, steht der Text nur einmal in der Mail.
@@ -53,7 +53,7 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Payments:** with configurable quick amounts. Optionally a confirmation email is prepared in the local mail program (never / selectable per payment / always).
 - **Orders:** per day and provider, with buttons for the days of the current week, an overview per day and person, and a warning if orders already exist.
 - **Coffee fund:** separate fund with deposits and payouts; read-only without signing in.
-- **Changes:** edit existing payments and orders afterwards. This requires a change token; every change including who made it is written to the log.
+- **Changes:** edit or reverse existing payments and orders afterwards. This requires a change token; every change including who made it is written to the log.
 - **Collective payment requests:** On the dashboard the payment requests for all highlighted people with an email address are prepared one person at a time (one click, one email).\n- **Export:** payments and orders of a period (optionally of one person) as a CSV file for Excel.
 - **People and providers:** add, edit, search, sort, hide and restore. Every person has a language for emails.
 - **Emails:** payment request, payment confirmation and the error report to the admin are sent bilingually: first in the language of the person (German for the error report), then in the language of the signed-in user. If both are the same, the text appears only once.
@@ -140,10 +140,10 @@ PowerShell: `Get-Content MySqlScripts/update_v1-2-0_zu_1-3-0.sql -Raw | docker e
 
 ## Update auf 1.4.2 / Upgrade to 1.4.2
 **Deutsch:** Sicherung erstellen und `docker-compose up -d --build`. Die Datenbank-Änderungen spielt die API beim Start selbst ein. Was sich ändert:
-- Auf dem Dashboard lassen sich die Zahlungsaufforderungen für alle auffälligen Personen nacheinander vorbereiten (nur angemeldet).\n- Neue Seite „Export“ (nur angemeldet): Einzahlungen und Bestellungen eines Zeitraums als CSV-Datei, wahlweise für eine Person. Bestellungen haben einen negativen Betrag.
+- Einzahlungen und Bestellungen lassen sich stornieren: Statt sie zu löschen, legt die API eine Gegenbuchung mit umgekehrtem Betrag an (Zeitpunkt der Buchung plus ein Tick, damit beide in Tages- und Anbieterauswertungen zusammen null ergeben) und korrigiert den Saldo. Beide bleiben in der Liste sichtbar (die stornierte durchgestrichen). Stornierte Buchungen und Stornobuchungen sind nicht mehr änderbar. Dafür ergänzt das Skript `update_v1-4-1_zu_1-4-2.sql` die Spalten `ReversalOf` und `ReversedBy` in den Tabellen `Payment` und `Order`; das Backup enthält sie.\n- Auf dem Dashboard lassen sich die Zahlungsaufforderungen für alle auffälligen Personen nacheinander vorbereiten (nur angemeldet).\n- Neue Seite „Export“ (nur angemeldet): Einzahlungen und Bestellungen eines Zeitraums als CSV-Datei, wahlweise für eine Person. Bestellungen haben einen negativen Betrag.
 
 **English:** Create a backup and run `docker-compose up -d --build`. The API applies the database changes itself at start-up. What changes:
-- On the dashboard the payment requests for all highlighted people can be prepared one after the other (signed in only).\n- New page "Export" (signed in only): payments and orders of a period as a CSV file, optionally for one person. Orders have a negative amount.
+- Payments and orders can be reversed: instead of deleting them, the API creates an offsetting entry with the opposite amount (booking time plus one tick, so that both add up to zero in daily and provider reports) and corrects the balance. Both stay visible in the list (the reversed one struck through). Reversed bookings and reversal entries can no longer be changed. The script `update_v1-4-1_zu_1-4-2.sql` adds the columns `ReversalOf` and `ReversedBy` to the tables `Payment` and `Order`; the backup contains them.\n- On the dashboard the payment requests for all highlighted people can be prepared one after the other (signed in only).\n- New page "Export" (signed in only): payments and orders of a period as a CSV file, optionally for one person. Orders have a negative amount.
 
 ## Update auf 1.4.1 / Upgrade to 1.4.1
 **Deutsch:** Sicherung erstellen und `docker-compose up -d --build`. Die API spielt das Skript `update_v1-4-0_zu_1-4-1.sql` beim Start selbst ein. Was sich ändert:

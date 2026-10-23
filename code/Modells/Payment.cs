@@ -17,6 +17,12 @@ namespace Modells {
         /// <summary></summary>
         [JsonInclude]
         public string Comment { get; set; } = default!;
+        /// <summary>Nur bei einer Stornobuchung: Zeitpunkt (Ticks) der stornierten Einzahlung.</summary>
+        [JsonInclude]
+        public long? ReversalOf { get; set; }
+        /// <summary>Nur bei einer stornierten Einzahlung: Zeitpunkt (Ticks) der Stornobuchung.</summary>
+        [JsonInclude]
+        public long? ReversedBy { get; set; }
 
         /// <summary></summary>
         public Payment() { }

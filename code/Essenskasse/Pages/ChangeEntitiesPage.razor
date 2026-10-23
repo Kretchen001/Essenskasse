@@ -57,18 +57,26 @@
                         <h3 class="ek-hist-month">@month.Key.ToString("MMMM yyyy")</h3>
                         <ul class="ek-hist">
                             @foreach (Payment x in month) {
-                                <li class="@(x.Amount.IsPositiv() ? "" : "is-negative")">
+                                <li class="@RowClass(x.Amount.IsPositiv() ? "" : "is-negative", x.ReversedBy, x.ReversalOf)">
                                     <span class="ek-hist-date">@DateText.WeekdayDayMonthTime(x.DateTime)</span>
                                     <span class="ek-chg-main">
                                         <span class="ek-chg-person">@PersonName(x.ReferencedPerson)</span>
+                                        @if (x.ReversedBy is not null) {
+                                            <span class="ek-chg-badge">@_loc[nameof(RessourceAppStrings.reversedLabel)]</span>
+                                        }
+                                        else if (x.ReversalOf is not null) {
+                                            <span class="ek-chg-badge">@_loc[nameof(RessourceAppStrings.reversalLabel)]</span>
+                                        }
                                         @if (!string.IsNullOrWhiteSpace(x.Comment)) {
                                             <span class="ek-chg-sub">@x.Comment</span>
                                         }
                                     </span>
                                     <span class="ek-hist-amount">@x.Amount.ToString()</span>
-                                    <button type="button" class="ek-btn ek-chg-edit" @onclick="() => OpenEditPayment(x)">
-                                        @_loc[nameof(RessourceAppStrings.change)]
-                                    </button>
+                                    @if (x.ReversedBy is null && x.ReversalOf is null) {
+                                        <button type="button" class="ek-btn ek-chg-edit" @onclick="() => OpenEditPayment(x)">
+                                            @_loc[nameof(RessourceAppStrings.change)]
+                                        </button>
+                                    }
                                 </li>
                             }
                         </ul>
@@ -96,16 +104,24 @@
                         <h3 class="ek-hist-month">@month.Key.ToString("MMMM yyyy")</h3>
                         <ul class="ek-hist">
                             @foreach (Order x in month) {
-                                <li>
+                                <li class="@RowClass("", x.ReversedBy, x.ReversalOf)">
                                     <span class="ek-hist-date">@DateText.WeekdayDayMonthTime(x.DateTime)</span>
                                     <span class="ek-chg-main">
                                         <span class="ek-chg-person">@PersonName(x.ReferencedPerson)</span>
+                                        @if (x.ReversedBy is not null) {
+                                            <span class="ek-chg-badge">@_loc[nameof(RessourceAppStrings.reversedLabel)]</span>
+                                        }
+                                        else if (x.ReversalOf is not null) {
+                                            <span class="ek-chg-badge">@_loc[nameof(RessourceAppStrings.reversalLabel)]</span>
+                                        }
                                         <span class="ek-chg-sub">@x.Provider.Designation</span>
                                     </span>
                                     <span class="ek-hist-amount">@x.Money.ToString()</span>
-                                    <button type="button" class="ek-btn ek-chg-edit" @onclick="() => OpenEditOrder(x)">
-                                        @_loc[nameof(RessourceAppStrings.change)]
-                                    </button>
+                                    @if (x.ReversedBy is null && x.ReversalOf is null) {
+                                        <button type="button" class="ek-btn ek-chg-edit" @onclick="() => OpenEditOrder(x)">
+                                            @_loc[nameof(RessourceAppStrings.change)]
+                                        </button>
+                                    }
                                 </li>
                             }
                         </ul>
@@ -130,6 +146,9 @@
 
                         @if (TokenMissing) {
                             <p class="ek-hint is-warn" role="alert">@_loc[nameof(RessourceAppStrings.changeTokenMissing)]</p>
+                        }
+                        @if (confirmingReverse) {
+                            <p class="ek-hint is-warn" role="alert">@_loc[nameof(RessourceAppStrings.reverseConfirm)]</p>
                         }
 
                         <label class="ek-field @(PersonChanged ? "is-changed" : "")">
@@ -176,6 +195,12 @@
                     </form>
                 </ChildContent>
                 <Footer>
+                    @if (confirmingReverse) {
+                        <button type="button" class="ek-btn ek-btn-danger" disabled="@(isSaving || TokenMissing)" @onclick="ReverseAsync">@_loc[nameof(RessourceAppStrings.reverseConfirmButton)]</button>
+                    }
+                    else {
+                        <button type="button" class="ek-btn" disabled="@(isSaving || TokenMissing)" @onclick="AskReverse">@_loc[nameof(RessourceAppStrings.reverseButton)]</button>
+                    }
                     <button type="button" class="ek-btn" disabled="@isSaving" @onclick="CloseEdit">@_loc[nameof(RessourceAppStrings.cancel)]</button>
                     <button type="button" class="ek-btn ek-btn-primary" disabled="@(!CanSave)" @onclick="SaveAsync">@_loc[nameof(RessourceAppStrings.acceptChanges)]</button>
                 </Footer>

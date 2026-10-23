@@ -316,5 +316,11 @@
         massMailNext,
         massMailReset,
         massMailDone,
+        reverseButton,
+        reverseConfirm,
+        reverseConfirmButton,
+        reverseDone,
+        reversedLabel,
+        reversalLabel,
     }
 }

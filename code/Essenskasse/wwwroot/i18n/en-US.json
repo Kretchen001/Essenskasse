@@ -313,5 +313,11 @@
   "massMailInfo": "{0} people below the limit, {1} of them with an email address. Each email is prepared separately in the mail program.",
   "massMailNext": "Prepare payment request for {0} ({1}/{2})",
   "massMailReset": "Start over",
-  "massMailDone": "All payment requests have been prepared."
+  "massMailDone": "All payment requests have been prepared.",
+  "reverseButton": "Reverse",
+  "reverseConfirm": "Really reverse? An offsetting entry is created and the balance is corrected. The original booking stays visible.",
+  "reverseConfirmButton": "Yes, reverse",
+  "reverseDone": "Booking reversed.",
+  "reversedLabel": "reversed",
+  "reversalLabel": "Reversal"
 }
