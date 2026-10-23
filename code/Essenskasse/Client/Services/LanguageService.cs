@@ -1,21 +1,24 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.JSInterop;
+using Essenskasse.Client.Localization;
 using System.Globalization;
 
 namespace Essenskasse.Client.Services {
 
-    /// <summary>Wechselt die Sprache der App im laufenden Betrieb. Alle Texte sind bereits geladen (siehe TextService),
-    /// deshalb genuegt es, die Kultur zu setzen und die Oberflaeche neu aufzubauen (MainLayout hoert auf <see cref="Changed"/>).</summary>
+    /// <summary>Wechselt die Sprache der App im laufenden Betrieb. Die Texte der neuen Sprache werden bei Bedarf nachgeladen
+    /// (siehe TextService), dann genuegt es, die Kultur zu setzen und die Oberflaeche neu aufzubauen (MainLayout hoert auf <see cref="Changed"/>).</summary>
     public sealed class LanguageService {
 
         private const string CultureKey = "culture";
 
         private readonly ILocalStorageService _storage;
         private readonly IJSRuntime _js;
+        private readonly TextService _texts;
 
-        public LanguageService(ILocalStorageService storage, IJSRuntime js) {
+        public LanguageService(ILocalStorageService storage, IJSRuntime js, TextService texts) {
             _storage = storage;
             _js = js;
+            _texts = texts;
         }
 
         /// <summary>Wird nach jedem Sprachwechsel ausgeloest.</summary>
@@ -29,10 +32,15 @@ namespace Essenskasse.Client.Services {
             if (!LocalizerSettings.SupportedCultures.Any(x => x.Culture == culture)) {
                 return;
             }
-            await _storage.SetItemAsync(CultureKey, culture);
             if (CultureInfo.CurrentUICulture.Name == culture) {
+                await _storage.SetItemAsync(CultureKey, culture);
                 return;
             }
+            await _texts.LoadAsync(culture);
+            if (!_texts.IsLoaded(culture)) {
+                return; // Texte nicht erreichbar (offline und nicht im Cache): bei der bisherigen Sprache bleiben
+            }
+            await _storage.SetItemAsync(CultureKey, culture);
 
             CultureInfo info = new(culture);
             CultureInfo.DefaultThreadCurrentCulture = info;

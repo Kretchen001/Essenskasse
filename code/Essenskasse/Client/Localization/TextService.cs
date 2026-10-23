@@ -3,8 +3,9 @@ using System.Net.Http.Json;
 
 namespace Essenskasse.Client.Localization {
 
-    /// <summary>Haelt die Texte aller Sprachen (<c>wwwroot/i18n/{Kultur}.json</c>). Alle Sprachen werden beim Start geladen,
-    /// damit die Sprache spaeter ohne Neuladen der Seite gewechselt werden kann. Es gilt die Sprache der aktuellen Kultur
+    /// <summary>Haelt die Texte der Sprachen (<c>wwwroot/i18n/{Kultur}.json</c>). Beim Start wird nur die Startsprache geladen
+    /// (Standard Deutsch); die uebrigen laedt <see cref="LoadAllAsync"/> erst beim Oeffnen der Einstellungen, damit die Sprache
+    /// danach ohne Neuladen der Seite gewechselt werden kann. Es gilt die Sprache der aktuellen Kultur
     /// (<see cref="CultureInfo.CurrentUICulture"/>); fehlt ein Text, wird Deutsch benutzt.</summary>
     public sealed class TextService {
 
@@ -15,12 +16,31 @@ namespace Essenskasse.Client.Localization {
             _http = http;
         }
 
-        /// <summary>Laedt die Textdateien aller unterstuetzten Sprachen.</summary>
+        /// <summary>Laedt beim Start nur die Startsprache; scheitert das, ersatzweise Deutsch.</summary>
+        public async Task LoadStartAsync() {
+            string current = CultureInfo.CurrentUICulture.Name;
+            string start = LocalizerSettings.SupportedCultures.Any(x => x.Culture == current)
+                ? current
+                : LocalizerSettings.NeutralCulture.Culture;
+            await LoadAsync(start);
+            if (!IsLoaded(start)) {
+                await LoadAsync(LocalizerSettings.NeutralCulture.Culture);
+            }
+        }
+
+        /// <summary>Laedt die Textdateien aller unterstuetzten Sprachen (bereits geladene werden uebersprungen).</summary>
         public async Task LoadAllAsync() {
             await Task.WhenAll(LocalizerSettings.SupportedCultures.Select(x => LoadAsync(x.Culture)));
         }
 
-        private async Task LoadAsync(string culture) {
+        /// <summary>Sind die Texte dieser Sprache geladen?</summary>
+        public bool IsLoaded(string culture) => _texts.ContainsKey(culture);
+
+        /// <summary>Laedt die Texte einer Sprache, falls noch nicht geschehen.</summary>
+        public async Task LoadAsync(string culture) {
+            if (_texts.ContainsKey(culture)) {
+                return;
+            }
             try {
                 Dictionary<string, string>? texts = await _http.GetFromJsonAsync<Dictionary<string, string>>($"i18n/{culture}.json");
                 if (texts is not null) {

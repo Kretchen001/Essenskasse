@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Essenskasse.Client;
+using Essenskasse.Client.Localization;
 
 namespace Essenskasse.Cards {
 
@@ -8,6 +9,7 @@ namespace Essenskasse.Cards {
         CultureWithName? SelectedCulture = null;
 
         protected override async Task OnInitializedAsync() {
+            _ = Texts.LoadAllAsync(); // die uebrigen Sprachen im Hintergrund holen, damit der Wechsel sofort geht
             string? culture = await LocalStorage.GetItemAsync<string>("culture");
             if (culture == "") {
                 SelectedCulture = LocalizerSettings.NeutralCulture;
