@@ -1,0 +1,58 @@
+﻿@page "/export"
+
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Config
+@inject IStringLocalizer<App> _loc
+@inject ToastService ToastService
+@inject NavigationManager Nav
+@inject AuthStateService AuthState
+
+<PageTitle>@_loc[nameof(RessourceAppStrings.export)]</PageTitle>
+
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="ek-dash ek-denied" role="alert">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.accessDenied)]</h2>
+            <p class="ek-denied-text">@_loc[nameof(RessourceAppStrings.accessDeniedHint)]</p>
+            <div class="ek-denied-actions">
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="AuthState.RequestLogin">
+                    @_loc[nameof(RessourceAppStrings.signIn)]
+                </button>
+                <button type="button" class="ek-btn" @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    @_loc[nameof(RessourceAppStrings.backToDashboard)]
+                </button>
+            </div>
+        </div>
+    </NotAuthorized>
+    <Authorized>
+        <div class="ek-dash ek-pg-export">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.export)]</h2>
+            <form class="ek-add" @onsubmit="ExportAsync" @onsubmit:preventDefault>
+                <p class="ek-hint">@_loc[nameof(RessourceAppStrings.exportHint)]</p>
+                <div class="ek-add-fields">
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.exportFrom)]</span>
+                        <input type="date" class="ek-input" @bind="fromDate" />
+                    </label>
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.exportTo)]</span>
+                        <input type="date" class="ek-input" @bind="toDate" />
+                    </label>
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.exportColPerson)]</span>
+                        <select class="ek-select" @bind="personGuid">
+                            <option value="">@_loc[nameof(RessourceAppStrings.exportAllPersons)]</option>
+                            @foreach (Person entry in persons) {
+                                <option value="@entry.Guid">@entry.Name</option>
+                            }
+                        </select>
+                    </label>
+                    <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@busy">
+                        @_loc[nameof(RessourceAppStrings.exportDownload)]
+                    </button>
+                </div>
+            </form>
+        </div>
+    </Authorized>
+</AuthorizeView>

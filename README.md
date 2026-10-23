@@ -40,6 +40,7 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Bestellungen:** pro Tag und Anbieter, mit Auswahl der Tage der aktuellen Woche, Übersicht je Tag und Person und Warnung bei bereits vorhandenen Bestellungen.
 - **Kaffeekasse:** getrennte Kasse mit Ein- und Auszahlungen; ohne Anmeldung nur lesbar.
 - **Änderungen:** vorhandene Einzahlungen und Bestellungen nachträglich ändern. Dafür wird ein Änderungstoken benötigt, jede Änderung wird samt Initiator im Log protokolliert.
+- **Export:** Einzahlungen und Bestellungen eines Zeitraums (optional einer Person) als CSV-Datei für Excel.
 - **Personen und Anbieter:** anlegen, bearbeiten, suchen, sortieren, ausblenden und wiederherstellen. Jede Person hat eine Sprache für Mails.
 - **Mails:** Zahlungsaufforderung, Einzahlungsbestätigung und Fehlermeldung an den Admin gehen zweisprachig raus: zuerst in der Sprache der Person (bei der Fehlermeldung Deutsch), danach in der Sprache des angemeldeten Benutzers. Sind beide gleich, steht der Text nur einmal in der Mail.
 - **Sprachen und Aussehen:** Deutsch, Englisch, Spanisch, Russisch (Wechsel sofort, ohne Neuladen); helles und dunkles Farbschema.
@@ -53,6 +54,7 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Orders:** per day and provider, with buttons for the days of the current week, an overview per day and person, and a warning if orders already exist.
 - **Coffee fund:** separate fund with deposits and payouts; read-only without signing in.
 - **Changes:** edit existing payments and orders afterwards. This requires a change token; every change including who made it is written to the log.
+- **Export:** payments and orders of a period (optionally of one person) as a CSV file for Excel.
 - **People and providers:** add, edit, search, sort, hide and restore. Every person has a language for emails.
 - **Emails:** payment request, payment confirmation and the error report to the admin are sent bilingually: first in the language of the person (German for the error report), then in the language of the signed-in user. If both are the same, the text appears only once.
 - **Languages and look:** German, English, Spanish, Russian (switching takes effect immediately, no reload); light and dark theme.
@@ -138,8 +140,10 @@ PowerShell: `Get-Content MySqlScripts/update_v1-2-0_zu_1-3-0.sql -Raw | docker e
 
 ## Update auf 1.4.2 / Upgrade to 1.4.2
 **Deutsch:** Sicherung erstellen und `docker-compose up -d --build`. Die Datenbank-Änderungen spielt die API beim Start selbst ein. Was sich ändert:
+- Neue Seite „Export“ (nur angemeldet): Einzahlungen und Bestellungen eines Zeitraums als CSV-Datei, wahlweise für eine Person. Bestellungen haben einen negativen Betrag.
 
 **English:** Create a backup and run `docker-compose up -d --build`. The API applies the database changes itself at start-up. What changes:
+- New page "Export" (signed in only): payments and orders of a period as a CSV file, optionally for one person. Orders have a negative amount.
 
 ## Update auf 1.4.1 / Upgrade to 1.4.1
 **Deutsch:** Sicherung erstellen und `docker-compose up -d --build`. Die API spielt das Skript `update_v1-4-0_zu_1-4-1.sql` beim Start selbst ein. Was sich ändert:
