@@ -39,10 +39,12 @@ namespace Essenskasse.Cards {
         private bool isSaving = false;
         private string editName = "";
         private string editEmail = "";
+        private string editLanguage = "";
 
         private bool NameChanged => editName.Trim() != Person.Name;
         private bool EmailChanged => editEmail.Trim() != Person.Email;
-        private bool IsDirty => NameChanged || EmailChanged;
+        private bool LanguageChanged => editLanguage != MailSender.Normalize(Person.Language);
+        private bool IsDirty => NameChanged || EmailChanged || LanguageChanged;
 
         private string Initials => PersonText.Initials(Person.Name);
 
@@ -135,7 +137,7 @@ namespace Essenskasse.Cards {
             ToastService.ShowToast(_loc[nameof(RessourceAppStrings.copied)], ToastLevel.Success);
         }
 
-        private Task SendPaymentMail() => PaymentMail.SendAsync(JSRuntime, _loc, ToastService, Person);
+        private Task SendPaymentMail() => PaymentMail.SendAsync(JSRuntime, Texts, _loc, ToastService, Person);
 
         private async Task CopyEmail() {
             await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Person.Email);
@@ -158,6 +160,7 @@ namespace Essenskasse.Cards {
         private void StartEdit() {
             editName = Person.Name;
             editEmail = Person.Email;
+            editLanguage = MailSender.Normalize(Person.Language);
             isEditing = true;
         }
 
@@ -182,7 +185,8 @@ namespace Essenskasse.Cards {
                 Headers = {
                     { "guid", Person.Guid.ToString() },
                     { "name", Uri.EscapeDataString(name) },
-                    { "email", Uri.EscapeDataString(email) }
+                    { "email", Uri.EscapeDataString(email) },
+                    { "language", editLanguage }
                 }
             };
 
@@ -201,6 +205,7 @@ namespace Essenskasse.Cards {
             if (response.IsSuccessStatusCode) {
                 Person.Name = name;
                 Person.Email = email;
+                Person.Language = editLanguage;
                 isEditing = false;
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastUpdateSuccessful)], ToastLevel.Success);
                 await OnUpdated.InvokeAsync(Person);

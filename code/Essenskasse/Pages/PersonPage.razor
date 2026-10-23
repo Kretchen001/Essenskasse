@@ -44,6 +44,14 @@
                     <input type="email" class="ek-input" autocomplete="off"
                            @bind="newPersonEmail" @bind:event="oninput" />
                 </label>
+                <label class="ek-field">
+                    <span>@_loc[nameof(RessourceAppStrings.mailLanguage)]</span>
+                    <select class="ek-select" @bind="newPersonLanguage">
+                        @foreach (var culture in LocalizerSettings.SupportedCultures) {
+                            <option value="@culture.Culture">@culture.Name</option>
+                        }
+                    </select>
+                </label>
                 <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@(!CanAdd)">
                     @(NewNameDuplicate ? _loc[nameof(RessourceAppStrings.addAnyway)] : _loc[nameof(RessourceAppStrings.add)])
                 </button>

@@ -34,6 +34,7 @@ namespace Essenskasse.Pages {
 
         private string newPersonName = "";
         private string newPersonEmail = "";
+        private string newPersonLanguage = LocalizerSettings.NeutralCulture.Culture;
 
         private string filter = "";
 
@@ -176,7 +177,8 @@ namespace Essenskasse.Pages {
                     RequestUri = new Uri(Config["API-Adress"] + "person/new"),
                     Headers = {
                         {"name", Uri.EscapeDataString(name)},
-                        {"email", Uri.EscapeDataString(email)}
+                        {"email", Uri.EscapeDataString(email)},
+                        {"language", newPersonLanguage}
                     }
                 };
 

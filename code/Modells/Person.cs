@@ -14,6 +14,9 @@ namespace Modells {
         /// <summary></summary>
         [JsonInclude]
         public string Email { get; set; } = "";
+        /// <summary>Sprache der Mails an die Person (z. B. "de-DE"). Leer = Deutsch.</summary>
+        [JsonInclude]
+        public string Language { get; set; } = "";
         /// <summary></summary>
         [JsonInclude]
         public Money Saldo { get; set; } = new Money();

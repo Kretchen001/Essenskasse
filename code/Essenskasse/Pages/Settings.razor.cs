@@ -427,16 +427,10 @@ namespace Essenskasse.Pages {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoEmailEntered)], ToastLevel.Info);
             }
             else {
-                string subject = _loc[nameof(RessourceAppStrings.adminMailSubject)];
-                string body = _loc[nameof(RessourceAppStrings.adminMailBody)];
-                await JsRuntime.InvokeAsync<object>(
-                    "blazorExtensions.SendLocalEmail",
-                    new object[] {
-                        AdminEmail,
-                        subject,
-                        body
-                    }
-                );
+                // Der Admin bekommt die Mail auf Deutsch, danach in der Sprache des angemeldeten Benutzers.
+                await MailSender.SendAsync(JsRuntime, Texts, AdminEmail, null, lang => (
+                    Texts.Get(lang, nameof(RessourceAppStrings.adminMailSubject)),
+                    Texts.Get(lang, nameof(RessourceAppStrings.adminMailBody))));
             }
         }
 

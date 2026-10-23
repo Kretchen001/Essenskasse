@@ -18,6 +18,6 @@ namespace Essenskasse.Cards {
 
         private string Initials => PersonText.Initials(Person.Name);
 
-        private Task SendEmailForPayment() => PaymentMail.SendAsync(JSRuntime, _loc, ToastService, Person);
+        private Task SendEmailForPayment() => PaymentMail.SendAsync(JSRuntime, Texts, _loc, ToastService, Person);
     }
 }

@@ -293,5 +293,6 @@
         adminMailBody,
         currency,
         currencyHint,
+        mailLanguage,
     }
 }

@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS essenskasse.Person (
     Email VARCHAR(511),
     SaldoEuro BIGINT,
     SaldoCent SMALLINT,
-    Sichtbar BOOLEAN DEFAULT true
+    Sichtbar BOOLEAN DEFAULT true,
+    Language VARCHAR(8) NOT NULL DEFAULT '' -- Sprache der Mails an die Person, z. B. de-DE (leer = Deutsch)
 );
 
 -- Erstelle die Tabelle für Payment

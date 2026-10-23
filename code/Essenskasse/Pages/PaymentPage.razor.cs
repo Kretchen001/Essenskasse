@@ -336,15 +336,14 @@ namespace Essenskasse.Pages {
                     }
                     else {
                         ToastService.ShowToast(_loc[nameof(RessourceAppStrings.confirmationMailPreparing)], ToastLevel.Info);
-                        (string subject, string body) = PaymentConfirmation.Compose(
-                            _loc[nameof(RessourceAppStrings.emailConfirmSubject)],
-                            _loc[nameof(RessourceAppStrings.emailConfirmBody)],
-                            _loc[nameof(RessourceAppStrings.emailConfirmComment)],
-                            _loc[nameof(RessourceAppStrings.emailConfirmClosing)],
-                            bookedPerson.Name, newPayment.DateTime, newPayment.Amount, newPayment.Comment);
-                        await JSRuntime.InvokeAsync<object>(
-                            "blazorExtensions.SendLocalEmail",
-                            new object[] { bookedPerson.Email, subject, body });
+                        Payment bookedPayment = newPayment;
+                        await MailSender.SendAsync(JSRuntime, Texts, bookedPerson.Email, bookedPerson.Language, lang => PaymentConfirmation.Compose(
+                            Texts.Get(lang, nameof(RessourceAppStrings.emailConfirmSubject)),
+                            Texts.Get(lang, nameof(RessourceAppStrings.emailConfirmBody)),
+                            Texts.Get(lang, nameof(RessourceAppStrings.emailConfirmComment)),
+                            Texts.Get(lang, nameof(RessourceAppStrings.emailConfirmClosing)),
+                            bookedPerson.Name, bookedPayment.DateTime, bookedPayment.Amount, bookedPayment.Comment,
+                            new System.Globalization.CultureInfo(lang)));
                     }
                 }
                 return;

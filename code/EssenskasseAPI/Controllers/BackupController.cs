@@ -90,12 +90,13 @@ namespace EssenskasseAPI.Controllers {
                 tx.Query("DELETE FROM essenskasse.Person;");
                 foreach (Person x in persons) {
                     string queryStringInsert = $"" +
-                        $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
-                        $"VALUES (@guid, @name, @email, @euro, @cent);";
+                        $"INSERT INTO essenskasse.Person (Guid, Name, Email, Language, SaldoEuro, SaldoCent) " +
+                        $"VALUES (@guid, @name, @email, @language, @euro, @cent);";
                     tx.Query(queryStringInsert,
                         Db.P("@guid", x.Guid),
                         Db.P("@name", Uri.UnescapeDataString(x.Name)),
                         Db.P("@email", Uri.UnescapeDataString(x.Email)),
+                        Db.P("@language", SettingsSanitizer.SafeLanguage(x.Language)),
                         Db.P("@euro", x.Saldo.Euro),
                         Db.P("@cent", x.Saldo.Cent));
                 }
@@ -213,7 +214,7 @@ namespace EssenskasseAPI.Controllers {
                         euro: long.Parse(row["SaldoEuro"].ToString()!),
                         cent: short.Parse(row["SaldoCent"].ToString()!)
                         )
-                    ));
+                    ) { Language = dataTable.Columns.Contains("Language") ? row["Language"].ToString() ?? "" : "" });
             }
             return personList;
         }

@@ -290,5 +290,6 @@
   "adminMailSubject": "Error en Essenskasse",
   "adminMailBody": "Indique su nombre, la hora (día, mes, hora, minuto) y el tipo de error. Es decir, describa cómo se produjo el error durante el uso, para poder aislarlo y corregirlo más rápido.\n¡Gracias!",
   "currency": "Moneda",
-  "currencyHint": "Se aplica a todos los importes. Los importes ya guardados no se convierten."
+  "currencyHint": "Se aplica a todos los importes. Los importes ya guardados no se convierten.",
+  "mailLanguage": "Idioma de los correos"
 }

@@ -46,6 +46,11 @@
             };
         }
 
+        /// <summary>Ein unterstuetzter Sprachcode, sonst "" (= Standard Deutsch).</summary>
+        public static string SafeLanguage(string? language) {
+            return language is not null && Languages.Contains(language) ? language : "";
+        }
+
         /// <summary>Ein Sortierwert besteht nur aus Buchstaben und ist hoechstens <see cref="MaxSortLength"/> lang; sonst "".</summary>
         public static string SafeSortName(string? name) {
             if (string.IsNullOrEmpty(name) || name.Length > MaxSortLength || !name.All(char.IsAsciiLetter)) {

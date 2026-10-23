@@ -53,6 +53,18 @@ namespace Essenskasse.Client.Localization {
             }
         }
 
+        /// <summary>Text zum Schluessel in genau dieser Sprache (sonst Deutsch, sonst der Schluessel). Die Sprache muss geladen sein
+        /// (<see cref="LoadAsync"/>); fuer Texte, die nicht in der Sprache der Oberflaeche stehen, z. B. in Mails.</summary>
+        public string Get(string culture, string key) {
+            if (_texts.TryGetValue(culture, out Dictionary<string, string>? texts) && texts.TryGetValue(key, out string? found)) {
+                return found;
+            }
+            if (_texts.TryGetValue(LocalizerSettings.NeutralCulture.Culture, out Dictionary<string, string>? neutral) && neutral.TryGetValue(key, out string? fallback)) {
+                return fallback;
+            }
+            return key;
+        }
+
         /// <summary>Text zum Schluessel in der aktuellen Sprache (sonst Deutsch).</summary>
         public bool TryGet(string key, out string value) {
             foreach (string culture in CandidateCultures()) {

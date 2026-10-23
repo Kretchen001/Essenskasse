@@ -290,5 +290,6 @@
   "adminMailSubject": "Fehler in der Essenskasse",
   "adminMailBody": "Bitte Namen, Zeit (Tag, Monat, Stunde, Minute) und Art des Fehlers schildern. Dies meint eine Beschreibung, wie es bei der Bedienung zu dem Fehler kam, um ihn schneller isolieren und beheben zu können.\nDanke!",
   "currency": "Währung",
-  "currencyHint": "Gilt für alle Beträge. Bereits gespeicherte Beträge werden nicht umgerechnet."
+  "currencyHint": "Gilt für alle Beträge. Bereits gespeicherte Beträge werden nicht umgerechnet.",
+  "mailLanguage": "Sprache der Mails"
 }

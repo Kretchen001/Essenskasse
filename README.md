@@ -39,7 +39,8 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Bestellungen:** pro Tag und Anbieter, mit Auswahl der Tage der aktuellen Woche, Übersicht je Tag und Person und Warnung bei bereits vorhandenen Bestellungen.
 - **Kaffeekasse:** getrennte Kasse mit Ein- und Auszahlungen; ohne Anmeldung nur lesbar.
 - **Änderungen:** vorhandene Einzahlungen und Bestellungen nachträglich ändern. Dafür wird ein Änderungstoken benötigt, jede Änderung wird samt Initiator im Log protokolliert.
-- **Personen und Anbieter:** anlegen, bearbeiten, suchen, sortieren, ausblenden und wiederherstellen.
+- **Personen und Anbieter:** anlegen, bearbeiten, suchen, sortieren, ausblenden und wiederherstellen. Jede Person hat eine Sprache für Mails.
+- **Mails:** Zahlungsaufforderung, Einzahlungsbestätigung und Fehlermeldung an den Admin gehen zweisprachig raus: zuerst in der Sprache der Person (bei der Fehlermeldung Deutsch), danach in der Sprache des angemeldeten Benutzers. Sind beide gleich, steht der Text nur einmal in der Mail.
 - **Sprachen und Aussehen:** Deutsch, Englisch, Spanisch, Russisch (Wechsel sofort, ohne Neuladen); helles und dunkles Farbschema.
 - **Währung:** in den Einstellungen wählbar (z. B. EUR, USD, CHF) und gilt für alle Beträge. Es ändert sich nur die Anzeige, gespeicherte Beträge werden nicht umgerechnet.
 - **Einstellungen je Benutzer:** werden lokal gespeichert und lassen sich mit dem Server abgleichen (Schnellbeträge, Farbschema, Sprache, Währung, Sortierung).
@@ -51,7 +52,8 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Orders:** per day and provider, with buttons for the days of the current week, an overview per day and person, and a warning if orders already exist.
 - **Coffee fund:** separate fund with deposits and payouts; read-only without signing in.
 - **Changes:** edit existing payments and orders afterwards. This requires a change token; every change including who made it is written to the log.
-- **People and providers:** add, edit, search, sort, hide and restore.
+- **People and providers:** add, edit, search, sort, hide and restore. Every person has a language for emails.
+- **Emails:** payment request, payment confirmation and the error report to the admin are sent bilingually: first in the language of the person (German for the error report), then in the language of the signed-in user. If both are the same, the text appears only once.
 - **Languages and look:** German, English, Spanish, Russian (switching takes effect immediately, no reload); light and dark theme.
 - **Currency:** selectable in the settings (e.g. EUR, USD, CHF) and applies to all amounts. Only the display changes, stored amounts are not converted.
 - **Settings per user:** stored locally and can be synchronised with the server (quick amounts, theme, language, currency, sorting).
@@ -136,9 +138,11 @@ PowerShell: `Get-Content MySqlScripts/update_v1-2-0_zu_1-3-0.sql -Raw | docker e
 ## Update auf 1.4.1 / Upgrade to 1.4.1
 **Deutsch:** Sicherung erstellen und `docker-compose up -d --build`. Die API spielt das Skript `update_v1-4-0_zu_1-4-1.sql` beim Start selbst ein. Was sich ändert:
 - Die Währung der Anzeige ist in den Einstellungen wählbar (je Benutzer, wird mit dem Server abgeglichen). Dafür ergänzt das Skript die Spalte `currency`. Gespeicherte Beträge werden nicht umgerechnet.
+- Jede Person hat eine Sprache für Mails (Spalte `Language`, vorhandene Personen: Deutsch). Mails gehen zweisprachig raus (Person, danach angemeldeter Benutzer). Der Mailtext darf jetzt bis etwa 8000 Zeichen lang sein (vorher 2000, wodurch längere Texte abgeschnitten wurden); Sonderzeichen wie `&` werden korrekt übergeben.
 
 **English:** Create a backup and run `docker-compose up -d --build`. The API applies the script `update_v1-4-0_zu_1-4-1.sql` itself at start-up. What changes:
 - The display currency can be chosen in the settings (per user, synchronised with the server). The script adds the column `currency` for this. Stored amounts are not converted.
+- Every person has a language for emails (column `Language`; existing people: German). Emails are sent bilingually (person first, then the signed-in user). The email text may now be up to about 8000 characters (before: 2000, which cut off longer texts); special characters such as `&` are passed on correctly.
 
 ## Update auf 1.4.0 / Upgrade to 1.4.0
 **Deutsch:** Sicherung erstellen und `docker-compose up -d --build`. Die Datenbank-Änderungen spielt die API beim Start selbst ein (siehe oben). Was sich ändert:

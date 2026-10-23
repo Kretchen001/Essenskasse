@@ -72,7 +72,8 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpPost, Route("new")]
         public IActionResult AddNewPerson([FromHeader] string? name,
-                                            [FromHeader] string? email) {
+                                            [FromHeader] string? email,
+                                            [FromHeader] string? language = null) {
             using (Operation.Time("AddNewPerson")) {
                 Log.Information("AddNewPerson called");
                 if (name is null) {
@@ -86,14 +87,15 @@ namespace EssenskasseAPI.Controllers {
                 Person newPerson = new Person(
                     Uri.UnescapeDataString(name),
                     Uri.UnescapeDataString(email ?? "")
-                    );
+                    ) { Language = Modells.User.SettingsSanitizer.SafeLanguage(language) };
                 string queryStringInsert = $"" +
-                    $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
-                    $"VALUES (@guid, @name, @email, @saldoEuro, @saldoCent);";
+                    $"INSERT INTO essenskasse.Person (Guid, Name, Email, Language, SaldoEuro, SaldoCent) " +
+                    $"VALUES (@guid, @name, @email, @language, @saldoEuro, @saldoCent);";
                 _db.Query(queryStringInsert,
                     Db.P("@guid", newPerson.Guid),
                     Db.P("@name", newPerson.Name),
                     Db.P("@email", newPerson.Email),
+                    Db.P("@language", newPerson.Language),
                     Db.P("@saldoEuro", newPerson.Saldo.Euro),
                     Db.P("@saldoCent", newPerson.Saldo.Cent));
                 return Ok(JsonConvert.SerializeObject(newPerson.Guid));
@@ -103,7 +105,8 @@ namespace EssenskasseAPI.Controllers {
         [HttpPut, Route("update")]
         public IActionResult UpdatePerson([FromHeader] Guid guid,
                                             [FromHeader] string? name,
-                                            [FromHeader] string? email) {
+                                            [FromHeader] string? email,
+                                            [FromHeader] string? language = null) {
             using (Operation.Time("UpdatePerson")) {
                 Log.Information("UpdatePerson called");
 
@@ -130,15 +133,20 @@ namespace EssenskasseAPI.Controllers {
                         personToUpdate.Email = Uri.UnescapeDataString(email);
                     }
 
+                    if (language is not null) {
+                        personToUpdate.Language = Modells.User.SettingsSanitizer.SafeLanguage(language);
+                    }
+
                     // DataTableToListOfPerson liefert Name/Email URL-kodiert zurueck. Wurde ein Feld
                     // nicht geaendert, muss es vor dem Speichern wieder dekodiert werden.
                     string queryStringPersonUpdate = $"" +
                         $"UPDATE essenskasse.Person " +
-                        $"SET Name=@name, Email=@email " +
+                        $"SET Name=@name, Email=@email, Language=@language " +
                         $"WHERE Guid=@guid;";
                     _db.Query(queryStringPersonUpdate,
                         Db.P("@name", name is not null ? personToUpdate.Name : Uri.UnescapeDataString(personToUpdate.Name)),
                         Db.P("@email", email is not null ? personToUpdate.Email : Uri.UnescapeDataString(personToUpdate.Email)),
+                        Db.P("@language", personToUpdate.Language),
                         Db.P("@guid", personToUpdate.Guid));
 
                     Log.Information("Person successfully updated");
@@ -298,7 +306,7 @@ namespace EssenskasseAPI.Controllers {
                         euro: long.Parse(row["SaldoEuro"].ToString()!),
                         cent: short.Parse(row["SaldoCent"].ToString()!)
                         )
-                    ));
+                    ) { Language = dataTable.Columns.Contains("Language") ? row["Language"].ToString() ?? "" : "" });
             }
             return personList;
         }

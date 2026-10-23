@@ -1,5 +1,6 @@
 ﻿@inject HttpClient HttpClient
 @inject IJSRuntime JSRuntime
+@inject TextService Texts
 @inject IConfiguration Config
 @inject IStringLocalizer<App> _loc
 @inject ToastService ToastService
@@ -16,6 +17,14 @@
             <label class="ek-field @(EmailChanged ? "is-changed" : "")">
                 <span>@_loc[nameof(RessourceAppStrings.email)] @(EmailChanged ? "•" : "")</span>
                 <input type="email" class="ek-input" @bind="editEmail" @bind:event="oninput" @onkeydown="OnEditKeyDown" autocomplete="off" />
+            </label>
+            <label class="ek-field @(LanguageChanged ? "is-changed" : "")">
+                <span>@_loc[nameof(RessourceAppStrings.mailLanguage)] @(LanguageChanged ? "•" : "")</span>
+                <select class="ek-select" @bind="editLanguage">
+                    @foreach (var culture in LocalizerSettings.SupportedCultures) {
+                        <option value="@culture.Culture">@culture.Name</option>
+                    }
+                </select>
             </label>
             <div class="ek-edit-actions">
                 <button type="button" class="ek-btn ek-btn-primary" disabled="@(isSaving || !IsDirty)" @onclick="SaveEdit">
