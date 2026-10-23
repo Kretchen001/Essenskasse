@@ -9,7 +9,7 @@ namespace Essenskasse.Layout {
 
     public partial class MainLayout {
 
-        private NavMenu navMenu;
+        private NavMenu navMenu = default!; // wird von @ref in MainLayout.razor gesetzt
 
         private LoginModal? LoginModel { get; set; }
         private string currentUserName = string.Empty;
@@ -22,7 +22,7 @@ namespace Essenskasse.Layout {
         private bool isLoggingIn = false;
 
         [CascadingParameter]
-        private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+        private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!; // kommt als CascadingParameter
 
         protected override async Task OnInitializedAsync() {
             Language.Changed += OnLanguageChanged;

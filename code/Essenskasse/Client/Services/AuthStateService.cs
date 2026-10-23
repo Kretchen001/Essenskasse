@@ -12,7 +12,8 @@ namespace Essenskasse.Client {
             ClaimsIdentity identity;
 
             if (IsAuthenticating) {
-                return null;
+                // Waehrend der Anmeldung gilt der Benutzer als anonym (null waere kein gueltiger Zustand fuer Blazor).
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
             else if (IsAuthenticated) {
                 identity = new ClaimsIdentity(new List<Claim>
