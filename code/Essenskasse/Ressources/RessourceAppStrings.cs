@@ -291,5 +291,7 @@
         confirmSaveSettingsToServer,
         adminMailSubject,
         adminMailBody,
+        currency,
+        currencyHint,
     }
 }

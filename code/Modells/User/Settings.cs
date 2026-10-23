@@ -59,6 +59,10 @@ namespace Modells.User {
         [JsonInclude, JsonPropertyName("Language"), JsonProperty(nameof(Language))]
         public string Language { get; set; } = "";
 
+        /// <summary>Waehrung der Anzeige (Code, z. B. "EUR"). Leer = nichts gespeichert.</summary>
+        [JsonInclude, JsonPropertyName("Currency"), JsonProperty(nameof(Currency))]
+        public string Currency { get; set; } = "";
+
         /// <summary>Sortierung der Personenliste (Name des Auswahlwerts). Leer = nichts gespeichert.</summary>
         [JsonInclude, JsonPropertyName("PersonSort"), JsonProperty(nameof(PersonSort))]
         public string PersonSort { get; set; } = "";

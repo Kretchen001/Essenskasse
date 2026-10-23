@@ -83,5 +83,6 @@ CREATE TABLE IF NOT EXISTS essenskasse.SettingsUser (
     theme VARCHAR(16) NOT NULL DEFAULT '', -- Light oder Dark (leer = nichts gespeichert)
     language VARCHAR(16) NOT NULL DEFAULT '', -- z. B. de-DE (leer = nichts gespeichert)
     personSort VARCHAR(32) NOT NULL DEFAULT '',
-    providerSort VARCHAR(32) NOT NULL DEFAULT ''
+    providerSort VARCHAR(32) NOT NULL DEFAULT '',
+    currency VARCHAR(3) NOT NULL DEFAULT '' -- Waehrung der Anzeige, z. B. EUR (leer = nichts gespeichert)
 );

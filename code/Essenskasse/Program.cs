@@ -21,6 +21,7 @@ namespace Essenskasse {
             builder.Services.AddSingleton(texts);
             builder.Services.AddSingleton(typeof(IStringLocalizer<>), typeof(JsonStringLocalizer<>));
             builder.Services.AddScoped<LanguageService>();
+            builder.Services.AddScoped<CurrencyService>();
 
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");

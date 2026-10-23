@@ -20,6 +20,9 @@
         /// <summary>Erlaubte Sprachen.</summary>
         public static IReadOnlyList<string> Languages { get; } = ["de-DE", "en-US", "es-ES", "ru"];
 
+        /// <summary>Erlaubte Waehrungen (Codes).</summary>
+        public static IReadOnlyList<string> Currencies { get; } = Modells.Currency.All.Select(x => x.Code).ToList();
+
         /// <summary>Gibt eine bereinigte Kopie zurueck. Unbekannte oder ungueltige Texte werden zu "" (= nicht gespeichert).</summary>
         public static Settings Sanitize(Settings settings) {
             string email = (settings.AdminEmail ?? "").Trim();
@@ -38,7 +41,8 @@
                 Theme = Themes.Contains(settings.Theme) ? settings.Theme : "",
                 Language = Languages.Contains(settings.Language) ? settings.Language : "",
                 PersonSort = SafeSortName(settings.PersonSort),
-                ProviderSort = SafeSortName(settings.ProviderSort)
+                ProviderSort = SafeSortName(settings.ProviderSort),
+                Currency = Currencies.Contains(settings.Currency) ? settings.Currency : ""
             };
         }
 

@@ -26,29 +26,22 @@ namespace Modells {
             Cent = cent;
         }
 
-        /// <summary>Override the ToString so it returns a valid money String.
+        /// <summary>Die Waehrung, in der Betraege angezeigt werden. Der Client setzt sie aus den Einstellungen des Benutzers;
+        /// die API und die Tests bleiben bei Euro (nur die Anzeige aendert sich, gespeicherte Betraege werden nicht umgerechnet).</summary>
+        public static Currency CurrentCurrency { get; set; } = Currency.Euro;
+
+        /// <summary>Override the ToString so it returns a valid money String in the <see cref="CurrentCurrency"/>.
         /// For further information see documentation/pap/Money_ToString.puml</summary>
-        /// <returns>EURO,CENT €</returns>
+        /// <returns>Euro: EURO,CENT € (negativ: -EURO,CENT €)</returns>
         public override string ToString() {
-            if (Math.Abs(Cent) < 10) {
-                if (Cent < 0) {
-                    return ("-" + Math.Abs(Euro).ToString() + ",0" + Math.Abs(Cent).ToString() + " €");
-                }
-                else {
-                    return (Euro.ToString() + ",0" + Math.Abs(Cent).ToString() + " €");
-                }
-            }
-            else {
-                if (Cent < 0) {
-                    return ("-" + Math.Abs(Euro).ToString() + "," + Math.Abs(Cent).ToString() + " €");
-                }
-                else if (Euro < 0) {
-                    return (Euro.ToString() + "," + Cent.ToString() + " €");
-                }
-                else {
-                    return (Euro.ToString() + "," + Cent.ToString() + " €");
-                }
-            }
+            return ToString(CurrentCurrency);
+        }
+
+        /// <summary>Wie <see cref="ToString()"/>, aber in der angegebenen Waehrung.</summary>
+        public string ToString(Currency currency) {
+            bool negative = Euro < 0 || Cent < 0;
+            string number = Math.Abs(Euro).ToString(CultureInfo.InvariantCulture) + currency.DecimalSeparator + Math.Abs((int)Cent).ToString("00", CultureInfo.InvariantCulture);
+            return currency.Format(number, negative);
         }
 
         /// <summary>Convert a given String to a Money.</summary>
@@ -57,7 +50,8 @@ namespace Modells {
         public Money ToMoney(string ToStringMoney) {
             // Das Vorzeichen steht in ToString() nur einmal vorn ("-0,05 €"). Es gilt fuer Euro und Cent:
             // sonst ginge es bei 0 Euro verloren und "-8,30 €" waere rechnerisch -7,70 €.
-            string text = ToStringMoney.Replace("€", "").Trim();
+            // Waehrungszeichen und -codes aller waehlbaren Waehrungen entfernen; Punkt und Komma gelten beide als Dezimaltrennzeichen.
+            string text = Currency.StripSymbols(ToStringMoney).Replace('.', ',').Trim();
             bool negative = text.StartsWith('-');
             if (negative) {
                 text = text[1..];

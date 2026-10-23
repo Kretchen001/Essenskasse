@@ -288,5 +288,7 @@
   "confirmLoadSettingsFromServer": "¿Obtener los ajustes guardados DEL servidor y sobrescribir los locales?",
   "confirmSaveSettingsToServer": "¿Enviar los ajustes actuales AL servidor y sobrescribir los guardados allí?",
   "adminMailSubject": "Error en Essenskasse",
-  "adminMailBody": "Indique su nombre, la hora (día, mes, hora, minuto) y el tipo de error. Es decir, describa cómo se produjo el error durante el uso, para poder aislarlo y corregirlo más rápido.\n¡Gracias!"
+  "adminMailBody": "Indique su nombre, la hora (día, mes, hora, minuto) y el tipo de error. Es decir, describa cómo se produjo el error durante el uso, para poder aislarlo y corregirlo más rápido.\n¡Gracias!",
+  "currency": "Moneda",
+  "currencyHint": "Se aplica a todos los importes. Los importes ya guardados no se convierten."
 }

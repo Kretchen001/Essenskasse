@@ -162,11 +162,11 @@ namespace EssenskasseAPI.Controllers {
                                             $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
                                             $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
                                             $"adminEmail, noticeableOnRightSide, sendConfirmationMail, " +
-                                            $"quickAmounts, theme, language, personSort, providerSort) " +
+                                            $"quickAmounts, theme, language, personSort, providerSort, currency) " +
                         $"VALUES (@userGuid, @singleList, @loadPayment, @loadOrder, @showProvider, " +
                                             $"@moneyLimit, @showPerson, @accessToken, " +
                                             $"@adminEmail, @rightSide, @sendMail, " +
-                                            $"@quickAmounts, @theme, @language, @personSort, @providerSort);";
+                                            $"@quickAmounts, @theme, @language, @personSort, @providerSort, @currency);";
                     tx.Query(queryStringInsert,
                         Db.P("@userGuid", x.Item1),
                         Db.P("@singleList", x.Item2.IsSingleListWishDashboard),
@@ -183,7 +183,8 @@ namespace EssenskasseAPI.Controllers {
                         Db.P("@theme", x.Item2.Theme ?? ""),
                         Db.P("@language", x.Item2.Language ?? ""),
                         Db.P("@personSort", x.Item2.PersonSort ?? ""),
-                        Db.P("@providerSort", x.Item2.ProviderSort ?? ""));
+                        Db.P("@providerSort", x.Item2.ProviderSort ?? ""),
+                        Db.P("@currency", x.Item2.Currency ?? ""));
                 }
             }
             tx.Commit();
@@ -317,7 +318,8 @@ namespace EssenskasseAPI.Controllers {
                         Theme = row["theme"].ToString() ?? "",
                         Language = row["language"].ToString() ?? "",
                         PersonSort = row["personSort"].ToString() ?? "",
-                        ProviderSort = row["providerSort"].ToString() ?? ""
+                        ProviderSort = row["providerSort"].ToString() ?? "",
+                        Currency = row["currency"].ToString() ?? ""
                     }
                 ));
             }

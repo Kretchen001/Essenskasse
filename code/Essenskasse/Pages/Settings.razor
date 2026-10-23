@@ -131,6 +131,19 @@
         <h3 class="ek-set-title">@_loc[nameof(RessourceAppStrings.settingsCash)]</h3>
         <label class="ek-set-row">
             <span class="ek-set-text">
+                <span class="ek-set-label">@_loc[nameof(RessourceAppStrings.currency)]</span>
+                <span class="ek-set-hint">@_loc[nameof(RessourceAppStrings.currencyHint)]</span>
+            </span>
+            <span class="ek-set-control">
+                <select class="ek-select" value="@Modells.Money.CurrentCurrency.Code" @onchange="OnCurrencyChanged">
+                    @foreach (Modells.Currency currency in Modells.Currency.All) {
+                        <option value="@currency.Code">@currency.Code (@currency.Symbol)</option>
+                    }
+                </select>
+            </span>
+        </label>
+        <label class="ek-set-row">
+            <span class="ek-set-text">
                 <span class="ek-set-label">@_loc[nameof(RessourceAppStrings.limitValuePositivBalance)]</span>
                 <span class="ek-set-hint">@_loc[nameof(RessourceAppStrings.current)]: @DashboardMoneyLimit.ToString()</span>
             </span>

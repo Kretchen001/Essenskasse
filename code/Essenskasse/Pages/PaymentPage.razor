@@ -76,7 +76,7 @@
                 <h3 class="ek-group-title">@_loc[nameof(RessourceAppStrings.amount)]</h3>
                 <div class="ek-quick" role="group" aria-label="@_loc[nameof(RessourceAppStrings.quickAmounts)]">
                     @foreach (int euro in quickAmounts) {
-                        <button type="button" class="ek-chip" @onclick="() => SetQuickAmount(euro)">@euro €</button>
+                        <button type="button" class="ek-chip" @onclick="() => SetQuickAmount(euro)">@Modells.Money.CurrentCurrency.Format(euro.ToString())</button>
                     }
                 </div>
                 <div class="ek-add-fields ek-pay-fields">

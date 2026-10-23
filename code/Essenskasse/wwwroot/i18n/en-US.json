@@ -288,5 +288,7 @@
   "confirmLoadSettingsFromServer": "Fetch the saved settings FROM the server and overwrite the local ones?",
   "confirmSaveSettingsToServer": "Send the current settings TO the server and overwrite the saved ones there?",
   "adminMailSubject": "Error in Essenskasse",
-  "adminMailBody": "Please state your name, the time (day, month, hour, minute) and the kind of error. This means a description of how the error occurred during use, so that it can be isolated and fixed more quickly.\nThank you!"
+  "adminMailBody": "Please state your name, the time (day, month, hour, minute) and the kind of error. This means a description of how the error occurred during use, so that it can be isolated and fixed more quickly.\nThank you!",
+  "currency": "Currency",
+  "currencyHint": "Applies to all amounts. Amounts already stored are not converted."
 }

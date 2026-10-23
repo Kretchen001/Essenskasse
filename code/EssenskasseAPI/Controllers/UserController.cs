@@ -252,7 +252,7 @@ namespace EssenskasseAPI.Controllers {
                 DataTable tempSettings = _db.Query(
                     "SELECT isSingleListWishDashboard, loadAmountPayment, loadAmountOrder, filterShowProvider, dashboardMoneyLimit, " +
                     "filterShowPerson, adminEmail, noticeableOnRightSide, sendConfirmationMail, " +
-                    "quickAmounts, theme, language, personSort, providerSort " +
+                    "quickAmounts, theme, language, personSort, providerSort, currency " +
                     "FROM essenskasse.SettingsUser WHERE UserGuid=@userGuid;",
                     Db.P("@userGuid", userGuid));
                 if (tempSettings.Rows.Count == 0) {
@@ -281,16 +281,16 @@ namespace EssenskasseAPI.Controllers {
                 _db.Query(
                     "INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, loadAmountPayment, loadAmountOrder, " +
                     "filterShowProvider, dashboardMoneyLimit, filterShowPerson, accessToken, adminEmail, noticeableOnRightSide, " +
-                    "sendConfirmationMail, quickAmounts, theme, language, personSort, providerSort) " +
+                    "sendConfirmationMail, quickAmounts, theme, language, personSort, providerSort, currency) " +
                     "VALUES (@userGuid, @singleList, @loadPayment, @loadOrder, @showProvider, @moneyLimit, @showPerson, @accessToken, " +
-                    "@adminEmail, @rightSide, @sendMail, @quickAmounts, @theme, @language, @personSort, @providerSort) " +
+                    "@adminEmail, @rightSide, @sendMail, @quickAmounts, @theme, @language, @personSort, @providerSort, @currency) " +
                     "ON DUPLICATE KEY UPDATE " +
                     "isSingleListWishDashboard=VALUES(isSingleListWishDashboard), loadAmountPayment=VALUES(loadAmountPayment), " +
                     "loadAmountOrder=VALUES(loadAmountOrder), filterShowProvider=VALUES(filterShowProvider), " +
                     "dashboardMoneyLimit=VALUES(dashboardMoneyLimit), filterShowPerson=VALUES(filterShowPerson), " +
                     "accessToken=VALUES(accessToken), adminEmail=VALUES(adminEmail), noticeableOnRightSide=VALUES(noticeableOnRightSide), " +
                     "sendConfirmationMail=VALUES(sendConfirmationMail), quickAmounts=VALUES(quickAmounts), theme=VALUES(theme), " +
-                    "language=VALUES(language), personSort=VALUES(personSort), providerSort=VALUES(providerSort);",
+                    "language=VALUES(language), personSort=VALUES(personSort), providerSort=VALUES(providerSort), currency=VALUES(currency);",
                     Db.P("@userGuid", userGuid),
                     Db.P("@singleList", clean.IsSingleListWishDashboard),
                     Db.P("@loadPayment", clean.LoadAmountPayment),
@@ -306,7 +306,8 @@ namespace EssenskasseAPI.Controllers {
                     Db.P("@theme", clean.Theme),
                     Db.P("@language", clean.Language),
                     Db.P("@personSort", clean.PersonSort),
-                    Db.P("@providerSort", clean.ProviderSort));
+                    Db.P("@providerSort", clean.ProviderSort),
+                    Db.P("@currency", clean.Currency));
                 return Ok();
             }
         }
@@ -419,7 +420,8 @@ namespace EssenskasseAPI.Controllers {
                 Theme = ReadText(row["theme"]),
                 Language = ReadText(row["language"]),
                 PersonSort = ReadText(row["personSort"]),
-                ProviderSort = ReadText(row["providerSort"])
+                ProviderSort = ReadText(row["providerSort"]),
+                Currency = ReadText(row["currency"])
             });
         }
 

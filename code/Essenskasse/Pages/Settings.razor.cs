@@ -219,6 +219,10 @@ namespace Essenskasse.Pages {
             }
         }
 
+        private async Task OnCurrencyChanged(ChangeEventArgs args) {
+            await UserSettings.SetCurrencyAsync(args.Value?.ToString() ?? "");
+        }
+
         /// <summary>Grenzwert als Text fuer das Eingabefeld, z. B. "10,50" (ohne Waehrungszeichen).</summary>
         private string LimitDisplay {
             get {

@@ -34,7 +34,7 @@ namespace Essenskasse.Client.Services {
         private static readonly string[] MigratedKeys = [
             "IsSingleWishListDashboard", "NoticeableOnRightSide", "loadAmountOfPayments", "loadAmountOfOrders",
             "filterShowProvider", "filterShowPerson", "DashboardMoneyLimit", "AdminEmail", "ConfirmationMailMode",
-            "SendConfirmationMail", "OrderQuickAmounts", "UserTheme", "PersonSort", "ProviderSort", "PersonIsASC", "ProviderIsASC"
+            "SendConfirmationMail", "OrderQuickAmounts", "UserTheme", "PersonSort", "ProviderSort", "PersonIsASC", "ProviderIsASC", "Currency"
         ];
 
         private readonly ILocalStorageService _storage;
@@ -43,10 +43,12 @@ namespace Essenskasse.Client.Services {
         private readonly HttpClient _http;
         private readonly IConfiguration _config;
         private readonly LanguageService _language;
+        private readonly CurrencyService _currency;
 
         public UserSettingsStore(ILocalStorageService storage, AppDataService appData, ThemeService theme,
-                                    HttpClient http, IConfiguration config, LanguageService language) {
+                                    HttpClient http, IConfiguration config, LanguageService language, CurrencyService currency) {
             _language = language;
+            _currency = currency;
             _storage = storage;
             _appData = appData;
             _theme = theme;
@@ -155,9 +157,17 @@ namespace Essenskasse.Client.Services {
             _appData.AdminEmail = await GetAsync("AdminEmail", "");
             _appData.SendConfirmationMail = await ReadConfirmationMailModeAsync();
             _appData.QuickAmounts = Modells.QuickAmounts.Normalize(await GetAsync<List<long>>("OrderQuickAmounts", []));
+            _currency.Set(Modells.Currency.FromCode(await GetAsync("Currency", "")));
             // Der Aenderungstoken gibt es nur pro angemeldetem Benutzer.
             Guid token = UserName.Length == 0 ? Guid.Empty : await GetAsync("AccessToken", Guid.Empty);
             _appData.AccessToken = token == Guid.Empty ? null : token;
+        }
+
+        /// <summary>Waehlt die Waehrung der Anzeige, merkt sie sich beim Benutzer und stellt die Oberflaeche um.</summary>
+        public async Task SetCurrencyAsync(string code) {
+            Modells.Currency currency = Modells.Currency.FromCode(code);
+            await SetAsync("Currency", currency.Code);
+            _currency.Set(currency);
         }
 
         private static int InRange(int value, int fallback) {
@@ -206,6 +216,7 @@ namespace Essenskasse.Client.Services {
             settings.Language = await CurrentLanguageAsync();
             settings.PersonSort = await GetAsync("PersonSort", "");
             settings.ProviderSort = await GetAsync("ProviderSort", "");
+            settings.Currency = Modells.Money.CurrentCurrency.Code;
             return settings;
         }
 
@@ -238,6 +249,9 @@ namespace Essenskasse.Client.Services {
             }
             if (settings.ProviderSort.Length > 0) {
                 await SetAsync("ProviderSort", settings.ProviderSort);
+            }
+            if (Modells.Currency.IsKnown(settings.Currency)) {
+                await SetCurrencyAsync(settings.Currency);
             }
             if (settings.Language.Length > 0 && settings.Language != await CurrentLanguageAsync()) {
                 await _language.SetAsync(settings.Language); // wechselt sofort ohne Neuladen

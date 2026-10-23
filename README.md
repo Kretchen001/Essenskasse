@@ -40,7 +40,8 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Änderungen:** vorhandene Einzahlungen und Bestellungen nachträglich ändern. Dafür wird ein Änderungstoken benötigt, jede Änderung wird samt Initiator im Log protokolliert.
 - **Personen und Anbieter:** anlegen, bearbeiten, suchen, sortieren, ausblenden und wiederherstellen.
 - **Sprachen und Aussehen:** Deutsch, Englisch, Spanisch, Russisch (Wechsel sofort, ohne Neuladen); helles und dunkles Farbschema.
-- **Einstellungen je Benutzer:** werden lokal gespeichert und lassen sich mit dem Server abgleichen (Schnellbeträge, Farbschema, Sprache, Sortierung).
+- **Währung:** in den Einstellungen wählbar (z. B. EUR, USD, CHF) und gilt für alle Beträge. Es ändert sich nur die Anzeige, gespeicherte Beträge werden nicht umgerechnet.
+- **Einstellungen je Benutzer:** werden lokal gespeichert und lassen sich mit dem Server abgleichen (Schnellbeträge, Farbschema, Sprache, Währung, Sortierung).
 - **PWA:** installierbar, nach dem ersten Laden auch offline startbar; neue Versionen werden per Hinweis angeboten.
 
 **English**
@@ -51,7 +52,8 @@ As soon as a provider or person is no longer used, it can be hidden via a button
 - **Changes:** edit existing payments and orders afterwards. This requires a change token; every change including who made it is written to the log.
 - **People and providers:** add, edit, search, sort, hide and restore.
 - **Languages and look:** German, English, Spanish, Russian (switching takes effect immediately, no reload); light and dark theme.
-- **Settings per user:** stored locally and can be synchronised with the server (quick amounts, theme, language, sorting).
+- **Currency:** selectable in the settings (e.g. EUR, USD, CHF) and applies to all amounts. Only the display changes, stored amounts are not converted.
+- **Settings per user:** stored locally and can be synchronised with the server (quick amounts, theme, language, currency, sorting).
 - **PWA:** installable, starts offline after the first load; new versions are offered through a notice.
 
 ## Installation und Start / Installation and Run

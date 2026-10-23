@@ -7,7 +7,7 @@
 
         /// <summary>
         /// Liest einen Betrag. Erlaubt sind Ziffern, ein Komma oder Punkt als Dezimaltrennzeichen mit ein oder zwei Nachkommastellen,
-        /// ein fuehrendes Minus, Leerzeichen und ein Euro-Zeichen. Kommen Komma und Punkt vor, gilt das letzte als Dezimaltrennzeichen
+        /// ein fuehrendes Minus, Leerzeichen und ein Waehrungszeichen (oder -code). Kommen Komma und Punkt vor, gilt das letzte als Dezimaltrennzeichen
         /// und das andere als Tausendertrennzeichen. Mehr als zwei Nachkommastellen und alles andere sind ungueltig
         /// (es wird nie stillschweigend gerundet oder abgeschnitten). Der Wert 0 ist gueltig, die Pruefung auf 0 ist Sache des Aufrufers.
         /// </summary>
@@ -16,7 +16,7 @@
             if (input is null) {
                 return false;
             }
-            string text = input.Replace("€", "").Replace(" ", "").Replace("\u00A0", "").Trim();
+            string text = Currency.StripSymbols(input).Replace(" ", "").Replace("\u00A0", "").Trim();
             if (text.Length == 0) {
                 return false;
             }

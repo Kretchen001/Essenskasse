@@ -63,10 +63,10 @@
             return (cents < 0 ? "-" : "") + (abs / 100) + "," + (abs % 100).ToString("00");
         }
 
-        /// <summary>Kurze Beschriftung: "5 €" bei ganzen Euro, sonst "2,50 €".</summary>
+        /// <summary>Kurze Beschriftung in der aktuellen Waehrung: "5 €" bei ganzen Einheiten, sonst "2,50 €".</summary>
         public static string Label(long cents) {
             if (cents % 100 == 0) {
-                return (cents / 100).ToString() + " €";
+                return Money.CurrentCurrency.Format((cents / 100).ToString());
             }
             return Money.FromTotalCents(cents).ToString();
         }

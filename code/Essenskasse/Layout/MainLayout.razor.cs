@@ -26,6 +26,7 @@ namespace Essenskasse.Layout {
 
         protected override async Task OnInitializedAsync() {
             Language.Changed += OnLanguageChanged;
+            Currencies.Changed += OnLanguageChanged;
             await Language.SyncDocumentLanguageAsync();
             AuthState.LoginRequested += () => {
                 if (LoginModel is not null) {
@@ -47,6 +48,7 @@ namespace Essenskasse.Layout {
 
         public void Dispose() {
             Language.Changed -= OnLanguageChanged;
+            Currencies.Changed -= OnLanguageChanged;
         }
 
         private void ShowLoginModal() {

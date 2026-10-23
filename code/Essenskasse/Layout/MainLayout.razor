@@ -12,12 +12,13 @@
 @inject UserSettingsStore UserSettings
 @inject NavigationManager NavManager
 @inject LanguageService Language
+@inject CurrencyService Currencies
 
 @inject AuthStateService AuthState
 
 <ToastCard />
 
-<div class="page" @key="Language.Version">
+<div class="page" @key="@($"{Language.Version}-{Currencies.Version}")">
     <div class="sidebar">
         <NavMenu @ref="navMenu" />
     </div>
