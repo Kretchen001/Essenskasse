@@ -8,6 +8,7 @@
 - [Funktionen / Features](#funktionen--features)
 - [Installation und Start / Installation and Run](#installation-und-start--installation-and-run)
 - [Datenbank-Updates / Database updates](#datenbank-updates--database-updates)
+- [Update auf 1.4.2 / Upgrade to 1.4.2](#update-auf-142--upgrade-to-142)
 - [Update auf 1.4.1 / Upgrade to 1.4.1](#update-auf-141--upgrade-to-141)
 - [Update auf 1.4.0 / Upgrade to 1.4.0](#update-auf-140--upgrade-to-140)
 - [Update auf 1.3.0 / Upgrade to 1.3.0](#update-auf-130--upgrade-to-130)
@@ -134,6 +135,11 @@ cd code
 docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> essenskasse < MySqlScripts/update_v1-2-0_zu_1-3-0.sql
 ```
 PowerShell: `Get-Content MySqlScripts/update_v1-2-0_zu_1-3-0.sql -Raw | docker exec -i EssenskasseDB mysql -uroot -p<DB_ROOT_PASSWORD> essenskasse`
+
+## Update auf 1.4.2 / Upgrade to 1.4.2
+**Deutsch:** Sicherung erstellen und `docker-compose up -d --build`. Die Datenbank-Änderungen spielt die API beim Start selbst ein. Was sich ändert:
+
+**English:** Create a backup and run `docker-compose up -d --build`. The API applies the database changes itself at start-up. What changes:
 
 ## Update auf 1.4.1 / Upgrade to 1.4.1
 **Deutsch:** Sicherung erstellen und `docker-compose up -d --build`. Die API spielt das Skript `update_v1-4-0_zu_1-4-1.sql` beim Start selbst ein. Was sich ändert:
