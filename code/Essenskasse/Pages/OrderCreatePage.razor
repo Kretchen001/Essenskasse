@@ -45,8 +45,8 @@
                             @foreach (DateTime day in ThisWeek) {
                                 <button type="button" class="ek-chip ek-day @(selectedDate.Date == day ? "is-active" : "") @(day == DateTime.Today ? "is-today" : "")"
                                         aria-pressed="@((selectedDate.Date == day).ToString().ToLowerInvariant())"
-                                        title="@day.ToString("dddd, dd.MM.yyyy")" @onclick="() => SetDate(day)">
-                                    @day.ToString("ddd dd.")
+                                        title="@day.ToString("D")" @onclick="() => SetDate(day)">
+                                    @DateText.WeekdayDay(day)
                                 </button>
                             }
                             <input type="date" class="ek-input" aria-label="@_loc[nameof(RessourceAppStrings.date)]" @bind="SelectedDateValue" />
@@ -108,7 +108,7 @@
                                         <ul class="ek-hist">
                                             @foreach (Order o in HistoryOf(current.Guid)) {
                                                 <li>
-                                                    <span class="ek-hist-date">@o.DateTime.ToString("ddd, dd.MM.yyyy")</span>
+                                                    <span class="ek-hist-date">@DateText.WeekdayDate(o.DateTime)</span>
                                                     <span class="ek-hist-text">@o.Provider.Designation</span>
                                                     <span class="ek-hist-amount">@o.Money.ToString()</span>
                                                 </li>
@@ -146,7 +146,7 @@
                 <EkDialog Open="previewOpen" Title="@_loc[nameof(RessourceAppStrings.orderPreviewTitle)]" OnClose="ClosePreview">
                     <ChildContent>
                         <p class="ek-ord-prev-meta">
-                            <span>@selectedDate.ToString("dddd, dd.MM.yyyy")</span>
+                            <span>@selectedDate.ToString("D")</span>
                             <span aria-hidden="true">·</span>
                             <span>@SelectedProviderData?.Designation</span>
                         </p>
@@ -181,7 +181,7 @@
                             <ul class="ek-hist">
                                 @foreach (Order o in month) {
                                     <li>
-                                        <span class="ek-hist-date">@o.DateTime.ToString("ddd, dd.MM.yyyy")</span>
+                                        <span class="ek-hist-date">@DateText.WeekdayDate(o.DateTime)</span>
                                         <span class="ek-hist-text">@o.Provider.Designation</span>
                                         <span class="ek-hist-amount">@o.Money.ToString()</span>
                                     </li>
@@ -223,7 +223,7 @@
                             <tbody>
                                 @foreach (OrderOverviewDay day in overviewDays) {
                                     <tr class="@(IsWeekend(day.Date) ? "is-weekend" : "")">
-                                        <th scope="row" class="ek-ovw-date">@day.Date.ToString("ddd dd.MM.yy")</th>
+                                        <th scope="row" class="ek-ovw-date">@DateText.WeekdayDayMonth(day.Date)</th>
                                         @foreach (Person x in overviewPeople) {
                                             long cents = CentsOf(day, x);
                                             <td class="@(cents > 0 ? "has-order" : "no-order")">@(cents > 0 ? Modells.Money.FromTotalCents(cents).ToString() : "–")</td>
@@ -239,7 +239,7 @@
                         @foreach (OrderOverviewDay day in overviewDays) {
                             <section class="ek-ovw-card @(IsWeekend(day.Date) ? "is-weekend" : "")">
                                 <header>
-                                    <strong>@day.Date.ToString("dddd, dd.MM.yyyy")</strong>
+                                    <strong>@day.Date.ToString("D")</strong>
                                     <span class="ek-hist-amount">@Modells.Money.FromTotalCents(day.TotalCents).ToString()</span>
                                 </header>
                                 <ul>

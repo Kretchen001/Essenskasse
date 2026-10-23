@@ -178,7 +178,7 @@
     <value>Betrag gutschreiben!</value>
   </data>
   <data name="current" xml:space="preserve">
-    <value>Akutell</value>
+    <value>Aktuell</value>
   </data>
   <data name="currentlySelected" xml:space="preserve">
     <value>aktuell ausgewählt</value>
@@ -277,7 +277,7 @@
     <value>Hell</value>
   </data>
   <data name="limitValuePositivBalance" xml:space="preserve">
-    <value>Grenzwert für Positives Saldo</value>
+    <value>Grenzwert für positives Saldo</value>
   </data>
   <data name="loadData" xml:space="preserve">
     <value>Daten laden</value>
@@ -301,7 +301,7 @@
     <value>Nein</value>
   </data>
   <data name="noProviderPleaseInsertBefore" xml:space="preserve">
-    <value>Keine Anbieter verfügbar!\nBitte vorher eintragen!</value>
+    <value>Keine Anbieter verfügbar! Bitte vorher eintragen!</value>
   </data>
   <data name="noSettingsAvailable" xml:space="preserve">
     <value>Keine Einstellungen wiederherstellbar! Bitte beim Admin melden.</value>
@@ -423,17 +423,17 @@
   <data name="toastEventErrorRememberProcedurePlease" xml:space="preserve">
     <value>Bei Fehlern bitte das Vorgehen zum Nachstellen merken!</value>
   </data>
-  <data name="toastFilterPeronOff" xml:space="preserve">
-    <value>Filter für die Personen ausgeschalten!</value>
+  <data name="toastFilterPersonOff" xml:space="preserve">
+    <value>Filter für die Personen ausgeschaltet!</value>
   </data>
   <data name="toastFilterPersonOn" xml:space="preserve">
-    <value>Filter für die Personen angeschalten!</value>
+    <value>Filter für die Personen angeschaltet!</value>
   </data>
   <data name="toastFilterProviderOff" xml:space="preserve">
-    <value>Filter für den Anbieter ausgeschalten!</value>
+    <value>Filter für den Anbieter ausgeschaltet!</value>
   </data>
   <data name="toastFilterProviderOn" xml:space="preserve">
-    <value>Filter für den Anbieter angeschalten!</value>
+    <value>Filter für den Anbieter angeschaltet!</value>
   </data>
   <data name="toastGuidNotThere" xml:space="preserve">
     <value>Guid nicht vergeben!</value>
@@ -442,7 +442,7 @@
     <value>Grenzwert gesetzt auf:</value>
   </data>
   <data name="toastMoneyFormatInvalid" xml:space="preserve">
-    <value>Betrag invalide!</value>
+    <value>Ungültiger Betrag!</value>
   </data>
   <data name="toastNoApiConnection" xml:space="preserve">
     <value>Keine API Verbindung möglich!</value>
@@ -460,7 +460,7 @@
     <value>Löschen nicht möglich...</value>
   </data>
   <data name="toastNobodyHasChanges" xml:space="preserve">
-    <value>Bei niemanden etwas eingetragen!</value>
+    <value>Bei niemandem etwas eingetragen!</value>
   </data>
   <data name="toastNotAdded" xml:space="preserve">
     <value>Einfügen nicht möglich...</value>
@@ -478,7 +478,7 @@
     <value>Person nicht verfügbar! Bitte Guid überprüfen.</value>
   </data>
   <data name="toastRemoveNotBecauseNoEntity" xml:space="preserve">
-    <value>Löschen nicht möglich, da kein equivalenter Eintrag vorhanden.</value>
+    <value>Löschen nicht möglich, da kein äquivalenter Eintrag vorhanden.</value>
   </data>
   <data name="toastSaveError" xml:space="preserve">
     <value>Fehler beim Speichern.</value>
@@ -490,13 +490,13 @@
     <value>AccessToken erfolgreich abgerufen und eingetragen!</value>
   </data>
   <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
-    <value>erfolgreich festgelegt für die zu ladende Einzahlungen.</value>
+    <value>erfolgreich festgelegt für die zu ladenden Einzahlungen.</value>
   </data>
   <data name="toastSuccessfullyAdded" xml:space="preserve">
     <value>Einfügen erfolgreich!</value>
   </data>
   <data name="toastSuccessfullyOrderAmount" xml:space="preserve">
-    <value>erfolgreich festgelegt für die zu ladende Bestellungen.</value>
+    <value>erfolgreich festgelegt für die zu ladenden Bestellungen.</value>
   </data>
   <data name="toastSuccessfullyRemoved" xml:space="preserve">
     <value>erfolgreich entfernt!</value>
@@ -961,5 +961,34 @@ hiermit wird Ihnen bestätigt, dass am {1} um {2} eine Einzahlung in Höhe von {
   </data>
   <data name="changePersonField" xml:space="preserve">
     <value>Person</value>
+  </data>
+  <data name="notFoundTitle" xml:space="preserve">
+    <value>Seite nicht gefunden</value>
+  </data>
+  <data name="notFoundText" xml:space="preserve">
+    <value>Unter dieser Adresse gibt es leider nichts.</value>
+  </data>
+  <data name="navMenuToggle" xml:space="preserve">
+    <value>Navigationsmenü</value>
+  </data>
+  <data name="confirmAccessToken" xml:space="preserve">
+    <value>Mit diesem Token können Änderungen an bestehenden Datensätzen vorgenommen werden.
+HINWEIS: Zur Rückverfolgbarkeit wird jede Änderung inklusive des Initiators im Log der Essenskasse protokolliert!</value>
+  </data>
+  <data name="confirmNewAccessToken" xml:space="preserve">
+    <value>Sind Sie sicher, dass Sie einen neuen beantragen wollen?</value>
+  </data>
+  <data name="confirmLoadSettingsFromServer" xml:space="preserve">
+    <value>Gespeicherte Einstellungen VOM Server abfragen und lokale überschreiben?</value>
+  </data>
+  <data name="confirmSaveSettingsToServer" xml:space="preserve">
+    <value>Aktuelle Einstellungen ZUM Server übertragen und dort überschreiben?</value>
+  </data>
+  <data name="adminMailSubject" xml:space="preserve">
+    <value>Fehler in der Essenskasse</value>
+  </data>
+  <data name="adminMailBody" xml:space="preserve">
+    <value>Bitte Namen, Zeit (Tag, Monat, Stunde, Minute) und Art des Fehlers schildern. Dies meint eine Beschreibung, wie es bei der Bedienung zu dem Fehler kam, um ihn schneller isolieren und beheben zu können.
+Danke!</value>
   </data>
 </root>

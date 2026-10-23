@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="GuidofTheProviderToBeRemoved" xml:space="preserve">
-    <value>Код провайдера, который необходимо удалить</value>
+    <value>Guid поставщика, которого нужно удалить</value>
   </data>
   <data name="acceptChanges" xml:space="preserve">
     <value>Принять изменения</value>
@@ -127,7 +127,7 @@
     <value>Добавить</value>
   </data>
   <data name="addNewProvider" xml:space="preserve">
-    <value>Добавить нового провайдера.</value>
+    <value>Добавить нового поставщика.</value>
   </data>
   <data name="addPerson" xml:space="preserve">
     <value>Добавить человека</value>
@@ -139,7 +139,7 @@
     <value>Доступно</value>
   </data>
   <data name="buttonLoadMore" xml:space="preserve">
-    <value>загружать больше</value>
+    <value>загрузить ещё</value>
   </data>
   <data name="cannotBeChanged" xml:space="preserve">
     <value>(Изменить нельзя!)</value>
@@ -157,7 +157,7 @@
     <value>Закрыть</value>
   </data>
   <data name="coffeeFund" xml:space="preserve">
-    <value>Кофейный фонд</value>
+    <value>Кофейная касса</value>
   </data>
   <data name="colortheme" xml:space="preserve">
     <value>Цветовая схема</value>
@@ -175,7 +175,7 @@
     <value>Разместить заказ</value>
   </data>
   <data name="creditAmount" xml:space="preserve">
-    <value>Зачислите сумму!</value>
+    <value>Зачислить сумму!</value>
   </data>
   <data name="current" xml:space="preserve">
     <value>Текущий</value>
@@ -184,7 +184,7 @@
     <value>выбранный в данный момент</value>
   </data>
   <data name="dark" xml:space="preserve">
-    <value>Темный</value>
+    <value>Тёмная</value>
   </data>
   <data name="dashboard" xml:space="preserve">
     <value>Приборная панель</value>
@@ -193,61 +193,61 @@
     <value>Дата</value>
   </data>
   <data name="designator" xml:space="preserve">
-    <value>Назначение</value>
+    <value>Название</value>
   </data>
   <data name="editPerson" xml:space="preserve">
     <value>Редактировать человека</value>
   </data>
   <data name="email" xml:space="preserve">
-    <value>e-mail</value>
+    <value>E-mail</value>
   </data>
   <data name="emailAdminContact" xml:space="preserve">
     <value>Электронная почта для связи с администратором</value>
   </data>
   <data name="emailCashManagement" xml:space="preserve">
-    <value>правление вашим кассовым аппаратом</value>
+    <value>Администрация кассы</value>
   </data>
   <data name="emailDearSirMadam" xml:space="preserve">
-    <value>Уважаемый господин или госпожа</value>
+    <value>Уважаемый(ая)</value>
   </data>
   <data name="emailPositiv" xml:space="preserve">
-    <value>больше не является положительным.</value>
+    <value>и больше не является положительным.</value>
   </data>
   <data name="emailPositivButNotNegativ" xml:space="preserve">
-    <value>только на положительной территории.</value>
+    <value>и лишь немного в плюсе.</value>
   </data>
   <data name="emailRemaining" xml:space="preserve">
-    <value>Искренне ваш</value>
+    <value>С уважением</value>
   </data>
   <data name="emailRemedy" xml:space="preserve">
     <value>Пожалуйста, исправьте ситуацию!</value>
   </data>
   <data name="emailSubject" xml:space="preserve">
-    <value>Запрос на оплату в кассу</value>
+    <value>Требование об оплате: касса</value>
   </data>
   <data name="emailSubjectPositiv" xml:space="preserve">
     <value>Essenskasse - Информация об остатке на счете</value>
   </data>
   <data name="emailYouAreCurrently" xml:space="preserve">
-    <value>Вы находитесь с</value>
+    <value>Ваш текущий баланс составляет</value>
   </data>
   <data name="english" xml:space="preserve">
     <value>Английский</value>
   </data>
   <data name="entered" xml:space="preserve">
-    <value>Зарегистрированный</value>
+    <value>Введён</value>
   </data>
   <data name="error" xml:space="preserve">
     <value>Ошибка</value>
   </data>
   <data name="filter" xml:space="preserve">
-    <value>Фильтры</value>
+    <value>Фильтр</value>
   </data>
   <data name="german" xml:space="preserve">
     <value>Немецкий</value>
   </data>
   <data name="guid" xml:space="preserve">
-    <value>Гуид</value>
+    <value>Guid</value>
   </data>
   <data name="hide" xml:space="preserve">
     <value>скрыть</value>
@@ -256,10 +256,10 @@
     <value>История</value>
   </data>
   <data name="inCent" xml:space="preserve">
-    <value>в центе</value>
+    <value>в центах</value>
   </data>
   <data name="inconspicuous" xml:space="preserve">
-    <value>Незаметный</value>
+    <value>Без отклонений</value>
   </data>
   <data name="information" xml:space="preserve">
     <value>Информация</value>
@@ -268,28 +268,28 @@
     <value>Введите следующую сумму?</value>
   </data>
   <data name="language" xml:space="preserve">
-    <value>Языки</value>
+    <value>Язык</value>
   </data>
   <data name="lastDayMaybyIncomplete" xml:space="preserve">
     <value>Последний день может оказаться неполным!</value>
   </data>
   <data name="light" xml:space="preserve">
-    <value>Свет</value>
+    <value>Светлая</value>
   </data>
   <data name="limitValuePositivBalance" xml:space="preserve">
     <value>Предельное значение для положительного баланса</value>
   </data>
   <data name="loadData" xml:space="preserve">
-    <value>Данные о нагрузке</value>
+    <value>Загрузить данные</value>
   </data>
   <data name="loginFailedRetry" xml:space="preserve">
     <value>Вход в систему не удался, пожалуйста, введите свои данные повторно!</value>
   </data>
   <data name="logout" xml:space="preserve">
-    <value>Отменено!</value>
+    <value>Вы вышли из системы!</value>
   </data>
   <data name="modifyEntity" xml:space="preserve">
-    <value>Записи об изменениях</value>
+    <value>Изменить записи</value>
   </data>
   <data name="name" xml:space="preserve">
     <value>Имя</value>
@@ -301,46 +301,46 @@
     <value>Нет</value>
   </data>
   <data name="noProviderPleaseInsertBefore" xml:space="preserve">
-    <value>Провайдеров нет!\nПожалуйста, зарегистрируйтесь!</value>
+    <value>Нет поставщиков! Пожалуйста, сначала добавьте их!</value>
   </data>
   <data name="noSettingsAvailable" xml:space="preserve">
     <value>Никакие настройки не могут быть восстановлены! Пожалуйста, свяжитесь с администратором.</value>
   </data>
   <data name="notEntered" xml:space="preserve">
-    <value>Не зарегистрирован...</value>
+    <value>Не указано...</value>
   </data>
   <data name="notRequested" xml:space="preserve">
-    <value>Не запрашивается</value>
+    <value>Не запрошен</value>
   </data>
   <data name="nothingMoreToLoad" xml:space="preserve">
     <value>Никаких дополнительных данных для загрузки!</value>
   </data>
   <data name="noticeable" xml:space="preserve">
-    <value>Заметный</value>
+    <value>С отклонениями</value>
   </data>
   <data name="notify" xml:space="preserve">
     <value>Уведомить</value>
   </data>
   <data name="order" xml:space="preserve">
-    <value>заказ</value>
+    <value>Заказ</value>
   </data>
   <data name="orderHistory" xml:space="preserve">
     <value>История заказов</value>
   </data>
   <data name="ordersToBeLoaded" xml:space="preserve">
-    <value>Заказы, подлежащие загрузке</value>
+    <value>Заказы для загрузки</value>
   </data>
   <data name="overview" xml:space="preserve">
-    <value>обзор</value>
+    <value>Обзор</value>
   </data>
   <data name="payment" xml:space="preserve">
-    <value>Депозит</value>
+    <value>Платёж</value>
   </data>
   <data name="paymentsToBeLoaded" xml:space="preserve">
-    <value>Депозиты, подлежащие загрузке</value>
+    <value>Платежи для загрузки</value>
   </data>
   <data name="person" xml:space="preserve">
-    <value>Человек</value>
+    <value>Люди</value>
   </data>
   <data name="personRegistered" xml:space="preserve">
     <value>Зарегистрированные лица</value>
@@ -358,10 +358,10 @@
     <value>Удалить запись</value>
   </data>
   <data name="request" xml:space="preserve">
-    <value>Запрос</value>
+    <value>Запросить</value>
   </data>
   <data name="requestSavedSettings" xml:space="preserve">
-    <value>Настройки запросов</value>
+    <value>Запросить настройки</value>
   </data>
   <data name="russian" xml:space="preserve">
     <value>Русский</value>
@@ -379,10 +379,10 @@
     <value>Настройки успешно восстановлены с сервера!</value>
   </data>
   <data name="showNoticeablePersonRightDashboard" xml:space="preserve">
-    <value>Вывешивайте на видных местах справа/снизу приборной панели</value>
+    <value>Показывать заметных людей справа/снизу на панели</value>
   </data>
   <data name="singleColumn" xml:space="preserve">
-    <value>Одноколоночный</value>
+    <value>Один столбец</value>
   </data>
   <data name="submit" xml:space="preserve">
     <value>Отправить</value>
@@ -394,16 +394,16 @@
     <value>Успешно передано!</value>
   </data>
   <data name="swapColumns" xml:space="preserve">
-    <value>Поменяйте колонки местами</value>
+    <value>Поменять столбцы местами</value>
   </data>
   <data name="toastAdd" xml:space="preserve">
     <value>добавлено.</value>
   </data>
   <data name="toastAddedAndAvailable" xml:space="preserve">
-    <value>добавлены и доступны.</value>
+    <value>добавлено и доступно.</value>
   </data>
   <data name="toastAddedButNotAvailable" xml:space="preserve">
-    <value>добавлено; НО не доступно!</value>
+    <value>добавлено; НО недоступно!</value>
   </data>
   <data name="toastAdminCall" xml:space="preserve">
     <value>Пожалуйста, свяжитесь с администратором.</value>
@@ -412,7 +412,7 @@
     <value>Электронная почта администратора успешно введена!</value>
   </data>
   <data name="toastColorThemePost" xml:space="preserve">
-    <value>спасен!</value>
+    <value>сохранена!</value>
   </data>
   <data name="toastColorThemePre" xml:space="preserve">
     <value>Цветовая схема</value>
@@ -421,22 +421,22 @@
     <value>Ошибка при передаче...</value>
   </data>
   <data name="toastEventErrorRememberProcedurePlease" xml:space="preserve">
-    <value>В случае ошибок, пожалуйста, запомните процедуру регулировки!</value>
+    <value>При ошибках, пожалуйста, запомните, как их воспроизвести!</value>
   </data>
-  <data name="toastFilterPeronOff" xml:space="preserve">
-    <value>Фильтр для отключенных людей!</value>
+  <data name="toastFilterPersonOff" xml:space="preserve">
+    <value>Фильтр по людям выключен!</value>
   </data>
   <data name="toastFilterPersonOn" xml:space="preserve">
-    <value>Фильтр для включенных людей!</value>
+    <value>Фильтр по людям включён!</value>
   </data>
   <data name="toastFilterProviderOff" xml:space="preserve">
-    <value>Фильтр для провайдера отключен!</value>
+    <value>Фильтр по поставщикам выключен!</value>
   </data>
   <data name="toastFilterProviderOn" xml:space="preserve">
-    <value>Фильтр для провайдера включен!</value>
+    <value>Фильтр по поставщикам включён!</value>
   </data>
   <data name="toastGuidNotThere" xml:space="preserve">
-    <value>Guid не прощает!</value>
+    <value>Guid не назначен!</value>
   </data>
   <data name="toastLimitToValueSet" xml:space="preserve">
     <value>Предельное значение установлено на:</value>
@@ -454,28 +454,28 @@
     <value>Электронная почта не введена!</value>
   </data>
   <data name="toastNoGuidThere" xml:space="preserve">
-    <value>Никакого Гида!</value>
+    <value>Guid отсутствует!</value>
   </data>
   <data name="toastNoRemove" xml:space="preserve">
     <value>Удаление невозможно...</value>
   </data>
   <data name="toastNobodyHasChanges" xml:space="preserve">
-    <value>Ни с кем ничего не зарегистрировано!</value>
+    <value>Ни у кого ничего не внесено!</value>
   </data>
   <data name="toastNotAdded" xml:space="preserve">
     <value>Вставить невозможно...</value>
   </data>
   <data name="toastNothingRequested" xml:space="preserve">
-    <value>Ничего не найдено!</value>
+    <value>Ничего не получено!</value>
   </data>
   <data name="toastNothingToLoad" xml:space="preserve">
-    <value>Больше ничего нет в наличии!</value>
+    <value>Больше ничего загрузить нельзя!</value>
   </data>
   <data name="toastOrderSended" xml:space="preserve">
-    <value>Приказы переданы.</value>
+    <value>Заказы переданы.</value>
   </data>
   <data name="toastPersonNotAvailableCheckGuid" xml:space="preserve">
-    <value>Человек недоступен! Пожалуйста, проверьте гида.</value>
+    <value>Человек недоступен! Пожалуйста, проверьте Guid.</value>
   </data>
   <data name="toastRemoveNotBecauseNoEntity" xml:space="preserve">
     <value>Удаление невозможно, так как не существует эквивалентной записи.</value>
@@ -490,7 +490,7 @@
     <value>AccessToken успешно получен и введен!</value>
   </data>
   <data name="toastSuccessfullPaymentAmount" xml:space="preserve">
-    <value>успешно установлен для загрузки депозитов.</value>
+    <value>успешно установлен для загрузки платежей.</value>
   </data>
   <data name="toastSuccessfullyAdded" xml:space="preserve">
     <value>Вставка прошла успешно!</value>
@@ -499,7 +499,7 @@
     <value>успешно установлен для загрузки заказов.</value>
   </data>
   <data name="toastSuccessfullyRemoved" xml:space="preserve">
-    <value>успешно удалены!</value>
+    <value>успешно удалено!</value>
   </data>
   <data name="toastUpdateSuccessful" xml:space="preserve">
     <value>Обновление прошло успешно!</value>
@@ -520,7 +520,7 @@
     <value>Внимание</value>
   </data>
   <data name="welcome" xml:space="preserve">
-    <value>Теплый прием</value>
+    <value>Добро пожаловать</value>
   </data>
   <data name="yes" xml:space="preserve">
     <value>Да</value>
@@ -547,7 +547,7 @@
     <value>{0} из {1}</value>
   </data>
   <data name="sortBy" xml:space="preserve">
-    <value>Сортировка</value>
+    <value>Сортировать по</value>
   </data>
   <data name="sortNameAsc" xml:space="preserve">
     <value>Имя А–Я</value>
@@ -795,7 +795,7 @@
     <value>Примечание к записи: {0}</value>
   </data>
   <data name="emailConfirmClosing" xml:space="preserve">
-    <value>Ваше управление кассой</value>
+    <value>Администрация кассы</value>
   </data>
   <data name="sendConfirmation" xml:space="preserve">
     <value>Отправить подтверждение по e-mail</value>
@@ -961,5 +961,34 @@
   </data>
   <data name="changePersonField" xml:space="preserve">
     <value>Человек</value>
+  </data>
+  <data name="notFoundTitle" xml:space="preserve">
+    <value>Страница не найдена</value>
+  </data>
+  <data name="notFoundText" xml:space="preserve">
+    <value>К сожалению, по этому адресу ничего нет.</value>
+  </data>
+  <data name="navMenuToggle" xml:space="preserve">
+    <value>Меню навигации</value>
+  </data>
+  <data name="confirmAccessToken" xml:space="preserve">
+    <value>С помощью этого токена можно изменять существующие записи.
+ВНИМАНИЕ: Для отслеживаемости каждое изменение вместе с его автором записывается в журнал Essenskasse!</value>
+  </data>
+  <data name="confirmNewAccessToken" xml:space="preserve">
+    <value>Вы уверены, что хотите запросить новый?</value>
+  </data>
+  <data name="confirmLoadSettingsFromServer" xml:space="preserve">
+    <value>Получить сохранённые настройки С сервера и перезаписать локальные?</value>
+  </data>
+  <data name="confirmSaveSettingsToServer" xml:space="preserve">
+    <value>Отправить текущие настройки НА сервер и перезаписать сохранённые там?</value>
+  </data>
+  <data name="adminMailSubject" xml:space="preserve">
+    <value>Ошибка в Essenskasse</value>
+  </data>
+  <data name="adminMailBody" xml:space="preserve">
+    <value>Укажите, пожалуйста, своё имя, время (день, месяц, час, минута) и характер ошибки. То есть опишите, как возникла ошибка при работе, чтобы её можно было быстрее найти и исправить.
+Спасибо!</value>
   </data>
 </root>

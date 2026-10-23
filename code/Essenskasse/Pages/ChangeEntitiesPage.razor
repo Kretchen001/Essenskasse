@@ -58,7 +58,7 @@
                         <ul class="ek-hist">
                             @foreach (Payment x in month) {
                                 <li class="@(x.Amount.IsPositiv() ? "" : "is-negative")">
-                                    <span class="ek-hist-date">@x.DateTime.ToString("ddd, dd.MM. HH:mm")</span>
+                                    <span class="ek-hist-date">@DateText.WeekdayDayMonthTime(x.DateTime)</span>
                                     <span class="ek-chg-main">
                                         <span class="ek-chg-person">@PersonName(x.ReferencedPerson)</span>
                                         @if (!string.IsNullOrWhiteSpace(x.Comment)) {
@@ -97,7 +97,7 @@
                         <ul class="ek-hist">
                             @foreach (Order x in month) {
                                 <li>
-                                    <span class="ek-hist-date">@x.DateTime.ToString("ddd, dd.MM. HH:mm")</span>
+                                    <span class="ek-hist-date">@DateText.WeekdayDayMonthTime(x.DateTime)</span>
                                     <span class="ek-chg-main">
                                         <span class="ek-chg-person">@PersonName(x.ReferencedPerson)</span>
                                         <span class="ek-chg-sub">@x.Provider.Designation</span>
@@ -126,7 +126,7 @@
             <EkDialog Open="EditOpen" Title="@EditTitle" OnClose="CloseEdit">
                 <ChildContent>
                     <form class="ek-chg-form" @onsubmit="SaveAsync" @onsubmit:preventDefault>
-                        <p class="ek-chg-date">@EditDate.ToString("dddd, dd. MMMM yyyy, HH:mm")</p>
+                        <p class="ek-chg-date">@EditDate.ToString("f")</p>
 
                         @if (TokenMissing) {
                             <p class="ek-hint is-warn" role="alert">@_loc[nameof(RessourceAppStrings.changeTokenMissing)]</p>

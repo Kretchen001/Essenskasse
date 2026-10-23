@@ -356,9 +356,7 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <returns></returns>
         private async Task RequestAccessTokenForChanges() {
-            if (!await JsRuntime.InvokeAsync<bool>("confirm", "Mit diesem Token können Änderungen an bestehenden Datensätzen vollzogen werden." +
-                "\n" +
-                "HINWEIS: Zur Rückverfolgbarkeit wird jede Änderung inklusive des Initiators im Log der Essenskasse getrackt!")) {
+            if (!await JsRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.confirmAccessToken)].Value)) {
                 return;
             }
             
@@ -393,7 +391,7 @@ namespace Essenskasse.Pages {
         /// <summary></summary>
         /// <returns></returns>
         private async Task RequestNewAccessTokenForChanges() {
-            if (await JsRuntime.InvokeAsync<bool>("confirm", "Sicher, daß Sie einen neuen beantragen wollen?")) {
+            if (await JsRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.confirmNewAccessToken)].Value)) {
                 await RequestAccessTokenForChanges();
             }
         }
@@ -425,10 +423,8 @@ namespace Essenskasse.Pages {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoEmailEntered)], ToastLevel.Info);
             }
             else {
-                string subject = "Fehler in der \"Essenkasse\"";
-                string body = "Bitte Namen, Zeit (Tag, Monat, Stunde, Minute) und Art des Fehlers schildern. " +
-                    "Dies meint eine Beschreibung, wie es bei der Bedienung zu dem Fehler kam, um ihn schneller isolieren und beheben zu können." +
-                    "\nDanke!";
+                string subject = _loc[nameof(RessourceAppStrings.adminMailSubject)];
+                string body = _loc[nameof(RessourceAppStrings.adminMailBody)];
                 await JsRuntime.InvokeAsync<object>(
                     "blazorExtensions.SendLocalEmail",
                     new object[] {
@@ -442,7 +438,7 @@ namespace Essenskasse.Pages {
 
         /// <summary>Holt die gespeicherten Einstellungen vom Server und ersetzt die lokalen (nach Rueckfrage).</summary>
         private async Task RequestOnlineSettingsForThisUser() {
-            if (!await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen VOM Server abfragen und lokale überschreiben?")) {
+            if (!await JsRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.confirmLoadSettingsFromServer)].Value)) {
                 return;
             }
             switch (await UserSettings.LoadFromServerAsync()) {
@@ -465,7 +461,7 @@ namespace Essenskasse.Pages {
 
         /// <summary>Speichert die aktuellen Einstellungen auf dem Server (nach Rueckfrage).</summary>
         private async Task SaveSettingsForThisUserOnline() {
-            if (!await JsRuntime.InvokeAsync<bool>("confirm", "Gespeicherte Einstellungen ZUM Server übertragen und online überschreiben?")) {
+            if (!await JsRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.confirmSaveSettingsToServer)].Value)) {
                 return;
             }
             switch (await UserSettings.SaveToServerAsync()) {

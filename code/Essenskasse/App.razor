@@ -1,13 +1,14 @@
-﻿<CascadingAuthenticationState>
+﻿@inject IStringLocalizer<App> _loc
+<CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
-            <PageTitle>Not found</PageTitle>
+            <PageTitle>@_loc[nameof(RessourceAppStrings.notFoundTitle)]</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
+                <p role="alert">@_loc[nameof(RessourceAppStrings.notFoundText)]</p>
             </LayoutView>
         </NotFound>
     </Router>
