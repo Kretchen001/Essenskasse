@@ -28,15 +28,8 @@
   "editPerson": "Edit person",
   "email": "E-Mail",
   "emailAdminContact": "Email for admin contact",
-  "emailCashManagement": "Your cash management",
-  "emailDearSirMadam": "Dear",
-  "emailPositiv": "which is no longer positive.",
-  "emailPositivButNotNegativ": "which is only just in the black.",
-  "emailRemaining": "Yours sincerely",
-  "emailRemedy": "Please remedy this!",
   "emailSubject": "Payment request – cash fund",
   "emailSubjectPositiv": "Essenskasse - Information about account balance",
-  "emailYouAreCurrently": "Your current balance is",
   "english": "English",
   "entered": "Entered",
   "error": "Error",
@@ -319,5 +312,7 @@
   "reverseConfirmButton": "Yes, reverse",
   "reverseDone": "Booking reversed.",
   "reversedLabel": "reversed",
-  "reversalLabel": "Reversal"
+  "reversalLabel": "Reversal",
+  "emailBodyNegative": "Dear {0},\n\nYour current balance is:\n    {1}\n\nThis means you are no longer in credit. Please remedy this!\n\nYours sincerely\nYour cash management",
+  "emailBodyPositive": "Dear {0},\n\nYour current balance is:\n    {1}\n\nThis means you are only just in the black.\n\nYours sincerely\nYour cash management"
 }

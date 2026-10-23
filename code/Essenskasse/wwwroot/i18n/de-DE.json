@@ -28,15 +28,8 @@
   "editPerson": "Person bearbeiten",
   "email": "E-Mail",
   "emailAdminContact": "E-Mail für Admin-Kontakt",
-  "emailCashManagement": "Ihre Kassenverwaltung",
-  "emailDearSirMadam": "Sehr geehrte(r)",
-  "emailPositiv": "nicht mehr im Positiven.",
-  "emailPositivButNotNegativ": "nur noch knapp im Plus.",
-  "emailRemaining": "Mit freundlichen Grüßen verbleibend",
-  "emailRemedy": "Bitte Abhilfe schaffen!",
   "emailSubject": "Zahlungsaufforderung Kasse",
   "emailSubjectPositiv": "Essenskasse - Information zum Kontostand",
-  "emailYouAreCurrently": "Sie befinden sich mit",
   "english": "Englisch",
   "entered": "Eingetragen",
   "error": "Fehler",
@@ -319,5 +312,7 @@
   "reverseConfirmButton": "Ja, stornieren",
   "reverseDone": "Buchung storniert.",
   "reversedLabel": "storniert",
-  "reversalLabel": "Storno"
+  "reversalLabel": "Storno",
+  "emailBodyNegative": "Sehr geehrte(r) {0},\n\nIhr aktueller Kontostand beträgt:\n    {1}\n\nSie sind damit nicht mehr im Positiven. Bitte schaffen Sie Abhilfe!\n\nMit freundlichen Grüßen\nIhre Kassenverwaltung",
+  "emailBodyPositive": "Sehr geehrte(r) {0},\n\nIhr aktueller Kontostand beträgt:\n    {1}\n\nSie sind damit nur noch knapp im Plus.\n\nMit freundlichen Grüßen\nIhre Kassenverwaltung"
 }

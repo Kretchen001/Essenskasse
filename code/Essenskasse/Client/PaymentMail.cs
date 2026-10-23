@@ -10,24 +10,14 @@ namespace Essenskasse.Client {
     /// <summary>Baut die Zahlungsaufforderung (bzw. Kontostandsmeldung) und oeffnet das lokale Mailprogramm.</summary>
     public static class PaymentMail {
 
-        /// <summary>Betreff und Text der Mail fuer die Person in einer Sprache; bei positivem Saldo eine reine Information.</summary>
+        /// <summary>Betreff und Text der Mail fuer die Person in einer Sprache; bei positivem Saldo eine reine Information.
+        /// Der Text ist je Sprache ein ganzer Text mit den Platzhaltern {0} Name und {1} Saldo, damit die Uebersetzung
+        /// die Wortstellung frei waehlen kann.</summary>
         public static (string Subject, string Body) Build(TextService texts, string language, Person person) {
-            string T(string key) => texts.Get(language, key);
-            string subject = T(nameof(RessourceAppStrings.emailSubject));
-            string body = T(nameof(RessourceAppStrings.emailDearSirMadam)) + " " + person.Name + ",\n\n" +
-                            T(nameof(RessourceAppStrings.emailYouAreCurrently)) + "\n" +
-                            "\xA0\xA0\xA0\xA0" + person.Saldo.ToString() + "\n";
-            if (person.Saldo.IsPositiv()) {
-                subject = T(nameof(RessourceAppStrings.emailSubjectPositiv));
-                body += T(nameof(RessourceAppStrings.emailPositivButNotNegativ));
-            }
-            else {
-                body += T(nameof(RessourceAppStrings.emailPositiv)) + "\n\n" +
-                            T(nameof(RessourceAppStrings.emailRemedy));
-            }
-            body += "\n\n" + T(nameof(RessourceAppStrings.emailRemaining)) + "\n" +
-                            T(nameof(RessourceAppStrings.emailCashManagement));
-            return (subject, body);
+            bool positive = person.Saldo.IsPositiv();
+            string subject = texts.Get(language, positive ? nameof(RessourceAppStrings.emailSubjectPositiv) : nameof(RessourceAppStrings.emailSubject));
+            string template = texts.Get(language, positive ? nameof(RessourceAppStrings.emailBodyPositive) : nameof(RessourceAppStrings.emailBodyNegative));
+            return (subject, string.Format(template, person.Name, person.Saldo.ToString()));
         }
 
         /// <summary>Oeffnet das Mailprogramm mit der vorbereiteten Mail (Sprache der Person, danach die des Benutzers). Ohne E-Mail-Adresse kommt ein Hinweis.</summary>

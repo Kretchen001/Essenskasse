@@ -90,13 +90,6 @@
         insertFollowingAmount,
         emailSubject,
         emailSubjectPositiv,
-        emailDearSirMadam,
-        emailYouAreCurrently,
-        emailPositiv,
-        emailPositivButNotNegativ,
-        emailRemedy,
-        emailRemaining,
-        emailCashManagement,
         inCent,
         comment,
         toastUpdateSuccessful,
@@ -322,5 +315,7 @@
         reverseDone,
         reversedLabel,
         reversalLabel,
+        emailBodyNegative,
+        emailBodyPositive,
     }
 }

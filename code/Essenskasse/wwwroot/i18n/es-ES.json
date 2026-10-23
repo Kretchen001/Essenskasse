@@ -28,15 +28,8 @@
   "editPerson": "Editar persona",
   "email": "E-Mail",
   "emailAdminContact": "Correo electrónico de contacto administrativo",
-  "emailCashManagement": "Su gestión de caja",
-  "emailDearSirMadam": "Estimado/a",
-  "emailPositiv": "y ya no es positivo.",
-  "emailPositivButNotNegativ": "y está apenas en positivo.",
-  "emailRemaining": "Le saluda atentamente",
-  "emailRemedy": "Por favor, ponga remedio a esta situación.",
   "emailSubject": "Solicitud de pago de la caja",
   "emailSubjectPositiv": "Essenskasse - Información sobre el saldo de la cuenta",
-  "emailYouAreCurrently": "Su saldo actual es de",
   "english": "Inglés",
   "entered": "Introducido",
   "error": "Error",
@@ -319,5 +312,7 @@
   "reverseConfirmButton": "Sí, anular",
   "reverseDone": "Movimiento anulado.",
   "reversedLabel": "anulado",
-  "reversalLabel": "Anulación"
+  "reversalLabel": "Anulación",
+  "emailBodyNegative": "Estimado/a {0}:\n\nSu saldo actual es de:\n    {1}\n\nCon ello ya no tiene saldo positivo. Por favor, ponga remedio a esta situación.\n\nLe saluda atentamente\nSu gestión de caja",
+  "emailBodyPositive": "Estimado/a {0}:\n\nSu saldo actual es de:\n    {1}\n\nCon ello está apenas en positivo.\n\nLe saluda atentamente\nSu gestión de caja"
 }
