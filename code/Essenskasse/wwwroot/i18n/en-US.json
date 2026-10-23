@@ -309,5 +309,9 @@
   "exportColAmount": "Amount",
   "exportColCurrency": "Currency",
   "exportKindPayment": "Payment",
-  "exportKindOrder": "Order"
+  "exportKindOrder": "Order",
+  "massMailInfo": "{0} people below the limit, {1} of them with an email address. Each email is prepared separately in the mail program.",
+  "massMailNext": "Prepare payment request for {0} ({1}/{2})",
+  "massMailReset": "Start over",
+  "massMailDone": "All payment requests have been prepared."
 }

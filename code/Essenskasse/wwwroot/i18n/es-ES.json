@@ -309,5 +309,9 @@
   "exportColAmount": "Importe",
   "exportColCurrency": "Moneda",
   "exportKindPayment": "Ingreso",
-  "exportKindOrder": "Pedido"
+  "exportKindOrder": "Pedido",
+  "massMailInfo": "{0} personas por debajo del límite, {1} de ellas con dirección de correo. Cada correo se prepara por separado en el programa de correo.",
+  "massMailNext": "Preparar solicitud de pago para {0} ({1}/{2})",
+  "massMailReset": "Empezar de nuevo",
+  "massMailDone": "Todas las solicitudes de pago están preparadas."
 }

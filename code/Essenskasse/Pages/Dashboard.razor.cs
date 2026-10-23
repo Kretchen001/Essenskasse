@@ -49,6 +49,34 @@ namespace Essenskasse.Pages {
 
         private Money currentCashBalance = new Money(0, 0);
 
+        /// <summary>Personen, fuer die in dieser Sitzung schon eine Zahlungsaufforderung vorbereitet wurde.</summary>
+        private readonly HashSet<Guid> mailed = [];
+
+        /// <summary>Auffaellige Personen mit E-Mail-Adresse: die Empfaenger der Zahlungsaufforderungen.</summary>
+        private List<Person> MailCandidates => NoticeablePersons.Where(x => !string.IsNullOrWhiteSpace(x.Email)).ToList();
+
+        private int MailDone => MailCandidates.Count(x => mailed.Contains(x.Guid));
+
+        private Person? NextMailPerson => MailCandidates.FirstOrDefault(x => !mailed.Contains(x.Guid));
+
+        /// <summary>Bereitet die Zahlungsaufforderung fuer die naechste Person vor. Das Mailprogramm oeffnet immer eine Mail
+        /// pro Klick (jede Mail hat Namen und Saldo der Person), deshalb geht es Person fuer Person weiter.</summary>
+        private async Task PrepareNextMail() {
+            Person? next = NextMailPerson;
+            if (next is null) {
+                return;
+            }
+            mailed.Add(next.Guid);
+            await PaymentMail.SendAsync(JSRuntime, Texts, _loc, ToastService, next);
+            if (NextMailPerson is null) {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.massMailDone)], ToastLevel.Success);
+            }
+        }
+
+        private void ResetMails() {
+            mailed.Clear();
+        }
+
         protected override async Task OnInitializedAsync() {
             await RequestAllPerson();
             CurrentCashBalanceCalculate();

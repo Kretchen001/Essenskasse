@@ -8,6 +8,7 @@
 @inject AppDataService AppData
 @inject UserSettingsStore UserSettings
 @inject ToastService ToastService
+@inject TextService Texts
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.dashboard)]</PageTitle>
 
@@ -60,6 +61,29 @@
             </p>
         </div>
     </section>
+
+    <AuthorizeView>
+        <Authorized>
+            @if (MailCandidates.Count > 0) {
+                <section class="ek-add ek-massmail">
+                    <p class="ek-hint">@(string.Format(_loc[nameof(RessourceAppStrings.massMailInfo)].Value, noticeable.Count, MailCandidates.Count))</p>
+                    <div class="ek-edit-actions">
+                        @if (NextMailPerson is not null) {
+                            <button type="button" class="ek-btn ek-btn-primary" @onclick="PrepareNextMail">
+                                @(string.Format(_loc[nameof(RessourceAppStrings.massMailNext)].Value, NextMailPerson.Name, MailDone + 1, MailCandidates.Count))
+                            </button>
+                        }
+                        else {
+                            <span class="ek-edit-state">@_loc[nameof(RessourceAppStrings.massMailDone)]</span>
+                        }
+                        @if (mailed.Count > 0) {
+                            <button type="button" class="ek-btn" @onclick="ResetMails">@_loc[nameof(RessourceAppStrings.massMailReset)]</button>
+                        }
+                    </div>
+                </section>
+            }
+        </Authorized>
+    </AuthorizeView>
 
     @if (IsSingleListWish) {
         <div class="ek-grid">

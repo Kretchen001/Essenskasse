@@ -309,5 +309,9 @@
   "exportColAmount": "Сумма",
   "exportColCurrency": "Валюта",
   "exportKindPayment": "Взнос",
-  "exportKindOrder": "Заказ"
+  "exportKindOrder": "Заказ",
+  "massMailInfo": "{0} человек ниже лимита, у {1} из них есть адрес электронной почты. Каждое письмо готовится отдельно в почтовой программе.",
+  "massMailNext": "Подготовить требование об оплате для {0} ({1}/{2})",
+  "massMailReset": "Начать заново",
+  "massMailDone": "Все требования об оплате подготовлены."
 }

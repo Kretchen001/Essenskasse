@@ -312,5 +312,9 @@
         exportColCurrency,
         exportKindPayment,
         exportKindOrder,
+        massMailInfo,
+        massMailNext,
+        massMailReset,
+        massMailDone,
     }
 }
