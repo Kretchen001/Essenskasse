@@ -337,5 +337,16 @@
         factOrdersTotal,
         factDifference,
         factOrdersPerMonth,
+        minusTitle,
+        minusHint,
+        minusNow,
+        minusEver,
+        minusAverageShare,
+        minusPerson,
+        minusShare,
+        minusDays,
+        minusPhases,
+        minusLongest,
+        minusBalance,
     }
 }

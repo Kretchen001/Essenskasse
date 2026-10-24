@@ -334,5 +334,16 @@
   "factPaymentsTotal": "Einzahlungen gesamt",
   "factOrdersTotal": "Bestellungen gesamt",
   "factDifference": "Differenz",
-  "factOrdersPerMonth": "Bestellungen pro Monat (Ø)"
+  "factOrdersPerMonth": "Bestellungen pro Monat (Ø)",
+  "minusTitle": "Wer war im Minus?",
+  "minusHint": "„Im Minus“ heißt: Saldo höchstens {0} (Grenzwert aus den Einstellungen des Dashboards). Die Zeitanteile beziehen sich auf den gewählten Zeitraum.",
+  "minusNow": "Aktuell im Minus",
+  "minusEver": "Mindestens einmal im Minus",
+  "minusAverageShare": "Ø Zeitanteil im Minus",
+  "minusPerson": "Person",
+  "minusShare": "Zeit im Minus",
+  "minusDays": "Tage",
+  "minusPhases": "Phasen",
+  "minusLongest": "Längste (Tage)",
+  "minusBalance": "Saldo am Ende"
 }

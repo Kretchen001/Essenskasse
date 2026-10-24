@@ -334,5 +334,16 @@
   "factPaymentsTotal": "Payments in total",
   "factOrdersTotal": "Orders in total",
   "factDifference": "Difference",
-  "factOrdersPerMonth": "Orders per month (avg.)"
+  "factOrdersPerMonth": "Orders per month (avg.)",
+  "minusTitle": "Who was in the red?",
+  "minusHint": "“In the red” means: balance at most {0} (the dashboard limit from the settings). Time shares refer to the selected period.",
+  "minusNow": "Currently in the red",
+  "minusEver": "In the red at least once",
+  "minusAverageShare": "Avg. share of time in the red",
+  "minusPerson": "Person",
+  "minusShare": "Time in the red",
+  "minusDays": "Days",
+  "minusPhases": "Phases",
+  "minusLongest": "Longest (days)",
+  "minusBalance": "Closing balance"
 }

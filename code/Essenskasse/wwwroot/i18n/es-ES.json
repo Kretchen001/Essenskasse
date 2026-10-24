@@ -334,5 +334,16 @@
   "factPaymentsTotal": "Ingresos en total",
   "factOrdersTotal": "Pedidos en total",
   "factDifference": "Diferencia",
-  "factOrdersPerMonth": "Pedidos por mes (media)"
+  "factOrdersPerMonth": "Pedidos por mes (media)",
+  "minusTitle": "¿Quién estuvo en números rojos?",
+  "minusHint": "«En números rojos» significa: saldo como máximo {0} (límite del panel en los ajustes). Los porcentajes se refieren al periodo seleccionado.",
+  "minusNow": "Ahora en rojos",
+  "minusEver": "Al menos una vez en rojos",
+  "minusAverageShare": "Porcentaje medio de tiempo en rojos",
+  "minusPerson": "Persona",
+  "minusShare": "Tiempo en rojos",
+  "minusDays": "Días",
+  "minusPhases": "Fases",
+  "minusLongest": "Más larga (días)",
+  "minusBalance": "Saldo final"
 }

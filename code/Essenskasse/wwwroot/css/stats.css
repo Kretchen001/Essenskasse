@@ -152,3 +152,48 @@ body.Dark .ek-pg-stats {
     border-radius: 3px;
     background: var(--ek-series);
 }
+
+.ek-stat-tablewrap {
+    overflow-x: auto;
+    margin-top: 0.75rem;
+}
+
+.ek-stat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+    .ek-stat-table th,
+    .ek-stat-table td {
+        padding: 0.35rem 0.5rem;
+        text-align: left;
+        border-bottom: 1px solid var(--ek-border, rgba(128, 128, 128, 0.3));
+        white-space: nowrap;
+    }
+
+    .ek-stat-table .num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ek-stat-table tr.is-minus td:first-child {
+        font-weight: 600;
+    }
+
+.ek-sharebar {
+    display: inline-block;
+    width: 5rem;
+    height: 0.6rem;
+    margin-right: 0.4rem;
+    border-radius: 3px;
+    background: rgba(128, 128, 128, 0.25);
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+    .ek-sharebar > span {
+        display: block;
+        height: 100%;
+        background: var(--ek-chart-3);
+    }

@@ -334,5 +334,16 @@
   "factPaymentsTotal": "Взносы всего",
   "factOrdersTotal": "Заказы всего",
   "factDifference": "Разница",
-  "factOrdersPerMonth": "Заказы в месяц (в среднем)"
+  "factOrdersPerMonth": "Заказы в месяц (в среднем)",
+  "minusTitle": "Кто был в минусе?",
+  "minusHint": "«В минусе» означает: баланс не выше {0} (предел панели из настроек). Доли времени относятся к выбранному периоду.",
+  "minusNow": "Сейчас в минусе",
+  "minusEver": "Хотя бы раз в минусе",
+  "minusAverageShare": "Средняя доля времени в минусе",
+  "minusPerson": "Человек",
+  "minusShare": "Время в минусе",
+  "minusDays": "Дней",
+  "minusPhases": "Фаз",
+  "minusLongest": "Самая длинная (дней)",
+  "minusBalance": "Баланс на конец"
 }

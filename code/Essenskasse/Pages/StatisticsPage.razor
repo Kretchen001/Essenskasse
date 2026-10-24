@@ -6,6 +6,7 @@
 @inject ToastService ToastService
 @inject NavigationManager Nav
 @inject AuthStateService AuthState
+@inject AppDataService AppData
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.statistics)]</PageTitle>
 
@@ -59,6 +60,7 @@
             else if (fromDate.Date <= toDate.Date) {
                 <CashHistoryCard Data="data" From="fromDate" To="toDate" />
                 <MonthlyFlowCard Data="data" From="fromDate" To="toDate" />
+                <MinusCard Data="data" From="fromDate" To="toDate" LimitCents="AppData.DashboardMoneyLimit.ToTotalCents()" />
             }
         </div>
     </Authorized>
