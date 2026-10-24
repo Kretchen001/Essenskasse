@@ -23,7 +23,8 @@
                     </rect>
                 }
                 @if (i % LabelStep == 0) {
-                    <SvgLabel X="@F(GroupCenter(i))" Y="@F(Height - 10)" Anchor="middle">@Labels[i]</SvgLabel>
+                    string label = Labels[i];
+                    <SvgLabel X="@F(GroupCenter(i))" Y="@F(Height - 10)" Anchor="middle">@label</SvgLabel>
                 }
             }
         </svg>
