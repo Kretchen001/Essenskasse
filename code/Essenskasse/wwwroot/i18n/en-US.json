@@ -314,5 +314,19 @@
   "reversedLabel": "reversed",
   "reversalLabel": "Reversal",
   "emailBodyNegative": "Dear {0},\n\nYour current balance is:\n    {1}\n\nThis means you are no longer in credit. Please remedy this!\n\nYours sincerely\nYour cash management",
-  "emailBodyPositive": "Dear {0},\n\nYour current balance is:\n    {1}\n\nThis means you are only just in the black.\n\nYours sincerely\nYour cash management"
+  "emailBodyPositive": "Dear {0},\n\nYour current balance is:\n    {1}\n\nThis means you are only just in the black.\n\nYours sincerely\nYour cash management",
+  "statistics": "Statistics",
+  "statsHint": "Statistics from all payments and orders. Reversed bookings and their offsetting entries cancel each other out.",
+  "statsRange3": "3 months",
+  "statsRange12": "12 months",
+  "statsRangeAll": "All",
+  "statsLoading": "Loading data …",
+  "statsNoData": "There is no data for this period.",
+  "cashHistoryTitle": "Cash balance over time",
+  "cashHistoryHint": "Cash balance at the end of each day (sum of all balances).",
+  "factStart": "Balance at start",
+  "factEnd": "Balance at end",
+  "factChange": "Change",
+  "factLowest": "Lowest balance",
+  "factHighest": "Highest balance"
 }

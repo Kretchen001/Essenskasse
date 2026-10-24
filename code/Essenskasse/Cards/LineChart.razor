@@ -1,0 +1,33 @@
+﻿@using Modells.Statistics
+@inject IStringLocalizer<App> _loc
+
+<figure class="ek-chart">
+    @if (Points.Count < 2) {
+        <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.statsNoData)]</p>
+    }
+    else {
+        <svg class="ek-chart-svg" viewBox="0 0 @F(Width) @F(Height)" role="img" aria-label="@Title">
+            @foreach (long tick in YTicks) {
+                <line class="ek-chart-grid" x1="@F(Left)" x2="@F(Width - Right)" y1="@F(Y(tick))" y2="@F(Y(tick))" />
+                <text class="ek-chart-axis" x="@F(Left - 8)" y="@F(Y(tick) + 4)" text-anchor="end">@FormatValue(tick)</text>
+            }
+            @if (YLow < 0 && YHigh > 0) {
+                <line class="ek-chart-zero" x1="@F(Left)" x2="@F(Width - Right)" y1="@F(Y(0))" y2="@F(Y(0))" />
+            }
+            @if (ReferenceLine is not null && ReferenceLine > YLow && ReferenceLine < YHigh) {
+                <line class="ek-chart-ref" x1="@F(Left)" x2="@F(Width - Right)" y1="@F(Y(ReferenceLine.Value))" y2="@F(Y(ReferenceLine.Value))" />
+            }
+            @foreach ((int index, string label) in XLabels) {
+                <text class="ek-chart-axis" x="@F(X(index))" y="@F(Height - 8)"
+                      text-anchor="@(index == 0 ? "start" : index == Points.Count - 1 ? "end" : "middle")">@label</text>
+            }
+            <path class="ek-chart-area" d="@AreaPath" />
+            <polyline class="ek-chart-line" points="@LinePoints" />
+            @for (int i = 0; i < Points.Count; i++) {
+                <rect class="ek-chart-hit" x="@F(X(i) - HitWidth / 2)" y="@F(Top)" width="@F(HitWidth)" height="@F(Height - Top - Bottom)">
+                    <title>@Points[i].Day.ToString("d"): @FormatValue(Points[i].Cents)</title>
+                </rect>
+            }
+        </svg>
+    }
+</figure>

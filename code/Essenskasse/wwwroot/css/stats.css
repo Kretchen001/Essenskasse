@@ -1,0 +1,118 @@
+﻿/* Auswertungen: Karten und SVG-Diagramme. Farben aus den Theme-Variablen (theme.css). */
+
+.ek-pg-stats {
+    --ek-chart-1: hsl(var(--ek-hue) 62% 34%);
+    --ek-chart-2: hsl(calc(var(--ek-hue) + 150) 48% 40%);
+    --ek-chart-3: hsl(calc(var(--ek-hue) - 70) 55% 42%);
+    --ek-chart-4: hsl(calc(var(--ek-hue) + 70) 50% 40%);
+}
+
+body.Dark .ek-pg-stats {
+    --ek-chart-1: hsl(var(--ek-hue) 60% 62%);
+    --ek-chart-2: hsl(calc(var(--ek-hue) + 150) 48% 62%);
+    --ek-chart-3: hsl(calc(var(--ek-hue) - 70) 55% 66%);
+    --ek-chart-4: hsl(calc(var(--ek-hue) + 70) 50% 62%);
+}
+
+.ek-stat {
+    margin-top: 1.25rem;
+    padding: 1rem 1.25rem 1.25rem;
+    border: 1px solid var(--ek-line);
+    border-radius: 14px;
+    background: var(--ek-surface);
+}
+
+.ek-stat-title {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+}
+
+.ek-stat-hint {
+    margin: 0 0 0.75rem;
+    color: var(--ek-muted);
+    font-size: 0.9rem;
+}
+
+.ek-stat-range .ek-stat-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+.ek-stat-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.75rem 1rem;
+    margin: 0.75rem 0 0;
+}
+
+    .ek-stat-facts dt {
+        color: var(--ek-muted);
+        font-size: 0.8rem;
+        font-weight: 400;
+    }
+
+    .ek-stat-facts dd {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .ek-stat-facts small {
+        color: var(--ek-muted);
+        font-weight: 400;
+    }
+
+.ek-chart {
+    margin: 0;
+}
+
+.ek-chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.ek-chart-grid {
+    stroke: var(--ek-line);
+    stroke-width: 1;
+}
+
+.ek-chart-zero {
+    stroke: var(--ek-line-strong);
+    stroke-width: 1.5;
+}
+
+.ek-chart-ref {
+    stroke: var(--ek-bad);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 4;
+}
+
+.ek-chart-axis {
+    fill: var(--ek-muted);
+    font-size: 11px;
+}
+
+.ek-chart-line {
+    fill: none;
+    stroke: var(--ek-chart-1);
+    stroke-width: 2.25;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.ek-chart-area {
+    fill: var(--ek-chart-1);
+    fill-opacity: 0.12;
+    stroke: none;
+}
+
+.ek-chart-hit {
+    fill: transparent;
+}
+
+    .ek-chart-hit:hover {
+        fill: var(--ek-chart-1);
+        fill-opacity: 0.1;
+    }

@@ -314,5 +314,19 @@
   "reversedLabel": "storniert",
   "reversalLabel": "Storno",
   "emailBodyNegative": "Sehr geehrte(r) {0},\n\nIhr aktueller Kontostand beträgt:\n    {1}\n\nSie sind damit nicht mehr im Positiven. Bitte schaffen Sie Abhilfe!\n\nMit freundlichen Grüßen\nIhre Kassenverwaltung",
-  "emailBodyPositive": "Sehr geehrte(r) {0},\n\nIhr aktueller Kontostand beträgt:\n    {1}\n\nSie sind damit nur noch knapp im Plus.\n\nMit freundlichen Grüßen\nIhre Kassenverwaltung"
+  "emailBodyPositive": "Sehr geehrte(r) {0},\n\nIhr aktueller Kontostand beträgt:\n    {1}\n\nSie sind damit nur noch knapp im Plus.\n\nMit freundlichen Grüßen\nIhre Kassenverwaltung",
+  "statistics": "Auswertung",
+  "statsHint": "Auswertungen aus allen Einzahlungen und Bestellungen. Stornierte Buchungen und ihre Gegenbuchungen heben sich auf.",
+  "statsRange3": "3 Monate",
+  "statsRange12": "12 Monate",
+  "statsRangeAll": "Alles",
+  "statsLoading": "Daten werden geladen …",
+  "statsNoData": "Für diesen Zeitraum gibt es keine Daten.",
+  "cashHistoryTitle": "Kassenverlauf",
+  "cashHistoryHint": "Kassenstand am Ende jedes Tages (Summe aller Salden).",
+  "factStart": "Stand am Anfang",
+  "factEnd": "Stand am Ende",
+  "factChange": "Veränderung",
+  "factLowest": "Tiefster Stand",
+  "factHighest": "Höchster Stand"
 }

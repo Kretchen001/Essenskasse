@@ -1,0 +1,39 @@
+﻿@using Modells.Statistics
+@inject IStringLocalizer<App> _loc
+
+<section class="ek-stat">
+    <h3 class="ek-stat-title">@_loc[nameof(RessourceAppStrings.cashHistoryTitle)]</h3>
+    <p class="ek-stat-hint">@_loc[nameof(RessourceAppStrings.cashHistoryHint)]</p>
+    <LineChart Points="chartPoints" Title="@_loc[nameof(RessourceAppStrings.cashHistoryTitle)]" />
+    @if (days.Count > 0) {
+        <dl class="ek-stat-facts">
+            <div><dt>@_loc[nameof(RessourceAppStrings.factStart)]</dt><dd>@Format(days[0].Cents)</dd></div>
+            <div><dt>@_loc[nameof(RessourceAppStrings.factEnd)]</dt><dd>@Format(days[^1].Cents)</dd></div>
+            <div><dt>@_loc[nameof(RessourceAppStrings.factChange)]</dt><dd>@Format(days[^1].Cents - days[0].Cents)</dd></div>
+            <div><dt>@_loc[nameof(RessourceAppStrings.factLowest)]</dt><dd>@Format(lowest.Cents) <small>(@lowest.Day.ToString("d"))</small></dd></div>
+            <div><dt>@_loc[nameof(RessourceAppStrings.factHighest)]</dt><dd>@Format(highest.Cents) <small>(@highest.Day.ToString("d"))</small></dd></div>
+        </dl>
+    }
+</section>
+
+@code {
+    [Parameter] public StatisticsData Data { get; set; } = default!;
+    [Parameter] public DateTime From { get; set; }
+    [Parameter] public DateTime To { get; set; }
+
+    private List<DayValue> days = [];
+    private List<DayValue> chartPoints = [];
+    private DayValue lowest = new(DateTime.MinValue, 0);
+    private DayValue highest = new(DateTime.MinValue, 0);
+
+    protected override void OnParametersSet() {
+        days = CashHistory.Daily(Data.Events, From, To);
+        chartPoints = CashHistory.Downsample(days, 240);
+        if (days.Count > 0) {
+            lowest = days.MinBy(x => x.Cents)!;
+            highest = days.MaxBy(x => x.Cents)!;
+        }
+    }
+
+    private static string Format(long cents) => Money.FromTotalCents(cents).ToString();
+}

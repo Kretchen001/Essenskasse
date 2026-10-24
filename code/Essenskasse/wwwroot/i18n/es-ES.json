@@ -314,5 +314,19 @@
   "reversedLabel": "anulado",
   "reversalLabel": "Anulación",
   "emailBodyNegative": "Estimado/a {0}:\n\nSu saldo actual es de:\n    {1}\n\nCon ello ya no tiene saldo positivo. Por favor, ponga remedio a esta situación.\n\nLe saluda atentamente\nSu gestión de caja",
-  "emailBodyPositive": "Estimado/a {0}:\n\nSu saldo actual es de:\n    {1}\n\nCon ello está apenas en positivo.\n\nLe saluda atentamente\nSu gestión de caja"
+  "emailBodyPositive": "Estimado/a {0}:\n\nSu saldo actual es de:\n    {1}\n\nCon ello está apenas en positivo.\n\nLe saluda atentamente\nSu gestión de caja",
+  "statistics": "Estadísticas",
+  "statsHint": "Estadísticas de todos los ingresos y pedidos. Los movimientos anulados y sus asientos contrarios se compensan.",
+  "statsRange3": "3 meses",
+  "statsRange12": "12 meses",
+  "statsRangeAll": "Todo",
+  "statsLoading": "Cargando datos …",
+  "statsNoData": "No hay datos para este periodo.",
+  "cashHistoryTitle": "Evolución de la caja",
+  "cashHistoryHint": "Saldo de la caja al final de cada día (suma de todos los saldos).",
+  "factStart": "Saldo al inicio",
+  "factEnd": "Saldo al final",
+  "factChange": "Variación",
+  "factLowest": "Saldo más bajo",
+  "factHighest": "Saldo más alto"
 }
