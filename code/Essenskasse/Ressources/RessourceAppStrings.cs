@@ -355,5 +355,10 @@
         providerShareAmount,
         providerShareCount,
         providerShareAverage,
+        habitsTitle,
+        habitsHint,
+        habitsOrderDays,
+        habitsFavorite,
+        habitsSmallSample,
     }
 }

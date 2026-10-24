@@ -352,5 +352,10 @@
   "providerShareShare": "Share",
   "providerShareAmount": "Amount",
   "providerShareCount": "Orders",
-  "providerShareAverage": "Avg. per order"
+  "providerShareAverage": "Avg. per order",
+  "habitsTitle": "Order probabilities",
+  "habitsHint": "How often a person ordered on a weekday, relative to all days of that weekday in the period (relative frequency from the order log, not a forecast). The darker, the more likely. Persons marked ⚠ have fewer than {0} order days, so their values are only rough estimates.",
+  "habitsOrderDays": "Order days",
+  "habitsFavorite": "Favorite providers",
+  "habitsSmallSample": "Few order days: rough estimate only"
 }

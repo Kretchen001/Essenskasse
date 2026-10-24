@@ -201,3 +201,12 @@ body.Dark .ek-pg-stats {
 .ek-sharebar > span.is-provider {
     background: var(--ek-chart-2);
 }
+
+.ek-habit-cell {
+    background: color-mix(in srgb, var(--ek-chart-1) var(--ek-heat, 0%), transparent);
+}
+
+.ek-habit-warn {
+    margin-left: 0.3rem;
+    cursor: help;
+}

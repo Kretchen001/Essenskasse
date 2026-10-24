@@ -352,5 +352,10 @@
   "providerShareShare": "Cuota",
   "providerShareAmount": "Importe",
   "providerShareCount": "Pedidos",
-  "providerShareAverage": "Media por pedido"
+  "providerShareAverage": "Media por pedido",
+  "habitsTitle": "Probabilidades de pedido",
+  "habitsHint": "Con qué frecuencia una persona pidió un día de la semana, respecto a todos los días de ese día de la semana en el periodo (frecuencia relativa del registro de pedidos, no una previsión). Cuanto más oscuro, más probable. Las personas marcadas con ⚠ tienen menos de {0} días de pedido; sus valores son solo estimaciones aproximadas.",
+  "habitsOrderDays": "Días de pedido",
+  "habitsFavorite": "Proveedores favoritos",
+  "habitsSmallSample": "Pocos días de pedido: solo una estimación aproximada"
 }

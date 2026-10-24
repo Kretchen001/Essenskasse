@@ -352,5 +352,10 @@
   "providerShareShare": "Anteil",
   "providerShareAmount": "Summe",
   "providerShareCount": "Bestellungen",
-  "providerShareAverage": "Ø je Bestellung"
+  "providerShareAverage": "Ø je Bestellung",
+  "habitsTitle": "Bestell-Wahrscheinlichkeiten",
+  "habitsHint": "Wie oft eine Person an einem Wochentag bestellt hat, bezogen auf alle Tage dieses Wochentags im Zeitraum (relative Häufigkeit aus dem Bestell-Log, keine Prognose). Je dunkler, desto wahrscheinlicher. Mit ⚠ markierte Personen haben weniger als {0} Bestelltage, ihre Werte sind nur grobe Schätzungen.",
+  "habitsOrderDays": "Bestelltage",
+  "habitsFavorite": "Lieblings-Anbieter",
+  "habitsSmallSample": "Wenige Bestelltage: nur grobe Schätzung"
 }
