@@ -9,7 +9,7 @@
         <svg class="ek-chart-svg" viewBox="0 0 @F(Width) @F(Height)" role="img" aria-label="@Title">
             @foreach (long tick in YTicks) {
                 <line class="ek-chart-grid" x1="@F(Left)" x2="@F(Width - Right)" y1="@F(Y(tick))" y2="@F(Y(tick))" />
-                <text class="ek-chart-axis" x="@F(Left - 8)" y="@F(Y(tick) + 4)" text-anchor="end">@FormatValue(tick)</text>
+                <SvgLabel X="@F(Left - 8)" Y="@F(Y(tick) + 4)" Anchor="end">@FormatValue(tick)</SvgLabel>
             }
             @if (YLow < 0 && YHigh > 0) {
                 <line class="ek-chart-zero" x1="@F(Left)" x2="@F(Width - Right)" y1="@F(Y(0))" y2="@F(Y(0))" />
@@ -23,7 +23,7 @@
                     </rect>
                 }
                 @if (i % LabelStep == 0) {
-                    <text class="ek-chart-axis" x="@F(GroupCenter(i))" y="@F(Height - 10)" text-anchor="middle">@Labels[i]</text>
+                    <SvgLabel X="@F(GroupCenter(i))" Y="@F(Height - 10)" Anchor="middle">@Labels[i]</SvgLabel>
                 }
             }
         </svg>
