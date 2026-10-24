@@ -6,131 +6,169 @@
 @inject IStringLocalizer<App> _loc
 @inject AppDataService AppData
 @inject ToastService ToastService
+@inject TextService Texts
 @inject NavigationManager Nav
-
-<style>
-    th:nth-child(1), td:nth-child(1) {
-        width: 30% !important; /* First row 30% width */
-    }
-
-    th:nth-child(2), td:nth-child(2) {
-        width: 40% !important; /* Secound row 30% width (60%) */
-    }
-
-    th:nth-child(3), td:nth-child(3) {
-        width: 30% !important; /* Third row 40% width (100%) */
-    }
-</style>
+@inject AuthStateService AuthState
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.payment)]</PageTitle>
 
 <AuthorizeView>
     <NotAuthorized>
-        <div class="row">
-            <div class="col-lg-3">
-                Zugriff verweigert!
-            </div>
-            <div class="col-lg-9">
-                <button @onclick="() => Nav.NavigateTo(dashboardLink)">
-                    Rückkehr zum Dashboard
+        <div class="ek-dash ek-denied" role="alert">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.accessDenied)]</h2>
+            <p class="ek-denied-text">@_loc[nameof(RessourceAppStrings.accessDeniedHint)]</p>
+            <div class="ek-denied-actions">
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="AuthState.RequestLogin">
+                    @_loc[nameof(RessourceAppStrings.signIn)]
+                </button>
+                <button type="button" class="ek-btn" @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    @_loc[nameof(RessourceAppStrings.backToDashboard)]
                 </button>
             </div>
         </div>
     </NotAuthorized>
     <Authorized>
-        <h2>@_loc[nameof(RessourceAppStrings.payment)]</h2>
+        <div class="ek-dash ek-pg-payment">
+        <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.payment)]</h2>
 
-        <div class="row">
-            <div class="col-lg-3 align-self-center">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.person)]
-                </label>
+        @if (SelectedPersonData is null) {
+            <h3 class="ek-group-title ek-list-title">@_loc[nameof(RessourceAppStrings.selectPerson)]</h3>
+            <div class="ek-search">
+                <svg class="ek-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                </svg>
+                <input id="ek-person-search" type="text" inputmode="search" class="ek-search-input" autocomplete="off"
+                       placeholder="@_loc[nameof(RessourceAppStrings.searchPaymentPerson)]"
+                       aria-label="@_loc[nameof(RessourceAppStrings.searchPaymentPerson)]"
+                       @bind="PersonFilter" @bind:event="oninput" @onkeydown="OnPersonSearchKeyDown" />
+                @if (PersonFilter.Length == 0) {
+                    <kbd class="ek-kbd" aria-hidden="true">/</kbd>
+                }
+                else {
+                    <button type="button" class="ek-icon-btn" @onclick="ClearPersonFilter"
+                            title="@_loc[nameof(RessourceAppStrings.clearSearch)]"
+                            aria-label="@_loc[nameof(RessourceAppStrings.clearSearch)]">✕</button>
+                }
             </div>
-            <div class="col-lg-9">
-                <select class="form-select" @bind="@SelectedPerson">
-                    @if (person is not null) {
-                        @foreach (var x in person) {
-                            <option value="@x.Guid">@x.Name</option>
-                        }
+            <div class="ek-grid ek-people ek-pick-grid">
+                @foreach (Person x in ShownPersons) {
+                    <PersonPickCard Person="x" PositivSaldo="IsInconspicuous(x)" OnPick="SelectPerson" />
+                }
+            </div>
+            @if (person is not null && person.Count > 0 && !ShownPersons.Any()) {
+                <div class="ek-empty">
+                    <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noMatches)]</p>
+                    <button type="button" class="ek-btn" @onclick="ClearPersonFilter">@_loc[nameof(RessourceAppStrings.resetFilter)]</button>
+                </div>
+            }
+        }
+        else {
+            <div class="ek-pay-summary @(IsInconspicuous(SelectedPersonData) ? "ek-person-ok" : "ek-person-bad")">
+                <span class="ek-avatar" aria-hidden="true">@PersonText.Initials(SelectedPersonData.Name)</span>
+                <div class="ek-person-text">
+                    <h3 class="ek-person-name">@SelectedPersonData.Name</h3>
+                    <p class="ek-person-sub">@_loc[nameof(RessourceAppStrings.balanceBefore)]</p>
+                </div>
+                <span class="ek-amount">@SelectedPersonData.Saldo.ToString()</span>
+                <button type="button" class="ek-btn" @onclick="ClearSelection">@_loc[nameof(RessourceAppStrings.changePerson)]</button>
+            </div>
+
+            <form class="ek-add ek-pay-form" @onsubmit="OpenPreview" @onsubmit:preventDefault>
+                <h3 class="ek-group-title">@_loc[nameof(RessourceAppStrings.amount)]</h3>
+                <div class="ek-quick" role="group" aria-label="@_loc[nameof(RessourceAppStrings.quickAmounts)]">
+                    @foreach (int euro in quickAmounts) {
+                        <button type="button" class="ek-chip" @onclick="() => SetQuickAmount(euro)">@Modells.Money.CurrentCurrency.Format(euro.ToString())</button>
                     }
-                </select>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-lg-3 align-self-center">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.amount)]
-                </label>
-            </div>
-            <div class="col-lg-4 align-self-center" style="width: 25%">
-                <input style="width: 100%" type="number" @bind="Payment" placeholder="Euro,Cent -> 10,00€">
-            </div>
-            <div class="col-lg-5 align-self-center">
-                <label>
-                    @Money.ToString()
-                </label>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-lg-3">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.comment)]
-                </label>
-            </div>
-            <div class="col-lg-9" style="width: 75%">
-                <input type="text" style="width: 100%" @bind="comment" />
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="() => InsertPayment()">
-                @_loc[nameof(RessourceAppStrings.creditAmount)]
-            </button>
-        </div>
-        <br />
-        <hr />
-        <br />
-        <div class="row">
-            <div class="col-lg-12">
-                <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
-                    <tr>
-                        <th>@_loc[nameof(RessourceAppStrings.date)]</th>
-                        <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
-                        <th style="text-align: right">@_loc[nameof(RessourceAppStrings.amount)]</th>
-                    </tr>
-                    @for (int i = 0; i < paymentsOfSelectedPerson.Count; i += 1) {
-                        var payment = paymentsOfSelectedPerson[i];
-                        string rowColor = (i % 3) switch {
-                            0 => "#EEEEEE", // Hellgrau
-                            1 => "#DDDDDD", // Mittelgrau
-                            2 => "#CCCCCC", // Dunkelgrau
-                            _ => "#FFFFFF"  // Default (White)
-                        };
-                        if (!payment.Amount.IsPositiv()) {
-                            rowColor = "#F55D52"; // Rot für negative Beträge
-                        }
-                        <tr style="background-color: @rowColor; color: rgb(10,10,10);">
-                            <td>@payment.DateTime.ToString("dddd, dd.MMMM.yyyy (HH:mm)")</td>
-                            <td>@payment.Comment</td>
-                            <td style="text-align: right">@payment.Amount</td>
-                        </tr>
+                </div>
+                <div class="ek-add-fields ek-pay-fields">
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.amount)]</span>
+                        <input @ref="amountInput" type="text" inputmode="decimal" class="ek-input" autocomplete="off"
+                               placeholder="10,00" @bind="amountText" @bind:event="oninput" />
+                    </label>
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.comment)]</span>
+                        <input type="text" class="ek-input" autocomplete="off" @bind="comment" @bind:event="oninput" />
+                    </label>
+                    <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@(!AmountValid || isBooking)">
+                        @_loc[nameof(RessourceAppStrings.creditAmount)]
+                    </button>
+                </div>
+                @if (AmountEntered && !AmountValid) {
+                    <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</p>
+                }
+                @if (MailChoosable) {
+                    <label class="ek-switch ek-pay-mail">
+                        <input type="checkbox" @bind="sendConfirmation" disabled="@(!HasEmail)" />
+                        <span class="ek-switch-track"></span>
+                        <span>@_loc[nameof(RessourceAppStrings.sendConfirmation)]</span>
+                    </label>
+                }
+                else if (MailAlways) {
+                    <p class="ek-hint">@_loc[nameof(RessourceAppStrings.confirmationMailAlwaysInfo)]</p>
+                }
+                @if (!HasEmail && AppData.SendConfirmationMail != Modells.User.ConfirmationMailMode.Never) {
+                    <p class="ek-hint is-warn">@_loc[nameof(RessourceAppStrings.toastNoEmailEntered)]</p>
+                }
+            </form>
+
+            @if (previewOpen) {
+                <div class="ek-confirm ek-pay-preview" role="group" aria-label="@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]">
+                    <p class="ek-confirm-title">@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]</p>
+                    <p class="ek-confirm-text">
+                        <strong>@SelectedPersonData.Name</strong>: @Money.ToString()<br />
+                        @_loc[nameof(RessourceAppStrings.balanceBefore)]: @SelectedPersonData.Saldo.ToString()
+                        &nbsp;→&nbsp;
+                        @_loc[nameof(RessourceAppStrings.balanceAfter)]: <strong>@BalanceAfter?.ToString()</strong>
+                    </p>
+                    <div class="ek-edit-actions">
+                        <button type="button" class="ek-btn ek-btn-primary" disabled="@isBooking" @onclick="() => InsertPayment()">
+                            @_loc[nameof(RessourceAppStrings.bookNow)]
+                        </button>
+                        <button type="button" class="ek-btn" disabled="@isBooking" @onclick="ClosePreview">
+                            @_loc[nameof(RessourceAppStrings.cancel)]
+                        </button>
+                    </div>
+                </div>
+            }
+            <h3 class="ek-group-title ek-list-title">@_loc[nameof(RessourceAppStrings.paymentHistory)]</h3>
+            @if (historyLoading) {
+                <ul class="ek-hist" aria-busy="true" aria-live="polite">
+                    @for (int i = 0; i < 4; i++) {
+                        <li class="ek-skeleton" aria-hidden="true"><span class="ek-skeleton-line"></span></li>
                     }
-                </table>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-lg-12" align="right">
-                <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px" @onclick="() => LoadNextAmountOfPayments()">
-                    @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
-                </button>
-            </div>
+                </ul>
+            }
+            else if (paymentsOfSelectedPerson.Count == 0) {
+                <div class="ek-empty">
+                    <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noPaymentsYet)]</p>
+                </div>
+            }
+            else {
+                @foreach (IGrouping<DateTime, Payment> month in PaymentsByMonth) {
+                    <h4 class="ek-hist-month">@month.Key.ToString("MMMM yyyy")</h4>
+                    <ul class="ek-hist">
+                        @foreach (Payment x in month) {
+                            <li class="@(x.Amount.IsPositiv() ? "" : "is-negative")">
+                                <span class="ek-hist-date">@DateText.WeekdayDayMonthTime(x.DateTime)</span>
+                                <span class="ek-hist-text">@x.Comment</span>
+                                <span class="ek-hist-amount">@x.Amount.ToString()</span>
+                            </li>
+                        }
+                    </ul>
+                }
+                <div class="ek-hist-more">
+                    @if (allLoaded) {
+                        <span class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.endOfList)]</span>
+                    }
+                    else {
+                        <button type="button" class="ek-btn" disabled="@loadingMore" @onclick="() => LoadNextAmountOfPayments()">
+                            @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+                        </button>
+                    }
+                </div>
+            }
+        }
         </div>
     </Authorized>
 </AuthorizeView>
-
-@code {
-    string dashboardLink = "/";
-}

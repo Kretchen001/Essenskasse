@@ -244,38 +244,22 @@ namespace EssenskasseAPI.Controllers {
         [HttpGet, Route("loadSettingsForUser")]
         public IActionResult LoadSettingsForUser([FromHeader] Guid sessionToken = default, [FromHeader] string name = "") {
             using (Operation.Time($"Load Settings for: {name}")) {
-                string queryStringRequestName = $"" +
-                        $"SELECT * " +
-                        $"FROM essenskasse.User " +
-                        $"WHERE Name=@name;";
-                DataTable dataTableUser = _db.Query(queryStringRequestName, Db.P("@name", name));
-                List<U.User> user = DataTableToListOfUser(dataTableUser);
-                if (user.Count == 1) {
-                    string queryStringRequestToken = $"" +
-                        $"SELECT ExpaireDate " +
-                        $"FROM essenskasse.SessionToken " +
-                        $"WHERE Guid=@sessionToken AND " +
-                        $"UserGuid=@userGuid;";
-                    DataTable tempRes = _db.Query(queryStringRequestToken,
-                        Db.P("@sessionToken", sessionToken),
-                        Db.P("@userGuid", user[0].Guid));
-                    if (tempRes.Rows.Count == 1) {
-                        long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
-                        if (DateTime.Now.Ticks < s) { // is under expaire
-                            string queryStringRequestSettings = $"" +
-                                //$"SELECT * " +
-                                $"SELECT isSingleListWishDashboard, loadAmountPayment, loadAmountOrder, filterShowProvider, dashboardMoneyLimit, filterShowPerson, accessToken, adminEmail, noticeableOnRightSide, sendConfirmationMail " +
-                                $"FROM essenskasse.SettingsUser " +
-                                $"WHERE UserGuid=@userGuid;";
-                            DataTable tempSettings = _db.Query(queryStringRequestSettings, Db.P("@userGuid", user[0].Guid));
-                            return Ok(DataTableToSettings(tempSettings));
-                        }
-                        Log.Information("User expire token");
-                    }
-                    Log.Warning("User found, but tempRes empty");
+                Guid? userGuid = ResolveUserOfSession(name, sessionToken);
+                if (userGuid is null) {
+                    Log.Warning("Settings not loaded (unknown user or invalid session)");
+                    return BadRequest();
                 }
-                Log.Warning("Not loaded!");
-                return BadRequest();
+                DataTable tempSettings = _db.Query(
+                    "SELECT isSingleListWishDashboard, loadAmountPayment, loadAmountOrder, filterShowProvider, dashboardMoneyLimit, " +
+                    "filterShowPerson, adminEmail, noticeableOnRightSide, sendConfirmationMail, " +
+                    "quickAmounts, theme, language, personSort, providerSort, currency " +
+                    "FROM essenskasse.SettingsUser WHERE UserGuid=@userGuid;",
+                    Db.P("@userGuid", userGuid));
+                if (tempSettings.Rows.Count == 0) {
+                    // Noch nie gespeichert: kein Fehler, der Client arbeitet dann mit seinen Standardwerten weiter.
+                    return NoContent();
+                }
+                return Ok(DataRowToSettings(tempSettings.Rows[0]));
             }
         }
 
@@ -286,81 +270,45 @@ namespace EssenskasseAPI.Controllers {
                     Log.Information("Request without Settings-Content.");
                     return BadRequest();
                 }
-                string queryStringRequestName = $"" +
-                        $"SELECT * " +
-                        $"FROM essenskasse.User " +
-                        $"WHERE Name=@name;";
-                DataTable dataTableUser = _db.Query(queryStringRequestName, Db.P("@name", name));
-                List<U.User> user = DataTableToListOfUser(dataTableUser);
-                if (user.Count == 1) { // user exist
-                    string queryStringRequestToken = $"" +
-                        $"SELECT ExpaireDate " +
-                        $"FROM essenskasse.SessionToken " +
-                        $"WHERE Guid=@sessionToken AND " +
-                        $"UserGuid=@userGuid;";
-                    DataTable tempRes = _db.Query(queryStringRequestToken,
-                        Db.P("@sessionToken", sessionToken),
-                        Db.P("@userGuid", user[0].Guid));
-                    if (tempRes.Rows.Count == 1) {
-                        long s = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
-                        if (DateTime.Now.Ticks < s) { // is under expaire
-                            string queryCheckIfSettingsSaved = $"" +
-                                $"SELECT * " +
-                                $"FROM essenskasse.SettingsUser " +
-                                $"WHERE UserGuid=@userGuid;";
-                            DataTable tempSettings = _db.Query(queryCheckIfSettingsSaved, Db.P("@userGuid", user[0].Guid));
-                            settings.AccessToken ??= new Guid("00000000-0000-0000-0000-000000000000");
-                            MySqlParameter[] settingsParameters = [
-                                Db.P("@userGuid", user[0].Guid),
-                                Db.P("@singleList", settings.IsSingleListWishDashboard),
-                                Db.P("@loadPayment", settings.LoadAmountPayment),
-                                Db.P("@loadOrder", settings.LoadAmountOrder),
-                                Db.P("@showProvider", settings.FilterShowProvider),
-                                Db.P("@moneyLimit", settings.DashboardMoneyLimit.ToString()),
-                                Db.P("@showPerson", settings.FilterShowPerson),
-                                Db.P("@accessToken", settings.AccessToken),
-                                Db.P("@adminEmail", settings.AdminEmail),
-                                Db.P("@rightSide", settings.NoticeableOnRightSide),
-                                Db.P("@sendMail", settings.SendConfirmationMail)
-                            ];
-                            if (tempSettings.Rows.Count == 0) { // no settings there, so insert
-                                string insertQueryString = $"" +
-                                    $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
-                                                $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
-                                                $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
-                                                $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
-                                    $"VALUES (@userGuid, @singleList, @loadPayment, @loadOrder, @showProvider, " +
-                                                $"@moneyLimit, @showPerson, @accessToken, " +
-                                                $"@adminEmail, @rightSide, @sendMail);";
-                                _db.Query(insertQueryString, settingsParameters);
-                            }
-                            else { // settings saved, so update
-                                string queryUpdate = $"" +
-                                $"UPDATE essenskasse.SettingsUser " +
-                                    $"SET " +
-                                    $"isSingleListWishDashboard=@singleList, " +
-                                    $"loadAmountPayment=@loadPayment, " +
-                                    $"loadAmountOrder=@loadOrder, " +
-                                    $"filterShowProvider=@showProvider, " +
-                                    $"dashboardMoneyLimit=@moneyLimit, " +
-                                    $"filterShowPerson=@showPerson, " +
-                                    $"accessToken=@accessToken, " +
-                                    $"adminEmail=@adminEmail, " +
-                                    $"noticeableOnRightSide=@rightSide, " +
-                                    $"sendConfirmationMail=@sendMail " +
-                                    $"WHERE UserGuid=@userGuid;";
-                                _db.Query(queryUpdate, settingsParameters);
-                            }
-                            return Ok();
-                        }
-                        else {
-                            Log.Warning("Not saved! (expiredate!)");
-                            return BadRequest();
-                        }
-                    }
+                Guid? userGuid = ResolveUserOfSession(name, sessionToken);
+                if (userGuid is null) {
+                    Log.Warning("Settings not saved (unknown user or invalid session)");
+                    return BadRequest();
                 }
-                Log.Warning("Not saved! (no user found)");
-                return BadRequest();
+                // Werte begrenzen und pruefen; der Aenderungstoken gehoert zum Benutzer und wird hier nie gespeichert.
+                U.Settings clean = U.SettingsSanitizer.Sanitize(settings);
+                // Einfuegen oder aktualisieren in einem Schritt: zwei gleichzeitige erste Speichervorgaenge scheitern nicht am Schluessel.
+                _db.Query(
+                    "INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, loadAmountPayment, loadAmountOrder, " +
+                    "filterShowProvider, dashboardMoneyLimit, filterShowPerson, accessToken, adminEmail, noticeableOnRightSide, " +
+                    "sendConfirmationMail, quickAmounts, theme, language, personSort, providerSort, currency) " +
+                    "VALUES (@userGuid, @singleList, @loadPayment, @loadOrder, @showProvider, @moneyLimit, @showPerson, @accessToken, " +
+                    "@adminEmail, @rightSide, @sendMail, @quickAmounts, @theme, @language, @personSort, @providerSort, @currency) " +
+                    "ON DUPLICATE KEY UPDATE " +
+                    "isSingleListWishDashboard=VALUES(isSingleListWishDashboard), loadAmountPayment=VALUES(loadAmountPayment), " +
+                    "loadAmountOrder=VALUES(loadAmountOrder), filterShowProvider=VALUES(filterShowProvider), " +
+                    "dashboardMoneyLimit=VALUES(dashboardMoneyLimit), filterShowPerson=VALUES(filterShowPerson), " +
+                    "accessToken=VALUES(accessToken), adminEmail=VALUES(adminEmail), noticeableOnRightSide=VALUES(noticeableOnRightSide), " +
+                    "sendConfirmationMail=VALUES(sendConfirmationMail), quickAmounts=VALUES(quickAmounts), theme=VALUES(theme), " +
+                    "language=VALUES(language), personSort=VALUES(personSort), providerSort=VALUES(providerSort), currency=VALUES(currency);",
+                    Db.P("@userGuid", userGuid),
+                    Db.P("@singleList", clean.IsSingleListWishDashboard),
+                    Db.P("@loadPayment", clean.LoadAmountPayment),
+                    Db.P("@loadOrder", clean.LoadAmountOrder),
+                    Db.P("@showProvider", clean.FilterShowProvider),
+                    Db.P("@moneyLimit", clean.DashboardMoneyLimit.ToString()),
+                    Db.P("@showPerson", clean.FilterShowPerson),
+                    Db.P("@accessToken", Guid.Empty),
+                    Db.P("@adminEmail", clean.AdminEmail),
+                    Db.P("@rightSide", clean.NoticeableOnRightSide),
+                    Db.P("@sendMail", (int)clean.SendConfirmationMail),
+                    Db.P("@quickAmounts", U.SettingsSanitizer.QuickAmountsToText(clean.QuickAmounts)),
+                    Db.P("@theme", clean.Theme),
+                    Db.P("@language", clean.Language),
+                    Db.P("@personSort", clean.PersonSort),
+                    Db.P("@providerSort", clean.ProviderSort),
+                    Db.P("@currency", clean.Currency));
+                return Ok();
             }
         }
 
@@ -428,23 +376,72 @@ namespace EssenskasseAPI.Controllers {
             return userList;
         }
 
-        private static U.Settings DataTableToSettings(DataTable dataTable) {
-            Guid? accessTokenGuid = null;
-            if (dataTable.Rows[0]["accessToken"].ToString()! != "00000000-0000-0000-0000-000000000000") {
-                accessTokenGuid = new Guid(dataTable.Rows[0]["accessToken"].ToString()!);
+        /// <summary>Prueft Name und Sitzungstoken. Gibt die Guid des Benutzers zurueck oder null, wenn der Benutzer
+        /// unbekannt (oder der Name mehrdeutig) ist oder die Sitzung nicht zu ihm gehoert bzw. abgelaufen ist.</summary>
+        private Guid? ResolveUserOfSession(string name, Guid sessionToken) {
+            DataTable dataTableUser = _db.Query("SELECT Guid FROM essenskasse.User WHERE Name=@name;", Db.P("@name", name));
+            if (dataTableUser.Rows.Count != 1) {
+                return null;
             }
-            return new U.Settings(
-                bool.Parse(dataTable.Rows[0]["isSingleListWishDashboard"].ToString() ?? "false"),
-                int.Parse(dataTable.Rows[0]["loadAmountPayment"].ToString() ?? "25"),
-                int.Parse(dataTable.Rows[0]["loadAmountOrder"].ToString() ?? "50"),
-                bool.Parse(dataTable.Rows[0]["filterShowProvider"].ToString() ?? "false"),
-                new Modells.Money().ToMoney(dataTable.Rows[0]["dashboardMoneyLimit"].ToString() ?? "0,00€"),
-                bool.Parse(dataTable.Rows[0]["filterShowPerson"].ToString() ?? "false"),
-                accessTokenGuid,
-                dataTable.Rows[0]["adminEmail"].ToString() ?? "",
-                bool.Parse(dataTable.Rows[0]["noticeableOnRightSide"].ToString() ?? "false"),
-                bool.Parse(dataTable.Rows[0]["sendConfirmationMail"].ToString() ?? "true")
-                );
+            Guid userGuid = new Guid(dataTableUser.Rows[0]["Guid"].ToString()!);
+            DataTable tempRes = _db.Query(
+                "SELECT ExpaireDate FROM essenskasse.SessionToken WHERE Guid=@sessionToken AND UserGuid=@userGuid;",
+                Db.P("@sessionToken", sessionToken),
+                Db.P("@userGuid", userGuid));
+            if (tempRes.Rows.Count != 1) {
+                return null;
+            }
+            long expires = long.Parse(tempRes.Rows[0]["ExpaireDate"].ToString()!);
+            return DateTime.Now.Ticks < expires ? userGuid : null;
+        }
+
+        /// <summary>Liest eine Zeile der Einstellungstabelle. Leere Felder (NULL) ergeben die Standardwerte;
+        /// das Ergebnis wird bereinigt, der Aenderungstoken ist immer leer.</summary>
+        private static U.Settings DataRowToSettings(DataRow row) {
+            Modells.Money limit;
+            try {
+                limit = new Modells.Money().ToMoney(ReadText(row["dashboardMoneyLimit"]));
+            }
+            catch {
+                limit = new Modells.Money(0, 0);
+            }
+            U.ConfirmationMailMode mailMode = U.ConfirmationMailModes.Parse(ReadText(row["sendConfirmationMail"]));
+            return U.SettingsSanitizer.Sanitize(new U.Settings {
+                IsSingleListWishDashboard = ReadBool(row["isSingleListWishDashboard"], false),
+                LoadAmountPayment = ReadInt(row["loadAmountPayment"], 10),
+                LoadAmountOrder = ReadInt(row["loadAmountOrder"], 25),
+                FilterShowProvider = ReadBool(row["filterShowProvider"], true),
+                DashboardMoneyLimit = limit,
+                FilterShowPerson = ReadBool(row["filterShowPerson"], true),
+                AdminEmail = ReadText(row["adminEmail"]),
+                NoticeableOnRightSide = ReadBool(row["noticeableOnRightSide"], true),
+                SendConfirmationMail = mailMode,
+                QuickAmounts = U.SettingsSanitizer.QuickAmountsFromText(ReadText(row["quickAmounts"])),
+                Theme = ReadText(row["theme"]),
+                Language = ReadText(row["language"]),
+                PersonSort = ReadText(row["personSort"]),
+                ProviderSort = ReadText(row["providerSort"]),
+                Currency = ReadText(row["currency"])
+            });
+        }
+
+        private static string ReadText(object? value) {
+            return value is null or DBNull ? "" : value.ToString() ?? "";
+        }
+
+        private static int ReadInt(object? value, int fallback) {
+            return int.TryParse(ReadText(value), out int result) ? result : fallback;
+        }
+
+        private static bool ReadBool(object? value, bool fallback) {
+            if (value is bool b) {
+                return b;
+            }
+            string text = ReadText(value);
+            if (text.Length == 0) {
+                return fallback;
+            }
+            return bool.TryParse(text, out bool parsed) ? parsed : text != "0";
         }
         #endregion
     }

@@ -1,5 +1,6 @@
 ﻿using EssenskasseAPI.Data;
 using EssenskasseAPI.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modells;
 using MySql.Data.MySqlClient;
@@ -23,7 +24,8 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region Controller
-        [HttpGet, Route("all")]
+        // Die Kaffeekasse darf ohne Anmeldung angesehen werden (reine Anzeige); Eintragen verlangt weiterhin eine Sitzung.
+        [AllowAnonymous, HttpGet, Route("all")]
         public IActionResult TransactionProcedure() {
             using (Operation.Time("TransactionProcedure")) {
                 string queryString = $"" +
@@ -41,6 +43,9 @@ namespace EssenskasseAPI.Controllers {
         [HttpPost, Route("new")]
         public IActionResult NewOne([FromBody] TransactionProcedure newOne) {
             using (Operation.Time("NewOne at Procedures")) {
+                if (newOne is null || newOne.Amount is null || newOne.Amount.ToTotalCents() == 0 || string.IsNullOrWhiteSpace(newOne.Comment)) {
+                    return BadRequest();
+                }
                 string queryString = $"" +
                     $"INSERT INTO essenskasse.TransactionProcedure (DateTime, AmountEuro, AmountCent, Comment) " +
                     $"VALUES (@dateTime, @euro, @cent, @comment);";

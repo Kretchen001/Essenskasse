@@ -1,0 +1,84 @@
+﻿/* Aenderungen-Seite: Umschalter und Buchungslisten. Farben aus .ek-dash. */
+
+.ek-chg-tabs {
+    margin-top: 0.25rem;
+}
+
+.ek-chg .ek-hist li {
+    align-items: center;
+}
+
+.ek-chg-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.ek-chg-person {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.ek-chg .ek-hist li.is-reversed .ek-chg-person,
+.ek-chg .ek-hist li.is-reversed .ek-chg-sub,
+.ek-chg .ek-hist li.is-reversed .ek-hist-amount {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.ek-chg .ek-hist li.is-reversal .ek-chg-person {
+    font-style: italic;
+}
+
+.ek-chg-badge {
+    align-self: flex-start;
+    margin: 0.1rem 0;
+    padding: 0 0.5rem;
+    border: 1px solid var(--ek-muted);
+    border-radius: 999px;
+    color: var(--ek-muted);
+    font-size: 0.75rem;
+}
+
+.ek-chg-sub {
+    color: var(--ek-muted);
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+.ek-dash .ek-chg-edit {
+    flex: none;
+    padding: 0.3rem 0.8rem;
+}
+
+.ek-chg-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding-top: 0.5rem;
+}
+
+.ek-chg-date {
+    margin: 0;
+    color: var(--ek-muted);
+}
+
+.ek-chg-form .ek-hint {
+    margin: 0;
+}
+
+@media (max-width: 575.98px) {
+    .ek-chg .ek-hist li .ek-chg-main {
+        flex-basis: 100%;
+        order: 1;
+    }
+
+    .ek-chg .ek-hist li .ek-hist-amount {
+        order: 2;
+    }
+
+    .ek-dash .ek-chg-edit {
+        order: 3;
+    }
+}

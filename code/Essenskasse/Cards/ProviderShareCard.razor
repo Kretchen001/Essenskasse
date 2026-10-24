@@ -1,0 +1,51 @@
+﻿@using Modells.Statistics
+@inject IStringLocalizer<App> _loc
+
+<details class="ek-stat">
+    <summary class="ek-stat-summary"><h3 class="ek-stat-title">@_loc[nameof(RessourceAppStrings.providerShareTitle)]</h3></summary>
+    <p class="ek-stat-hint">@_loc[nameof(RessourceAppStrings.providerShareHint)]</p>
+    @if (rows.Count == 0) {
+        <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.statsNoData)]</p>
+    }
+    else {
+        <div class="ek-stat-tablewrap">
+            <table class="ek-stat-table">
+                <thead>
+                    <tr>
+                        <th>@_loc[nameof(RessourceAppStrings.providerShareName)]</th>
+                        <th>@_loc[nameof(RessourceAppStrings.providerShareShare)]</th>
+                        <th class="num">@_loc[nameof(RessourceAppStrings.providerShareAmount)]</th>
+                        <th class="num">@_loc[nameof(RessourceAppStrings.providerShareCount)]</th>
+                        <th class="num">@_loc[nameof(RessourceAppStrings.providerShareAverage)]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (ProviderShare row in rows) {
+                        <tr>
+                            <td>@row.Name</td>
+                            <td>
+                                <span class="ek-sharebar"><span class="is-provider" style="width:@((row.AmountShare * 100).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></span></span>
+                                <small>@row.AmountShare.ToString("P0")</small>
+                            </td>
+                            <td class="num">@Money.FromTotalCents(row.Cents).ToString()</td>
+                            <td class="num">@row.Count</td>
+                            <td class="num">@Money.FromTotalCents(row.AverageCents).ToString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</details>
+
+@code {
+    [Parameter] public StatisticsData Data { get; set; } = default!;
+    [Parameter] public DateTime From { get; set; }
+    [Parameter] public DateTime To { get; set; }
+
+    private List<ProviderShare> rows = [];
+
+    protected override void OnParametersSet() {
+        rows = ProviderShares.Build(Data.Orders, From, To);
+    }
+}

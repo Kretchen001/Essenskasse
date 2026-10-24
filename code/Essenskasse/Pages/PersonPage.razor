@@ -7,152 +7,170 @@
 @inject AppDataService AppData
 @inject ToastService ToastService
 @inject ILocalStorageService LocalStorage
+@inject UserSettingsStore UserSettings
 @inject NavigationManager Nav
-
-<style>
-    table, th, td {
-        border: 1px solid gray;
-    }
-
-        th:nth-child(1), td:nth-child(1) {
-            width: 32% !important; /* First row 30% width */
-        }
-
-        th:nth-child(2), td:nth-child(2) {
-            width: 30% !important; /* Secound row 30% width (60%) */
-        }
-
-        th:nth-child(3), td:nth-child(3) {
-            width: 38% !important; /* Third row 40% width (100%) */
-        }
-</style>
+@inject AuthStateService AuthState
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.person)]</PageTitle>
 
 <AuthorizeView>
     <NotAuthorized>
-        <div class="row">
-            <div class="col-lg-3">
-                Zugriff verweigert!
-            </div>
-            <div class="col-lg-9">
-                <button @onclick="() => Nav.NavigateTo(dashboardLink)">
-                    Rückkehr zum Dashboard
+        <div class="ek-dash ek-denied" role="alert">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.accessDenied)]</h2>
+            <p class="ek-denied-text">@_loc[nameof(RessourceAppStrings.accessDeniedHint)]</p>
+            <div class="ek-denied-actions">
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="AuthState.RequestLogin">
+                    @_loc[nameof(RessourceAppStrings.signIn)]
+                </button>
+                <button type="button" class="ek-btn" @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    @_loc[nameof(RessourceAppStrings.backToDashboard)]
                 </button>
             </div>
         </div>
     </NotAuthorized>
     <Authorized>
-        <h2>@_loc[nameof(RessourceAppStrings.person)]</h2>
-        <div class="row">
-            <h4 style="margin-top: 1rem;">
-                @_loc[nameof(RessourceAppStrings.addPerson)]
-            </h4>
-            @if (!accessToAdd) {
-                <button type="button" class="btn-primary" data-dismiss="modal" style="border-radius:8px; width: fit-content;" @onclick="() => {accessToAdd = true;}">
-                    @_loc[nameof(RessourceAppStrings.addPerson)]
+        <div class="ek-dash ek-pg-person">
+        <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.person)]</h2>
+        <form class="ek-add" @onsubmit="AddNewPerson" @onsubmit:preventDefault>
+            <h3 class="ek-group-title">@_loc[nameof(RessourceAppStrings.addPerson)]</h3>
+            <div class="ek-add-fields">
+                <label class="ek-field">
+                    <span>@_loc[nameof(RessourceAppStrings.name)]</span>
+                    <input @ref="newNameInput" type="text" class="ek-input" autocomplete="off"
+                           @bind="newPersonName" @bind:event="oninput" />
+                </label>
+                <label class="ek-field">
+                    <span>@_loc[nameof(RessourceAppStrings.email)]</span>
+                    <input type="email" class="ek-input" autocomplete="off"
+                           @bind="newPersonEmail" @bind:event="oninput" />
+                </label>
+                <label class="ek-field">
+                    <span>@_loc[nameof(RessourceAppStrings.mailLanguage)]</span>
+                    <select class="ek-select" @bind="newPersonLanguage">
+                        @foreach (var culture in LocalizerSettings.SupportedCultures) {
+                            <option value="@culture.Culture">@culture.Name</option>
+                        }
+                    </select>
+                </label>
+                <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@(!CanAdd)">
+                    @(NewNameDuplicate ? _loc[nameof(RessourceAppStrings.addAnyway)] : _loc[nameof(RessourceAppStrings.add)])
                 </button>
+            </div>
+            @if (NewNameDuplicate) {
+                <p class="ek-hint is-warn">@_loc[nameof(RessourceAppStrings.duplicateName)]</p>
             }
-            else {
-                <div class="col-lg-2">
-                    <label style="vertical-align: middle;">
-                        @_loc[nameof(RessourceAppStrings.add)]
-                    </label>
-                </div>
-                <div class="col-lg-8">
-                    <div class="row">
-                        <input type="text" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.name)]" id="idHinzuzufuegen"
-                               style="width: 100%;" @bind-value="newPersonName">
-                    </div>
-                    <div class="row">
-                        <input type="email" name="nameHinzuzufuegen" placeholder="@_loc[nameof(RessourceAppStrings.email)]" id="idHinzuzufuegen"
-                               style="width: 100%;" @bind-value="newPersonEmail">
-                    </div>
-                </div>
-                <div class="col-lg-2">
-                    <button @onclick="() => { AddNewPerson(); }">
-                        @_loc[nameof(RessourceAppStrings.submit)]!
-                    </button>
-                </div>
+            @if (NewEmailInvalid) {
+                <p class="ek-hint is-error">@_loc[nameof(RessourceAppStrings.emailInvalid)]</p>
             }
-        </div>
+        </form>
 
-        <br />
-
-        <h4>@_loc[nameof(RessourceAppStrings.personRegistered)]</h4>
+        <h3 class="ek-group-title ek-list-title">@_loc[nameof(RessourceAppStrings.personRegistered)]</h3>
         @if (AppData.FilterShowPerson) {
-            <div class="row" style="margin-top: 1rem;">
-                <div class="col-lg-2">
-                    <label>
-                        @_loc[nameof(RessourceAppStrings.filter)]
-                    </label>
-                </div>
-                <div class="col-lg-10 align-self-center">
-                    <input @bind="filter" @bind:event="oninput" @onkeyup="ChangePersonShownList" />
-                </div>
+            <div class="ek-search">
+                <svg class="ek-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                </svg>
+                <input id="ek-person-search" type="text" inputmode="search" class="ek-search-input" autocomplete="off"
+                       placeholder="@_loc[nameof(RessourceAppStrings.searchPersons)]"
+                       aria-label="@_loc[nameof(RessourceAppStrings.searchPersons)]"
+                       @bind="Filter" @bind:event="oninput" @onkeydown="OnSearchKeyDown" />
+                @if (Filter.Length == 0) {
+                    <kbd class="ek-kbd" aria-hidden="true">/</kbd>
+                }
+                @if (IsFiltered) {
+                    <span class="ek-search-count">@_loc[nameof(RessourceAppStrings.shownOfTotal), shownPersonList.Count, person.Count]</span>
+                }
+                @if (Filter.Length > 0) {
+                    <button type="button" class="ek-icon-btn" @onclick="ClearFilter"
+                            title="@_loc[nameof(RessourceAppStrings.clearSearch)]"
+                            aria-label="@_loc[nameof(RessourceAppStrings.clearSearch)]">✕</button>
+                }
+            </div>
+            <div class="ek-chips" role="group" aria-label="@_loc[nameof(RessourceAppStrings.filterByStatus)]">
+                @foreach (PersonStatusFilter chip in chipOrder) {
+                    <button type="button" class="ek-chip @(statusFilter == chip ? "is-active" : "")"
+                            aria-pressed="@((statusFilter == chip).ToString().ToLowerInvariant())"
+                            @onclick="() => SetStatusFilter(chip)">
+                        @ChipLabel(chip) <span class="ek-chip-count">@ChipCount(chip)</span>
+                    </button>
+                }
             </div>
         }
-        <div class="row" style="margin-top: 1rem;">
-            <table style="width: 100%; table-layout: fixed;">
-                <colgroup>
-                    <col style="width: 50%;">
-                    <col style="width: 50%;">
-                </colgroup>
-                <tr>
-                    @if (IsASC) {
-                        <th style="padding-left: 5px;">
-                            @_loc[nameof(RessourceAppStrings.name)]&nbsp;&nbsp;
-                            <button type="button" class="btn btn-primary" @onclick="ToggleAscDesc">
-                                <i style="border: solid black; border-width: 0 3px 3px 0; display: inline-block; padding: 3px;
-                                    transform: rotate(-135deg); -webkit-transform: rotate(-135deg);"></i>
-                            </button>
-                        </th>
-                    }
-                    else {
-                        <th style="padding-left: 5px;">
-                            @_loc[nameof(RessourceAppStrings.name)]&nbsp;&nbsp;
-                            <button type="button" class="btn btn-primary" @onclick="ToggleAscDesc">
-                                <i style="border: solid black; border-width: 0 3px 3px 0; display: inline-block; padding: 3px;
-                                    transform: rotate(45deg); -webkit-transform: rotate(45deg);"></i>
-                            </button>
-                        </th>
-                    }
-                    <th style="padding-left: 5px;">@_loc[nameof(RessourceAppStrings.email)]</th>
-                </tr>
-                @foreach (var x in shownPersonList) {
-                    <tr>
-                        <td style="padding-left: 5px;">
-                            @x.Name |
-                            <label>
-                                @_loc[nameof(RessourceAppStrings.copy)] @_loc[nameof(RessourceAppStrings.guid)]:
-                            </label>
-                            <button style="border: none;" title="@_loc[nameof(RessourceAppStrings.copy)]" @onclick="async () => await CopyToClipboard(x.Guid.ToString())">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7" />
-                                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z" />
-                                    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z" />
-                                </svg>
-                            </button>
-                        </td>
-                        @if (x.Email.Equals("")) {
-                            <td style="padding-left: 5px; color: gray;">@_loc[nameof(RessourceAppStrings.notEntered)]</td>
-                        }
-                        else {
-                            <td style="padding-left: 5px;">@x.Email</td>
-                        }
-                    </tr>
-                }
-            </table>
+        <div class="ek-people-tools">
+            <label class="ek-select-wrap">
+                <span>@_loc[nameof(RessourceAppStrings.sortBy)]</span>
+                <select class="ek-select" @bind="SortKey">
+                    <option value="@nameof(PersonSortMode.NameAsc)">@_loc[nameof(RessourceAppStrings.sortNameAsc)]</option>
+                    <option value="@nameof(PersonSortMode.NameDesc)">@_loc[nameof(RessourceAppStrings.sortNameDesc)]</option>
+                    <option value="@nameof(PersonSortMode.SaldoAsc)">@_loc[nameof(RessourceAppStrings.sortSaldoAsc)]</option>
+                    <option value="@nameof(PersonSortMode.SaldoDesc)">@_loc[nameof(RessourceAppStrings.sortSaldoDesc)]</option>
+                    <option value="@nameof(PersonSortMode.NoEmailFirst)">@_loc[nameof(RessourceAppStrings.sortNoEmailFirst)]</option>
+                </select>
+            </label>
         </div>
-        <div class="row">
-            <h4 style="margin-top: 1rem;">
-                @_loc[nameof(RessourceAppStrings.editPerson)]
-            </h4>
-            <EditPersonCard OnChangeCommit="ChangeOfPersonCommit" />
+        @if (isLoading) {
+            <div class="ek-grid ek-people" aria-busy="true" aria-live="polite">
+                @for (int i = 0; i < 6; i++) {
+                    <div class="ek-person ek-skeleton" aria-hidden="true">
+                        <span class="ek-avatar"></span>
+                        <div class="ek-person-text">
+                            <span class="ek-skeleton-line"></span>
+                            <span class="ek-skeleton-line is-short"></span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else if (loadFailed) {
+            <div class="ek-empty" role="alert">
+                <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.loadFailed)]</p>
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="RetryLoadAsync">@_loc[nameof(RessourceAppStrings.retry)]</button>
+            </div>
+        }
+        else if (person.Count == 0) {
+            <div class="ek-empty">
+                <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noPersonsYet)]</p>
+                <p class="ek-empty-text">@_loc[nameof(RessourceAppStrings.noPersonsYetHint)]</p>
+            </div>
+        }
+        else if (shownPersonList.Count == 0) {
+            <div class="ek-empty">
+                <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noMatches)]</p>
+                <button type="button" class="ek-btn" @onclick="ResetFilters">@_loc[nameof(RessourceAppStrings.resetFilter)]</button>
+            </div>
+        }
+        else {
+            <div class="ek-grid ek-people">
+                @foreach (Person x in shownPersonList) {
+                    <PersonListCard Person="x" PositivSaldo="IsInconspicuous(x)" OnUpdated="OnPersonUpdated" OnHidden="OnPersonHidden" />
+                }
+            </div>
+        }
+
+        <button type="button" class="ek-btn ek-hidden-toggle" aria-expanded="@showHidden" @onclick="ToggleHiddenAsync">
+            @(showHidden ? _loc[nameof(RessourceAppStrings.hideHiddenPersons)] : _loc[nameof(RessourceAppStrings.showHiddenPersons)])
+        </button>
+        @if (showHidden) {
+            @if (hiddenPersons.Count == 0) {
+                <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.noHiddenPersons)]</p>
+            }
+            else {
+                <div class="ek-grid ek-people ek-people-hidden">
+                    @foreach (Person x in hiddenPersons) {
+                        <article class="ek-person ek-person-muted">
+                            <span class="ek-avatar" aria-hidden="true">@PersonText.Initials(x.Name)</span>
+                            <div class="ek-person-text">
+                                <h4 class="ek-person-name">@x.Name</h4>
+                                <p class="ek-person-sub">@x.Saldo.ToString()</p>
+                            </div>
+                            <button type="button" class="ek-btn" @onclick="() => RestorePersonAsync(x)">
+                                @_loc[nameof(RessourceAppStrings.restore)]
+                            </button>
+                        </article>
+                    }
+                </div>
+            }
+        }
         </div>
     </Authorized>
 </AuthorizeView>
-
-@code {
-    string dashboardLink = "/";
-}

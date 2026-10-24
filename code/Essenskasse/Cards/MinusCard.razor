@@ -1,0 +1,65 @@
+﻿@using Modells.Statistics
+@inject IStringLocalizer<App> _loc
+
+<details class="ek-stat">
+    <summary class="ek-stat-summary"><h3 class="ek-stat-title">@_loc[nameof(RessourceAppStrings.minusTitle)]</h3></summary>
+    <p class="ek-stat-hint">@string.Format(_loc[nameof(RessourceAppStrings.minusHint)].Value, Money.FromTotalCents(LimitCents).ToString())</p>
+    @if (rows.Count == 0) {
+        <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.statsNoData)]</p>
+    }
+    else {
+        <dl class="ek-stat-facts">
+            <div><dt>@_loc[nameof(RessourceAppStrings.minusNow)]</dt><dd>@rows.Count(x => x.InMinusAtEnd) / @rows.Count</dd></div>
+            <div><dt>@_loc[nameof(RessourceAppStrings.minusEver)]</dt><dd>@rows.Count(x => x.Phases > 0) / @rows.Count</dd></div>
+            <div><dt>@_loc[nameof(RessourceAppStrings.minusAverageShare)]</dt><dd>@Percent(rows.Average(x => x.Share))</dd></div>
+        </dl>
+        <div class="ek-stat-tablewrap">
+            <table class="ek-stat-table">
+                <thead>
+                    <tr>
+                        <th>@_loc[nameof(RessourceAppStrings.minusPerson)]</th>
+                        <th>@_loc[nameof(RessourceAppStrings.minusShare)]</th>
+                        <th class="num">@_loc[nameof(RessourceAppStrings.minusDays)]</th>
+                        <th class="num">@_loc[nameof(RessourceAppStrings.minusPhases)]</th>
+                        <th class="num">@_loc[nameof(RessourceAppStrings.minusLongest)]</th>
+                        <th class="num">@_loc[nameof(RessourceAppStrings.minusBalance)]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (PersonMinus row in rows) {
+                        <tr class="@(row.InMinusAtEnd ? "is-minus" : null)">
+                            <td>@row.Person.Name</td>
+                            <td>
+                                <span class="ek-sharebar" title="@Percent(row.Share)"><span style="width:@((row.Share * 100).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></span></span>
+                                <small>@Percent(row.Share)</small>
+                            </td>
+                            <td class="num">@Days(row.InMinus)</td>
+                            <td class="num">@row.Phases</td>
+                            <td class="num">@Days(row.Longest)</td>
+                            <td class="num">@Money.FromTotalCents(row.EndBalance).ToString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</details>
+
+@code {
+    [Parameter] public StatisticsData Data { get; set; } = default!;
+    [Parameter] public DateTime From { get; set; }
+    [Parameter] public DateTime To { get; set; }
+    /// <summary>Dashboard-Grenzwert in Cent.</summary>
+    [Parameter] public long LimitCents { get; set; }
+
+    private List<PersonMinus> rows = [];
+
+    protected override void OnParametersSet() {
+        rows = MinusAnalysis.Analyze(Data, From, To, LimitCents, DateTime.Now)
+            .OrderByDescending(x => x.Share).ThenByDescending(x => x.Phases).ThenBy(x => x.Person.Name).ToList();
+    }
+
+    private static string Percent(double share) => share.ToString("P0");
+
+    private static string Days(TimeSpan span) => span.TotalDays.ToString("0.#");
+}

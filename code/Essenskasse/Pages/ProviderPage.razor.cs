@@ -1,5 +1,7 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
@@ -8,14 +10,63 @@ namespace Essenskasse.Pages {
 
     public partial class ProviderPage {
 
-        private bool accessToAdd = false;
-        private bool accessToDelete = false;
-        private bool IsASC = true;
+        private string dashboardLink = "/";
+        private bool isAdding = false;
+        private ElementReference newNameInput;
+        private bool isLoading = true;
+        private bool loadFailed = false;
+        private ProviderSort sortMode = ProviderSort.NameAsc;
+        private Dictionary<Guid, ProviderStatistics> statistics = new Dictionary<Guid, ProviderStatistics>();
 
         private string newProviderDesignation = "";
-        private string providerToDeleteGuid = "";
 
         private string filter = "";
+
+        /// <summary>Suchtext; jede Aenderung baut die Liste sofort neu auf.</summary>
+        private string Filter {
+            get => filter;
+            set {
+                filter = value ?? "";
+                ApplyFilterAndSort();
+            }
+        }
+
+        /// <summary>Esc leert die Suche.</summary>
+        private void OnSearchKeyDown(KeyboardEventArgs e) {
+            if (e.Key == "Escape" && Filter.Length > 0) {
+                ClearFilter();
+            }
+        }
+
+        /// <summary>Gewaehlte Sortierung als Text fuer das Auswahlfeld; wird im Browser gemerkt.</summary>
+        private string SortKey {
+            get => sortMode.ToString();
+            set {
+                if (Enum.TryParse(value, out ProviderSort mode)) {
+                    sortMode = mode;
+                    _ = UserSettings.SetAsync("ProviderSort", mode.ToString());
+                    ApplyFilterAndSort();
+                }
+            }
+        }
+
+        private ProviderStatistics? StatisticsOf(Provider provider) {
+            return statistics.TryGetValue(provider.Guid, out ProviderStatistics? s) ? s : null;
+        }
+
+        private async Task ReadSortModeAsync() {
+            string? stored = await UserSettings.GetAsync<string?>("ProviderSort", null);
+            if (Enum.TryParse(stored, out ProviderSort mode)) {
+                sortMode = mode;
+            }
+            else if (!await UserSettings.GetAsync("ProviderIsASC", true)) {
+                sortMode = ProviderSort.NameDesc; // alte Einstellung (absteigend) uebernehmen
+            }
+        }
+
+        private void ClearFilter() {
+            Filter = "";
+        }
 
         private List<Provider> providers = new List<Provider>();
         private List<Provider> shownProviderList = new List<Provider>();
@@ -25,164 +76,126 @@ namespace Essenskasse.Pages {
                 Nav.NavigateTo("/");
             }
             else {
-                IsASC = await LocalStorage.GetItemAsync<bool>("ProviderIsASC");
+                await ReadSortModeAsync();
                 await RequestAllProviderFromApiAsync();
             }
             base.StateHasChanged();
         }
 
         private async Task RequestAllProviderFromApiAsync() {
-            // Request all providers, that are saved in the database.
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "provider/requestAll")
-            };
-
-            HttpResponseMessage? response = null;
+            isLoading = true;
+            loadFailed = false;
             try {
-                response = await HttpClient.SendAsync(httpRequestMessage);
-            }
-            catch {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
-            }
+                // Request all providers, that are saved in the database.
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(Config["API-Adress"] + "provider/requestAll")
+                };
 
-            if (response.IsSuccessStatusCode) { // success?
-                                                // deserialize the result-JSON with Newtownsoft to the List
-                providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
-                providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
-                providers = providers.OrderBy(x => x.Designation).ToList();
-                shownProviderList.AddRange(providers);
-                SortProviderList();
-            }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
-            }
-        }
-
-        private async void AddNewAnbieter() {
-            if (newProviderDesignation.Equals("")) {
-                return;
-            }
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(Config["API-Adress"] + "provider/new"),
-                Headers = {
-                        {"name", Uri.EscapeDataString(newProviderDesignation)}
-                    }
-            };
-
-            HttpResponseMessage? response = null;
-            try {
-                response = await HttpClient.SendAsync(httpRequestMessage);
-            }
-            catch {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
-            }
-
-            if (response.IsSuccessStatusCode) {
-                string temp = await response.Content.ReadAsStringAsync();
-                providers.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
-                providers = providers.OrderBy(x => x.Designation).ToList();
-                shownProviderList.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), newProviderDesignation));
-                SortProviderList();
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.provider)] + " " + newProviderDesignation + " " + _loc[nameof(RessourceAppStrings.toastAdd)], ToastLevel.Success);
-            }
-
-            newProviderDesignation = "";
-            accessToAdd = false;
-            base.StateHasChanged();
-        }
-
-        private async Task DeleteAnbieter() {
-            if (Guid.TryParse(providerToDeleteGuid, out Guid providerDesignation)) {
-                Provider? tempAnbieter = providers.Find(x => x.Guid.Equals(new Guid(providerToDeleteGuid)));
-                if (tempAnbieter is null) {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastGuidNotThere)], ToastLevel.Info);
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+                }
+                catch {
+                    loadFailed = true;
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
                     return;
                 }
-                if (await JSRuntime.InvokeAsync<bool>(
-                                    "confirm",
-                                    "Wollen sie den Anbieter - " +
-                                    tempAnbieter.Designation +
-                                    " - wirklich löschen?")) {
-                    // Bestätigt, also lösche
-                    HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                        Method = HttpMethod.Delete,
-                        RequestUri = new Uri(Config["API-Adress"] + "provider/remove"),
-                        Headers = {
-                            {"guid", providerToDeleteGuid}
-                        }
-                    };
 
-                    HttpResponseMessage? response = null;
-                    try {
-                        response = await HttpClient.SendAsync(httpRequestMessage);
-                    }
-                    catch {
-                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                        return;
-                    }
-
-                    if (response.IsSuccessStatusCode) {
-                        Provider temp = JsonConvert.DeserializeObject<Provider>(await response.Content.ReadAsStringAsync())!;
-                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.person)] + " " + temp.Designation + " " + _loc[nameof(RessourceAppStrings.toastSuccessfullyRemoved)], ToastLevel.Success);
-                        providers.Remove(tempAnbieter);
-                        accessToDelete = false;
-                        providerToDeleteGuid = "";
-                        base.StateHasChanged();
-                    }
-                    else if (response.StatusCode.Equals(System.Net.HttpStatusCode.NoContent)) {
-                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastRemoveNotBecauseNoEntity)], ToastLevel.Info);
-                    }
-                    else {
-                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoRemove)] + "\n" + _loc[nameof(RessourceAppStrings.toastAdminCall)], ToastLevel.Warning);
-                    }
+                if (response.IsSuccessStatusCode) {
+                    providers = JsonConvert.DeserializeObject<List<Provider>>(await response.Content.ReadAsStringAsync()) ?? new List<Provider>();
+                    providers.ForEach(x => x.Designation = Uri.UnescapeDataString(x.Designation));
+                    ApplyFilterAndSort();
+                    await RequestStatisticsAsync();
+                }
+                else {
+                    loadFailed = true;
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
                 }
             }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoGuidThere)], ToastLevel.Error);
+            finally {
+                isLoading = false;
             }
         }
 
-        private async Task CopyToClipboard(string text) {
-            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
-        }
-
-        private void ChangeProviderShownList() {
-            Console.WriteLine(filter);
-            shownProviderList.Clear();
-            if (filter.Equals("")) {
-                shownProviderList.AddRange(providers);
-            }
-            else {
-                foreach (Provider x in providers) {
-                    if (x.Designation.Contains(filter)) {
-                        shownProviderList.Add(x);
-                    }
+        /// <summary>Laedt Anzahl, Summe und letzte Bestellung je Anbieter. Ohne diese Daten funktioniert die Seite weiter.</summary>
+        private async Task RequestStatisticsAsync() {
+            HttpRequestMessage request = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "provider/statistics")
+            };
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode) {
+                    List<ProviderStatistics> loaded = JsonConvert.DeserializeObject<List<ProviderStatistics>>(await response.Content.ReadAsStringAsync()) ?? new List<ProviderStatistics>();
+                    statistics = loaded.ToDictionary(x => x.ProviderGuid);
+                    ApplyFilterAndSort();
                 }
             }
-        }
-
-        private void ToggleAscDesc() {
-            IsASC = !IsASC;
-            _ = SaveAscStatus();
-            SortProviderList();
-            base.StateHasChanged();
-        }
-
-        private void SortProviderList() {
-            if (IsASC) {
-                shownProviderList = shownProviderList.OrderBy(x => x.Designation).ToList();
-            }
-            else {
-                shownProviderList = shownProviderList.OrderByDescending(x => x.Designation).ToList();
+            catch {
+                // Auswertung ist optional.
             }
         }
 
-        public async Task SaveAscStatus() {
-            await LocalStorage.SetItemAsync<bool>("ProviderIsASC", IsASC);
+        private bool NewNameEntered => newProviderDesignation.Trim().Length > 0;
+        private bool NewNameDuplicate => NewNameEntered
+            && providers.Any(x => string.Equals(x.Designation, newProviderDesignation.Trim(), StringComparison.CurrentCultureIgnoreCase));
+        private bool CanAdd => NewNameEntered && !isAdding;
+
+        private async Task AddNewProvider() {
+            if (!CanAdd) {
+                return;
+            }
+            string name = newProviderDesignation.Trim();
+            isAdding = true;
+            try {
+                HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "provider/new"),
+                    Headers = {
+                        {"name", Uri.EscapeDataString(name)}
+                    }
+                };
+
+                HttpResponseMessage? response = null;
+                try {
+                    response = await HttpClient.SendAsync(httpRequestMessage);
+                }
+                catch {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
+                    return;
+                }
+                string temp = await response.Content.ReadAsStringAsync();
+                providers.Add(new Provider(new Guid(temp[1..(temp.Length - 1)]), name));
+                ApplyFilterAndSort();
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.provider)] + " " + name + " " + _loc[nameof(RessourceAppStrings.toastAdd)], ToastLevel.Success);
+                newProviderDesignation = "";
+            }
+            finally {
+                isAdding = false;
+            }
+            await newNameInput.FocusAsync(); // direkt den naechsten Anbieter eingeben
+        }
+
+        /// <summary>Eine Kachel hat die Bezeichnung gespeichert: Liste (Filter, Sortierung) neu aufbauen.</summary>
+        private void OnProviderUpdated(Provider updated) {
+            ApplyFilterAndSort();
+        }
+
+        /// <summary>Eine Kachel hat den Anbieter entfernt: aus der Liste nehmen.</summary>
+        private void OnProviderRemoved(Provider removed) {
+            providers.RemoveAll(x => x.Guid == removed.Guid);
+            ApplyFilterAndSort();
+        }
+
+        /// <summary>Baut die angezeigte Liste aus allen Anbietern: Suchtext (ohne Beachtung der Schreibweise), dann Sortierung.</summary>
+        private void ApplyFilterAndSort() {
+            shownProviderList = ProviderListing.Apply(providers, filter, sortMode, statistics);
         }
     }
 }

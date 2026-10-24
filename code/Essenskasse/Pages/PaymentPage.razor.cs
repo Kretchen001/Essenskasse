@@ -1,14 +1,18 @@
 ﻿using Essenskasse.Client;
 using Essenskasse.Ressources;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Modells;
 using Newtonsoft.Json;
 using System.Text;
+using U = Modells.User;
 
 namespace Essenskasse.Pages {
 
     public partial class PaymentPage {
 
+        private string dashboardLink = "/";
         private List<Person>? person = new List<Person>();
         private Guid _selectedPerson;
         private Guid SelectedPerson {
@@ -17,32 +21,28 @@ namespace Essenskasse.Pages {
             }
             set {
                 _selectedPerson = value;
-                RequestPaymentsOfPerson();
-            }
-        }
-
-        private decimal _Payment = 0;
-        private decimal Payment {
-            get {
-                return _Payment;
-            }
-            set {
-                if (value != 0) {
-                    Money temp = ConvertToMoney(value);
-                    if (temp.Cent < 100) {
-                        _Payment = value;
-                    }
-                    else {
-                        // nothing
-                    }
+                previewOpen = false;
+                if (value == Guid.Empty) {
+                    paymentsOfSelectedPerson = new List<Payment>();
+                }
+                else {
+                    _ = RequestPaymentsOfPerson();
                 }
             }
         }
-        private Money Money {
-            get {
-                return ConvertToMoney(_Payment);
+
+        /// <summary>Eingetippter Betrag, z. B. "12,50". Wird erst beim Buchen in einen Geldbetrag umgewandelt.</summary>
+        private string _amountText = "";
+        private string amountText {
+            get => _amountText;
+            set {
+                _amountText = value ?? "";
+                previewOpen = false; // die Vorschau gilt nur fuer genau diesen Betrag
             }
         }
+        private bool AmountEntered => amountText.Trim().Length > 0;
+        private bool AmountValid => MoneyParser.TryParse(amountText, out Money parsed) && parsed.ToTotalCents() != 0;
+        private Money Money => MoneyParser.TryParse(amountText, out Money parsed) ? parsed : new Money(0, 0);
 
         private string comment = "";
 
@@ -59,21 +59,6 @@ namespace Essenskasse.Pages {
                 await RefreshPersonList();
             }
             base.StateHasChanged();
-        }
-
-        /// <summary></summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private Money ConvertToMoney(decimal value) {
-            try {
-                long euro = (long)value;
-                short cent = (short)((value - euro) * 100);
-                return new Money(euro, cent);
-            }
-            catch {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastMoneyFormatInvalid)], ToastLevel.Warning);
-                return new Money(0, 0);
-            }
         }
 
         private async Task RefreshPersonList() {
@@ -98,22 +83,44 @@ namespace Essenskasse.Pages {
                 person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
                 person = person.OrderBy(x => x.Name).ToList();
 
-                if (person.Count > 0) {
-                    SelectedPerson = person[0].Guid;
-                }
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoApiConnection)], ToastLevel.Warning);
             }
         }
 
-        private async void RequestPaymentsOfPerson() {
+        private bool historyLoading = false;
+        private bool loadingMore = false;
+        private bool allLoaded = false;
+
+        /// <summary>Einzahlungen gruppiert nach Monat (neueste zuerst).</summary>
+        private IEnumerable<IGrouping<DateTime, Payment>> PaymentsByMonth => paymentsOfSelectedPerson
+            .OrderByDescending(x => x.DateTime)
+            .GroupBy(x => new DateTime(x.DateTime.Year, x.DateTime.Month, 1));
+
+        private async Task RequestPaymentsOfPerson() {
+            Guid requestedFor = SelectedPerson;
+            historyLoading = true;
+            allLoaded = false;
+            try {
+                await RequestPaymentsCoreAsync();
+            }
+            finally {
+                if (requestedFor == SelectedPerson) {
+                    historyLoading = false;
+                }
+                StateHasChanged();
+            }
+        }
+
+        private async Task RequestPaymentsCoreAsync() {
             // Request last payments of a person
+            Guid requestedFor = SelectedPerson;
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/fromPerson"),
                 Headers = {
-                    { "guid", SelectedPerson.ToString() },
+                    { "guid", requestedFor.ToString() },
                     { "amount", Amount.ToString() }
                 }
             };
@@ -128,8 +135,13 @@ namespace Essenskasse.Pages {
             }
 
             if (response.IsSuccessStatusCode) {
-                paymentsOfSelectedPerson = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+                List<Payment> loaded = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
+                if (requestedFor != SelectedPerson) {
+                    return; // zwischenzeitlich wurde eine andere Person gewaehlt, deren Liste nicht ueberschreiben
+                }
+                paymentsOfSelectedPerson = loaded;
                 paymentsOfSelectedPerson.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
+                allLoaded = loaded.Count < Amount;
             }
             else {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSomethingWrong)], ToastLevel.Warning);
@@ -138,19 +150,162 @@ namespace Essenskasse.Pages {
             base.StateHasChanged();
         }
 
-        private async void InsertPayment() {
-            if (!(await JSRuntime.InvokeAsync<bool>("confirm", _loc[nameof(RessourceAppStrings.insertFollowingAmount)] + "\n" + Money.ToString()))) {
+        private string personFilter = "";
+        private string PersonFilter {
+            get => personFilter;
+            set => personFilter = value ?? "";
+        }
+        private ElementReference amountInput;
+        private bool focusAmount = false;
+        private static readonly int[] quickAmounts = { 5, 10, 20, 50 };
+
+        /// <summary>Gleiche Einteilung wie auf dem Dashboard: Saldo ueber dem Grenzwert ist unauffaellig.</summary>
+        private bool IsInconspicuous(Person x) => x.Saldo.IsGreater(AppData.DashboardMoneyLimit);
+
+        /// <summary>Personen passend zum Suchtext (Name oder E-Mail, ohne Beachtung der Schreibweise), nach Name sortiert.</summary>
+        private IEnumerable<Person> ShownPersons {
+            get {
+                string text = personFilter.Trim();
+                IEnumerable<Person> result = person ?? new List<Person>();
+                if (text.Length > 0) {
+                    result = result.Where(x => x.Name.Contains(text, StringComparison.CurrentCultureIgnoreCase)
+                                            || x.Email.Contains(text, StringComparison.CurrentCultureIgnoreCase));
+                }
+                return result.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase);
+            }
+        }
+
+        private void OnPersonSearchKeyDown(KeyboardEventArgs e) {
+            if (e.Key == "Escape") {
+                ClearPersonFilter();
+            }
+            else if (e.Key == "Enter") {
+                // Genau ein Treffer: Enter waehlt ihn.
+                List<Person> matches = ShownPersons.Take(2).ToList();
+                if (matches.Count == 1) {
+                    SelectPerson(matches[0]);
+                }
+            }
+        }
+
+        private void ClearPersonFilter() {
+            personFilter = "";
+        }
+
+        private void SelectPerson(Person selected) {
+            amountText = "";
+            comment = "";
+            SelectedPerson = selected.Guid;
+            sendConfirmation = AppData.SendConfirmationMail != U.ConfirmationMailMode.Never && !selected.Email.Equals("");
+            focusAmount = true; // Cursor direkt ins Betragsfeld
+        }
+
+        private void ClearSelection() {
+            amountText = "";
+            comment = "";
+            personFilter = "";
+            SelectedPerson = Guid.Empty;
+        }
+
+        private void SetQuickAmount(int euro) {
+            amountText = euro.ToString() + ",00";
+            focusAmount = true;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender) {
+            if (focusAmount) {
+                focusAmount = false;
+                try {
+                    await amountInput.FocusAsync();
+                }
+                catch {
+                    // Feld nicht (mehr) sichtbar, kein Problem.
+                }
+            }
+        }
+
+        /// <summary>Soll fuer die naechste Buchung eine Bestaetigungsmail vorbereitet werden? Voreinstellung aus den Einstellungen.</summary>
+        private bool sendConfirmation = false;
+        /// <summary>Nur bei der Einstellung "pro Einzahlung waehlbar" gibt es den Schalter.</summary>
+        private bool MailChoosable => AppData.SendConfirmationMail == U.ConfirmationMailMode.Optional;
+
+        /// <summary>Bei "immer" wird die Bestaetigungsmail zu jeder Einzahlung vorbereitet.</summary>
+        private bool MailAlways => AppData.SendConfirmationMail == U.ConfirmationMailMode.Always;
+
+        private bool HasEmail => !(SelectedPersonData?.Email ?? "").Equals("");
+
+        private bool isBooking = false;
+        private bool previewOpen = false;
+
+        private Person? SelectedPersonData => person?.Find(x => x.Guid.Equals(SelectedPerson));
+
+        /// <summary>Stand der Person nach der Buchung (Stand jetzt plus Betrag).</summary>
+        private Money? BalanceAfter => SelectedPersonData is null
+            ? null
+            : Money.FromTotalCents(SelectedPersonData.Saldo.ToTotalCents() + Money.ToTotalCents());
+
+        private void OpenPreview() {
+            if (AmountValid && SelectedPersonData is not null) {
+                previewOpen = true;
+            }
+        }
+
+        private void ClosePreview() {
+            previewOpen = false;
+        }
+
+        /// <summary>Holt den aktuellen Stand der Person vom Server, damit die naechste Vorschau stimmt.</summary>
+        private async Task RefreshSaldoAsync(Guid guid) {
+            HttpRequestMessage request = new HttpRequestMessage() {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config["API-Adress"] + "person/perGuid"),
+                Headers = { { "guid", guid.ToString() } }
+            };
+            try {
+                HttpResponseMessage response = await HttpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode) {
+                    Person? fresh = JsonConvert.DeserializeObject<Person>(await response.Content.ReadAsStringAsync());
+                    Person? local = person?.Find(x => x.Guid.Equals(guid));
+                    if (fresh is not null && local is not null) {
+                        local.Saldo = fresh.Saldo;
+                    }
+                }
+            }
+            catch {
+                // Der Stand ist nur Anzeige; ein Fehler hier darf die Buchung nicht beeintraechtigen.
+            }
+        }
+
+        /// <summary>Bucht die Einzahlung. Solange eine Buchung laeuft, wird jeder weitere Aufruf ignoriert (kein doppeltes Buchen).</summary>
+        private async Task InsertPayment() {
+            if (isBooking) {
                 return;
             }
+            isBooking = true;
+            try {
+                await InsertPaymentCoreAsync();
+            }
+            finally {
+                isBooking = false;
+                previewOpen = false;
+            }
+        }
 
+        private async Task InsertPaymentCoreAsync() {
+            if (!AmountValid) {
+                return;
+            }
+            Guid bookedFor = SelectedPerson;
+            Money booked = Money;
+            bool sendForThisBooking = MailAlways || (MailChoosable && sendConfirmation); // Wahl zum Zeitpunkt der Buchung festhalten
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/insertNew"),
                 Headers = {
-                    {"referencedPerson", SelectedPerson.ToString()},
+                    {"referencedPerson", bookedFor.ToString()},
                     {"comment", Uri.EscapeDataString(comment)}
                 },
-                Content = new StringContent(JsonConvert.SerializeObject(Money), Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonConvert.SerializeObject(booked), Encoding.UTF8, "application/json")
             };
 
             HttpResponseMessage? response = null;
@@ -164,33 +319,31 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastSuccessfullyAdded)], ToastLevel.Success);
-                paymentsOfSelectedPerson.Add(JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!);
-                paymentsOfSelectedPerson.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
-                paymentsOfSelectedPerson = paymentsOfSelectedPerson.OrderByDescending(x => x.DateTime).ToList();
+                amountText = "";
+                comment = "";
+                await RefreshSaldoAsync(bookedFor);
+                Payment newPayment = JsonConvert.DeserializeObject<Payment>(await response.Content.ReadAsStringAsync())!;
+                newPayment.Comment = Uri.UnescapeDataString(newPayment.Comment);
+                if (bookedFor == SelectedPerson) {
+                    paymentsOfSelectedPerson.Add(newPayment);
+                    paymentsOfSelectedPerson = paymentsOfSelectedPerson.OrderByDescending(x => x.DateTime).ToList();
+                }
                 base.StateHasChanged();
-                if (AppData.SendConfirmationMail) {
-                    if (person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Email.Equals("")) {
+                if (sendForThisBooking) {
+                    Person? bookedPerson = person?.Find(x => x.Guid.Equals(bookedFor));
+                    if (bookedPerson is null || bookedPerson.Email.Equals("")) {
                         ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNoEmailEntered)], ToastLevel.Info);
                     }
                     else {
-                        ToastService.ShowToast("Bestätigungsmail versenden...", ToastLevel.Info);
-                        Payment d = paymentsOfSelectedPerson[0];
-                        string subject = "Bestätigung einer Einzahlung | \"Essenkasse\"";
-                        string body = $"Sehr geehrte(r) {person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Name}\n" +
-                            $"Hiermit wird Ihnen bestätigt, daß am heutigen " +
-                            $"Tage {d.DateTime:d} um {d.DateTime:t} " +
-                            $"eine Einzahlung in der Höhe {d.Amount} erfolgte!\n" +
-                            $"Anmerkung des Eintrages: {d.Comment}" +
-                            $"\n\n" +
-                            $"Ihre Kassenverwaltung";
-                        await JSRuntime.InvokeAsync<object>(
-                            "blazorExtensions.SendLocalEmail",
-                            new object[] {
-                                person![person.FindIndex(x => x.Guid.Equals(SelectedPerson))].Email,
-                                subject,
-                                body
-                            }
-                        );
+                        ToastService.ShowToast(_loc[nameof(RessourceAppStrings.confirmationMailPreparing)], ToastLevel.Info);
+                        Payment bookedPayment = newPayment;
+                        await MailSender.SendAsync(JSRuntime, Texts, bookedPerson.Email, bookedPerson.Language, lang => PaymentConfirmation.Compose(
+                            Texts.Get(lang, nameof(RessourceAppStrings.emailConfirmSubject)),
+                            Texts.Get(lang, nameof(RessourceAppStrings.emailConfirmBody)),
+                            Texts.Get(lang, nameof(RessourceAppStrings.emailConfirmComment)),
+                            Texts.Get(lang, nameof(RessourceAppStrings.emailConfirmClosing)),
+                            bookedPerson.Name, bookedPayment.DateTime, bookedPayment.Amount, bookedPayment.Comment,
+                            new System.Globalization.CultureInfo(lang)));
                     }
                 }
                 return;
@@ -201,12 +354,25 @@ namespace Essenskasse.Pages {
         }
 
         private async Task LoadNextAmountOfPayments() {
-            // Request last payments of a person
+            if (loadingMore) {
+                return;
+            }
+            loadingMore = true;
+            try {
+                await LoadNextCoreAsync();
+            }
+            finally {
+                loadingMore = false;
+            }
+        }
+
+        private async Task LoadNextCoreAsync() {
+            Guid requestedFor = SelectedPerson;
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(Config["API-Adress"] + "payment/requestNextAmountFromPerson"),
                 Headers = {
-                    { "guid", SelectedPerson.ToString() },
+                    { "guid", requestedFor.ToString() },
                     { "amount", Amount.ToString() },
                     { "alreadyLoaded", paymentsOfSelectedPerson.Count.ToString()}
                 }
@@ -223,12 +389,15 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 List<Payment> getted = JsonConvert.DeserializeObject<List<Payment>>(await response.Content.ReadAsStringAsync()) ?? new List<Payment>();
-                if (getted.Count == 0) {
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastNothingToLoad)], ToastLevel.Info);
+                if (requestedFor != SelectedPerson) {
+                    return; // zwischenzeitlich andere Person gewaehlt
                 }
-                else {
+                if (getted.Count > 0) {
                     getted.ForEach(x => x.Comment = Uri.UnescapeDataString(x.Comment));
                     paymentsOfSelectedPerson.AddRange(getted);
+                }
+                if (getted.Count < Amount) {
+                    allLoaded = true;
                 }
             }
             else {

@@ -72,7 +72,8 @@ namespace EssenskasseAPI.Controllers {
 
         [HttpPost, Route("new")]
         public IActionResult AddNewPerson([FromHeader] string? name,
-                                            [FromHeader] string? email) {
+                                            [FromHeader] string? email,
+                                            [FromHeader] string? language = null) {
             using (Operation.Time("AddNewPerson")) {
                 Log.Information("AddNewPerson called");
                 if (name is null) {
@@ -86,14 +87,15 @@ namespace EssenskasseAPI.Controllers {
                 Person newPerson = new Person(
                     Uri.UnescapeDataString(name),
                     Uri.UnescapeDataString(email ?? "")
-                    );
+                    ) { Language = Modells.User.SettingsSanitizer.SafeLanguage(language) };
                 string queryStringInsert = $"" +
-                    $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
-                    $"VALUES (@guid, @name, @email, @saldoEuro, @saldoCent);";
+                    $"INSERT INTO essenskasse.Person (Guid, Name, Email, Language, SaldoEuro, SaldoCent) " +
+                    $"VALUES (@guid, @name, @email, @language, @saldoEuro, @saldoCent);";
                 _db.Query(queryStringInsert,
                     Db.P("@guid", newPerson.Guid),
                     Db.P("@name", newPerson.Name),
                     Db.P("@email", newPerson.Email),
+                    Db.P("@language", newPerson.Language),
                     Db.P("@saldoEuro", newPerson.Saldo.Euro),
                     Db.P("@saldoCent", newPerson.Saldo.Cent));
                 return Ok(JsonConvert.SerializeObject(newPerson.Guid));
@@ -103,9 +105,16 @@ namespace EssenskasseAPI.Controllers {
         [HttpPut, Route("update")]
         public IActionResult UpdatePerson([FromHeader] Guid guid,
                                             [FromHeader] string? name,
-                                            [FromHeader] string? email) {
+                                            [FromHeader] string? email,
+                                            [FromHeader] string? language = null) {
             using (Operation.Time("UpdatePerson")) {
                 Log.Information("UpdatePerson called");
+
+                // Ein leerer Header (E-Mail soll geleert werden) wird vom Model Binding zu null; deshalb
+                // wird hier direkt geprueft, ob der Header mitgeschickt wurde.
+                if (Request.Headers.TryGetValue("email", out Microsoft.Extensions.Primitives.StringValues sentEmail)) {
+                    email = sentEmail.ToString();
+                }
 
                 string queryStringRequestPerson = $"" +
                     $"SELECT * " +
@@ -124,15 +133,20 @@ namespace EssenskasseAPI.Controllers {
                         personToUpdate.Email = Uri.UnescapeDataString(email);
                     }
 
+                    if (language is not null) {
+                        personToUpdate.Language = Modells.User.SettingsSanitizer.SafeLanguage(language);
+                    }
+
                     // DataTableToListOfPerson liefert Name/Email URL-kodiert zurueck. Wurde ein Feld
                     // nicht geaendert, muss es vor dem Speichern wieder dekodiert werden.
                     string queryStringPersonUpdate = $"" +
                         $"UPDATE essenskasse.Person " +
-                        $"SET Name=@name, Email=@email " +
+                        $"SET Name=@name, Email=@email, Language=@language " +
                         $"WHERE Guid=@guid;";
                     _db.Query(queryStringPersonUpdate,
                         Db.P("@name", name is not null ? personToUpdate.Name : Uri.UnescapeDataString(personToUpdate.Name)),
                         Db.P("@email", email is not null ? personToUpdate.Email : Uri.UnescapeDataString(personToUpdate.Email)),
+                        Db.P("@language", personToUpdate.Language),
                         Db.P("@guid", personToUpdate.Guid));
 
                     Log.Information("Person successfully updated");
@@ -142,6 +156,43 @@ namespace EssenskasseAPI.Controllers {
                     Log.Error($"UpdatePerson failed, requested Guid = '{guid}'");
                     return BadRequest("Änderungen konnten nicht übernommen werden. Bitte beim Admin melden.");
                 }
+            }
+        }
+
+        /// <summary>Ausgeblendete Personen (Sichtbar=false), damit sie wiederhergestellt werden koennen.</summary>
+        [HttpGet, Route("requestHidden")]
+        public IActionResult GetHiddenPerson() {
+            using (Operation.Time("Request hidden Persons")) {
+                string queryString = $"" +
+                    $"SELECT * " +
+                    $"FROM essenskasse.Person " +
+                    $"WHERE Sichtbar=false;";
+
+                DataTable dataTablePerson = _db.Query(queryString);
+                List<Person> persons = DataTableToListOfPerson(dataTablePerson);
+                Log.Information(persons.Count + " hidden Person requested");
+                return Ok(JsonConvert.SerializeObject(persons));
+            }
+        }
+
+        /// <summary>Blendet eine ausgeblendete Person wieder ein.</summary>
+        [HttpPut, Route("restore")]
+        public IActionResult RestorePerson([FromHeader] Guid? guid) {
+            using (Operation.Time("RestorePerson")) {
+                Log.Information("RestorePerson called");
+                if (guid is null) {
+                    Log.Warning("Nothing to restore");
+                    return BadRequest();
+                }
+                DataTable dataTable = _db.Query($"SELECT * FROM essenskasse.Person WHERE Guid=@guid;", Db.P("@guid", guid));
+                List<Person> persons = DataTableToListOfPerson(dataTable);
+                if (persons.Count != 1) {
+                    Log.Warning($"{guid} not found");
+                    return NotFound("Person konnte nicht gefunden werden!");
+                }
+                _db.Query($"UPDATE essenskasse.Person SET Sichtbar=true WHERE Guid=@guid;", Db.P("@guid", guid));
+                Log.Information($"{persons[0].Name} with {persons[0].Guid} successfully visible set");
+                return Ok(JsonConvert.SerializeObject(persons[0]));
             }
         }
 
@@ -255,7 +306,7 @@ namespace EssenskasseAPI.Controllers {
                         euro: long.Parse(row["SaldoEuro"].ToString()!),
                         cent: short.Parse(row["SaldoCent"].ToString()!)
                         )
-                    ));
+                    ) { Language = dataTable.Columns.Contains("Language") ? row["Language"].ToString() ?? "" : "" });
             }
             return personList;
         }

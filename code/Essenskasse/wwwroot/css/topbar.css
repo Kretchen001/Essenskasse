@@ -1,0 +1,51 @@
+/* Kopfzeile mit Anmelden/Abmelden. Farben kommen als Variablen aus theme.css. */
+
+/* ueberschreibt die Farben aus MainLayout.razor.css (isoliertes CSS wird spaeter geladen) */
+main .top-row.ek-topbar {
+    gap: 0.75rem;
+    background-color: var(--ek-surface);
+    border-bottom: 1px solid var(--ek-line);
+    color: var(--ek-text);
+}
+
+.ek-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    color: var(--ek-text);
+}
+
+.ek-user-avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--ek-ok-tint);
+    color: var(--ek-ok);
+    font-size: 0.8rem;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+}
+
+.ek-user-name {
+    overflow: hidden;
+    max-width: 14rem;
+    font-weight: 550;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ek-topbar-busy {
+    color: var(--ek-muted);
+    font-size: 0.95rem;
+}
+
+/* Auf schmalen Bildschirmen nur das Kuerzel, damit die Zeile nicht umbricht */
+@media (max-width: 575.98px) {
+    .ek-user-name {
+        display: none;
+    }
+}

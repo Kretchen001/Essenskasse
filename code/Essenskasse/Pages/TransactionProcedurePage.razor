@@ -1,113 +1,147 @@
 ﻿@page "/transactionProcedure"
 
-@inject HttpClient HttpClient
-@inject AppDataService AppData
-@inject NavigationManager Nav
-@inject ThemeService themeService
-@inject ToastService ToastService
 @inject IStringLocalizer<App> _loc
-@inject IJSRuntime JsRuntime
-@inject IConfiguration Config
-@inject ILocalStorageService LocalStorage
-
-<style>
-    th:nth-child(1), td:nth-child(1) {
-        width: 30% !important; /* First row 30% width */
-    }
-
-    th:nth-child(2), td:nth-child(2) {
-        width: 40% !important; /* Secound row 30% width (60%) */
-    }
-
-    th:nth-child(3), td:nth-child(3) {
-        width: 30% !important; /* Third row 40% width (100%) */
-    }
-</style>
+@inject AuthStateService AuthState
 
 <PageTitle>@_loc[nameof(RessourceAppStrings.coffeeFund)]</PageTitle>
 
-<h3>@_loc[nameof(RessourceAppStrings.coffeeFund)]</h3>
+<div class="ek-dash ek-pg-coffee">
+    <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.coffeeFund)]</h2>
 
-<br />
-<div class="row">
-    <div class="col-lg-3 align-self-lg-center">
-        <h4>@_loc[nameof(RessourceAppStrings.cashBalanceCurrent)]</h4>
+    <div class="ek-cash-hero @(summary.Balance.IsPositiv() ? "ek-person-ok" : "ek-person-bad")">
+        <div class="ek-cash-main">
+            <span class="ek-cash-label">@_loc[nameof(RessourceAppStrings.cashBalanceCurrent)]</span>
+            <span class="ek-cash-balance" aria-live="polite">@summary.Balance.ToString()</span>
+        </div>
+        <dl class="ek-cash-sums">
+            <div>
+                <dt>@_loc[nameof(RessourceAppStrings.coffeeTotalIn)]</dt>
+                <dd class="is-in">+ @summary.Income.ToString()</dd>
+            </div>
+            <div>
+                <dt>@_loc[nameof(RessourceAppStrings.coffeeTotalOut)]</dt>
+                <dd class="is-out">- @summary.Expense.ToString()</dd>
+            </div>
+        </dl>
     </div>
-    <div class="col-lg-9 align-self-lg-center">
-        <h4>@currentCashBalance.ToString()</h4>
-    </div>
-</div>
-<AuthorizeView>
-    <Authorized>
-        <hr />
-        <br />
-        <div class="row">
-            <div class="col-lg-3 align-self-center">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.amount)]
-                </label>
-            </div>
-            <div class="col-lg-3 align-self-center" style="width: 25%">
-                <input style="width: 100%" type="number" @bind="Amount" placeholder="Euro,Cent -> 10,00€">
-            </div>
-            <div class="col-lg-3 align-self-center">
-                <label>
-                    (@amountMoney.ToString())
-                </label>
-            </div>
-            <div class="col-lg-3 align-self-center">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.negativeValuePayout)]
-                </label>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-lg-3">
-                <label>
-                    @_loc[nameof(RessourceAppStrings.comment)]
-                </label>
-            </div>
-            <div class="col-lg-9">
-                <input type="text" style="width: 100%" @bind="comment" />
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px" @onclick="() => InsertNewTransaction()">
-                @_loc[nameof(RessourceAppStrings.submit)]
-            </button>
-        </div>
-    </Authorized>
-</AuthorizeView>
-<br />
-<hr />
-<br />
-<div class="row">
-    <div class="col-lg-12">
-        <table style="margin-left: 1rem; margin-right: 1rem; width: calc(100% - 2rem);">
-            <tr style="border-bottom: groove lightgray">
-                <th>@_loc[nameof(RessourceAppStrings.date)]</th>
-                <th>@_loc[nameof(RessourceAppStrings.comment)]</th>
-                <th style="text-align: right">@_loc[nameof(RessourceAppStrings.amount)]</th>
-            </tr>
-            @for (int i = 0; i < transactions.Count; i += 1) {
-                var transaction = transactions[i];
-                string rowColor = (i % 3) switch {
-                    0 => "#EEEEEE", // Hellgrau
-                    1 => "#DDDDDD", // Mittelgrau
-                    2 => "#CCCCCC", // Dunkelgrau
-                    _ => "#FFFFFF"  // Default (White)
-                };
-                if (!transaction.Amount.IsPositiv()) {
-                    rowColor = "#F55D52"; // Rot für negative Beträge
+
+    <AuthorizeView>
+        <Authorized>
+            <form class="ek-add ek-cash-form" @onsubmit="OpenPreview" @onsubmit:preventDefault>
+                <div class="ek-seg" role="group" aria-label="@_loc[nameof(RessourceAppStrings.coffeeFund)]">
+                    <button type="button" class="is-in @(isPayout ? "" : "is-active")" aria-pressed="@(!isPayout)" @onclick="() => SetDirection(false)">
+                        <span aria-hidden="true">↓</span> @_loc[nameof(RessourceAppStrings.coffeeDeposit)]
+                    </button>
+                    <button type="button" class="is-out @(isPayout ? "is-active" : "")" aria-pressed="@isPayout" @onclick="() => SetDirection(true)">
+                        <span aria-hidden="true">↑</span> @_loc[nameof(RessourceAppStrings.coffeePayout)]
+                    </button>
+                </div>
+                <div class="ek-add-fields ek-cash-fields">
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.amount)]</span>
+                        <input type="text" inputmode="decimal" class="ek-input" autocomplete="off" placeholder="10,00"
+                               @bind="amountText" @bind:event="oninput" />
+                    </label>
+                    <label class="ek-field ek-field-required @(AmountValid && !CommentValid ? "is-missing" : "")">
+                        <span class="ek-req-label">
+                            @_loc[nameof(RessourceAppStrings.comment)]
+                            <span class="ek-req-badge">@_loc[nameof(RessourceAppStrings.coffeeRequired)]</span>
+                        </span>
+                        <input type="text" class="ek-input" autocomplete="off" maxlength="200" required aria-required="true"
+                               aria-invalid="@(AmountValid && !CommentValid)" @bind="comment" @bind:event="oninput" />
+                    </label>
+                    <button type="submit" class="ek-btn ek-btn-primary ek-add-submit" disabled="@(!CanBook || isBooking)">
+                        @_loc[nameof(RessourceAppStrings.coffeeBook)]
+                    </button>
+                </div>
+                @if (AmountEntered && !AmountValid) {
+                    <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.amountInvalid)]</p>
                 }
-                <tr style="background-color: @rowColor; color: rgb(10,10,10);">
-                    <td>@transaction.DateTime.ToString("dddd, dd.MMMM.yyyy (HH:mm)")</td>
-                    <td>@transaction.Comment</td>
-                    <td style="text-align: right">@transaction.Amount</td>
-                </tr>
-            }            
-        </table>
-    </div>
+                else if (AmountValid && !CommentValid) {
+                    <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.coffeeCommentRequired)]</p>
+                }
+                else if (AmountValid) {
+                    <p class="ek-hint @(BalanceAfter.IsPositiv() ? "" : "is-warn")">
+                        @_loc[nameof(RessourceAppStrings.coffeeBalanceAfter)]: <strong>@BalanceAfter.ToString()</strong>
+                        @if (!BalanceAfter.IsPositiv()) {
+                            <span> – @_loc[nameof(RessourceAppStrings.coffeeWouldGoNegative)]</span>
+                        }
+                    </p>
+                }
+            </form>
+
+            @if (previewOpen && CanBook) {
+                <div class="ek-confirm ek-pay-preview" role="group" aria-label="@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]">
+                    <p class="ek-confirm-title">@_loc[nameof(RessourceAppStrings.bookingPreviewTitle)]</p>
+                    <p class="ek-confirm-text">
+                        <strong>@(isPayout ? _loc[nameof(RessourceAppStrings.coffeePayout)] : _loc[nameof(RessourceAppStrings.coffeeDeposit)])</strong>:
+                        @SignedAmount.ToString() – @comment.Trim()<br />
+                        @_loc[nameof(RessourceAppStrings.balanceBefore)]: @summary.Balance.ToString()
+                        &nbsp;→&nbsp;
+                        @_loc[nameof(RessourceAppStrings.balanceAfter)]: <strong>@BalanceAfter.ToString()</strong>
+                    </p>
+                    <div class="ek-edit-actions">
+                        <button type="button" class="ek-btn ek-btn-primary" disabled="@isBooking" @onclick="InsertNewTransaction">
+                            @_loc[nameof(RessourceAppStrings.bookNow)]
+                        </button>
+                        <button type="button" class="ek-btn" disabled="@isBooking" @onclick="ClosePreview">
+                            @_loc[nameof(RessourceAppStrings.cancel)]
+                        </button>
+                    </div>
+                </div>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <div class="ek-cash-note">
+                <p class="ek-hint">@_loc[nameof(RessourceAppStrings.coffeeSignInHint)]</p>
+                <button type="button" class="ek-btn" @onclick="AuthState.RequestLogin">@_loc[nameof(RessourceAppStrings.signIn)]</button>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    @if (loading) {
+        <ul class="ek-hist ek-cash-hist" aria-busy="true" aria-live="polite">
+            @for (int i = 0; i < 4; i++) {
+                <li class="ek-skeleton" aria-hidden="true"><span class="ek-skeleton-line"></span></li>
+            }
+        </ul>
+    }
+    else if (loadFailed) {
+        <div class="ek-empty">
+            <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.coffeeLoadFailed)]</p>
+            <button type="button" class="ek-btn" @onclick="ReloadAsync">@_loc[nameof(RessourceAppStrings.retry)]</button>
+        </div>
+    }
+    else if (transactions.Count == 0) {
+        <div class="ek-empty">
+            <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.coffeeNoEntries)]</p>
+        </div>
+    }
+    else {
+        @foreach (IGrouping<DateTime, TransactionProcedure> month in ShownByMonth) {
+            <h4 class="ek-hist-month">@month.Key.ToString("MMMM yyyy")</h4>
+            <ul class="ek-hist ek-cash-hist">
+                @foreach (TransactionProcedure x in month) {
+                    bool isIn = x.Amount.IsPositiv();
+                    <li class="@(isIn ? "is-in" : "is-out")">
+                        <span class="ek-cash-dir" aria-hidden="true">@(isIn ? "↓" : "↑")</span>
+                        <span class="ek-hist-date">@x.DateTime.ToString("ddd, dd.MM. HH:mm")</span>
+                        <span class="ek-hist-text">
+                            <span class="ek-cash-kind">@(isIn ? _loc[nameof(RessourceAppStrings.coffeeDeposit)] : _loc[nameof(RessourceAppStrings.coffeePayout)])</span>
+                            @x.Comment
+                        </span>
+                        <span class="ek-hist-amount">@x.Amount.ToString()</span>
+                    </li>
+                }
+            </ul>
+        }
+        <div class="ek-hist-more">
+            @if (transactions.Count <= visibleCount) {
+                <span class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.endOfList)]</span>
+            }
+            else {
+                <button type="button" class="ek-btn" @onclick="ShowMore">@_loc[nameof(RessourceAppStrings.buttonLoadMore)]</button>
+            }
+        </div>
+    }
 </div>

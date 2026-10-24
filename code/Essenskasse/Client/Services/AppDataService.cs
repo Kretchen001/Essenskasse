@@ -34,8 +34,11 @@ namespace Essenskasse.Client.Services {
         /// <summary></summary>
         public bool NoticeableOnRightSide { get; set; } = true;
         
+        /// <summary>Die Schnellbetraege (Chips) im Bestellfenster in Cent; mindestens einer.</summary>
+        public List<long> QuickAmounts { get; set; } = [.. Modells.QuickAmounts.Default];
+
         /// <summary></summary>
-        public bool SendConfirmationMail { get; set; } = true;
+        public U.ConfirmationMailMode SendConfirmationMail { get; set; } = U.ConfirmationMailMode.Optional;
 
         public U.Settings GetAppDataAsSettingsObject() {
             return new U.Settings(
@@ -45,11 +48,13 @@ namespace Essenskasse.Client.Services {
                 filterShowProvider: FilterShowProvider,
                 dashboardMoneyLimit: DashboardMoneyLimit,
                 filterShowPerson: FilterShowPerson,
-                accessToken: AccessToken,
+                accessToken: null, // der Aenderungstoken gehoert zum Benutzer und wird nicht mit den Einstellungen gespeichert
                 adminEmail: AdminEmail,
                 noticeableOnRightSide: NoticeableOnRightSide,
                 sendConfirmationMail: SendConfirmationMail
-                );
+                ) {
+                QuickAmounts = [.. QuickAmounts]
+            };
         }
 
         public void SettingsToAppData(U.Settings settings) {
@@ -59,7 +64,7 @@ namespace Essenskasse.Client.Services {
             FilterShowProvider = settings.FilterShowProvider;
             DashboardMoneyLimit = settings.DashboardMoneyLimit;
             FilterShowPerson = settings.FilterShowPerson;
-            AccessToken = settings.AccessToken;
+            // Der Aenderungstoken wird bewusst nicht uebernommen (siehe GetAppDataAsSettingsObject).
             AdminEmail = settings.AdminEmail;
             NoticeableOnRightSide = settings.NoticeableOnRightSide;
             SendConfirmationMail = settings.SendConfirmationMail;

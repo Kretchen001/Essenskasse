@@ -1,0 +1,172 @@
+﻿@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject TextService Texts
+@inject IConfiguration Config
+@inject IStringLocalizer<App> _loc
+@inject ToastService ToastService
+
+<article class="ek-person @(PositivSaldo ? "ek-person-ok" : "ek-person-bad") @(isEditing ? "is-editing" : "")">
+    <span class="ek-avatar" aria-hidden="true">@Initials</span>
+    @if (isEditing) {
+        <div class="ek-person-edit">
+            <h3 class="ek-edit-title">@_loc[nameof(RessourceAppStrings.editPerson)]</h3>
+            <label class="ek-field @(NameChanged ? "is-changed" : "")">
+                <span>@_loc[nameof(RessourceAppStrings.name)] @(NameChanged ? "•" : "")</span>
+                <input type="text" class="ek-input" @bind="editName" @bind:event="oninput" @onkeydown="OnEditKeyDown" autocomplete="off" />
+            </label>
+            <label class="ek-field @(EmailChanged ? "is-changed" : "")">
+                <span>@_loc[nameof(RessourceAppStrings.email)] @(EmailChanged ? "•" : "")</span>
+                <input type="email" class="ek-input" @bind="editEmail" @bind:event="oninput" @onkeydown="OnEditKeyDown" autocomplete="off" />
+            </label>
+            <label class="ek-field @(LanguageChanged ? "is-changed" : "")">
+                <span>@_loc[nameof(RessourceAppStrings.mailLanguage)] @(LanguageChanged ? "•" : "")</span>
+                <select class="ek-select" @bind="editLanguage">
+                    @foreach (var culture in LocalizerSettings.SupportedCultures) {
+                        <option value="@culture.Culture">@culture.Name</option>
+                    }
+                </select>
+            </label>
+            <div class="ek-edit-actions">
+                <button type="button" class="ek-btn ek-btn-primary" disabled="@(isSaving || !IsDirty)" @onclick="SaveEdit">
+                    @_loc[nameof(RessourceAppStrings.save)]
+                </button>
+                <button type="button" class="ek-btn" disabled="@isSaving" @onclick="CancelEdit">
+                    @(IsDirty ? _loc[nameof(RessourceAppStrings.discard)] : _loc[nameof(RessourceAppStrings.cancel)])
+                </button>
+                @if (IsDirty) {
+                    <span class="ek-edit-state is-dirty">@_loc[nameof(RessourceAppStrings.unsaved)]</span>
+                }
+                else {
+                    <span class="ek-edit-state">@_loc[nameof(RessourceAppStrings.toastNoChanges)]</span>
+                }
+            </div>
+        </div>
+    }
+    else {
+        <div class="ek-person-text">
+            <h4 class="ek-person-name">@Person.Name</h4>
+            @if (Person.Email.Equals("")) {
+                <p class="ek-person-sub ek-muted">@_loc[nameof(RessourceAppStrings.notEntered)]</p>
+            }
+            else {
+                <p class="ek-person-sub">@Person.Email</p>
+            }
+        </div>
+        <span class="ek-amount">@Person.Saldo.ToString()</span>
+        <div class="ek-person-actions">
+            @if (!PositivSaldo) {
+                <button type="button" class="ek-icon-btn ek-icon-warn" @onclick="SendPaymentMail"
+                        title="@_loc[nameof(RessourceAppStrings.emailSubject)]"
+                        aria-label="@_loc[nameof(RessourceAppStrings.emailSubject)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2zm3.708 6.208L1 11.105V5.383zM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2z" />
+                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1.5a.5.5 0 0 1-1 0V11a.5.5 0 0 1 1 0m0 3a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0" />
+                    </svg>
+                </button>
+            }
+            @if (!Person.Email.Equals("")) {
+                <button type="button" class="ek-icon-btn" @onclick="CopyEmail"
+                        title="@_loc[nameof(RessourceAppStrings.copyEmail)]"
+                        aria-label="@_loc[nameof(RessourceAppStrings.copyEmail)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
+                    </svg>
+                </button>
+            }
+            <button type="button" class="ek-icon-btn" @onclick="StartEdit"
+                    title="@_loc[nameof(RessourceAppStrings.editPerson)]"
+                    aria-label="@_loc[nameof(RessourceAppStrings.editPerson)]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
+                </svg>
+            </button>
+            <button type="button" class="ek-icon-btn" @onclick="ToggleDetails"
+                    aria-expanded="@showDetails"
+                    title="@(showDetails ? _loc[nameof(RessourceAppStrings.hideDetails)] : _loc[nameof(RessourceAppStrings.details)])"
+                    aria-label="@(showDetails ? _loc[nameof(RessourceAppStrings.hideDetails)] : _loc[nameof(RessourceAppStrings.details)])">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" class="ek-chevron @(showDetails ? "is-open" : "")">
+                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+                </svg>
+            </button>
+            <button type="button" class="ek-icon-btn ek-icon-warn" @onclick="AskHide"
+                    title="@_loc[nameof(RessourceAppStrings.hidePerson)]"
+                    aria-label="@_loc[nameof(RessourceAppStrings.hidePerson)]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486zM11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829" />
+                    <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z" />
+                </svg>
+            </button>
+        </div>
+        @if (confirmingHide) {
+            <div class="ek-confirm" role="alertdialog" aria-label="@_loc[nameof(RessourceAppStrings.hidePerson)]">
+                <p class="ek-confirm-title">@_loc[nameof(RessourceAppStrings.confirmHide), Person.Name]</p>
+                <p class="ek-confirm-text">@_loc[nameof(RessourceAppStrings.confirmHideHint)]</p>
+                <div class="ek-edit-actions">
+                    <button type="button" class="ek-btn ek-btn-danger" disabled="@isHiding" @onclick="ConfirmHide">
+                        @_loc[nameof(RessourceAppStrings.hide)]
+                    </button>
+                    <button type="button" class="ek-btn" disabled="@isHiding" @onclick="CancelHide">
+                        @_loc[nameof(RessourceAppStrings.cancel)]
+                    </button>
+                </div>
+            </div>
+        }
+        @if (showDetails) {
+            <div class="ek-person-details">
+                <div class="ek-detail-row">
+                    <span class="ek-detail-label">@_loc[nameof(RessourceAppStrings.guid)]</span>
+                    <code class="ek-guid">@Person.Guid</code>
+                    <button type="button" class="ek-icon-btn" @onclick="CopyGuid"
+                            title="@_loc[nameof(RessourceAppStrings.copy)] @_loc[nameof(RessourceAppStrings.guid)]"
+                            aria-label="@_loc[nameof(RessourceAppStrings.copy)] @_loc[nameof(RessourceAppStrings.guid)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z" />
+                            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z" />
+                        </svg>
+                    </button>
+                </div>
+                @if (historyLoading) {
+                    <p class="ek-detail-empty">…</p>
+                }
+                else {
+                    <div class="ek-history">
+                        <div>
+                            <h5 class="ek-history-title">@_loc[nameof(RessourceAppStrings.lastPayments)]</h5>
+                            @if (payments.Count == 0) {
+                                <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.noEntriesYet)]</p>
+                            }
+                            else {
+                                <ul class="ek-history-list">
+                                    @foreach (Payment x in payments) {
+                                        <li>
+                                            <span class="ek-history-date">@x.DateTime.ToString("d")</span>
+                                            <span class="ek-history-text">@x.Comment</span>
+                                            <span class="ek-history-amount">@x.Amount.ToString()</span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                        <div>
+                            <h5 class="ek-history-title">@_loc[nameof(RessourceAppStrings.lastOrders)]</h5>
+                            @if (orders.Count == 0) {
+                                <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.noEntriesYet)]</p>
+                            }
+                            else {
+                                <ul class="ek-history-list">
+                                    @foreach (Order x in orders) {
+                                        <li>
+                                            <span class="ek-history-date">@x.DateTime.ToString("d")</span>
+                                            <span class="ek-history-text">@x.Provider.Designation</span>
+                                            <span class="ek-history-amount">@x.Money.ToString()</span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</article>

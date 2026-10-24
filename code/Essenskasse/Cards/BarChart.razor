@@ -1,0 +1,37 @@
+﻿@using Modells.Statistics
+@inject IStringLocalizer<App> _loc
+
+<figure class="ek-chart">
+    @if (Labels.Count == 0) {
+        <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.statsNoData)]</p>
+    }
+    else {
+        <svg class="ek-chart-svg" viewBox="0 0 @F(Width) @F(Height)" role="img" aria-label="@Title">
+            @foreach (long tick in YTicks) {
+                <line class="ek-chart-grid" x1="@F(Left)" x2="@F(Width - Right)" y1="@F(Y(tick))" y2="@F(Y(tick))" />
+                <SvgLabel X="@F(Left - 8)" Y="@F(Y(tick) + 4)" Anchor="end">@FormatValue(tick)</SvgLabel>
+            }
+            @if (YLow < 0 && YHigh > 0) {
+                <line class="ek-chart-zero" x1="@F(Left)" x2="@F(Width - Right)" y1="@F(Y(0))" y2="@F(Y(0))" />
+            }
+            @for (int i = 0; i < Labels.Count; i++) {
+                @for (int s = 0; s < Series.Count; s++) {
+                    long value = Series[s].Values[i];
+                    <rect class="ek-bar @Series[s].CssClass" x="@F(BarX(i, s))" y="@F(Math.Min(Y(value), Y(0)))" width="@F(BarWidth)"
+                          height="@F(Math.Max(1, Math.Abs(Y(value) - Y(0))))" rx="2">
+                        <title>@Labels[i] – @Series[s].Name: @FormatValue(value)</title>
+                    </rect>
+                }
+                @if (i % LabelStep == 0) {
+                    string label = Labels[i];
+                    <SvgLabel X="@F(GroupCenter(i))" Y="@F(Height - 10)" Anchor="middle">@label</SvgLabel>
+                }
+            }
+        </svg>
+        <figcaption class="ek-legend-row">
+            @foreach (BarSeries series in Series) {
+                <span class="ek-legend-chip"><span class="ek-swatch @series.CssClass"></span>@series.Name</span>
+            }
+        </figcaption>
+    }
+</figure>

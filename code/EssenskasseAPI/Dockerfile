@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 # Modells
 WORKDIR /src/Modells
@@ -19,7 +19,7 @@ FROM build AS publish
 RUN dotnet publish ./EssenskasseAPI/EssenskasseAPI.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 # Laufzeit-Image statt SDK: deutlich kleiner und ohne Build-Werkzeuge
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 EXPOSE 8080

@@ -41,7 +41,41 @@ namespace Essenskasse.Pages {
         private List<Person> person = new List<Person>();
         private List<int> positivSaldo = new List<int>();
 
+        /// <summary>Personen, deren Saldo unter dem Dashboard-Limit liegt.</summary>
+        private List<Person> NoticeablePersons => person.Where((x, i) => !positivSaldo.Contains(i)).ToList();
+
+        /// <summary>Personen, deren Saldo ueber dem Dashboard-Limit liegt.</summary>
+        private List<Person> InconspicuousPersons => person.Where((x, i) => positivSaldo.Contains(i)).ToList();
+
         private Money currentCashBalance = new Money(0, 0);
+
+        /// <summary>Personen, fuer die in dieser Sitzung schon eine Zahlungsaufforderung vorbereitet wurde.</summary>
+        private readonly HashSet<Guid> mailed = [];
+
+        /// <summary>Auffaellige Personen mit E-Mail-Adresse: die Empfaenger der Zahlungsaufforderungen.</summary>
+        private List<Person> MailCandidates => NoticeablePersons.Where(x => !string.IsNullOrWhiteSpace(x.Email)).ToList();
+
+        private int MailDone => MailCandidates.Count(x => mailed.Contains(x.Guid));
+
+        private Person? NextMailPerson => MailCandidates.FirstOrDefault(x => !mailed.Contains(x.Guid));
+
+        /// <summary>Bereitet die Zahlungsaufforderung fuer die naechste Person vor. Das Mailprogramm oeffnet immer eine Mail
+        /// pro Klick (jede Mail hat Namen und Saldo der Person), deshalb geht es Person fuer Person weiter.</summary>
+        private async Task PrepareNextMail() {
+            Person? next = NextMailPerson;
+            if (next is null) {
+                return;
+            }
+            mailed.Add(next.Guid);
+            await PaymentMail.SendAsync(JSRuntime, Texts, _loc, ToastService, next);
+            if (NextMailPerson is null) {
+                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.massMailDone)], ToastLevel.Success);
+            }
+        }
+
+        private void ResetMails() {
+            mailed.Clear();
+        }
 
         protected override async Task OnInitializedAsync() {
             await RequestAllPerson();
@@ -67,6 +101,7 @@ namespace Essenskasse.Pages {
 
             if (response.IsSuccessStatusCode) {
                 person.Clear();
+                positivSaldo.Clear(); // sonst bleiben die Indizes nach "Saldo neu berechnen" veraltet bzw. doppelt erhalten
                 person = JsonConvert.DeserializeObject<List<Person>>(await response.Content.ReadAsStringAsync()) ?? new List<Person>();
                 person.ForEach(x => x.Name = Uri.UnescapeDataString(x.Name));
                 person.ForEach(x => x.Email = Uri.UnescapeDataString(x.Email));
@@ -109,7 +144,7 @@ namespace Essenskasse.Pages {
         }
 
         private async void WriteWishListToLocalStorage(bool value) {
-            await LocalStorage.SetItemAsync<bool>("IsSingleWishListDashboard", value);
+            await UserSettings.SetAsync("IsSingleWishListDashboard", value);
         }
 
         private void CurrentCashBalanceCalculate() {
@@ -133,7 +168,7 @@ namespace Essenskasse.Pages {
         }
 
         private async void WriteNoticableSideToLocalStorage(bool value) {
-            await LocalStorage.SetItemAsync<bool>("NoticeableOnRightSide", value);
+            await UserSettings.SetAsync("NoticeableOnRightSide", value);
         }
     }
 }

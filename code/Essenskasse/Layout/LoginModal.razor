@@ -1,41 +1,15 @@
 ﻿@inject IStringLocalizer<App> _loc
 
-<div class="modal @modalClass" tabindex="-1" role="dialog" style="display:@modalDisplay; overflow-y: auto; color: black;">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Anmeldeformular</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="@_loc[nameof(RessourceAppStrings.close)]" @onclick="Close">
-                </button>
-            </div>
-            <div class="modal-body" style=" background-color: #EFEFEF;">
-                @ChildContent
-            </div>
+@if (isOpen) {
+    <div class="ek-login-backdrop" @onclick="Close"></div>
+    <div class="ek-login" role="dialog" aria-modal="true" aria-labelledby="ek-login-title" tabindex="-1" @onkeydown="OnKeyDown">
+        <div class="ek-login-head">
+            <h2 id="ek-login-title" class="ek-login-title">@Title</h2>
+            <button type="button" class="ek-icon-btn" aria-label="@_loc[nameof(RessourceAppStrings.close)]"
+                    title="@_loc[nameof(RessourceAppStrings.close)]" @onclick="Close">✕</button>
+        </div>
+        <div class="ek-login-body">
+            @ChildContent
         </div>
     </div>
-</div>
-
-@if (showBackdrop) {
-    <div class="modal-backdrop fade show"></div>
-}
-
-@code {
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
-    private string modalDisplay = "none;";
-    private string modalClass = string.Empty;
-    private bool showBackdrop = false;
-
-    public void Open() {
-        modalDisplay = "block";
-        modalClass = "show";
-        showBackdrop = true;
-    }
-
-    public void Close() {
-        modalDisplay = "none";
-        modalClass = string.Empty;
-        showBackdrop = false;
-    }
 }

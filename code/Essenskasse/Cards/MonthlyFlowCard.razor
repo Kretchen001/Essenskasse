@@ -1,0 +1,37 @@
+﻿@using Modells.Statistics
+@inject IStringLocalizer<App> _loc
+
+<details class="ek-stat">
+    <summary class="ek-stat-summary"><h3 class="ek-stat-title">@_loc[nameof(RessourceAppStrings.monthlyFlowTitle)]</h3></summary>
+    <p class="ek-stat-hint">@_loc[nameof(RessourceAppStrings.monthlyFlowHint)]</p>
+    <BarChart Labels="labels" Series="series" Title="@_loc[nameof(RessourceAppStrings.monthlyFlowTitle)]" />
+    @if (months.Count > 0) {
+        <dl class="ek-stat-facts">
+            <div><dt>@_loc[nameof(RessourceAppStrings.factPaymentsTotal)]</dt><dd>@Format(months.Sum(x => x.PaymentCents))</dd></div>
+            <div><dt>@_loc[nameof(RessourceAppStrings.factOrdersTotal)]</dt><dd>@Format(months.Sum(x => x.OrderCents))</dd></div>
+            <div><dt>@_loc[nameof(RessourceAppStrings.factDifference)]</dt><dd>@Format(months.Sum(x => x.NetCents))</dd></div>
+            <div><dt>@_loc[nameof(RessourceAppStrings.factOrdersPerMonth)]</dt><dd>@Format(months.Sum(x => x.OrderCents) / months.Count)</dd></div>
+        </dl>
+    }
+</details>
+
+@code {
+    [Parameter] public StatisticsData Data { get; set; } = default!;
+    [Parameter] public DateTime From { get; set; }
+    [Parameter] public DateTime To { get; set; }
+
+    private List<MonthFlow> months = [];
+    private List<string> labels = [];
+    private List<BarSeries> series = [];
+
+    protected override void OnParametersSet() {
+        months = MonthlyFlow.Build(Data.Payments, Data.Orders, From, To);
+        labels = months.Select(x => x.Month.ToString("MMM yy")).ToList();
+        series = [
+            new BarSeries(_loc[nameof(RessourceAppStrings.exportKindPayment)].Value, months.Select(x => x.PaymentCents).ToList(), "ek-series-1"),
+            new BarSeries(_loc[nameof(RessourceAppStrings.exportKindOrder)].Value, months.Select(x => x.OrderCents).ToList(), "ek-series-0")
+        ];
+    }
+
+    private static string Format(long cents) => Money.FromTotalCents(cents).ToString();
+}

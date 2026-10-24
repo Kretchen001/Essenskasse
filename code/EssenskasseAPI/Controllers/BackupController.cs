@@ -90,12 +90,13 @@ namespace EssenskasseAPI.Controllers {
                 tx.Query("DELETE FROM essenskasse.Person;");
                 foreach (Person x in persons) {
                     string queryStringInsert = $"" +
-                        $"INSERT INTO essenskasse.Person (Guid, Name, Email, SaldoEuro, SaldoCent) " +
-                        $"VALUES (@guid, @name, @email, @euro, @cent);";
+                        $"INSERT INTO essenskasse.Person (Guid, Name, Email, Language, SaldoEuro, SaldoCent) " +
+                        $"VALUES (@guid, @name, @email, @language, @euro, @cent);";
                     tx.Query(queryStringInsert,
                         Db.P("@guid", x.Guid),
                         Db.P("@name", Uri.UnescapeDataString(x.Name)),
                         Db.P("@email", Uri.UnescapeDataString(x.Email)),
+                        Db.P("@language", SettingsSanitizer.SafeLanguage(x.Language)),
                         Db.P("@euro", x.Saldo.Euro),
                         Db.P("@cent", x.Saldo.Cent));
                 }
@@ -116,29 +117,33 @@ namespace EssenskasseAPI.Controllers {
                 tx.Query("DELETE FROM essenskasse.Payment;");
                 foreach (Payment x in payments) {
                     string queryStringInsert = $"" +
-                        $"INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment) " +
-                        $"VALUES (@dateTime, @euro, @cent, @person, @comment);";
+                        $"INSERT INTO essenskasse.Payment (DateTime, AmountEuro, AmountCent, ReferencedPerson, Comment, ReversalOf, ReversedBy) " +
+                        $"VALUES (@dateTime, @euro, @cent, @person, @comment, @reversalOf, @reversedBy);";
                     tx.Query(queryStringInsert,
                         Db.P("@dateTime", x.DateTime.Ticks),
                         Db.P("@euro", x.Amount.Euro),
                         Db.P("@cent", x.Amount.Cent),
                         Db.P("@person", x.ReferencedPerson),
-                        Db.P("@comment", x.Comment));
+                        Db.P("@comment", x.Comment),
+                        Db.P("@reversalOf", x.ReversalOf),
+                        Db.P("@reversedBy", x.ReversedBy));
                 }
             }
             if (orders is not null) {
                 tx.Query("DELETE FROM essenskasse.Order;");
                 foreach (Order x in orders) {
                     string queryStringInsert = $"" +
-                        $"INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson) " +
-                        $"VALUES (@dateTime, @euro, @cent, @providerGuid, @providerDesignation, @person);";
+                        $"INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson, ReversalOf, ReversedBy) " +
+                        $"VALUES (@dateTime, @euro, @cent, @providerGuid, @providerDesignation, @person, @reversalOf, @reversedBy);";
                     tx.Query(queryStringInsert,
                         Db.P("@dateTime", x.DateTime.Ticks),
                         Db.P("@euro", x.Money.Euro),
                         Db.P("@cent", x.Money.Cent),
                         Db.P("@providerGuid", x.Provider.Guid),
                         Db.P("@providerDesignation", x.Provider.Designation),
-                        Db.P("@person", x.ReferencedPerson));
+                        Db.P("@person", x.ReferencedPerson),
+                        Db.P("@reversalOf", x.ReversalOf),
+                        Db.P("@reversedBy", x.ReversedBy));
                 }
             }
             if (transactionProcedures is not null) {
@@ -161,10 +166,12 @@ namespace EssenskasseAPI.Controllers {
                         $"INSERT INTO essenskasse.SettingsUser (UserGuid, isSingleListWishDashboard, " +
                                             $"loadAmountPayment, loadAmountOrder, filterShowProvider, " +
                                             $"dashboardMoneyLimit, filterShowPerson, accessToken, " +
-                                            $"adminEmail, noticeableOnRightSide, sendConfirmationMail) " +
+                                            $"adminEmail, noticeableOnRightSide, sendConfirmationMail, " +
+                                            $"quickAmounts, theme, language, personSort, providerSort, currency) " +
                         $"VALUES (@userGuid, @singleList, @loadPayment, @loadOrder, @showProvider, " +
                                             $"@moneyLimit, @showPerson, @accessToken, " +
-                                            $"@adminEmail, @rightSide, @sendMail);";
+                                            $"@adminEmail, @rightSide, @sendMail, " +
+                                            $"@quickAmounts, @theme, @language, @personSort, @providerSort, @currency);";
                     tx.Query(queryStringInsert,
                         Db.P("@userGuid", x.Item1),
                         Db.P("@singleList", x.Item2.IsSingleListWishDashboard),
@@ -176,7 +183,13 @@ namespace EssenskasseAPI.Controllers {
                         Db.P("@accessToken", x.Item2.AccessToken?.ToString() ?? "00000000-0000-0000-0000-000000000000"),
                         Db.P("@adminEmail", x.Item2.AdminEmail),
                         Db.P("@rightSide", x.Item2.NoticeableOnRightSide),
-                        Db.P("@sendMail", x.Item2.SendConfirmationMail));
+                        Db.P("@sendMail", (int)x.Item2.SendConfirmationMail),
+                        Db.P("@quickAmounts", SettingsSanitizer.QuickAmountsToText(x.Item2.QuickAmounts)),
+                        Db.P("@theme", x.Item2.Theme ?? ""),
+                        Db.P("@language", x.Item2.Language ?? ""),
+                        Db.P("@personSort", x.Item2.PersonSort ?? ""),
+                        Db.P("@providerSort", x.Item2.ProviderSort ?? ""),
+                        Db.P("@currency", x.Item2.Currency ?? ""));
                 }
             }
             tx.Commit();
@@ -205,9 +218,13 @@ namespace EssenskasseAPI.Controllers {
                         euro: long.Parse(row["SaldoEuro"].ToString()!),
                         cent: short.Parse(row["SaldoCent"].ToString()!)
                         )
-                    ));
+                    ) { Language = dataTable.Columns.Contains("Language") ? row["Language"].ToString() ?? "" : "" });
             }
             return personList;
+        }
+
+        private static long? ReadTicks(DataRow row, string column) {
+            return row.Table.Columns.Contains(column) && row[column] is not DBNull ? Convert.ToInt64(row[column]) : null;
         }
 
         private static List<Tuple<Provider, bool>> DataTableToListOfProvider(DataTable dataTable) {
@@ -238,7 +255,7 @@ namespace EssenskasseAPI.Controllers {
                         ),
                     referencedPerson: new Guid(row["ReferencedPerson"].ToString()!),
                     comment: row["Comment"].ToString()!
-                    ));
+                    ) { ReversalOf = ReadTicks(row, "ReversalOf"), ReversedBy = ReadTicks(row, "ReversedBy") });
             }
             return paymentList;
         }
@@ -257,7 +274,7 @@ namespace EssenskasseAPI.Controllers {
                         designation: row["ProviderDesignation"].ToString()!
                         ),
                     referencedPerson: new Guid(row["ReferencedPerson"].ToString()!)
-                    ));
+                    ) { ReversalOf = ReadTicks(row, "ReversalOf"), ReversedBy = ReadTicks(row, "ReversedBy") });
             }
             return ordersList;
         }
@@ -304,8 +321,15 @@ namespace EssenskasseAPI.Controllers {
                             row["accessToken"].ToString() is null ? null : new Guid(row["accessToken"].ToString()!),
                             row["adminEmail"].ToString()!,
                             bool.Parse(row["noticeableOnRightSide"].ToString()!),
-                            bool.Parse(row["sendConfirmationMail"].ToString()!)
-                    )
+                            ConfirmationMailModes.Parse(row["sendConfirmationMail"].ToString())
+                    ) {
+                        QuickAmounts = SettingsSanitizer.QuickAmountsFromText(row["quickAmounts"].ToString()),
+                        Theme = row["theme"].ToString() ?? "",
+                        Language = row["language"].ToString() ?? "",
+                        PersonSort = row["personSort"].ToString() ?? "",
+                        ProviderSort = row["providerSort"].ToString() ?? "",
+                        Currency = row["currency"].ToString() ?? ""
+                    }
                 ));
             }
             return settings;

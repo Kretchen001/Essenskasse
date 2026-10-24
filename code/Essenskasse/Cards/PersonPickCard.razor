@@ -1,0 +1,7 @@
+﻿<button type="button" class="ek-person ek-pick @(PositivSaldo ? "ek-person-ok" : "ek-person-bad")" @onclick="Pick">
+    <span class="ek-avatar" aria-hidden="true">@PersonText.Initials(Person.Name)</span>
+    <span class="ek-person-text">
+        <span class="ek-person-name">@Person.Name</span>
+    </span>
+    <span class="ek-amount">@Person.Saldo.ToString()</span>
+</button>

@@ -12,7 +12,8 @@ namespace Essenskasse.Client {
             ClaimsIdentity identity;
 
             if (IsAuthenticating) {
-                return null;
+                // Waehrend der Anmeldung gilt der Benutzer als anonym (null waere kein gueltiger Zustand fuer Blazor).
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
             else if (IsAuthenticated) {
                 identity = new ClaimsIdentity(new List<Claim>
@@ -26,6 +27,13 @@ namespace Essenskasse.Client {
             }
 
             return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(identity)));
+        }
+
+        /// <summary>Wird ausgeloest, wenn eine Seite den Anmeldedialog oeffnen moechte (z. B. "Zugriff verweigert").</summary>
+        public event Action? LoginRequested;
+
+        public void RequestLogin() {
+            LoginRequested?.Invoke();
         }
 
         public void NotifyAuthenticationStateChanged() {

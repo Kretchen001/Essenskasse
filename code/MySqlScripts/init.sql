@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS essenskasse.Person (
     Email VARCHAR(511),
     SaldoEuro BIGINT,
     SaldoCent SMALLINT,
-    Sichtbar BOOLEAN DEFAULT true
+    Sichtbar BOOLEAN DEFAULT true,
+    Language VARCHAR(8) NOT NULL DEFAULT '' -- Sprache der Mails an die Person, z. B. de-DE (leer = Deutsch)
 );
 
 -- Erstelle die Tabelle für Payment
@@ -14,6 +15,8 @@ CREATE TABLE IF NOT EXISTS essenskasse.Payment (
     AmountCent SMALLINT,
     ReferencedPerson CHAR(36),
     Comment TEXT,
+    ReversalOf BIGINT NULL, -- Stornobuchung: DateTime der stornierten Einzahlung
+    ReversedBy BIGINT NULL, -- stornierte Einzahlung: DateTime der Stornobuchung
     INDEX idx_Payment_ReferencedPerson (ReferencedPerson),
     CONSTRAINT fk_Payment_Person FOREIGN KEY (ReferencedPerson) REFERENCES essenskasse.Person (Guid)
 );
@@ -33,6 +36,8 @@ CREATE TABLE IF NOT EXISTS essenskasse.Order (
     ProviderGuid CHAR(36),
     ProviderDesignation VARCHAR(255),
     ReferencedPerson CHAR(36),
+    ReversalOf BIGINT NULL, -- Stornobuchung: DateTime der stornierten Bestellung
+    ReversedBy BIGINT NULL, -- stornierte Bestellung: DateTime der Stornobuchung
     INDEX idx_Order_ReferencedPerson (ReferencedPerson),
     INDEX idx_Order_ProviderGuid (ProviderGuid),
     CONSTRAINT fk_Order_Person FOREIGN KEY (ReferencedPerson) REFERENCES essenskasse.Person (Guid),
@@ -78,5 +83,11 @@ CREATE TABLE IF NOT EXISTS essenskasse.SettingsUser (
     accessToken CHAR(36) DEFAULT "00000000-0000-0000-0000-000000000000",
     adminEmail VARCHAR(255),
     noticeableOnRightSide BOOLEAN DEFAULT false,
-    sendConfirmationMail BOOLEAN DEFAULT true
+    sendConfirmationMail TINYINT NOT NULL DEFAULT 1, -- 0 = nie, 1 = pro Einzahlung waehlbar, 2 = immer
+    quickAmounts VARCHAR(255) NOT NULL DEFAULT '', -- Schnellbetraege in Cent, kommagetrennt (leer = nichts gespeichert)
+    theme VARCHAR(16) NOT NULL DEFAULT '', -- Light oder Dark (leer = nichts gespeichert)
+    language VARCHAR(16) NOT NULL DEFAULT '', -- z. B. de-DE (leer = nichts gespeichert)
+    personSort VARCHAR(32) NOT NULL DEFAULT '',
+    providerSort VARCHAR(32) NOT NULL DEFAULT '',
+    currency VARCHAR(3) NOT NULL DEFAULT '' -- Waehrung der Anzeige, z. B. EUR (leer = nichts gespeichert)
 );

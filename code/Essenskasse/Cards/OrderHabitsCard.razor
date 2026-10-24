@@ -1,0 +1,62 @@
+﻿@using System.Globalization
+@using Modells.Statistics
+@inject IStringLocalizer<App> _loc
+
+<details class="ek-stat">
+    <summary class="ek-stat-summary"><h3 class="ek-stat-title">@_loc[nameof(RessourceAppStrings.habitsTitle)]</h3></summary>
+    <p class="ek-stat-hint">@string.Format(_loc[nameof(RessourceAppStrings.habitsHint)].Value, OrderHabits.SmallSampleDays)</p>
+    @if (rows.Count == 0) {
+        <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.statsNoData)]</p>
+    }
+    else {
+        <div class="ek-stat-tablewrap">
+            <table class="ek-stat-table ek-habits">
+                <thead>
+                    <tr>
+                        <th>@_loc[nameof(RessourceAppStrings.minusPerson)]</th>
+                        @foreach (int day in order) {
+                            <th class="num">@DayName(day)</th>
+                        }
+                        <th class="num">@_loc[nameof(RessourceAppStrings.habitsOrderDays)]</th>
+                        <th>@_loc[nameof(RessourceAppStrings.habitsFavorite)]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (PersonHabit row in rows) {
+                        <tr>
+                            <td>
+                                @row.Person.Name
+                                @if (row.SmallSample) {
+                                    <span class="ek-habit-warn" title="@_loc[nameof(RessourceAppStrings.habitsSmallSample)]" aria-label="@_loc[nameof(RessourceAppStrings.habitsSmallSample)]">⚠</span>
+                                }
+                            </td>
+                            @foreach (int day in order) {
+                                double p = row.WeekdayProbability[day];
+                                <td class="num ek-habit-cell" style="--ek-heat:@((p * 100).ToString("0", CultureInfo.InvariantCulture))%"
+                                    title="@row.WeekdayDays[day]">@(row.WeekdayDays[day] == 0 ? "–" : p.ToString("P0"))</td>
+                            }
+                            <td class="num">@row.OrderDays</td>
+                            <td>@string.Join(", ", row.TopProviders.Select(x => $"{x.Provider} {x.Share:P0}"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</details>
+
+@code {
+    [Parameter] public StatisticsData Data { get; set; } = default!;
+    [Parameter] public DateTime From { get; set; }
+    [Parameter] public DateTime To { get; set; }
+
+    private static readonly int[] order = [0, 1, 2, 3, 4, 5, 6];
+    private List<PersonHabit> rows = [];
+
+    protected override void OnParametersSet() {
+        rows = OrderHabits.Build(Data, From, To, DateTime.Now);
+    }
+
+    /// <summary>Kurzname des Wochentags (0 = Montag).</summary>
+    private static string DayName(int index) => CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames[(index + 1) % 7];
+}

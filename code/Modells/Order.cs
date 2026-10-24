@@ -17,6 +17,12 @@ namespace Modells {
         /// <summary></summary>
         [JsonInclude]
         public Guid ReferencedPerson{ get; set; } = new Guid();
+        /// <summary>Nur bei einer Stornobuchung: Zeitpunkt (Ticks) der stornierten Bestellung.</summary>
+        [JsonInclude]
+        public long? ReversalOf { get; set; }
+        /// <summary>Nur bei einer stornierten Bestellung: Zeitpunkt (Ticks) der Stornobuchung.</summary>
+        [JsonInclude]
+        public long? ReversedBy { get; set; }
 
         /// <summary></summary>
         public Order () { }

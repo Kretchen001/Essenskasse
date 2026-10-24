@@ -1,0 +1,9 @@
+﻿<text class="ek-chart-axis" x="@X" y="@Y" text-anchor="@Anchor">@ChildContent</text>
+
+@code {
+    // <text> darf in Razor-Codebloecken keine Attribute tragen; dieses Bauteil umgeht das.
+    [Parameter] public string X { get; set; } = "0";
+    [Parameter] public string Y { get; set; } = "0";
+    [Parameter] public string Anchor { get; set; } = "start";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

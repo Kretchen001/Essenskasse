@@ -1,0 +1,83 @@
+﻿/* Themes: Farben und Hintergrund der ganzen App.
+   Alle ek-*-Komponenten lesen die Variablen unten. Hell ist der Standard (body), body.Dark ueberschreibt sie.
+   Jede Seite setzt ueber eine Klasse ek-pg-* einen leicht abweichenden Farbton (--ek-hue, alle im Blaugruen-Bereich);
+   Hintergrund und Seitenleiste folgen ihm. */
+
+body {
+    --ek-hue: 190;
+
+    --ek-bg-base: hsl(var(--ek-hue) 18% 95%);
+    --ek-glow-a: hsl(var(--ek-hue) 55% 55% / 0.11);
+    --ek-glow-b: hsl(calc(var(--ek-hue) + 30) 50% 62% / 0.08);
+    --ek-glow-c: hsl(calc(var(--ek-hue) - 25) 50% 60% / 0.06);
+
+    --ek-surface: #ffffff;
+    --ek-line: #d5dfe0;
+    --ek-line-strong: #b0c2c4;
+    --ek-text: #12292f;
+    --ek-muted: #51696f;
+    --ek-link: #0b6bb5;
+    --ek-ok: #17734f;
+    --ek-ok-tint: #dcf1e6;
+    --ek-bad: #b3263f;
+    --ek-bad-tint: #fbe3e7;
+    --ek-hero-bg: linear-gradient(135deg, #0e3a47 0%, #14606b 100%);
+    --ek-hero-text: #f2f8f7;
+    --ek-hero-muted: #b2cdd2;
+    --ek-pip-ok: #62d4a6;
+    --ek-pip-bad: #ff8c9e;
+    --ek-focus: #1b6ec2;
+
+    color: var(--ek-text);
+    background-color: var(--ek-bg-base);
+    background-image:
+        radial-gradient(60rem 40rem at 0% 0%, var(--ek-glow-a), transparent 70%),
+        radial-gradient(55rem 40rem at 100% 100%, var(--ek-glow-b), transparent 70%),
+        radial-gradient(45rem 30rem at 100% 0%, var(--ek-glow-c), transparent 70%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+body.Dark {
+    --ek-bg-base: hsl(var(--ek-hue) 20% 10%);
+    --ek-glow-a: hsl(var(--ek-hue) 50% 45% / 0.13);
+    --ek-glow-b: hsl(calc(var(--ek-hue) + 30) 45% 50% / 0.09);
+    --ek-glow-c: hsl(calc(var(--ek-hue) - 25) 45% 50% / 0.07);
+
+    --ek-surface: #172428;
+    --ek-line: #2a3e44;
+    --ek-line-strong: #41585f;
+    --ek-text: #e7f0f1;
+    --ek-muted: #9db3b8;
+    --ek-link: #7db8ff;
+    --ek-ok: #6fd6ae;
+    --ek-ok-tint: #1f3d34;
+    --ek-bad: #ff8c9e;
+    --ek-bad-tint: #4a2a32;
+    --ek-hero-bg: linear-gradient(135deg, #0b2f3a 0%, #0f4552 100%);
+    --ek-focus: #7db8ff;
+}
+
+/* Farbton je Seite (Hintergrund und Seitenleiste folgen ihm) */
+body:has(.ek-pg-dashboard) { --ek-hue: 192; }
+body:has(.ek-pg-payment)   { --ek-hue: 172; }
+body:has(.ek-pg-person)    { --ek-hue: 206; }
+body:has(.ek-pg-provider)  { --ek-hue: 222; }
+body:has(.ek-pg-coffee)    { --ek-hue: 160; }
+body:has(.ek-pg-order)     { --ek-hue: 182; }
+body:has(.ek-pg-change)    { --ek-hue: 212; }
+body:has(.ek-pg-settings)  { --ek-hue: 198; }
+
+/* Schaltflaechen ohne eigenes Aussehen folgen dem Theme */
+body button {
+    color: inherit;
+    border-color: var(--ek-line-strong);
+}
+
+a, .btn-link {
+    color: var(--ek-link);
+}
+
+.page, main, article, .content {
+    background: transparent;
+}

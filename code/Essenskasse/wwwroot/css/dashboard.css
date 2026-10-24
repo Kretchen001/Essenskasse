@@ -1,0 +1,380 @@
+﻿/* Dashboard: Kassenstand, Gruppen und Personenkacheln.
+   Farben und Hintergrund kommen als Variablen aus theme.css. */
+
+.ek-dash {
+    color: var(--ek-text);
+    font-family: system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------- Kopfzeile ---------- */
+
+.ek-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.ek-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1rem;
+}
+
+.ek-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+/* Schalter (ersetzt die Bootstrap-Checkbox) */
+.ek-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--ek-text);
+}
+
+    .ek-switch input {
+        position: absolute;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+    }
+
+.ek-switch-track {
+    position: relative;
+    flex: none;
+    width: 2.5rem;
+    height: 1.4rem;
+    border-radius: 999px;
+    background: var(--ek-line-strong);
+    transition: background-color 0.15s;
+}
+
+    .ek-switch-track::after {
+        content: "";
+        position: absolute;
+        top: 0.2rem;
+        left: 0.2rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: #ffffff;
+        transition: transform 0.15s;
+    }
+
+.ek-switch input:checked + .ek-switch-track {
+    background: var(--ek-ok);
+}
+
+    .ek-switch input:checked + .ek-switch-track::after {
+        transform: translateX(1.1rem);
+    }
+
+.ek-switch input:focus-visible + .ek-switch-track {
+    outline: 2px solid var(--ek-focus);
+    outline-offset: 2px;
+}
+
+/* ---------- Kassenstand ---------- */
+
+.ek-hero {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    gap: 1rem 3rem;
+    margin-bottom: 1.75rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 14px;
+    background: var(--ek-hero-bg);
+    color: var(--ek-hero-text);
+}
+
+    .ek-hero p {
+        margin: 0;
+    }
+
+.ek-hero-side {
+    min-width: 0;
+}
+
+@media (max-width: 719.98px) {
+    .ek-hero {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 1rem 1.1rem;
+    }
+}
+
+.ek-hero-label {
+    color: var(--ek-hero-muted);
+    font-size: 1rem;
+}
+
+.ek-hero-amount {
+    margin-top: 0.15rem;
+    font-size: clamp(2.4rem, 7vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Eine Markierung je Person: auffaellige zuerst, dann unauffaellige. */
+.ek-roll {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* Die Markierungen fuellen die Breite des Kassenstand-Blocks (bis zu einer Hoechstbreite je Person). */
+.ek-pip {
+    flex: 1 1 0.6rem;
+    max-width: 5rem;
+    height: 1.9rem;
+    border-radius: 4px;
+}
+
+.ek-pip-ok {
+    background: var(--ek-pip-ok);
+}
+
+.ek-pip-bad {
+    background: var(--ek-pip-bad);
+}
+
+.ek-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    margin-top: 0.65rem !important;
+    color: var(--ek-hero-muted);
+    font-size: 0.95rem;
+}
+
+.ek-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.ek-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+}
+
+.ek-dot-ok {
+    background: var(--ek-pip-ok);
+}
+
+.ek-dot-bad {
+    background: var(--ek-pip-bad);
+}
+
+/* ---------- Gruppen ---------- */
+
+.ek-groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+    gap: 1.5rem 2rem;
+    align-items: start;
+}
+
+    /* "Spalten vertauschen": auffaellige Personen rechts */
+    .ek-groups.ek-swap .ek-group-bad {
+        order: 2;
+    }
+
+.ek-group-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0 0 0.75rem;
+    font-size: 1.15rem;
+    font-weight: 650;
+}
+
+.ek-count {
+    min-width: 1.6rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-group-bad .ek-count {
+    background: var(--ek-bad-tint);
+    color: var(--ek-bad);
+}
+
+.ek-group-ok .ek-count {
+    background: var(--ek-ok-tint);
+    color: var(--ek-ok);
+}
+
+.ek-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 0.6rem;
+}
+
+/* ---------- Personenkachel ---------- */
+
+.ek-person {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    padding: 0.6rem 0.75rem 0.6rem 0.65rem;
+    border: 1px solid var(--ek-line);
+    border-left-width: 4px;
+    border-radius: 10px;
+    background: var(--ek-surface);
+    color: var(--ek-text);
+    transition: border-color 0.15s;
+}
+
+    .ek-person:hover {
+        border-color: var(--ek-line-strong);
+    }
+
+.ek-person-ok {
+    border-left-color: var(--ek-ok);
+}
+
+.ek-person-bad {
+    border-left-color: var(--ek-bad);
+}
+
+    .ek-person-ok:hover {
+        border-left-color: var(--ek-ok);
+    }
+
+    .ek-person-bad:hover {
+        border-left-color: var(--ek-bad);
+    }
+
+.ek-avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+}
+
+.ek-person-ok .ek-avatar {
+    background: var(--ek-ok-tint);
+    color: var(--ek-ok);
+}
+
+.ek-person-bad .ek-avatar {
+    background: var(--ek-bad-tint);
+    color: var(--ek-bad);
+}
+
+.ek-person-name {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 1rem;
+    font-weight: 550;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ek-amount {
+    flex: none;
+    font-size: 1.05rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.ek-person-ok .ek-amount {
+    color: var(--ek-ok);
+}
+
+.ek-person-bad .ek-amount {
+    color: var(--ek-bad);
+}
+
+/* ---------- Knoepfe ---------- */
+
+.ek-mail,
+.ek-btn {
+    font: inherit;
+    cursor: pointer;
+}
+
+.ek-mail {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid var(--ek-line);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ek-muted);
+}
+
+    .ek-mail:hover {
+        border-color: var(--ek-bad);
+        color: var(--ek-bad);
+        background: var(--ek-bad-tint);
+    }
+
+.ek-btn {
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ek-text);
+    font-size: 0.95rem;
+}
+
+    .ek-btn:hover {
+        background: var(--ek-surface);
+        border-color: var(--ek-text);
+    }
+
+.ek-mail:focus-visible,
+.ek-btn:focus-visible {
+    outline: 2px solid var(--ek-focus);
+    outline-offset: 2px;
+}
+
+/* Auf Touch-Geraeten grosse Tippflaechen */
+@media (pointer: coarse) {
+    .ek-btn {
+        min-height: 2.5rem;
+    }
+
+    .ek-mail {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ek-switch-track,
+    .ek-switch-track::after,
+    .ek-person {
+        transition: none;
+    }
+}

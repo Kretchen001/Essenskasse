@@ -1,9 +1,10 @@
-﻿@inject NavigationManager Navi
+﻿@inject LanguageService Language
+@inject TextService Texts
 @inject ILocalStorageService LocalStorage
 @inject IStringLocalizer<App> _loc
 
 <span>
-    <select @onchange="NewCultureSelectedAsync">
+    <select class="ek-select" aria-label="@_loc[nameof(RessourceAppStrings.language)]" @onchange="NewCultureSelectedAsync">
         @foreach (var culture in LocalizerSettings.SupportedCultures) {
             @if (SelectedCulture != null && culture == SelectedCulture) {
                 <option selected value="@culture.Culture">@culture.Name</option>
@@ -14,25 +15,3 @@
         }
     </select>
 </span>
-
-@code {
-    CultureWithName? SelectedCulture = null;
-
-    protected override async Task OnInitializedAsync() {
-        string? culture = await LocalStorage.GetItemAsync<string>("culture");
-        if (culture == "") {
-            SelectedCulture = LocalizerSettings.NeutralCulture;
-        }
-        else {
-            SelectedCulture = (from x in LocalizerSettings.SupportedCultures
-                               where x.Culture == culture
-                               select x).FirstOrDefault();
-        }
-    }
-
-    private async Task NewCultureSelectedAsync(ChangeEventArgs args) {
-        string cultureString = args.Value!.ToString() ?? "de-DE";
-        await LocalStorage.SetItemAsync<string>("culture", cultureString);
-        Navi.NavigateTo(Navi.Uri, true);
-    }
-}

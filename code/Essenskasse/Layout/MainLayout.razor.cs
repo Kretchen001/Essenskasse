@@ -9,21 +9,46 @@ namespace Essenskasse.Layout {
 
     public partial class MainLayout {
 
-        private NavMenu navMenu;
+        private NavMenu navMenu = default!; // wird von @ref in MainLayout.razor gesetzt
 
         private LoginModal? LoginModel { get; set; }
+        private string currentUserName = string.Empty;
         private string nameToLogin = string.Empty;
         private string passwordToLogin = string.Empty;
-        private int roleToLogin = 10;
+        private const int DefaultRole = 10;
+        private int roleToLogin = DefaultRole;
+        private bool showPassword = false;
+        private bool loginFailed = false;
+        private bool isLoggingIn = false;
 
         [CascadingParameter]
-        private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+        private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!; // kommt als CascadingParameter
 
         protected override async Task OnInitializedAsync() {
+            Language.Changed += OnLanguageChanged;
+            Currencies.Changed += OnLanguageChanged;
+            await Language.SyncDocumentLanguageAsync();
+            AuthState.LoginRequested += () => {
+                if (LoginModel is not null) {
+                    ShowLoginModal();
+                    StateHasChanged();
+                }
+            };
             await CheckLogin();
+            await UserSettings.MigrateLegacyAsync();
             await CollectUserThemeAsync();
-            await ReadLocalStorage();
+            await UserSettings.LoadAppDataAsync();
             await navMenu.ReloadNavMenu();
+        }
+
+        /// <summary>Nach einem Sprachwechsel baut sich die Oberflaeche neu auf (der Schluessel am Seitenrahmen aendert sich).</summary>
+        private void OnLanguageChanged() {
+            _ = InvokeAsync(StateHasChanged);
+        }
+
+        public void Dispose() {
+            Language.Changed -= OnLanguageChanged;
+            Currencies.Changed -= OnLanguageChanged;
         }
 
         private void ShowLoginModal() {
@@ -48,6 +73,8 @@ namespace Essenskasse.Layout {
                     response = await HttpClient.SendAsync(httpRequestMessage);
                     if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                         AuthStateService.IsAuthenticated = true;
+                        currentUserName = currentNameOfUser;
+                        UserSettings.UseUser(currentNameOfUser); // ab jetzt gelten die Einstellungen dieses Benutzers
                         string newToken = await response.Content.ReadAsStringAsync();
                         if (newToken.Length > 0) {
                             // Die API antwortet mit einem JSON-String, also in Anfuehrungszeichen.
@@ -67,40 +94,19 @@ namespace Essenskasse.Layout {
             }
         }
 
-        /// <summary> Request the LocalStorage for a saved theme. If no one is found is the light-theme selected. </summary>
+        /// <summary> Request the LocalStorage for the saved theme of the current user. If no one is found is the light-theme selected. </summary>
         private async Task CollectUserThemeAsync() {
-            switch (await LocalStorage.GetItemAsStringAsync("UserTheme")) {
-                case "Dark": {
-                        themeService.ThemeCode = ColorCode.Dark;
-                        break;
-                    }
-                default: { // ^= light-theme
-                        themeService.ThemeCode = ColorCode.Light;
-                        break;
-                    }
-            }
-        }
-
-        /// <summary>Read all Key-Value Pairs from the LocalStorage and bring it to its necessary place.</summary>
-        private async Task ReadLocalStorage() {
-            AppData.IsSingleListWishDashboard = await LocalStorage.GetItemAsync<bool>("IsSingleWishListDashboard");
-            AppData.NoticeableOnRightSide = await LocalStorage.GetItemAsync<bool>("NoticeableOnRightSide");
-            AppData.LoadAmountPayment = await LocalStorage.GetItemAsync<int>("loadAmountOfPayments") == 0 ? 10 : await LocalStorage.GetItemAsync<int>("loadAmountOfPayments");
-            AppData.LoadAmountOrder = await LocalStorage.GetItemAsync<int>("loadAmountOfOrders") == 0 ? 25 : await LocalStorage.GetItemAsync<int>("loadAmountOfOrders");
-            AppData.FilterShowProvider = await LocalStorage.GetItemAsync<bool>("filterShowProvider");
-            AppData.FilterShowPerson = await LocalStorage.GetItemAsync<bool>("filterShowPerson");
-            AppData.AccessToken = await LocalStorage.GetItemAsync<Guid>("AccessToken");
-            AppData.DashboardMoneyLimit = await LocalStorage.GetItemAsync<Money>("DashboardMoneyLimit") ?? new Money(0, 0);
-            if (AppData.AccessToken.Equals(new Guid("00000000-0000-0000-0000-000000000000"))) {
-                AppData.AccessToken = null;
-            }
-            AppData.AdminEmail = await LocalStorage.GetItemAsync<string>("AdminEmail") ?? "";
-            AppData.SendConfirmationMail = await LocalStorage.GetItemAsync<bool>("SendConfirmationMail");
+            themeService.ThemeCode = await UserSettings.ReadThemeAsync();
         }
 
         private async Task LogoutUser() {
             await LocalStorage.RemoveItemAsync("NameOfUser");
             await LocalStorage.RemoveItemAsync("SessionToken");
+            currentUserName = string.Empty;
+            // Danach gelten wieder die geraeteweiten Einstellungen; der Aenderungstoken des Benutzers verschwindet aus dem Programm.
+            UserSettings.UseUser("");
+            await UserSettings.LoadAppDataAsync();
+            await CollectUserThemeAsync();
             AuthStateService.IsAuthenticating = false;
             AuthStateService.IsAuthenticated = false;
             AuthState.NotifyAuthenticationStateChanged();
@@ -121,7 +127,25 @@ namespace Essenskasse.Layout {
         }
         #endregion
 
+        /// <summary>Nach der Anmeldung: eigene lokale Einstellungen laden und einmal beim Server nachfragen.
+        /// Kommt dort nichts (noch nie gespeichert oder nicht erreichbar), wird mit den lokalen bzw. Standardwerten weitergearbeitet.</summary>
+        private async Task LoadUserSettingsAfterLoginAsync(string userName) {
+            UserSettings.UseUser(userName);
+            await UserSettings.MigrateLegacyAsync();
+            await UserSettings.LoadAppDataAsync();
+            await CollectUserThemeAsync();
+            ServerSettingsResult result = await UserSettings.LoadFromServerAsync();
+            if (result == ServerSettingsResult.Applied) {
+                await navMenu.ReloadNavMenu();
+            }
+        }
+
         private async Task LoginUser() {
+            if (isLoggingIn || nameToLogin.Trim().Length == 0 || passwordToLogin.Length == 0) {
+                return;
+            }
+            isLoggingIn = true;
+            loginFailed = false;
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config["API-Adress"] + "user/newTokenForUser"),
@@ -136,23 +160,35 @@ namespace Essenskasse.Layout {
                 response = await HttpClient.SendAsync(httpRequestMessage);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                     AuthStateService.IsAuthenticated = true;
+                    currentUserName = nameToLogin;
                     string newToken = await response.Content.ReadAsStringAsync();
                     await LocalStorage.SetItemAsync<string>("NameOfUser", nameToLogin);
                     await LocalStorage.SetItemAsync<Guid>("SessionToken", new Guid(newToken[1..(newToken.Length - 1)]));
+                    string loggedInName = nameToLogin;
                     ToastService.ShowToast(_loc[nameof(RessourceAppStrings.welcome)], ToastLevel.Success);
+                    nameToLogin = "";
+                    passwordToLogin = "";
+                    roleToLogin = DefaultRole;
+                    showPassword = false;
+                    LoginModel?.Close();
+                    await LoadUserSettingsAfterLoginAsync(loggedInName);
                 }
                 else {
+                    // Dialog bleibt offen, das Passwort wird geleert und der Fokus springt zurueck ins Feld.
                     AuthStateService.IsAuthenticated = false;
-                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.loginFailedRetry)], ToastLevel.Error);
+                    loginFailed = true;
+                    passwordToLogin = "";
+                    if (LoginModel is not null) {
+                        await LoginModel.FocusAsync("ek-login-password");
+                    }
                 }
-                nameToLogin = "";
-                passwordToLogin = "";
-                roleToLogin = short.MaxValue;
                 AuthState.NotifyAuthenticationStateChanged();
             }
             catch {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
+            }
+            finally {
+                isLoggingIn = false;
             }
         }
     }

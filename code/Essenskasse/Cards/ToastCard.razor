@@ -3,70 +3,28 @@
 
 @implements IDisposable
 
-<div class="cs-toast @(_isVisible ? "cs-toast-visible" : null) @_backgroundCssClass">
-    <div class="cs-toast-icon">
-        <i class="fa fa-@_iconCssClass" aria-hidden="true"></i>
-    </div>
-    <div class="cs-toast-body">
-        <h5>@_heading</h5>
-        <p>@_message</p>
-    </div>
-</div>
-
-@code {
-    private string? _heading;
-    private string? _message;
-    private bool _isVisible;
-    private string? _backgroundCssClass;
-    private string? _iconCssClass;
-
-    protected override void OnInitialized () {
-        ToastService.OnShow += ShowToast;
-        ToastService.OnHide += HideToast;
-    }
-
-    private void ShowToast (string message, ToastLevel level) {
-        BuildToastSettings(level, message);
-        _isVisible = true;
-        StateHasChanged();
-    }
-
-    private void HideToast () {
-        _isVisible = false;
-        StateHasChanged();
-    }
-
-    private void BuildToastSettings (ToastLevel level, string message) {
-        switch (level) {
-            case ToastLevel.Info:
-                _backgroundCssClass = $"bg-info";
-                _iconCssClass = "info";
-                _heading = _loc[nameof(RessourceAppStrings.information)];
-                break;
+<div class="ek-toast @_levelCssClass @(_isVisible ? "ek-toast-visible" : null)"
+     role="@(_level == ToastLevel.Error || _level == ToastLevel.Warning ? "alert" : "status")" aria-live="polite">
+    <span class="ek-toast-icon" aria-hidden="true">
+        @switch (_level) {
             case ToastLevel.Success:
-                _backgroundCssClass = $"bg-success";
-                _iconCssClass = "check";
-                _heading = _loc[nameof(RessourceAppStrings.success)];
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M13.485 1.431a1.473 1.473 0 0 1 2.104 2.062l-7.84 9.801a1.473 1.473 0 0 1-2.12.04L.431 8.138a1.473 1.473 0 0 1 2.084-2.083l4.111 4.112 6.82-8.69a.486.486 0 0 1 .04-.045z" /></svg>
                 break;
             case ToastLevel.Warning:
-                _backgroundCssClass = $"bg-warning";
-                _iconCssClass = "exclamation";
-                _heading = _loc[nameof(RessourceAppStrings.warning)];
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2" /></svg>
                 break;
             case ToastLevel.Error:
-                _backgroundCssClass = "bg-danger";
-                _iconCssClass = "times";
-                _heading = _loc[nameof(RessourceAppStrings.error)];
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" /></svg>
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(level), level, null);
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2" /></svg>
+                break;
         }
-
-        _message = message;
-    }
-
-    void IDisposable.Dispose () {
-        ToastService.OnShow -= ShowToast;
-        ToastService.OnHide -= HideToast;
-    }
-}
+    </span>
+    <div class="ek-toast-body">
+        <p class="ek-toast-title">@_heading</p>
+        <p class="ek-toast-text">@_message</p>
+    </div>
+    <button type="button" class="ek-icon-btn" @onclick="HideToast"
+            aria-label="@_loc[nameof(RessourceAppStrings.close)]" title="@_loc[nameof(RessourceAppStrings.close)]">✕</button>
+</div>

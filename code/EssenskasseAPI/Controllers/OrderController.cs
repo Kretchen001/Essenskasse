@@ -142,6 +142,30 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        /// <summary>Je Person die zuletzt bestellte Summe (fuer den Vorschlag im Bestellfenster).</summary>
+        [HttpGet, Route("lastAmounts")]
+        public IActionResult GetLastAmountPerPerson() {
+            using (Operation.Time("TaskDuration")) {
+                string queryString = $"" +
+                    $"SELECT o.* " +
+                    $"FROM essenskasse.Order o " +
+                    $"INNER JOIN (" +
+                    $"  SELECT ReferencedPerson, MAX(DateTime) AS LastDate " +
+                    $"  FROM essenskasse.Order GROUP BY ReferencedPerson" +
+                    $") m ON o.ReferencedPerson = m.ReferencedPerson AND o.DateTime = m.LastDate;";
+                DataTable dataTable = _db.Query(queryString);
+                List<LastOrderAmount> result = [];
+                foreach (Order order in DataTableToListOfOrders(dataTable)) {
+                    result.Add(new LastOrderAmount() {
+                        ReferencedPerson = order.ReferencedPerson,
+                        Money = order.Money,
+                        DateTime = order.DateTime
+                    });
+                }
+                return Ok(JsonConvert.SerializeObject(result));
+            }
+        }
+
         [HttpGet, Route("requestDate")]
         public IActionResult GetCountOfOrdersFromDay([FromHeader] string? dateString) {
             using (Operation.Time("TaskDuration")) {
@@ -267,6 +291,9 @@ namespace EssenskasseAPI.Controllers {
                             Log.Warning($"At {dateAsLong} no Order found");
                             return NotFound("Keine Bestellung zum angegebenen Datum gefunden.");
                         }
+                        if (orders[0].ReversedBy is not null || orders[0].ReversalOf is not null) {
+                            return Conflict("Stornierte Bestellungen und Stornobuchungen koennen nicht geaendert werden.");
+                        }
 
                         bool hasChanges = false;
                         Money oldMoney = orders[0].Money;
@@ -333,6 +360,61 @@ namespace EssenskasseAPI.Controllers {
             }
         }
 
+        /// <summary>Storniert eine Bestellung durch eine Gegenbuchung (negativer Betrag, gleicher Anbieter und gleiche Person),
+        /// statt sie zu loeschen. Die Gegenbuchung bekommt den Zeitpunkt der Bestellung plus einen Tick, damit beide in
+        /// Tages- und Anbieterauswertungen zusammen null ergeben. Die Bestellung wird als storniert markiert, der Saldo korrigiert.</summary>
+        [HttpPut, Route("reverse")]
+        public IActionResult ReverseOrder([FromHeader] Guid? accessToken, [FromHeader] long? dateAsLong) {
+            using (Operation.Time("ReverseOrder")) {
+                Log.Information("ReverseOrder called");
+                if (!HasValidChangeToken(accessToken)) {
+                    Log.Warning("No valid AccessToken in Request");
+                    return BadRequest("No AccessToken in Request");
+                }
+                if (dateAsLong is null) {
+                    return BadRequest("Kein Datum angegeben!");
+                }
+                using DbScope tx = _db.BeginTransaction();
+                List<Order> orders = DataTableToListOfOrders(tx.Query(
+                    "SELECT * FROM essenskasse.Order WHERE DateTime=@dateAsLong FOR UPDATE;", Db.P("@dateAsLong", dateAsLong)));
+                if (orders.Count == 0) {
+                    return NotFound("Keine Bestellung zum angegebenen Datum gefunden.");
+                }
+                Order original = orders[0];
+                if (original.ReversedBy is not null || original.ReversalOf is not null) {
+                    return Conflict("Die Bestellung ist bereits storniert oder selbst eine Stornobuchung.");
+                }
+                if (!PersonExists(tx, original.ReferencedPerson)) {
+                    return NotFound("Person existiert nicht!");
+                }
+                long reversalTicks = original.DateTime.Ticks + 1;
+                while (Convert.ToInt64(tx.Query("SELECT COUNT(*) FROM essenskasse.Order WHERE DateTime=@ticks;", Db.P("@ticks", reversalTicks)).Rows[0][0]) > 0) {
+                    reversalTicks++;
+                }
+                Money negated = new Money(-original.Money.Euro, (short)-original.Money.Cent);
+                Order reversal = new Order(new DateTime(reversalTicks), negated, original.Provider, original.ReferencedPerson) {
+                    ReversalOf = original.DateTime.Ticks
+                };
+                tx.Query("INSERT INTO essenskasse.Order (DateTime, AmountEuro, AmountCent, ProviderGuid, ProviderDesignation, ReferencedPerson, ReversalOf) " +
+                         "VALUES (@dateTime, @euro, @cent, @providerGuid, @providerDesignation, @person, @reversalOf);",
+                    Db.P("@dateTime", reversalTicks),
+                    Db.P("@euro", negated.Euro),
+                    Db.P("@cent", negated.Cent),
+                    Db.P("@providerGuid", original.Provider.Guid),
+                    Db.P("@providerDesignation", original.Provider.Designation),
+                    Db.P("@person", original.ReferencedPerson),
+                    Db.P("@reversalOf", original.DateTime.Ticks));
+                tx.Query("UPDATE essenskasse.Order SET ReversedBy=@reversedBy WHERE DateTime=@dateAsLong;",
+                    Db.P("@reversedBy", reversalTicks),
+                    Db.P("@dateAsLong", original.DateTime.Ticks));
+                // Eine Bestellung bucht den Betrag ab; die Stornierung gibt ihn der Person zurueck.
+                AddToSaldo(tx, original.ReferencedPerson, original.Money);
+                tx.Commit();
+                Log.Information($"Order {original.DateTime.Ticks} reversed by {reversalTicks}");
+                return Ok(JsonConvert.SerializeObject(reversal));
+            }
+        }
+
         [HttpDelete, Route("remove")]
         public IActionResult DeleteOrder([FromHeader] long? dateAsLong) {
             using (Operation.Time("TaskDuration")) {
@@ -350,6 +432,9 @@ namespace EssenskasseAPI.Controllers {
                     if (orders.Count == 0) {
                         Log.Warning($"At {dateAsLong} no Order found");
                         return NotFound("Bestellung konnte nicht gefunden werden!\nFehler in der Eingabe?");
+                    }
+                    if (orders[0].ReversedBy is not null || orders[0].ReversalOf is not null) {
+                        return Conflict("Stornierte Bestellungen und Stornobuchungen koennen nicht geloescht werden.");
                     }
                     string queryStringDelete = $"" +
                         $"DELETE " +
@@ -370,6 +455,19 @@ namespace EssenskasseAPI.Controllers {
         #endregion
 
         #region InternalFunctions
+        /// <summary>Liest eine optionale Zeitangabe (Ticks) aus der Zeile; fehlt die Spalte oder ist sie leer, kommt null.</summary>
+        private static long? ReadTicks(DataRow row, string column) {
+            return row.Table.Columns.Contains(column) && row[column] is not DBNull ? Convert.ToInt64(row[column]) : null;
+        }
+
+        /// <summary>Gilt der Aenderungstoken (und ist nicht die Null-Guid)?</summary>
+        private bool HasValidChangeToken(Guid? accessToken) {
+            if (accessToken is null || accessToken == Guid.Empty) {
+                return false;
+            }
+            DataTable count = _db.Query("SELECT COUNT(*) FROM essenskasse.User WHERE TokenForChange=@accessToken;", Db.P("@accessToken", accessToken));
+            return Convert.ToInt64(count.Rows[0][0]) > 0;
+        }
         private static List<Order> DataTableToListOfOrders(DataTable dataTableOrders) {
             List<Order> ordersList = [];
             foreach (DataRow row in dataTableOrders.Rows) {
@@ -384,7 +482,7 @@ namespace EssenskasseAPI.Controllers {
                         designation: row["ProviderDesignation"].ToString()!
                         ),
                     referencedPerson: new Guid(row["ReferencedPerson"].ToString()!)
-                    ));
+                    ) { ReversalOf = ReadTicks(row, "ReversalOf"), ReversedBy = ReadTicks(row, "ReversedBy") });
             }
             return ordersList;
         }

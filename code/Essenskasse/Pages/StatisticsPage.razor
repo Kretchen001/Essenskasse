@@ -1,0 +1,69 @@
+﻿@page "/statistics"
+
+@inject HttpClient HttpClient
+@inject IConfiguration Config
+@inject IStringLocalizer<App> _loc
+@inject ToastService ToastService
+@inject NavigationManager Nav
+@inject AuthStateService AuthState
+@inject AppDataService AppData
+
+<PageTitle>@_loc[nameof(RessourceAppStrings.statistics)]</PageTitle>
+
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="ek-dash ek-denied" role="alert">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.accessDenied)]</h2>
+            <p class="ek-denied-text">@_loc[nameof(RessourceAppStrings.accessDeniedHint)]</p>
+            <div class="ek-denied-actions">
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="AuthState.RequestLogin">
+                    @_loc[nameof(RessourceAppStrings.signIn)]
+                </button>
+                <button type="button" class="ek-btn" @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    @_loc[nameof(RessourceAppStrings.backToDashboard)]
+                </button>
+            </div>
+        </div>
+    </NotAuthorized>
+    <Authorized>
+        <div class="ek-dash ek-pg-stats">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.statistics)]</h2>
+            <p class="ek-hint">@_loc[nameof(RessourceAppStrings.statsHint)]</p>
+
+            <form class="ek-add ek-stat-range" @onsubmit:preventDefault>
+                <div class="ek-add-fields">
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.exportFrom)]</span>
+                        <input type="date" class="ek-input" @bind="fromDate" />
+                    </label>
+                    <label class="ek-field">
+                        <span>@_loc[nameof(RessourceAppStrings.exportTo)]</span>
+                        <input type="date" class="ek-input" @bind="toDate" />
+                    </label>
+                    <div class="ek-stat-presets" role="group">
+                        <button type="button" class="ek-btn" @onclick="() => SetMonths(3)">@_loc[nameof(RessourceAppStrings.statsRange3)]</button>
+                        <button type="button" class="ek-btn" @onclick="() => SetMonths(12)">@_loc[nameof(RessourceAppStrings.statsRange12)]</button>
+                        <button type="button" class="ek-btn" @onclick="SetAll">@_loc[nameof(RessourceAppStrings.statsRangeAll)]</button>
+                    </div>
+                </div>
+                @if (fromDate.Date > toDate.Date) {
+                    <p class="ek-hint is-error" role="alert">@_loc[nameof(RessourceAppStrings.exportInvalidRange)]</p>
+                }
+            </form>
+
+            @if (loading) {
+                <p class="ek-detail-empty" aria-busy="true">@_loc[nameof(RessourceAppStrings.statsLoading)]</p>
+            }
+            else if (data is null) {
+                <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.statsNoData)]</p>
+            }
+            else if (fromDate.Date <= toDate.Date) {
+                <CashHistoryCard Data="data" From="fromDate" To="toDate" />
+                <MonthlyFlowCard Data="data" From="fromDate" To="toDate" />
+                <ProviderShareCard Data="data" From="fromDate" To="toDate" />
+                <MinusCard Data="data" From="fromDate" To="toDate" LimitCents="AppData.DashboardMoneyLimit.ToTotalCents()" />
+                <OrderHabitsCard Data="data" From="fromDate" To="toDate" />
+            }
+        </div>
+    </Authorized>
+</AuthorizeView>

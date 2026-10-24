@@ -49,6 +49,9 @@ services:
       dockerfile: EssenskasseAPI/Dockerfile
     ports:
       - 8010:8080
+    volumes:
+      # API-Backups (POST api/backup/newNow) landen im Ordner "Backups" neben "code" und ueberstehen so einen Neubau des Containers
+      - ../Backups:/app/backup
     environment:
       # ueberschreibt den Connection String aus der appsettings.json, damit der Container unabhaengig von der lokalen Entwicklungs-Konfiguration ist
       ConnectionStrings__essenskasse: "Server=database;Port=3306;Uid=${DB_USERNAME};Pwd=${DB_PASSWORD};Database=${DB_DATABASE};SslMode=None;"

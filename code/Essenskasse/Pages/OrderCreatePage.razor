@@ -1,7 +1,5 @@
 ﻿@page "/orderCreate"
 
-@using Microsoft.AspNetCore.Components.QuickGrid;
-
 @inject HttpClient HttpClient
 @inject IJSRuntime JSRuntime
 @inject IConfiguration Config
@@ -11,198 +9,267 @@
 @inject AuthStateService AuthState
 @inject NavigationManager Nav
 
-<style>
-    /* Fix height and enable scrolling */
-    .overViewGrid {
-        max-height: 70vh;
-        overflow-y: auto;
-        overflow-x: auto;
-    }
-
-        /* Sticky header while scrolling */
-        .overViewGrid thead {
-            position: sticky;
-            top: 0;
-            background-color: #eee;
-            border-bottom: solid 0.1rem black;
-        }
-
-        /* Subtle stripe effect */
-        .overViewGrid tr:nth-child(even) {
-            background: rgba(205, 205, 205, 0.4);
-        }
-</style>
-
 <PageTitle>@_loc[nameof(RessourceAppStrings.createNewOrder)]</PageTitle>
 
 <AuthorizeView>
     <NotAuthorized>
-        <div class="row">
-            <div class="col-lg-3">
-                Zugriff verweigert!
-            </div>
-            <div class="col-lg-9">
-                <button @onclick="() => Nav.NavigateTo(dashboardLink)">
-                    Rückkehr zum Dashboard
+        <div class="ek-dash ek-denied" role="alert">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.accessDenied)]</h2>
+            <p class="ek-denied-text">@_loc[nameof(RessourceAppStrings.accessDeniedHint)]</p>
+            <div class="ek-denied-actions">
+                <button type="button" class="ek-btn ek-btn-primary" @onclick="AuthState.RequestLogin">
+                    @_loc[nameof(RessourceAppStrings.signIn)]
+                </button>
+                <button type="button" class="ek-btn" @onclick="() => Nav.NavigateTo(dashboardLink)">
+                    @_loc[nameof(RessourceAppStrings.backToDashboard)]
                 </button>
             </div>
         </div>
     </NotAuthorized>
     <Authorized>
-        <BlazorXTabs.XTabs>
-            <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.createNewOrder)]">
+        <div class="ek-dash ek-ord-page ek-pg-order">
+            <h2 class="ek-title">@_loc[nameof(RessourceAppStrings.createNewOrder)]</h2>
 
-                <h2>@_loc[nameof(RessourceAppStrings.createNewOrder)]</h2>
+            <div class="ek-seg ek-seg-neutral ek-ord-tabs" role="tablist">
+                <button type="button" role="tab" class="@(view == OrderView.Order ? "is-active" : "")" aria-selected="@(view == OrderView.Order)"
+                        @onclick="() => ShowView(OrderView.Order)">@_loc[nameof(RessourceAppStrings.orderTabOrder)]</button>
+                <button type="button" role="tab" class="@(view == OrderView.Overview ? "is-active" : "")" aria-selected="@(view == OrderView.Overview)"
+                        @onclick="() => ShowView(OrderView.Overview)">@_loc[nameof(RessourceAppStrings.overview)]</button>
+            </div>
 
-                <div class="row" style="margin-bottom: 1rem; margin-top: 1rem;">
-                    <div class="col-lg-3 align-self-center">
-                        <label>
-                            @_loc[nameof(RessourceAppStrings.date)]
-                        </label>
+            @if (view == OrderView.Order) {
+                <div class="ek-add ek-ord-head">
+                    <div class="ek-field ek-ord-date">
+                        <span>@_loc[nameof(RessourceAppStrings.date)]</span>
+                        <div class="ek-ord-date-row">
+                            @foreach (DateTime day in ThisWeek) {
+                                <button type="button" class="ek-chip ek-day @(selectedDate.Date == day ? "is-active" : "") @(day == DateTime.Today ? "is-today" : "")"
+                                        aria-pressed="@((selectedDate.Date == day).ToString().ToLowerInvariant())"
+                                        title="@day.ToString("D")" @onclick="() => SetDate(day)">
+                                    @DateText.WeekdayDay(day)
+                                </button>
+                            }
+                            <input type="date" class="ek-input" aria-label="@_loc[nameof(RessourceAppStrings.date)]" @bind="SelectedDateValue" />
+                        </div>
                     </div>
-                    <div class="col-lg-9 align-self-center">
-                        <input type="date" @bind-value="selectedDate" />
-                    </div>
-                </div>
-
-                <br />
-
-                <div class="row" style="margin-bottom: 1rem;">
-                    <div class="col-lg-3 align-self-center">
-                        <label>
-                            @_loc[nameof(RessourceAppStrings.provider)]
-                        </label>
-                    </div>
-                    <div class="col-lg-9">
-                        <select class="form-select" @bind="@selectedProvider">
+                    <label class="ek-field ek-ord-provider">
+                        <span>@_loc[nameof(RessourceAppStrings.provider)]</span>
+                        <select class="ek-select" @bind="selectedProvider">
                             @foreach (var x in providers) {
                                 <option value="@x.Guid">@x.Designation</option>
                             }
                         </select>
-                    </div>
+                    </label>
                 </div>
 
-                <br />
-
-                @foreach (int i in Enumerable.Range(0, person.Count)) {
-                    <div class="row" style="margin: 0.1rem; border: 0.1rem inset">
-                        <div class="col-lg-12">
-                            <div class="row"
-                                 style="background-color: @(money[i].Equals(new Money(0, 0)) ? "transparent" : "#B3D9FF")">
-                                <div class="col-lg-8">
-                                    <PersonOrderCard @ref="@personOrderCards[i]" PersonName="@person[i].Name"
-                                                     Money="@money[i]"
-                                                     OnValuesChanged="(ChangedValues => HandleValuesChanged(i, ChangedValues))">
-                                    </PersonOrderCard>
-                                </div>
-                                <div class="col-lg-2 align-self-center">
-                                    <label>
-                                        @money[i].ToString()
-                                    </label>
-                                </div>
-                                <div class="col-lg-2 align-self-center">
-                                    @if (showHistory[i]) {
-                                        <button @onclick="() => LoadAndShowHistory(i)" type="button"
-                                                class="btn btn-info float-end" data-dismiss="modal"
-                                                style="border-radius:8px; margin-top: 2px;">
-                                            @_loc[nameof(RessourceAppStrings.orderHistory)]
-                                            @_loc[nameof(RessourceAppStrings.hide)]
-                                        </button>
-                                    }
-                                    else {
-                                        <button @onclick="() => LoadAndShowHistory(i)" type="button"
-                                                class="btn btn-info float-end" data-dismiss="modal" style="border-radius:8px">
-                                            @_loc[nameof(RessourceAppStrings.orderHistory)]
-                                        </button>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                @if (showHistory[i]) {
-                                    <div style="border: 0.5rem ridge; margin: 0.5rem;">
-                                        <PersonOrderHistoryCard Orders="shownOrders[i]" />
-                                        <div class="row" style="margin: 0.25rem;">
-                                            <div class="col-lg-12">
-                                                <button type="button" class="btn btn-info float-end"
-                                                        style="border-radius:8px; width: fit-content;"
-                                                        @onclick="() => HistoryLoadInModal(i)">
-                                                    @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                <div class="ek-ord-filter">
+                    <div class="ek-search">
+                        <svg class="ek-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                        </svg>
+                        <input type="text" inputmode="search" class="ek-search-input" autocomplete="off"
+                               placeholder="@_loc[nameof(RessourceAppStrings.orderSearchPerson)]"
+                               aria-label="@_loc[nameof(RessourceAppStrings.orderSearchPerson)]"
+                               @bind="personFilter" @bind:event="oninput" />
+                        @if (personFilter.Length > 0) {
+                            <button type="button" class="ek-icon-btn" @onclick="() => personFilter = string.Empty"
+                                    title="@_loc[nameof(RessourceAppStrings.clearSearch)]"
+                                    aria-label="@_loc[nameof(RessourceAppStrings.clearSearch)]">✕</button>
+                        }
                     </div>
-                }
-
-                <br />
-
-                <div class="row justify-content-between">
-                    <button type="button" class="btn-success" data-dismiss="modal" style="border-radius:8px"
-                            @onclick="PostOrderForTheDay">
-                        @_loc[nameof(RessourceAppStrings.submit)] @_loc[nameof(RessourceAppStrings.order)]
+                    <button type="button" class="ek-chip @(onlyFilled ? "is-active" : "")" aria-pressed="@onlyFilled" @onclick="() => onlyFilled = !onlyFilled">
+                        @_loc[nameof(RessourceAppStrings.orderOnlyFilled)] <span class="ek-chip-count">@FilledCount</span>
                     </button>
                 </div>
 
-                @*<button class="btn btn-primary" @onclick="() => ModalDialog.Open()">Click me!</button>*@
-                <HistoryModalCard @ref="@ModalDialog" Title="@ModalTitle">
-                    <div class="row">
-                        <div style="height: 70vh; overflow: scroll">
-                            @foreach (Order x in completeHistoryFromOne) {
-                                <div class="row"
-                                     style="margin-left: 1rem; margin-right: 1rem; border-color: black; border-bottom: solid 0.2px">
-                                    <div class="col-lg-5">
-                                        @x.DateTime.ToString("dddd, dd MMMM yyyy")
-                                    </div>
-                                    <div class="col-lg-2">
-                                        @x.Money.ToString()
-                                    </div>
-                                    <div class="col-lg-5">
-                                        @x.Provider.Designation
-                                    </div>
+                <ul class="ek-ord-list">
+                    @foreach (Person x in ShownPersons) {
+                        Person current = x;
+                        <OrderPersonRow @key="current.Guid" Person="current" SaldoOk="IsInconspicuous(current)"
+                                        Text="@TextOf(current.Guid)" TextChanged="@((string v) => SetText(current.Guid, v))"
+                                        Invalid="IsInvalid(current.Guid)" InputId="@InputIdOf(current)"
+                                        OnEnter="() => FocusNext(current.Guid)"
+                                        Quick="AppData.QuickAmounts" Last="LastOf(current.Guid)"
+                                        OnAddAmount="@((long c) => AddQuick(current.Guid, c))" OnApplyLast="() => ApplyLast(current.Guid)"
+                                        HistoryOpen="openHistory.Contains(current.Guid)" OnToggleHistory="() => ToggleHistory(current)">
+                            @if (openHistory.Contains(current.Guid)) {
+                                <div class="ek-ord-history">
+                                    @if (loadingHistory.Contains(current.Guid)) {
+                                        <ul class="ek-hist" aria-busy="true" aria-live="polite">
+                                            @for (int i = 0; i < 3; i++) {
+                                                <li class="ek-skeleton" aria-hidden="true"><span class="ek-skeleton-line"></span></li>
+                                            }
+                                        </ul>
+                                    }
+                                    else if (HistoryOf(current.Guid).Count == 0) {
+                                        <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.orderNoOrdersYet)]</p>
+                                    }
+                                    else {
+                                        <ul class="ek-hist">
+                                            @foreach (Order o in HistoryOf(current.Guid)) {
+                                                <li>
+                                                    <span class="ek-hist-date">@DateText.WeekdayDate(o.DateTime)</span>
+                                                    <span class="ek-hist-text">@o.Provider.Designation</span>
+                                                    <span class="ek-hist-amount">@o.Money.ToString()</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                        <div class="ek-hist-more">
+                                            <button type="button" class="ek-btn" @onclick="() => HistoryLoadInModal(current)">
+                                                @_loc[nameof(RessourceAppStrings.viewCompleteHistory)]
+                                            </button>
+                                        </div>
+                                    }
                                 </div>
                             }
-                        </div>
-                        <button class="btn btn-primary" @onclick="() => ModalDialog!.Close()">Close</button>
-                    </div>
-                </HistoryModalCard>
-            </BlazorXTabs.XTab>
-            <BlazorXTabs.XTab Title="@_loc[nameof(RessourceAppStrings.overview)]">
-                <h2>@_loc[nameof(RessourceAppStrings.overview)]</h2>
-                <div class="overViewGrid">
-                    @if (orderListForOverview.Count != 0) {
-                        <QuickGrid Items="@orderListForOverview.AsQueryable()">
-                            <PropertyColumn Property="@(p => p.DateTime.ToString("d"))"
-                                            Title="@(orderListForOverview[0].Head[0])" />
-                            @foreach (int i in Enumerable.Range(0, person.Count)) {
-                                <PropertyColumn Property="@(p => OverviewCellFillContent(p.Orders[i]))"
-                                                Title="@(orderListForOverview[0].Head[i + 1])" Class="text-center" />
-                            }
-                        </QuickGrid>
+                        </OrderPersonRow>
                     }
+                </ul>
+                @if (person.Count > 0 && !ShownPersons.Any()) {
+                    <div class="ek-empty">
+                        <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.noMatches)]</p>
+                        <button type="button" class="ek-btn" @onclick="ClearPersonFilter">@_loc[nameof(RessourceAppStrings.resetFilter)]</button>
+                    </div>
+                }
+
+                <div class="ek-ord-bar" role="region" aria-label="@_loc[nameof(RessourceAppStrings.order)]">
+                    <p class="ek-ord-bar-text">
+                        <strong>@Entries.Count</strong> @_loc[nameof(RessourceAppStrings.orderPersonsLabel)]
+                        <span aria-hidden="true">·</span>
+                        @_loc[nameof(RessourceAppStrings.orderSumLabel)] <strong>@Modells.Money.FromTotalCents(TotalCents).ToString()</strong>
+                    </p>
+                    <button type="button" class="ek-btn ek-btn-primary" disabled="@(isSubmitting || Entries.Count == 0)" @onclick="OpenPreview">
+                        @_loc[nameof(RessourceAppStrings.orderReview)]
+                    </button>
                 </div>
 
-                <button type="button" class="btn-primary" data-dismiss="modal"
-                        style="border-radius:8px; margin-top: 1rem; opacity: @OpacityOfNoMoreToLoad%"
-                        disabled="@noMoreToLoad" @onclick="LoadOrdersForOverview">
-                    @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
-                </button>
+                <EkDialog Open="previewOpen" Title="@_loc[nameof(RessourceAppStrings.orderPreviewTitle)]" OnClose="ClosePreview">
+                    <ChildContent>
+                        <p class="ek-ord-prev-meta">
+                            <span>@selectedDate.ToString("D")</span>
+                            <span aria-hidden="true">·</span>
+                            <span>@SelectedProviderData?.Designation</span>
+                        </p>
+                        @if (existingOrdersOnDay > 0) {
+                            <p class="ek-hint is-warn" role="alert">@string.Format(_loc[nameof(RessourceAppStrings.orderExistingWarn)], existingOrdersOnDay)</p>
+                        }
+                        <ul class="ek-ord-prev-list">
+                            @foreach ((Person x, long cents) in Entries) {
+                                <li>
+                                    <span>@x.Name</span>
+                                    <span class="ek-hist-amount">@Modells.Money.FromTotalCents(cents).ToString()</span>
+                                </li>
+                            }
+                        </ul>
+                        <p class="ek-ord-prev-sum">
+                            @_loc[nameof(RessourceAppStrings.orderSumLabel)]: <strong>@Modells.Money.FromTotalCents(TotalCents).ToString()</strong>
+                        </p>
+                    </ChildContent>
+                    <Footer>
+                        <button type="button" class="ek-btn" disabled="@isSubmitting" @onclick="ClosePreview">@_loc[nameof(RessourceAppStrings.cancel)]</button>
+                        <button type="button" class="ek-btn ek-btn-primary" disabled="@isSubmitting" @onclick="ConfirmOrder">@_loc[nameof(RessourceAppStrings.orderConfirmNow)]</button>
+                    </Footer>
+                </EkDialog>
 
-                <hr />
+                <EkDialog Open="historyDialogOpen" Wide="true" Title="@ModalTitle" OnClose="CloseHistoryDialog">
+                    <ChildContent>
+                        @if (completeHistoryFromOne.Count == 0) {
+                            <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.orderNoOrdersYet)]</p>
+                        }
+                        @foreach (IGrouping<DateTime, Order> month in CompleteHistoryByMonth) {
+                            <h4 class="ek-hist-month">@month.Key.ToString("MMMM yyyy")</h4>
+                            <ul class="ek-hist">
+                                @foreach (Order o in month) {
+                                    <li>
+                                        <span class="ek-hist-date">@DateText.WeekdayDate(o.DateTime)</span>
+                                        <span class="ek-hist-text">@o.Provider.Designation</span>
+                                        <span class="ek-hist-amount">@o.Money.ToString()</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </ChildContent>
+                    <Footer>
+                        <button type="button" class="ek-btn" @onclick="CloseHistoryDialog">@_loc[nameof(RessourceAppStrings.close)]</button>
+                    </Footer>
+                </EkDialog>
+            }
+            else {
+                <h3 class="ek-group-title">@_loc[nameof(RessourceAppStrings.overview)]</h3>
+                @if (overviewLoading && overviewDays.Count == 0) {
+                    <ul class="ek-hist" aria-busy="true" aria-live="polite">
+                        @for (int i = 0; i < 4; i++) {
+                            <li class="ek-skeleton" aria-hidden="true"><span class="ek-skeleton-line"></span></li>
+                        }
+                    </ul>
+                }
+                else if (overviewDays.Count == 0) {
+                    <div class="ek-empty">
+                        <p class="ek-empty-title">@_loc[nameof(RessourceAppStrings.orderNoOrdersYet)]</p>
+                    </div>
+                }
+                else {
+                    <div class="ek-ovw-table" tabindex="0" role="region" aria-label="@_loc[nameof(RessourceAppStrings.overviewTableLabel)]">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="ek-ovw-date">@_loc[nameof(RessourceAppStrings.date)]</th>
+                                    @foreach (Person x in overviewPeople) {
+                                        <th scope="col" class="ek-ovw-person" title="@x.Name">@x.Name</th>
+                                    }
+                                    <th scope="col" class="ek-ovw-sum">@_loc[nameof(RessourceAppStrings.orderSumLabel)]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (OrderOverviewDay day in overviewDays) {
+                                    <tr class="@(IsWeekend(day.Date) ? "is-weekend" : "")">
+                                        <th scope="row" class="ek-ovw-date">@DateText.WeekdayDayMonth(day.Date)</th>
+                                        @foreach (Person x in overviewPeople) {
+                                            long cents = CentsOf(day, x);
+                                            <td class="@(cents > 0 ? "has-order" : "no-order")">@(cents > 0 ? Modells.Money.FromTotalCents(cents).ToString() : "–")</td>
+                                        }
+                                        <td class="ek-ovw-sum">@Modells.Money.FromTotalCents(day.TotalCents).ToString()</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
-                <label>
-                    @_loc[nameof(RessourceAppStrings.lastDayMaybyIncomplete)]
-                </label>
+                    <div class="ek-ovw-cards">
+                        @foreach (OrderOverviewDay day in overviewDays) {
+                            <section class="ek-ovw-card @(IsWeekend(day.Date) ? "is-weekend" : "")">
+                                <header>
+                                    <strong>@day.Date.ToString("D")</strong>
+                                    <span class="ek-hist-amount">@Modells.Money.FromTotalCents(day.TotalCents).ToString()</span>
+                                </header>
+                                <ul>
+                                    @foreach (Person x in overviewPeople) {
+                                        long cents = CentsOf(day, x);
+                                        if (cents > 0) {
+                                            <li>
+                                                <span>@x.Name</span>
+                                                <span>@Modells.Money.FromTotalCents(cents).ToString()</span>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            </section>
+                        }
+                    </div>
 
-            </BlazorXTabs.XTab>
-        </BlazorXTabs.XTabs>
+                    <div class="ek-hist-more">
+                        @if (noMoreToLoad) {
+                            <span class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.endOfList)]</span>
+                        }
+                        else {
+                            <button type="button" class="ek-btn" disabled="@overviewLoading" @onclick="LoadOrdersForOverview">
+                                @_loc[nameof(RessourceAppStrings.buttonLoadMore)]
+                            </button>
+                            <p class="ek-hint">@_loc[nameof(RessourceAppStrings.lastDayMaybyIncomplete)]</p>
+                        }
+                    </div>
+                }
+            }
+        </div>
     </Authorized>
 </AuthorizeView>
-
-@code {
-    string dashboardLink = "/";
-}

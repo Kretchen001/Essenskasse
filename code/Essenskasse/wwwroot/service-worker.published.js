@@ -5,6 +5,12 @@ self.importScripts('./service-worker-assets.js');
 self.addEventListener('install', event => event.waitUntil(onInstall(event)));
 self.addEventListener('activate', event => event.waitUntil(onActivate(event)));
 self.addEventListener('fetch', event => event.respondWith(onFetch(event)));
+// Die Seite schickt diese Nachricht, wenn jemand im Hinweis "Neue Version verfuegbar" auf "Aktualisieren" klickt.
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
 
 const cacheNamePrefix = 'offline-cache-';
 // Die Version kommt aus dem Asset-Manifest und aendert sich mit jedem Publish. So wird nach einem Update

@@ -1,0 +1,385 @@
+/* Bestellfenster */
+
+.ek-ord-page {
+    padding-bottom: 1rem;
+}
+
+.ek-ord-tabs {
+    margin: 0.25rem 0 0.9rem;
+}
+
+.ek-dash .ek-seg.ek-seg-neutral button.is-active {
+    background-color: var(--ek-focus);
+    color: #ffffff;
+    font-weight: 650;
+}
+
+.ek-ord-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 0.75rem 1.25rem;
+    margin-top: 0;
+}
+
+.ek-ord-date-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Tage der aktuellen Woche: heute ist unterstrichen, auch wenn ein anderer Tag gewaehlt ist */
+.ek-dash .ek-ord-page .ek-day.is-today {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+@media (max-width: 719.98px) {
+    .ek-ord-head {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Suche und Filter */
+.ek-ord-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1rem;
+}
+
+    .ek-ord-filter .ek-search {
+        flex: 1 1 14rem;
+        margin-top: 0;
+    }
+
+/* Schnellbetrags-Chips */
+.ek-ord-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding-left: 2.9rem;
+}
+
+.ek-dash .ek-ord-chips .ek-chip-last {
+    border-style: dashed;
+    border-color: var(--ek-focus);
+}
+
+.ek-dash .ek-ord-chips .ek-chip:hover {
+    border-color: var(--ek-focus);
+    background-color: rgba(128, 128, 128, 0.16);
+}
+
+@media (max-width: 575.98px) {
+    .ek-ord-chips {
+        padding-left: 0;
+    }
+}
+
+/* Personenzeilen */
+.ek-ord-list {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ek-ord-row {
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--ek-line);
+    border-left-width: 4px;
+    border-radius: 12px;
+    background: var(--ek-surface);
+}
+
+    .ek-ord-row.ek-person-ok {
+        border-left-color: var(--ek-ok);
+    }
+
+    .ek-ord-row.ek-person-bad {
+        border-left-color: var(--ek-bad);
+    }
+
+    .ek-ord-row.is-filled {
+        box-shadow: 0 0 0 1px var(--ek-focus) inset;
+    }
+
+    .ek-ord-row.is-invalid {
+        box-shadow: 0 0 0 2px var(--ek-bad) inset;
+    }
+
+        .ek-ord-row.is-invalid .ek-input {
+            border-color: var(--ek-bad);
+            background: var(--ek-bad-tint);
+        }
+
+.ek-ord-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ek-ord-name {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 8rem;
+    min-width: 0;
+}
+
+    .ek-ord-name .ek-person-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: 600;
+    }
+
+.ek-ord-saldo {
+    color: var(--ek-muted);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-ord-input {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+    .ek-ord-input .ek-input {
+        width: 7.5rem;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+.ek-dash .ek-ord-row .ek-icon-btn {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background-color: transparent;
+    color: var(--ek-muted);
+    cursor: pointer;
+}
+
+    .ek-dash .ek-ord-row .ek-icon-btn:hover,
+    .ek-dash .ek-ord-row .ek-icon-btn.is-open {
+        border-color: var(--ek-focus);
+        color: var(--ek-text);
+        background-color: rgba(128, 128, 128, 0.16);
+    }
+
+.ek-ord-history {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--ek-line);
+}
+
+/* Feste Leiste mit Summe und Absenden */
+.ek-ord-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
+    margin-top: 1rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 12px;
+    background: var(--ek-surface);
+    box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.ek-ord-bar-text {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Bestaetigung */
+.ek-ord-prev-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0 0 0.6rem;
+    color: var(--ek-muted);
+}
+
+.ek-ord-prev-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--ek-line);
+    border-radius: 10px;
+}
+
+    .ek-ord-prev-list li {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.45rem 0.8rem;
+        border-top: 1px solid var(--ek-line);
+    }
+
+        .ek-ord-prev-list li:first-child {
+            border-top: 0;
+        }
+
+.ek-ord-prev-sum {
+    margin: 0.7rem 0 0;
+    text-align: right;
+}
+
+/* Die Theme-Dateien faerben jeden button: Chips und Knoepfe behalten ihre Farben */
+.ek-dash .ek-ord-page .ek-chip:not(.is-active) {
+    background-color: transparent;
+    color: var(--ek-text);
+    border-color: var(--ek-line-strong);
+}
+
+@media (pointer: coarse) {
+    .ek-dash .ek-ord-row .ek-icon-btn {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .ek-ord-main {
+        flex-wrap: wrap;
+    }
+
+    .ek-ord-input .ek-input {
+        width: 6.5rem;
+    }
+}
+
+/* Uebersicht: Tabelle am PC, Tageskarten auf dem Handy */
+.ek-ovw-table {
+    max-height: 70vh;
+    overflow: auto;
+    border: 1px solid var(--ek-line);
+    border-radius: 12px;
+    background: var(--ek-surface);
+}
+
+    .ek-ovw-table table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ek-ovw-table th,
+    .ek-ovw-table td {
+        padding: 0.45rem 0.8rem;
+        border-bottom: 1px solid var(--ek-line);
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .ek-ovw-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: var(--ek-surface);
+        border-bottom: 2px solid var(--ek-line-strong);
+        font-weight: 650;
+    }
+
+    .ek-ovw-table .ek-ovw-date {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background: var(--ek-surface);
+        border-right: 1px solid var(--ek-line);
+        text-align: left;
+        font-weight: 600;
+    }
+
+    .ek-ovw-table thead .ek-ovw-date {
+        z-index: 3;
+    }
+
+    .ek-ovw-table .ek-ovw-person {
+        max-width: 9rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ek-ovw-table .ek-ovw-sum {
+        font-weight: 650;
+        border-left: 1px solid var(--ek-line);
+    }
+
+    .ek-ovw-table td.no-order {
+        color: var(--ek-muted);
+    }
+
+    .ek-ovw-table tr.is-weekend > * {
+        background: rgba(128, 128, 128, 0.12);
+    }
+
+    .ek-ovw-table tbody tr:hover > * {
+        background: rgba(128, 128, 128, 0.2);
+    }
+
+.ek-ovw-cards {
+    display: none;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.ek-ovw-card {
+    border: 1px solid var(--ek-line);
+    border-left-width: 4px;
+    border-left-color: var(--ek-ok);
+    border-radius: 12px;
+    background: var(--ek-surface);
+}
+
+    .ek-ovw-card.is-weekend {
+        border-left-color: var(--ek-line-strong);
+    }
+
+    .ek-ovw-card header {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.6rem 0.9rem;
+    }
+
+    .ek-ovw-card ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .ek-ovw-card li {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.35rem 0.9rem;
+        border-top: 1px solid var(--ek-line);
+        font-variant-numeric: tabular-nums;
+    }
+
+@media (max-width: 719.98px) {
+    .ek-ovw-table {
+        display: none;
+    }
+
+    .ek-ovw-cards {
+        display: flex;
+    }
+}

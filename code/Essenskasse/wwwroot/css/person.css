@@ -1,0 +1,646 @@
+﻿/* Personenseite. Farben und Grundschrift kommen von .ek-dash (siehe dashboard.css). */
+
+/* ---------- Personenliste ---------- */
+
+.ek-search {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 0.35rem 0.5rem 0.35rem 0.85rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 10px;
+    background: var(--ek-surface);
+    color: var(--ek-muted);
+}
+
+    .ek-search:focus-within {
+        border-color: var(--ek-focus);
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 1px;
+    }
+
+.ek-search-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.3rem 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--ek-text);
+    font: inherit;
+}
+
+.ek-search-count {
+    flex: none;
+    color: var(--ek-muted);
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.ek-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ek-text);
+    font: inherit;
+    font-size: 0.92rem;
+    cursor: pointer;
+}
+
+    .ek-chip:hover {
+        border-color: var(--ek-text);
+    }
+
+    .ek-chip.is-active {
+        border-color: transparent;
+        background: var(--ek-hero-bg);
+        color: var(--ek-hero-text);
+    }
+
+    .ek-chip:focus-visible {
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 2px;
+    }
+
+.ek-chip-count {
+    color: var(--ek-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-chip.is-active .ek-chip-count {
+    color: var(--ek-hero-muted);
+}
+
+/* Details: eigene Zeile unter der Kachel */
+.ek-people .ek-person {
+    flex-wrap: wrap;
+}
+
+/* Knoepfe in einer eigenen Zeile unter Name und Saldo, damit sie den Namen nicht verdecken */
+.ek-person-actions {
+    flex: 1 0 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.4rem;
+}
+
+.ek-person-details {
+    flex: 1 0 100%;
+    margin-top: 0.1rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--ek-line);
+}
+
+.ek-detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+}
+
+.ek-detail-label {
+    flex: none;
+    color: var(--ek-muted);
+    font-size: 0.85rem;
+}
+
+.ek-guid {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 0.85rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ek-history {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.75rem 1.25rem;
+    margin-top: 0.75rem;
+}
+
+.ek-history-title {
+    margin: 0 0 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+.ek-history-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+    .ek-history-list li {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.2rem 0;
+        font-size: 0.88rem;
+    }
+
+.ek-history-date {
+    flex: none;
+    color: var(--ek-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-history-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ek-history-amount {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+}
+
+.ek-detail-empty {
+    margin: 0.2rem 0 0;
+    color: var(--ek-muted);
+    font-size: 0.88rem;
+}
+
+.ek-chevron {
+    transition: transform 0.15s;
+}
+
+    .ek-chevron.is-open {
+        transform: rotate(180deg);
+    }
+
+@media (prefers-reduced-motion: reduce) {
+    .ek-chevron {
+        transition: none;
+    }
+}
+
+.ek-btn-danger {
+    border-color: var(--ek-bad);
+    background: var(--ek-bad);
+    color: #ffffff;
+}
+
+    .ek-btn-danger:hover {
+        background: var(--ek-bad);
+        border-color: var(--ek-bad);
+        filter: brightness(0.92);
+    }
+
+.ek-confirm {
+    flex: 1 0 100%;
+    margin-top: 0.1rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--ek-bad);
+    border-radius: 8px;
+    background: var(--ek-bad-tint);
+}
+
+.ek-confirm-title {
+    margin: 0 0 0.2rem;
+    font-weight: 650;
+}
+
+.ek-confirm-text {
+    margin: 0 0 0.6rem;
+    font-size: 0.9rem;
+}
+
+.ek-hidden-toggle {
+    margin-top: 1.5rem;
+}
+
+.ek-people-hidden {
+    margin-top: 0.75rem;
+}
+
+.ek-person-muted {
+    border-left-color: var(--ek-line-strong);
+    opacity: 0.85;
+}
+
+/* Lade- und Leerzustand */
+.ek-empty {
+    padding: 2rem 1rem;
+    border: 1px dashed var(--ek-line-strong);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.ek-empty-title {
+    margin: 0 0 0.35rem;
+    font-size: 1.1rem;
+    font-weight: 650;
+}
+
+.ek-empty-text {
+    margin: 0;
+    color: var(--ek-muted);
+}
+
+.ek-empty .ek-btn {
+    margin-top: 0.6rem;
+}
+
+.ek-skeleton .ek-avatar,
+.ek-skeleton-line {
+    background: var(--ek-line);
+    animation: ek-pulse 1.2s ease-in-out infinite;
+}
+
+.ek-skeleton-line {
+    display: block;
+    height: 0.8rem;
+    margin: 0.35rem 0;
+    border-radius: 4px;
+}
+
+    .ek-skeleton-line.is-short {
+        width: 55%;
+    }
+
+@keyframes ek-pulse {
+    50% {
+        opacity: 0.45;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ek-skeleton .ek-avatar,
+    .ek-skeleton-line {
+        animation: none;
+    }
+}
+
+.ek-kbd {
+    flex: none;
+    padding: 0 0.45rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 5px;
+    color: var(--ek-muted);
+    font: inherit;
+    font-size: 0.8rem;
+}
+
+/* sichtbarer Fokus fuer alle bedienbaren Teile der Personenseite */
+.ek-people .ek-btn:focus-visible,
+.ek-people .ek-icon-btn:focus-visible,
+.ek-chip:focus-visible,
+.ek-select:focus-visible,
+.ek-hidden-toggle:focus-visible,
+.ek-add .ek-btn:focus-visible {
+    outline: 2px solid var(--ek-focus);
+    outline-offset: 2px;
+}
+
+.ek-edit-title {
+    display: none;
+}
+
+/* Touch-Geraete: grosse Tippflaechen, Eingabefelder mit 16px (kein Zoomen auf iOS) */
+@media (pointer: coarse) {
+    .ek-people .ek-icon-btn,
+    .ek-person-details .ek-icon-btn {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+
+    .ek-people .ek-btn,
+    .ek-add .ek-btn,
+    .ek-hidden-toggle {
+        min-height: 2.75rem;
+    }
+
+    .ek-input,
+    .ek-select,
+    .ek-search-input {
+        min-height: 2.75rem;
+        font-size: 1rem;
+    }
+
+    .ek-chip {
+        min-height: 2.5rem;
+    }
+}
+
+/* Schmale Bildschirme: Bearbeiten als Vollbild-Ansicht statt enger Kachel */
+@media (max-width: 575.98px) {
+    .ek-person.is-editing {
+        position: fixed;
+        inset: 0;
+        z-index: 1050;
+        display: block;
+        overflow-y: auto;
+        padding: 1rem 1rem 2rem;
+        border: 0;
+        border-radius: 0;
+        background: var(--ek-surface);
+    }
+
+        .ek-person.is-editing > .ek-avatar {
+            display: none;
+        }
+
+    .ek-person.is-editing .ek-person-edit {
+        gap: 0.9rem;
+        max-width: 32rem;
+        margin: 0 auto;
+    }
+
+    .ek-edit-title {
+        display: block;
+        margin: 0 0 0.25rem;
+        font-size: 1.35rem;
+        font-weight: 650;
+    }
+
+    .ek-person.is-editing .ek-edit-actions .ek-btn {
+        flex: 1 1 8rem;
+        min-height: 2.9rem;
+    }
+
+    .ek-person-details .ek-detail-row {
+        flex-wrap: wrap;
+    }
+
+    .ek-person-details .ek-guid {
+        flex-basis: 100%;
+        order: 3;
+        white-space: normal;
+        word-break: break-all;
+    }
+}
+
+.ek-icon-warn:hover {
+    border-color: var(--ek-bad);
+    color: var(--ek-bad);
+    background: var(--ek-bad-tint);
+}
+
+.ek-add {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem 1.1rem;
+    border: 1px solid var(--ek-line);
+    border-radius: 12px;
+    background: var(--ek-surface);
+}
+
+.ek-add .ek-group-title {
+    margin-bottom: 0.6rem;
+}
+
+.ek-add-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: end;
+}
+
+@media (max-width: 719.98px) {
+    .ek-add-fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.ek-add-single {
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+@media (max-width: 719.98px) {
+    .ek-add-single {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.ek-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 0.5rem 1rem;
+    margin: 0 0 0.6rem;
+}
+
+    .ek-stats dt {
+        color: var(--ek-muted);
+        font-size: 0.85rem;
+    }
+
+    .ek-stats dd {
+        margin: 0;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+
+.ek-hint {
+    margin: 0.6rem 0 0;
+    font-size: 0.9rem;
+}
+
+    .ek-hint.is-warn {
+        color: var(--ek-muted);
+    }
+
+    .ek-hint.is-error {
+        color: var(--ek-bad);
+    }
+
+.ek-list-title {
+    margin-top: 1.75rem;
+}
+
+.ek-select-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ek-muted);
+}
+
+.ek-select {
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 8px;
+    background: var(--ek-surface);
+    color: var(--ek-text);
+    font: inherit;
+}
+
+    .ek-select:focus-visible {
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 2px;
+    }
+
+.ek-people-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1rem 0 0.75rem;
+}
+
+.ek-people {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    align-items: start; /* aufgeklappte Kachel streckt ihre Nachbarn nicht in die Hoehe */
+}
+
+/* Anbieter haben keinen Saldo, daher eine neutrale Farbe fuer Rand und Kuerzel */
+.ek-provider {
+    border-left-color: var(--ek-focus);
+}
+
+    .ek-provider .ek-avatar {
+        background: var(--ek-line);
+        color: var(--ek-text);
+    }
+
+.ek-person-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.ek-person-sub {
+    margin: 0;
+    overflow: hidden;
+    color: var(--ek-muted);
+    font-size: 0.88rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+    .ek-person-sub.ek-muted {
+        font-style: italic;
+    }
+
+/* Bearbeiten in der Kachel */
+.ek-person.is-editing {
+    align-items: flex-start;
+}
+
+.ek-person-edit {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ek-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    color: var(--ek-muted);
+    font-size: 0.85rem;
+}
+
+.ek-field.is-changed {
+    color: var(--ek-text);
+}
+
+    .ek-field.is-changed .ek-input {
+        border-color: var(--ek-ok);
+    }
+
+.ek-edit-state {
+    align-self: center;
+    margin-left: 0.25rem;
+    color: var(--ek-muted);
+    font-size: 0.88rem;
+}
+
+    .ek-edit-state.is-dirty {
+        color: var(--ek-bad);
+        font-weight: 600;
+    }
+
+.ek-input {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--ek-line-strong);
+    border-radius: 8px;
+    background: var(--ek-surface);
+    color: var(--ek-text);
+    font: inherit;
+    font-size: 1rem;
+}
+
+    .ek-input:focus-visible {
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 1px;
+    }
+
+.ek-edit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+/* Kleiner Symbol-Knopf (wie der Mail-Knopf auf dem Dashboard) */
+.ek-icon-btn {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid var(--ek-line);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ek-muted);
+    font: inherit;
+    cursor: pointer;
+}
+
+    .ek-icon-btn:hover {
+        border-color: var(--ek-line-strong);
+        color: var(--ek-text);
+    }
+
+    .ek-icon-btn:focus-visible {
+        outline: 2px solid var(--ek-focus);
+        outline-offset: 2px;
+    }
+
+/* ---------- Kein Zugriff ---------- */
+
+.ek-denied {
+    max-width: 34rem;
+    padding: 1.5rem 0;
+}
+
+.ek-denied-text {
+    margin: 0.5rem 0 1.25rem;
+    color: var(--ek-muted);
+    font-size: 1.05rem;
+}
+
+.ek-denied-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+/* Haupt-Knopf (die Standard-Knoepfe .ek-btn stehen in dashboard.css) */
+.ek-btn-primary {
+    border-color: transparent;
+    background: var(--ek-hero-bg);
+    color: var(--ek-hero-text);
+}
+
+    .ek-btn-primary:hover {
+        background: var(--ek-hero-bg);
+        border-color: var(--ek-line-strong);
+    }

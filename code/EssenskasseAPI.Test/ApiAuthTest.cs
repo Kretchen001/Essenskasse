@@ -10,18 +10,22 @@ namespace EssenskasseAPI.Test {
         private readonly WebApplicationFactory<Program> _factory;
 
         public ApiAuthTest(WebApplicationFactory<Program> factory) {
-            _factory = factory;
+            // Diese Tests laufen ohne Datenbank: das automatische Einspielen der Datenbank-Updates beim Start ist aus.
+            _factory = factory.WithWebHostBuilder(builder => builder.UseSetting("Database:AutoMigrate", "false"));
         }
 
         public static TheoryData<string, string> ProtectedEndpoints => new() {
             { "GET", "api/person/perGuid" },
             { "POST", "api/person/new" },
             { "PUT", "api/person/update" },
+            { "GET", "api/person/requestHidden" },
+            { "PUT", "api/person/restore" },
             { "PUT", "api/person/updateDatabasePersonSaldo" },
             { "DELETE", "api/person/remove" },
             { "GET", "api/order/requestAll" },
             { "POST", "api/order/insertNew" },
             { "PUT", "api/order/update" },
+            { "GET", "api/order/lastAmounts" },
             { "DELETE", "api/order/remove" },
             { "GET", "api/payment/requestAll" },
             { "POST", "api/payment/insertNew" },
@@ -29,7 +33,11 @@ namespace EssenskasseAPI.Test {
             { "DELETE", "api/payment/remove" },
             { "GET", "api/provider/requestAll" },
             { "POST", "api/provider/new" },
-            { "GET", "api/transactionprocedure/all" },
+            { "PUT", "api/provider/update" },
+            { "DELETE", "api/provider/remove" },
+            { "GET", "api/provider/statistics" },
+            { "GET", "api/provider/testExist" },
+            // GET api/transactionprocedure/all ist bewusst oeffentlich (Anzeige der Kaffeekasse ohne Anmeldung).
             { "POST", "api/transactionprocedure/new" },
             { "PUT", "api/user/update" },
             { "GET", "api/user/exist" },

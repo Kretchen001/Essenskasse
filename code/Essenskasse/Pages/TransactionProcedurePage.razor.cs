@@ -1,127 +1,149 @@
 ﻿using Essenskasse.Client;
+using Essenskasse.Client.Services;
 using Essenskasse.Ressources;
+using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Components;
 using Modells;
 using Newtonsoft.Json;
 using System.Text;
 
 namespace Essenskasse.Pages {
 
+    /// <summary>Kaffeekasse: Anzeige fuer alle, Eintragen nur angemeldet.</summary>
     public partial class TransactionProcedurePage {
 
+        private const int PageSize = 25;
+
+        [Inject] private HttpClient HttpClient { get; set; } = default!;
+        [Inject] private IConfiguration Config { get; set; } = default!;
+        [Inject] private ToastService ToastService { get; set; } = default!;
+
         private List<TransactionProcedure> transactions = [];
+        private CoffeeFundSummary.Result summary = CoffeeFundSummary.Summarize([]);
+        private int visibleCount = PageSize;
+        private bool loading = true;
+        private bool loadFailed = false;
+        private bool isBooking = false;
+        private bool previewOpen = false;
 
-        /// <summary>internalValue</summary>
-        private decimal _Amount = 0;
-        private decimal Amount {
-            get {
-                return _Amount;
-            }
-            set {
-                if (value != 0) {
-                    long euro = (long)value;
-                    short cent = (short)((value - euro) * 100);
-                    if (cent < 100) {
-                        _Amount = value;
-                        amountMoney = new Money(euro, cent);
-                    }
-                    else {
-                        // nothing
-                    }
-                }
-            }
-        }
-
-        /// <summary></summary>
-        private Money amountMoney = new Money();
-        
-        /// <summary></summary>
+        /// <summary>false = Einzahlung in die Kasse, true = Auszahlung aus der Kasse.</summary>
+        private bool isPayout = false;
+        private string amountText = "";
         private string comment = "";
 
-        /// <summary></summary>
-        private Money currentCashBalance = new Money(0, 0);
+        private bool AmountEntered => amountText.Trim().Length > 0;
 
-        protected override async Task OnInitializedAsync() {
-            await RequestAllTransactions();
-            CurrentCashBalanceCalculate();
-            base.StateHasChanged();
+        /// <summary>Gueltig ist ein Betrag groesser als 0; die Richtung bestimmt der Umschalter, kein Minuszeichen.</summary>
+        private bool AmountValid => TryGetAmountCents(out _);
+
+        /// <summary>Der Kommentar ist ein Pflichtfeld.</summary>
+        private bool CommentValid => comment.Trim().Length > 0;
+
+        private bool CanBook => AmountValid && CommentValid;
+
+        /// <summary>Der Betrag mit Vorzeichen: Einzahlung positiv, Auszahlung negativ.</summary>
+        private Money SignedAmount {
+            get {
+                TryGetAmountCents(out long cents);
+                return Money.FromTotalCents(isPayout ? -cents : cents);
+            }
         }
 
-        private async Task RequestAllTransactions() {
-            // Request all Person, that are saved in the database
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Config["API-Adress"] + "transactionprocedure/all")
-            };
+        private void OpenPreview() {
+            previewOpen = CanBook;
+        }
 
-            HttpResponseMessage? response = null;
+        private void ClosePreview() {
+            previewOpen = false;
+        }
+
+        /// <summary>Der Kassenstand nach der eingegebenen Buchung.</summary>
+        private Money BalanceAfter {
+            get {
+                TryGetAmountCents(out long cents);
+                long delta = isPayout ? -cents : cents;
+                return Money.FromTotalCents(summary.Balance.ToTotalCents() + delta);
+            }
+        }
+
+        private IEnumerable<IGrouping<DateTime, TransactionProcedure>> ShownByMonth =>
+            transactions.Take(visibleCount).GroupBy(x => new DateTime(x.DateTime.Year, x.DateTime.Month, 1));
+
+        protected override async Task OnInitializedAsync() {
+            await ReloadAsync();
+        }
+
+        private bool TryGetAmountCents(out long cents) {
+            cents = 0;
+            if (MoneyParser.TryParse(amountText, out Money parsed) && parsed.ToTotalCents() > 0) {
+                cents = parsed.ToTotalCents();
+                return true;
+            }
+            return false;
+        }
+
+        private void SetDirection(bool payout) {
+            isPayout = payout;
+            previewOpen = false;
+        }
+
+        private void ShowMore() {
+            visibleCount += PageSize;
+        }
+
+        private async Task ReloadAsync() {
+            loading = true;
+            loadFailed = false;
             try {
-                response = await HttpClient.SendAsync(httpRequestMessage);
+                HttpResponseMessage response = await HttpClient.GetAsync(Config["API-Adress"] + "transactionprocedure/all");
+                if (response.IsSuccessStatusCode) {
+                    transactions = (JsonConvert.DeserializeObject<List<TransactionProcedure>>(await response.Content.ReadAsStringAsync()) ?? [])
+                        .OrderByDescending(x => x.DateTime).ToList();
+                    summary = CoffeeFundSummary.Summarize(transactions);
+                }
+                else {
+                    loadFailed = true;
+                }
             }
             catch {
+                loadFailed = true;
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
             }
-
-            if (response.IsSuccessStatusCode) {
-                transactions.Clear();
-                transactions = JsonConvert.DeserializeObject<List<TransactionProcedure>>(await response.Content.ReadAsStringAsync()) ?? new List<TransactionProcedure>();
-            }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
-            }
+            loading = false;
         }
 
         private async Task InsertNewTransaction() {
-            if (amountMoney.Equals(new Money(0, 0))) {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastMoneyFormatInvalid)], ToastLevel.Warning);
+            if (isBooking || !CanBook || !TryGetAmountCents(out long cents)) {
                 return;
             }
-            // Request all Person, that are saved in the database
-            TransactionProcedure temp = new TransactionProcedure() {
+            isBooking = true;
+            TransactionProcedure entry = new() {
                 DateTime = DateTime.Now,
-                Amount = amountMoney,
-                Comment = comment
+                Amount = Money.FromTotalCents(isPayout ? -cents : cents),
+                Comment = comment.Trim()
             };
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage() {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(Config["API-Adress"] + "transactionprocedure/new"),
-                Content = new StringContent(JsonConvert.SerializeObject(temp), Encoding.UTF8, "application/json")
-            };
-
-            HttpResponseMessage? response = null;
             try {
-                response = await HttpClient.SendAsync(httpRequestMessage);
+                HttpResponseMessage response = await HttpClient.SendAsync(new HttpRequestMessage() {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(Config["API-Adress"] + "transactionprocedure/new"),
+                    Content = new StringContent(JsonConvert.SerializeObject(entry), Encoding.UTF8, "application/json")
+                });
+                if (response.IsSuccessStatusCode) {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.successfullyTransmitted)], ToastLevel.Success);
+                    transactions.Insert(0, entry);
+                    summary = CoffeeFundSummary.Summarize(transactions);
+                    amountText = "";
+                    comment = "";
+                    previewOpen = false;
+                }
+                else {
+                    ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
+                }
             }
             catch {
                 ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)], ToastLevel.Error);
-                return;
             }
-
-            if (response.IsSuccessStatusCode) {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.successfullyTransmitted)], ToastLevel.Success);
-                transactions.Add(temp);
-                CurrentCashBalanceCalculate();
-                base.StateHasChanged();
-            }
-            else {
-                ToastService.ShowToast(_loc[nameof(RessourceAppStrings.toastConnectionError)] + "\n" + _loc[nameof(RessourceAppStrings.toastNothingRequested)], ToastLevel.Warning);
-            }
-        }
-
-        private void CurrentCashBalanceCalculate() {
-            currentCashBalance = new Money(0, 0);
-            foreach (TransactionProcedure x in transactions) {
-                if (x.Amount.IsPositiv()) {
-                    currentCashBalance = new Money().CalculateMoney(CalculationOperation.Addition, currentCashBalance, x.Amount) ?? new Money(0, 0);
-                }
-                else {
-                    Money temp = new Money() {
-                        Euro = Math.Abs(x.Amount.Euro),
-                        Cent = Math.Abs(x.Amount.Cent),
-                    };
-                    currentCashBalance = new Money().CalculateMoney(CalculationOperation.Substraction, currentCashBalance, temp) ?? new Money(0, 0);
-                }
-            }
+            isBooking = false;
         }
     }
 }
