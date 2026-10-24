@@ -348,5 +348,12 @@
         minusPhases,
         minusLongest,
         minusBalance,
+        providerShareTitle,
+        providerShareHint,
+        providerShareName,
+        providerShareShare,
+        providerShareAmount,
+        providerShareCount,
+        providerShareAverage,
     }
 }

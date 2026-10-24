@@ -345,5 +345,12 @@
   "minusDays": "Дней",
   "minusPhases": "Фаз",
   "minusLongest": "Самая длинная (дней)",
-  "minusBalance": "Баланс на конец"
+  "minusBalance": "Баланс на конец",
+  "providerShareTitle": "Доли поставщиков",
+  "providerShareHint": "Заказы по поставщикам за выбранный период, по сумме. Сторнированные заказы вычтены.",
+  "providerShareName": "Поставщик",
+  "providerShareShare": "Доля",
+  "providerShareAmount": "Сумма",
+  "providerShareCount": "Заказов",
+  "providerShareAverage": "В среднем за заказ"
 }

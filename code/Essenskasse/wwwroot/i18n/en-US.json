@@ -345,5 +345,12 @@
   "minusDays": "Days",
   "minusPhases": "Phases",
   "minusLongest": "Longest (days)",
-  "minusBalance": "Closing balance"
+  "minusBalance": "Closing balance",
+  "providerShareTitle": "Provider shares",
+  "providerShareHint": "Orders per provider in the selected period, sorted by amount. Reversed orders are deducted.",
+  "providerShareName": "Provider",
+  "providerShareShare": "Share",
+  "providerShareAmount": "Amount",
+  "providerShareCount": "Orders",
+  "providerShareAverage": "Avg. per order"
 }

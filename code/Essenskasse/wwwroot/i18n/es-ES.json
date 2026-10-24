@@ -345,5 +345,12 @@
   "minusDays": "Días",
   "minusPhases": "Fases",
   "minusLongest": "Más larga (días)",
-  "minusBalance": "Saldo final"
+  "minusBalance": "Saldo final",
+  "providerShareTitle": "Cuotas de los proveedores",
+  "providerShareHint": "Pedidos por proveedor en el periodo seleccionado, ordenados por importe. Los pedidos anulados están descontados.",
+  "providerShareName": "Proveedor",
+  "providerShareShare": "Cuota",
+  "providerShareAmount": "Importe",
+  "providerShareCount": "Pedidos",
+  "providerShareAverage": "Media por pedido"
 }

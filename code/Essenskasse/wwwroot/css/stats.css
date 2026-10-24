@@ -197,3 +197,7 @@ body.Dark .ek-pg-stats {
         height: 100%;
         background: var(--ek-chart-3);
     }
+
+.ek-sharebar > span.is-provider {
+    background: var(--ek-chart-2);
+}

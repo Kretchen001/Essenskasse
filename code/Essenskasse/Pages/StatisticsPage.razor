@@ -60,6 +60,7 @@
             else if (fromDate.Date <= toDate.Date) {
                 <CashHistoryCard Data="data" From="fromDate" To="toDate" />
                 <MonthlyFlowCard Data="data" From="fromDate" To="toDate" />
+                <ProviderShareCard Data="data" From="fromDate" To="toDate" />
                 <MinusCard Data="data" From="fromDate" To="toDate" LimitCents="AppData.DashboardMoneyLimit.ToTotalCents()" />
             }
         </div>

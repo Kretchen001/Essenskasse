@@ -345,5 +345,12 @@
   "minusDays": "Tage",
   "minusPhases": "Phasen",
   "minusLongest": "Längste (Tage)",
-  "minusBalance": "Saldo am Ende"
+  "minusBalance": "Saldo am Ende",
+  "providerShareTitle": "Anteile der Anbieter",
+  "providerShareHint": "Bestellungen je Anbieter im gewählten Zeitraum, nach Summe sortiert. Stornierte Bestellungen sind abgezogen.",
+  "providerShareName": "Anbieter",
+  "providerShareShare": "Anteil",
+  "providerShareAmount": "Summe",
+  "providerShareCount": "Bestellungen",
+  "providerShareAverage": "Ø je Bestellung"
 }
