@@ -328,5 +328,11 @@
   "factEnd": "Balance at end",
   "factChange": "Change",
   "factLowest": "Lowest balance",
-  "factHighest": "Highest balance"
+  "factHighest": "Highest balance",
+  "monthlyFlowTitle": "Payments and orders per month",
+  "monthlyFlowHint": "Total per month. Reversed bookings are already deducted.",
+  "factPaymentsTotal": "Payments in total",
+  "factOrdersTotal": "Orders in total",
+  "factDifference": "Difference",
+  "factOrdersPerMonth": "Orders per month (avg.)"
 }

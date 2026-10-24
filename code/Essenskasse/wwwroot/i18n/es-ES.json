@@ -328,5 +328,11 @@
   "factEnd": "Saldo al final",
   "factChange": "Variación",
   "factLowest": "Saldo más bajo",
-  "factHighest": "Saldo más alto"
+  "factHighest": "Saldo más alto",
+  "monthlyFlowTitle": "Ingresos y pedidos por mes",
+  "monthlyFlowHint": "Suma por mes. Los movimientos anulados ya están descontados.",
+  "factPaymentsTotal": "Ingresos en total",
+  "factOrdersTotal": "Pedidos en total",
+  "factDifference": "Diferencia",
+  "factOrdersPerMonth": "Pedidos por mes (media)"
 }

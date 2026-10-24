@@ -331,5 +331,11 @@
         factChange,
         factLowest,
         factHighest,
+        monthlyFlowTitle,
+        monthlyFlowHint,
+        factPaymentsTotal,
+        factOrdersTotal,
+        factDifference,
+        factOrdersPerMonth,
     }
 }

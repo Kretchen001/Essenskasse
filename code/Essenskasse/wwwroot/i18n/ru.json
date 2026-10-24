@@ -328,5 +328,11 @@
   "factEnd": "Остаток в конце",
   "factChange": "Изменение",
   "factLowest": "Минимальный остаток",
-  "factHighest": "Максимальный остаток"
+  "factHighest": "Максимальный остаток",
+  "monthlyFlowTitle": "Взносы и заказы по месяцам",
+  "monthlyFlowHint": "Сумма за месяц. Сторнированные записи уже вычтены.",
+  "factPaymentsTotal": "Взносы всего",
+  "factOrdersTotal": "Заказы всего",
+  "factDifference": "Разница",
+  "factOrdersPerMonth": "Заказы в месяц (в среднем)"
 }

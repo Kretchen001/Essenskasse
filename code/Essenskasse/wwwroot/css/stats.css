@@ -116,3 +116,39 @@ body.Dark .ek-pg-stats {
         fill: var(--ek-chart-1);
         fill-opacity: 0.1;
     }
+
+.ek-series-0 { --ek-series: var(--ek-chart-1); }
+.ek-series-1 { --ek-series: var(--ek-chart-2); }
+.ek-series-2 { --ek-series: var(--ek-chart-3); }
+.ek-series-3 { --ek-series: var(--ek-chart-4); }
+
+.ek-bar {
+    fill: var(--ek-series);
+}
+
+    .ek-bar:hover {
+        filter: brightness(1.15);
+    }
+
+.ek-legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: 0.5rem;
+    color: var(--ek-muted);
+    font-size: 0.85rem;
+}
+
+.ek-legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.ek-swatch {
+    display: inline-block;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 3px;
+    background: var(--ek-series);
+}

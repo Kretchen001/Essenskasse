@@ -328,5 +328,11 @@
   "factEnd": "Stand am Ende",
   "factChange": "Veränderung",
   "factLowest": "Tiefster Stand",
-  "factHighest": "Höchster Stand"
+  "factHighest": "Höchster Stand",
+  "monthlyFlowTitle": "Einzahlungen und Bestellungen pro Monat",
+  "monthlyFlowHint": "Summe je Monat. Stornierte Buchungen sind bereits abgezogen.",
+  "factPaymentsTotal": "Einzahlungen gesamt",
+  "factOrdersTotal": "Bestellungen gesamt",
+  "factDifference": "Differenz",
+  "factOrdersPerMonth": "Bestellungen pro Monat (Ø)"
 }
