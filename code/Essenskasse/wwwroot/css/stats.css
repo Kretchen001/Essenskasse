@@ -210,3 +210,51 @@ body.Dark .ek-pg-stats {
     margin-left: 0.3rem;
     cursor: help;
 }
+
+/* Ein- und ausklappbare Bereiche (standardmaessig eingeklappt) */
+.ek-stat-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+    .ek-stat-summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .ek-stat-summary::before {
+        content: "";
+        flex: none;
+        width: 0.55rem;
+        height: 0.55rem;
+        border-right: 2px solid var(--ek-muted);
+        border-bottom: 2px solid var(--ek-muted);
+        transform: rotate(-45deg);
+        transition: transform 0.15s;
+    }
+
+.ek-stat[open] > .ek-stat-summary::before {
+    transform: rotate(45deg);
+}
+
+.ek-stat-summary .ek-stat-title {
+    margin: 0;
+}
+
+.ek-stat[open] > .ek-stat-summary {
+    margin-bottom: 0.4rem;
+}
+
+.ek-stat-summary:focus-visible {
+    outline: 2px solid var(--ek-chart-1);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ek-stat-summary::before {
+        transition: none;
+    }
+}

@@ -2,8 +2,8 @@
 @using Modells.Statistics
 @inject IStringLocalizer<App> _loc
 
-<section class="ek-stat">
-    <h3 class="ek-stat-title">@_loc[nameof(RessourceAppStrings.habitsTitle)]</h3>
+<details class="ek-stat">
+    <summary class="ek-stat-summary"><h3 class="ek-stat-title">@_loc[nameof(RessourceAppStrings.habitsTitle)]</h3></summary>
     <p class="ek-stat-hint">@string.Format(_loc[nameof(RessourceAppStrings.habitsHint)].Value, OrderHabits.SmallSampleDays)</p>
     @if (rows.Count == 0) {
         <p class="ek-detail-empty">@_loc[nameof(RessourceAppStrings.statsNoData)]</p>
@@ -43,7 +43,7 @@
             </table>
         </div>
     }
-</section>
+</details>
 
 @code {
     [Parameter] public StatisticsData Data { get; set; } = default!;

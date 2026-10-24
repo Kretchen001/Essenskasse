@@ -1,8 +1,8 @@
 ﻿@using Modells.Statistics
 @inject IStringLocalizer<App> _loc
 
-<section class="ek-stat">
-    <h3 class="ek-stat-title">@_loc[nameof(RessourceAppStrings.monthlyFlowTitle)]</h3>
+<details class="ek-stat">
+    <summary class="ek-stat-summary"><h3 class="ek-stat-title">@_loc[nameof(RessourceAppStrings.monthlyFlowTitle)]</h3></summary>
     <p class="ek-stat-hint">@_loc[nameof(RessourceAppStrings.monthlyFlowHint)]</p>
     <BarChart Labels="labels" Series="series" Title="@_loc[nameof(RessourceAppStrings.monthlyFlowTitle)]" />
     @if (months.Count > 0) {
@@ -13,7 +13,7 @@
             <div><dt>@_loc[nameof(RessourceAppStrings.factOrdersPerMonth)]</dt><dd>@Format(months.Sum(x => x.OrderCents) / months.Count)</dd></div>
         </dl>
     }
-</section>
+</details>
 
 @code {
     [Parameter] public StatisticsData Data { get; set; } = default!;
